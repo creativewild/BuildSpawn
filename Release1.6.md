@@ -1,10 +1,5 @@
 # Buildspawn 1.6 (build 2.589-buildspawn.15)
 
-Buildspawn by [Luis Gomes](https://github.com/creativewild). Installing it over 1.5 keeps your settings and data.
-Everything in the 1.5 notes (`..\1.5\NOTES-2.589-buildspawn.14.md`) is included.
-
-How to start it on each system: `START-buildspawn-1.6.html` in this folder.
-
 ## New in 1.6
 
 ### Personal machines: run builds on your own computer
@@ -56,12 +51,3 @@ How to start it on each system: `START-buildspawn-1.6.html` in this folder.
 ## Fixed during testing
 - A style rule on the agents list could not be read by older browsers and test tools; it is written so they
   can read it.
-
-## Good to know
-- Java 21.0.13.1 (Temurin) is bundled with every server package and agent download, as in 1.5.
-- Saved settings, IDs and permission entries are unchanged, so existing jobs, credentials and permissions keep
-  working.
-- To serve Buildspawn under a path such as `https://your-host/buildspawn/`, add `--prefix=/buildspawn` to the
-  extra arguments (Windows app: Settings › Advanced; or `arguments=` in `buildspawn.cfg`), then set the
-  server URL in Settings › General.
-- Full test run: plans/SUITE_RESULTS_2026-11-24.md in the source tree.
