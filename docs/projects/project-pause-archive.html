@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pause and archive · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/project-pause-archive">
+<main class="doc">
+<h1>Pause and archive</h1>
+<p class="lead">Stop a whole project from starting builds, or take it out of use without deleting anything.</p>
+<figure class="shot">
+  <img src="../../assets/shots/projects/project-pause.png" alt="The Pause and archive tab of the Game project">
+  <figcaption>The Pause and archive tab.</figcaption>
+</figure>
+<h2>Pause</h2><p>Pause stops triggers and polling for everything in the project. A person can still press <strong>Run</strong>. Use it for a branch freeze, a Perforce maintenance window or a license problem.</p><ol class="steps">
+  <li>Open the project and click <strong>Pause and archive</strong>.</li>
+  <li>Under <strong>Pause</strong> type the reason in <strong>Why it is paused</strong>.</li>
+  <li>Click <strong>Pause</strong>. The page says <em>Paused by Dana on 27 Nov 2026</em>.</li>
+  <li>To end it click <strong>Resume</strong>.</li>
+</ol>
+<p>Builds that already run finish. Everything below the project is paused too. A build configuration shows <em>Paused from above</em>, with the name of the project and who paused it. Resume it on the project where the pause was set.</p><h2>Archive</h2><p>Archive takes a project and everything below it out of use. It cannot be run by triggers, polling, the REST API or the command line. Builds that wait for it are removed from the queue. Nothing is deleted: every build, log and setting stays. <strong>Unarchive</strong> brings it back.</p><ol class="steps">
+  <li>Open the project and click <strong>Pause and archive</strong>.</li>
+  <li>Under <strong>Archive</strong> click <strong>Archive</strong> and confirm.</li>
+</ol>
+<div class="callout note"><p>Archiving needs the Configure permission on the project. When project roles are in use, you also need the right to manage its roles.</p></div><h2>What is inherited</h2><table>
+  <thead><tr><th>State</th><th>What the build configurations inside get</th></tr></thead>
+  <tbody>
+    <tr><td>Not paused</td><td>They run normally.</td></tr>
+    <tr><td>Paused here or above</td><td>No triggers and no polling. Manual runs still work. The state says where it was set.</td></tr>
+    <tr><td>Archived here or above</td><td>Cannot be run in any way. The state says <em>Archived because Game is archived</em>.</td></tr>
+  </tbody>
+</table>
+<p>A single build configuration has its own <strong>Pause</strong> tab with the same pause. Moving something into an archived project is refused.</p><h2>What you see</h2><p>A banner at the top of the paused or archived project, and a state chip in lists. The state page shows the current state: <em>Not paused</em>, <em>Paused</em>, <em>Paused from above</em>, <em>Archived</em>.</p><h2>Problems and fixes</h2><table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>A build configuration is paused and I cannot resume it</td><td>The pause was set higher up. Resume on the project named on the page.</td></tr>
+    <tr><td>Resume does nothing for a build that was paused</td><td>It may be paused on its own tab as well. Check both.</td></tr>
+    <tr><td>I cannot archive</td><td>You need Configure on the project and, with project roles, the right to manage roles.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="projects.html">Projects</a></li>
+  <li><a href="../how-to/projects-pause-project.html">Pause a whole project</a></li>
+  <li><a href="project-move-delete.html">Moving and deleting</a></li>
+</ul>
+</main>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parameters · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="parameters/parameters">
+<main class="doc">
+<h1>Parameters</h1>
+<p class="lead">Parameters are named values your steps can use. You set them once on a build configuration or a project, and you can change them each time you run a build.</p>
+
+<p>A parameter has a <strong>name</strong>, a <strong>value</strong>, a <strong>kind</strong> and a <strong>value type</strong>. The kind decides where the value goes: into <code>%name%</code> references, into the environment of every step, or to your build tools. The value type decides what people can type in the <a href="../running-builds/run-dialog.html">Run dialog</a>: free text, a checkbox, a list or a password.</p>
+
+<h2>The Parameters tab</h2>
+<p>Every build configuration has its parameters on <strong>Settings › Parameters</strong>. Projects have the same page in their settings, and what a project defines passes down to everything inside it.</p>
+<figure class="shot">
+  <img src="../../assets/shots/parameters/parameters-tab.png" alt="The Parameters tab of the Windows Build: filter chips All, Configuration, Environment and System, and a table with CONFIG, CLEAN, system.pool.priority and a masked STEAM_UPLOAD_KEY">
+  <figcaption>The Parameters tab. Each row shows the value, the kind, where the parameter is defined and when it is set.</figcaption>
+</figure>
+<p>The table has these columns:</p>
+<table>
+  <thead><tr><th>Column</th><th>What it shows</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Name</strong></td><td>The name, with its prefix (<code>env.</code> or <code>system.</code>) if it has one.</td></tr>
+    <tr><td><strong>Value</strong></td><td>The default value. Passwords always show as dots.</td></tr>
+    <tr><td><strong>Kind</strong></td><td>Configuration, Environment or System. See <a href="#kinds">The three kinds</a>.</td></tr>
+    <tr><td><strong>Defined in</strong></td><td><em>This job</em>, or the project it comes from.</td></tr>
+    <tr><td><strong>When it is set</strong></td><td><em>Asked when the build runs</em> (people can change it in the Run dialog) or <em>Fixed value</em>, and the value type.</td></tr>
+  </tbody>
+</table>
+<p>Use the chips <strong>All</strong>, <strong>Configuration</strong>, <strong>Environment</strong> and <strong>System</strong> to filter the list, or type in <strong>Search parameters</strong>. Press <kbd>/</kbd> to jump to the search box.</p>
+<div class="callout note"><p>The Parameters tab saves as you work. There is no Save button: when you close the parameter dialog with <strong>Save</strong>, the change is stored.</p></div>
+
+<h2 id="kinds">The three kinds</h2>
+<p>The kind is part of the name. You pick it in the dialog, and Buildspawn adds the prefix for you.</p>
+<table>
+  <thead><tr><th>Kind</th><th>Name</th><th>Where the value goes</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Configuration</strong></td><td><code>NAME</code></td><td>Read in steps and runner fields as <code>%NAME%</code>.</td></tr>
+    <tr><td><strong>Environment</strong></td><td><code>env.NAME</code></td><td>Passed to the process of every step as the environment variable <code>NAME</code>. A step can override it for itself.</td></tr>
+    <tr><td><strong>System</strong></td><td><code>system.NAME</code></td><td>Passed to build tools, for example to Maven as <code>-DNAME=value</code>. Not put in the process environment.</td></tr>
+  </tbody>
+</table>
+
+<h3>Configuration parameters</h3>
+<p>A configuration parameter is the everyday kind. Write <code>%CONFIG%</code> in a runner field or in a script, and Buildspawn puts the value there when the build runs. For example, the Windows Build passes its build type to a script like this:</p>
+<pre><code>powershell -File Build\ci.ps1 -Stage compile -Platform Win64 -Config %CONFIG%</code></pre>
+<p>The script editor helps you: type <code>%</code> and it lists the parameters of the build. A name it does not know gets a hint. See <a href="../build-steps/script-editor.html">The script editor</a>.</p>
+
+<h3>env. parameters</h3>
+<p>An <code>env.</code> parameter becomes an environment variable. Name it <code>env.UE_SDK_ROOT</code> and every step sees <code>UE_SDK_ROOT</code>. Use this for tools that read their settings from the environment.</p>
+<pre><code>rem In a batch step
+echo SDK is in %UE_SDK_ROOT%
+
+# In a shell step
+echo "SDK is in $UE_SDK_ROOT"</code></pre>
+
+<h3>system. parameters</h3>
+<p>A <code>system.</code> parameter is a property for build tools. Maven steps get it as <code>-D</code>. Other steps don't see it in their environment, but you can still read it as <code>%system.NAME%</code> in a field.</p>
+
+<h2>Add or edit a parameter</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Parameters</strong>.</li>
+  <li>Click <strong>Add parameter</strong>, or <strong>Edit</strong> on a row.</li>
+  <li>Type the <strong>Name</strong>. Don't type the prefix: choose the <strong>Kind</strong> instead. Names must be unique in a build configuration.</li>
+  <li>Choose the <strong>Value type</strong> and fill in the value (see below).</li>
+  <li>Optional: open <strong>Customize the run dialog</strong> to set the label, description and display.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<h3>Value types</h3>
+<table>
+  <thead><tr><th>Value type</th><th>What people can enter</th><th>Options</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Text</strong></td><td>Any text.</td><td><strong>Any</strong>, <strong>Not empty</strong>, or <strong>Regex</strong>: the whole value must match the pattern, with your own <strong>Message when it does not match</strong>.</td></tr>
+    <tr><td><strong>Checkbox</strong></td><td>On or off.</td><td>The <strong>Checked value</strong> and <strong>Unchecked value</strong>, for example <code>true</code> / <code>false</code> or <code>-clean</code> / empty.</td></tr>
+    <tr><td><strong>Password</strong></td><td>A secret.</td><td>Stored encrypted and never shown again. See <a href="secrets.html">Secrets and Vault</a>.</td></tr>
+    <tr><td><strong>Select</strong></td><td>One item from a list, or several.</td><td><strong>Items</strong>, one per line, as <code>label =&gt; value</code> or just <code>value</code>. <strong>Allow multiple</strong> and a <strong>Value separator</strong> (a comma if empty).</td></tr>
+    <tr><td><strong>Remote</strong></td><td>Nothing: the value is fetched when the build starts.</td><td>A <strong>Source</strong>, such as HashiCorp Vault, and a query. See <a href="secrets.html#vault">Vault</a>.</td></tr>
+  </tbody>
+</table>
+<p>Example items for a Select parameter:</p>
+<pre><code>Development
+Shipping
+Debug build =&gt; Debug</code></pre>
+
+<h3>Customize the run dialog</h3>
+<table>
+  <thead><tr><th>Setting</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Display</strong></td><td><strong>Normal</strong> shows the field. <strong>Hidden</strong> leaves it out of the Run dialog. <strong>Prompt</strong> makes the <strong>Run</strong> button open the Run dialog every time, so people must look at the value.</td></tr>
+    <tr><td><strong>Label</strong></td><td>Shown in the Run dialog in place of the name.</td></tr>
+    <tr><td><strong>Description</strong></td><td>Shown under the field in the Run dialog.</td></tr>
+    <tr><td><strong>Read-only</strong></td><td>The configured value is always used. Nobody can change it when they start a build.</td></tr>
+  </tbody>
+</table>
+<div class="callout warning"><p><strong>Hidden</strong> is not protection. Anyone who can read the build configuration can still see the value. Use a <a href="secrets.html">password parameter</a> for secrets.</p></div>
+<p>The rules of a parameter count everywhere a build can start: the Run dialog, a trigger, the REST API and the command line. A value that breaks the rules is refused, and the build does not start.</p>
+
+<h2>One page for every type</h2>
+<table>
+  <thead><tr><th>Page</th><th>What it covers</th></tr></thead>
+  <tbody>
+    <tr><td><a href="param-typed.html">Parameter with a value type</a></td><td>The Add parameter form and all its value types.</td></tr>
+    <tr><td><a href="param-string.html">String</a>, <a href="param-multiline.html">Multi-line string</a></td><td>Text values.</td></tr>
+    <tr><td><a href="param-boolean.html">Boolean</a>, <a href="param-choice.html">Choice</a></td><td>A checkbox and a list.</td></tr>
+    <tr><td><a href="param-password.html">Password</a>, <a href="param-credentials.html">Credentials</a></td><td>Secrets and stored logins.</td></tr>
+    <tr><td><a href="param-file.html">File</a>, <a href="param-run.html">Run</a></td><td>An uploaded file and a pick of a build.</td></tr>
+    <tr><td><a href="param-prompt.html">Asked parameters</a></td><td>Display, label, read-only and prompt.</td></tr>
+    <tr><td><a href="param-agent.html">Agent parameters</a></td><td>Values about the machine.</td></tr>
+    <tr><td><a href="param-references.html">Parameter references</a>, <a href="../reference/build-values.html">Build values</a></td><td>Every <code>%…%</code> reference and environment variable.</td></tr>
+    <tr><td><a href="set-from-build.html">Set from a build</a>, <a href="build-chains.html">Build chains</a>, <a href="dependencies.html">Dependencies</a></td><td>Values that steps and other builds pass on.</td></tr>
+  </tbody>
+</table>
+
+<h2 id="inheritance">Inheritance</h2>
+<p>Parameters pass down. A parameter defined on a project reaches every project and build configuration inside it. Parameters on the <strong>Root project</strong> reach the whole server. See <a href="../projects/projects.html">Projects</a>.</p>
+<p>An inherited row shows its project in <strong>Defined in</strong>, and its menu offers:</p>
+<ul>
+  <li><strong>Override</strong>: give this build configuration its own default value and description. The name stays the same. The row then says <em>Own, overrides &lt;project&gt;</em>.</li>
+  <li><strong>Disable</strong>: this build configuration does not get the parameter. The row says <em>Disabled in this job</em>.</li>
+  <li><strong>Reset</strong>: drop your override or your disable and take the parameter back as the project defines it.</li>
+</ul>
+<p>If two levels define the same name, the nearest one wins: the build configuration beats its project, and a project beats its parent.</p>
+<div class="callout tip"><p>Put values that many build configurations share on the project: the SDK version, the store branch, the Perforce stream. Then you change them in one place.</p></div>
+
+<h2>Built-in parameters</h2>
+<p>Buildspawn also gives every build parameters you don't need to define, such as <code>%build.number%</code>. Every value is listed in <a href="../reference/build-values.html">Build values</a>. Values about the checked-out code, such as <code>%build.vcs.number%</code>, are also in <a href="../version-control/vcs-parameters.html">Version control parameters</a>. Tools have <code>%tool.&lt;id&gt;%</code>, the path of a tool on the agent.</p>
+
+<h2>Tips</h2>
+<ul>
+  <li>Use upper case for names that become environment variables, so scripts read them the same on Windows and Linux.</li>
+  <li>A step can set a parameter for the steps after it. See <a href="set-from-build.html">Set parameters from a build</a>.</li>
+  <li>In the <a href="../visual-editor/configuration-block.html">visual editor</a>, parameters are one group wired into the build configuration block, and each parameter lists the steps that use it.</li>
+</ul>
+</main>
+</body>
+</html>

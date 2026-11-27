@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gradle · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/gradle">
+<main class="doc">
+<h1>Gradle</h1>
+<p class="lead">Runs Gradle tasks with a build file and switches. It uses the project's Gradle wrapper when there is one.</p>
+
+<h2>When to use it</h2>
+<p>Use it for Android and Java projects, such as a mobile build of your game or a backend service. Test reports under <code>build/test-results</code> are recorded for you.</p>
+
+<h2>How to set it up</h2>
+
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>. Type <code>Gradle</code> in <strong>Filter step types</strong> if you like, then click the <strong>Gradle</strong> tile (group <strong>Build tools</strong>).</li>
+  <li>Type a <strong>Step name</strong>, for example <code>Assemble release</code>.</li>
+  <li>Fill in the fields described below.</li>
+  <li>Optional: set <strong>Execute step</strong>, <strong>Conditions</strong> and <strong>Retry on failure</strong>. See <a href="step-list.html">The steps list and the step editor</a>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<figure class="shot small">
+  <img src="../../assets/shots/build-steps/gradle.png" alt="The fields of the Gradle step in the step editor">
+  <figcaption>The fields of the Gradle step, as the step editor shows them.</figcaption>
+</figure>
+
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Tasks</strong></td><td>One task per line, such as <code>clean</code> and <code>build</code>. Empty runs the project's default tasks.</td><td>Empty</td><td><code>assembleRelease</code></td></tr>
+    <tr><td><strong>Build file</strong></td><td>Passed as <code>-b</code>. Empty lets Gradle find the build file. Gradle 9 removed <code>-b</code>: leave it empty there and set the working directory.</td><td>Empty</td><td><code>app/build.gradle</code></td></tr>
+    <tr><td><strong>Switches</strong></td><td>One switch per line, such as <code>--info</code> or <code>-Pname=value</code>. Pass a secret through the environment.</td><td>Empty</td><td><code>-PversionName=1.4</code></td></tr>
+    <tr><td><strong>Gradle wrapper</strong></td><td><strong>Automatic</strong> uses <code>gradlew</code> of the working directory when there is one, otherwise <code>gradle</code>. <strong>Use the Gradle wrapper</strong> fails the step if the script is missing and needs no Gradle on the agent. <strong>Use Gradle on the agent</strong> never runs a wrapper.</td><td>Automatic</td><td>Use the Gradle wrapper</td></tr>
+    <tr><td><strong>Path to the wrapper script</strong></td><td>Relative to the working directory, such as <code>tools/gradlew</code>. Empty uses <code>gradlew</code>. May use <code>%name%</code>.</td><td>Empty</td><td><code>tools/gradlew</code></td></tr>
+    <tr><td><strong>Debug</strong></td><td>Adds <code>--debug</code>. The log then holds a lot of detail: do not use it with secrets in the environment.</td><td>Off</td><td>Off</td></tr>
+    <tr><td><strong>Stacktrace</strong></td><td>Adds <code>--stacktrace</code> to print the stack trace of a failure.</td><td>Off</td><td>On</td></tr>
+    <tr><td><strong>Record test reports</strong></td><td>Records the JUnit XML under <code>build/test-results</code> of the working directory and its sub-projects, also when the build fails.</td><td>On</td><td>On</td></tr>
+    <tr><td><strong>Build cache</strong></td><td><strong>Gradle default</strong>, <strong>Use the build cache</strong> (<code>--build-cache</code>) or <strong>Do not use the build cache</strong> (<code>--no-build-cache</code>).</td><td>Gradle default</td><td>Use the build cache</td></tr>
+    <tr><td><strong>Code coverage, Include classes, Exclude classes</strong></td><td>As in <a href="maven.html">Maven</a>. JaCoCo is fetched from the repositories of the project.</td><td>None</td><td>JaCoCo</td></tr>
+    <tr><td><strong>JaCoCo version</strong></td><td>The version of the JaCoCo plugin. Empty uses the default of your Gradle version. Needs Gradle 7 or newer.</td><td>Empty</td><td><code>0.8.15</code></td></tr>
+    <tr><td><strong>Gradle home path</strong></td><td>Where Gradle is installed. It replaces the project wrapper. Empty uses the wrapper, or <code>gradle</code> from the <code>PATH</code>. May use <code>%name%</code>.</td><td>Empty</td><td><code>C:\tools\gradle-8.7</code></td></tr>
+    <tr><td><strong>JDK</strong></td><td><strong>Inherit</strong> uses the JDK of the build configuration, or the <code>java</code> of the agent. A JDK from <strong>Settings › Tools</strong> sets <code>JAVA_HOME</code> for this step. Not available in a container: the image brings its own Java.</td><td>Inherit</td><td>JDK 21</td></tr>
+    <tr><td><strong>JVM command line parameters</strong></td><td>One parameter per line, such as <code>-Xmx2g</code>. They go in the variable the tool reads and are added to what is set there. A parameter cannot hold a space or quote. Do not put a secret here.</td><td>Empty</td><td><code>-Xmx2g</code></td></tr>
+    <tr><td><strong>Working directory, Environment variables, Test reports, Run step within container</strong></td><td>The same in every runner. See <a href="common-step-fields.html">Fields every runner has</a>.</td><td></td><td></td></tr>
+  </tbody>
+</table>
+
+
+<h2>A worked example</h2>
+<p>Build the Android release of the game's companion app. Step name <code>Assemble release</code>, <strong>Tasks</strong> <code>clean</code> and <code>assembleRelease</code> on two lines, <strong>Switches</strong> <code>-PversionCode=%build.number%</code>, <strong>Gradle wrapper</strong> <strong>Use the Gradle wrapper</strong>.</p>
+
+<h2>What you see when it runs</h2>
+<p>The console shows <code>$ ./gradlew -PversionCode=57 clean assembleRelease</code>, then Gradle's task lines. Test results are listed on the build.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong><em>The Gradle wrapper script was not found</em></strong></td><td>Check <strong>Path to the wrapper script</strong>, or choose <strong>Use Gradle on the agent</strong>.</td></tr>
+    <tr><td><strong><em>Gradle was not found on this agent</em></strong></td><td>Add a <code>gradlew</code> to the project, install Gradle there or put <code>gradle</code> on the <code>PATH</code>.</td></tr>
+    <tr><td><strong>Gradle 9 complains about <code>-b</code></strong></td><td>Empty <strong>Build file</strong> and set the <strong>Working directory</strong>.</td></tr>
+    <tr><td><strong><em>No … coverage report was found</em></strong></td><td>The tests may have stopped before the report was written.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="maven.html">Maven</a></li>
+  <li><a href="ant.html">Ant</a></li>
+  <li><a href="kotlin-script.html">Kotlin Script</a></li>
+  <li><a href="runners.html">Runners</a></li>
+  <li><a href="common-step-fields.html">Fields every runner has</a></li>
+</ul>
+</main>
+</body>
+</html>

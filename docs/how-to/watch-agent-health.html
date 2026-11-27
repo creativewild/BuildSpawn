@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spot unhealthy agents · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/watch-agent-health">
+<main class="doc">
+<h1>Spot unhealthy agents</h1>
+<p class="lead">Find the machines that are short of disk, memory or CPU before their builds fail.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>Telemetry is on (it is by default). Each agent sends CPU, memory, disk, network and GPU values every 30 seconds.</li>
+  <li>To change thresholds you must be an administrator. Anyone who can see agents can look.</li>
+</ul>
+
+<h2>Steps</h2>
+<ol class="steps">
+  <li>Open <strong>Agents</strong> in the top bar.</li>
+  <li>In the filter bar, tick <strong>Warnings only</strong>. The list keeps only agents with a warning or critical value. Offline agents count as warnings.</li>
+  <li>Read the coloured bar at the start of each row: yellow is a warning, red is critical. The cell that caused it is coloured too, for example <strong>Disk</strong> at <strong>99%</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/how-to/watch-agent-health-1.png" alt="The Agents page with Warnings only ticked: linux-build-01 offline with a Warning, and the other agents marked Critical because their D: disk is 99% full"><figcaption>Warnings only: every row here needs attention. On this demo machine the disk is nearly full.</figcaption></figure>
+<ol class="steps" start="4">
+  <li>To set when a value counts as a warning, click <strong>Configure monitors</strong>.</li>
+  <li>Under <strong>Thresholds</strong>, set <strong>Warning</strong> and <strong>Critical</strong> for <strong>CPU use</strong>, <strong>Memory used</strong>, <strong>GPU use</strong> and <strong>Disk free space</strong>. For disk, lower is worse: critical is below warning. For example, on machines with big Perforce workspaces, set <strong>Disk free space</strong> to warn at <code>25</code>% and turn critical at <code>10</code>%.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/how-to/watch-agent-health-2.png" alt="The Configure monitors page: the Telemetry card with Collect telemetry from agents, Background interval 30 seconds, Live interval 2 seconds and Collect GPU use, and the Thresholds table with Warning and Critical values for CPU use, Memory used, GPU use and Disk free space"><figcaption>Thresholds decide when a value turns yellow or red.</figcaption></figure>
+<ol class="steps" start="7">
+  <li>To look at one machine over time, click its name and open the <strong>Telemetry</strong> tab.</li>
+  <li>Pick a time range: <strong>15 min</strong>, <strong>1 h</strong>, <strong>6 h</strong> or <strong>24 h</strong>. The dashed lines on each chart are the <strong>Warning</strong> and <strong>Critical</strong> thresholds.</li>
+  <li>Click <strong>Pause</strong> to freeze the charts while you read a spike. Click it again to go live.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/how-to/watch-agent-health-3.png" alt="The Telemetry tab of ht-win-agent-01: cards for CPU, Memory, GPU, Disk free in red at 19 GB, and Network; CPU and Memory charts over 15 minutes with dashed Warning and Critical lines"><figcaption>One agent's Telemetry tab. The red disk card shows the problem.</figcaption></figure>
+
+<h3>Take an agent offline before it runs out of disk</h3>
+<p>Thresholds on the Configure monitors page only colour the pages. To have Buildspawn stop sending builds to a machine that is short of disk, set a threshold on the agent itself:</p>
+<ol class="steps" start="10">
+  <li>Open the agent, click <strong>Configure</strong> and open <strong>Disk Space Monitoring Thresholds</strong> under <strong>Node Properties</strong>.</li>
+  <li>Set <strong>Free Disk Space Warning Threshold</strong> to <code>60GB</code> (a warning on the agent's page) and <strong>Free Disk Space Threshold</strong> to <code>30GB</code> (the agent is marked temporarily offline). Click <strong>Save</strong>. See <a href="../agents/agent-settings.html#disk-space">Agent settings</a>.</li>
+</ol>
+<p>On the machine itself, the <a href="../agents/windows-tray-app.html">tray app</a> or the <a href="../agents/agent-terminal.html">terminal program</a> shows the same CPU, memory and disk, and its <strong>Work folders</strong> view cleans old workspaces.</p>
+
+<h2>Check it worked</h2>
+<ul>
+  <li>With <strong>Warnings only</strong> ticked, the list shows only the agents that pass your new thresholds. When none do, the list is empty.</li>
+  <li>The filter is kept in the page address. Bookmark it to open the list filtered each morning.</li>
+  <li>On the <strong>Telemetry</strong> tab, the dashed lines sit at your new values.</li>
+</ul>
+
+<h2>Troubleshooting</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>An agent shows "—" in every live column.</td><td>Telemetry is off for it. Open the agent's <strong>Configure</strong> page and tick <strong>Collect telemetry from this agent</strong>, or remove it from <strong>Agents that don't send telemetry</strong>.</td></tr>
+    <tr><td><strong>Freshness</strong> says <strong>Stale</strong>.</td><td>No sample came in for a while. Check that the agent is still connected; open its <strong>Log</strong> tab.</td></tr>
+    <tr><td>GPU shows "—".</td><td>The machine has no GPU tool that Buildspawn reads (<code>nvidia-smi</code>, <code>amd-smi</code> / <code>rocm-smi</code> or <code>xpu-smi</code>). Install the vendor's tool.</td></tr>
+    <tr><td>Builds still run on an agent in red.</td><td>Thresholds only colour the pages; they never stop a build. Mark the agent offline from its row menu while you fix it.</td></tr>
+  </tbody>
+</table>
+
+<h2>Next steps</h2>
+<ul>
+  <li><a href="../agents/telemetry.html">Telemetry</a>: every card, chart and setting.</li>
+  <li><a href="../agents/agents-page.html">The Agents page</a>: filters, expanded rows and the row menu.</li>
+  <li><a href="../agents/agent-settings.html">Agent settings</a>: disk space thresholds and the telemetry box.</li>
+</ul>
+</main>
+</body>
+</html>

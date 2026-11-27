@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Retry a flaky step · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/steps-retry-flaky-step">
+<main class="doc">
+<h1>Retry a flaky step</h1>
+<p class="lead">Run a step again when it fails for a reason that comes and goes, such as a dropped network share.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>A step that sometimes fails on a crash or a timeout, and the exit code it ends with.</li>
+</ul>
+
+<h2>Steps</h2>
+<ol class="steps">
+  <li>Open <strong>Settings › Build Steps</strong> and click <strong>Edit</strong> on the step.</li>
+  <li>Scroll to <strong>Execution</strong>.</li>
+  <li>Set <strong>Retry on failure</strong> to <code>2</code> and <strong>Wait between attempts</strong> to <code>30</code> seconds.</li>
+  <li>In <strong>Only for exit codes</strong> type <code>-1, 3221225477</code> so only a crash is retried.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<h2>Check it worked</h2>
+<p>When the step fails with a listed code, the console says <em>Attempt 1 failed with exit code -1, which is in the retry list. Waiting 30 s, then attempt 2 of 3.</em> A step that finally passes says <em>Step passed on attempt 2 of 3.</em></p>
+
+<h2>Troubleshooting</h2>
+<ul>
+  <li><strong>A real error is retried.</strong> List the crash codes so a normal failure (exit code 1) fails at once.</li>
+  <li><strong>The step is not retried.</strong> The exit code is not in the list: <em>Attempt 1 failed with exit code 1, which is not in the retry list.</em></li>
+</ul>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../build-steps/resume-and-retry.html">Resume and retry</a></li>
+  <li><a href="rerun-from-failed-step.html">Re-run from the failed step</a></li>
+</ul>
+</main>
+</body>
+</html>

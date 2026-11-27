@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parallel tests · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/feature-parallel-tests">
+<main class="doc">
+<h1>Parallel tests</h1>
+<p class="lead">Splits the tests of one build into batches that run at the same time, each on its own agent, and merges the results.</p>
+<h2>When to use it</h2>
+<p>Use it when your test step is slow and you have free agents. The test run of <strong>Unit Tests</strong> takes 40 minutes on one agent. With 4 batches it takes about 10, plus the checkout time. It works best when you have hundreds of test classes of about the same size.</p>
+<figure class="shot">
+  <img src="../../assets/shots/projects/feat-parallel-tests.png" alt="The Parallel tests form with the Number of batches field">
+  <figcaption>The Parallel tests form.</figcaption>
+</figure>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration, click <strong>Settings</strong>, then <strong>Build Features</strong>. Click <strong>Add build feature</strong> and choose <strong>Parallel tests</strong>.</li>
+  <li>Type the <strong>Number of batches</strong>, from 2 to 20.</li>
+  <li>Click <strong>Save</strong>.</li>
+  <li>Make sure your test step can take its share (see the table of runners).</li>
+</ol>
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Number of batches</td><td>How many batch builds one build starts. Each batch runs all the build steps with its share of the test classes. Shares follow the durations of the last successful build. New tests are spread evenly. Between 2 and 20.</td><td>4</td><td><code>4</code></td></tr>
+    <tr><td>Runners</td><td>Says which steps take their share by themselves: Maven, Gradle and NUnit. Other steps read two environment variables: <code>BUILDSPAWN_PARALLEL_INCLUDE_FILE</code> (the classes of this batch) and <code>BUILDSPAWN_PARALLEL_EXCLUDE_FILE</code> (all the others).</td><td>-</td><td>-</td></tr>
+  </tbody>
+</table>
+<h2>How a parallel build runs</h2><ol class="steps">
+  <li>You start the build. It becomes the <em>parent</em>. It does not fetch sources and runs no steps. It holds no agent while it waits.</li>
+  <li>The parent starts one <em>batch</em> build per batch. Each batch fetches the sources on its own agent, works out its share of the test classes and runs your steps.</li>
+  <li>The parent waits, adds up the test counts and the durations, and ends with the worst result of the batches.</li>
+</ol>
+<p>Notifications, such as email, run once on the parent with the merged result.</p><h2>A worked example</h2>
+<p><strong>Unit Tests</strong> has a Maven step. The studio sets <strong>Number of batches</strong> to <code>4</code>. Maven gets <code>-Dtest=</code> with the classes of its batch. For a step that runs a game test runner, the script reads the include file:</p><pre><code>$classes = Get-Content $env:BUILDSPAWN_PARALLEL_INCLUDE_FILE
+.\RunTests.exe --classes ($classes -join ",")</code></pre>
+<h2>What you see when it runs</h2>
+<p>The parent build page has a <strong>Parallel tests</strong> block with one row per batch: its number, a link to the batch build, its agent, the duration and the result, and the merged test summary. A batch shows <em>Batch 2 of 4</em> with a link to the parent.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>The number is refused</td><td>It must be a whole number from 2 to 20.</td></tr>
+    <tr><td>One batch takes much longer</td><td>Shares follow the last successful build. The first run is spread by name. It evens out after one good run.</td></tr>
+    <tr><td>A step runs every test in every batch</td><td>That step does not read the share. Use the include file, or give it the filter arguments of your test tool.</td></tr>
+    <tr><td>Batches wait in the queue</td><td>You need as many free agents as batches. Lower the number, or add agents.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="bc-build-features.html">The Build Features tab</a></li>
+  <li><a href="../build-steps/parallel-blocks.html">Parallel blocks</a></li>
+  <li><a href="../build-steps/matrix-mode.html">Matrix mode</a></li>
+</ul>
+</main>
+</body>
+</html>

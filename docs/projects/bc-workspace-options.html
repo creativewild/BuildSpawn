@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Workspace options · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/bc-workspace-options">
+<main class="doc">
+<h1>Workspace options</h1>
+<p class="lead">What happens around getting the sources onto the agent: retries, a custom workspace folder, and how a Pipeline run is saved and resumed.</p>
+<h2>When to use it</h2>
+<p>Use them when a checkout is unreliable, when you want the sources in a fixed folder, or when a Pipeline must not resume after a restart. They are cards on <strong>General</strong>, with the Dependency options on the Dependencies tab.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings</strong>. Then click <strong>General</strong>.</li>
+  <li>Open <strong>Checkout options</strong>. Set <strong>Retry count</strong>, or turn on <strong>Use a custom workspace</strong> and type the <strong>Directory</strong>.</li>
+  <li>For a Pipeline, open <strong>Run behaviour</strong> and choose the options below.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<h2>Every field</h2>
+<h3>Checkout options</h3><table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Retry count</td><td>How often a failed checkout is tried again before the build fails. 0 tries once. Empty uses the server setting.</td><td>Server setting</td><td><code>3</code></td></tr>
+    <tr><td>Use a custom workspace</td><td>Checks the sources out into a folder you choose, not the default one for this build configuration.</td><td>Off</td><td>On</td></tr>
+    <tr><td>Directory</td><td>The custom folder. A relative path is read from the agent's work directory. Builds on the same agent share it, so run them one at a time.</td><td>Empty</td><td><code>E:\ws\skyforge</code></td></tr>
+  </tbody>
+</table>
+<h3>Run behaviour (Pipeline)</h3><table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Resume after a controller restart</td><td>A running build carries on after the server restarts. Off: a build that is running when the server restarts ends and is not resumed.</td><td>On</td><td>Off</td></tr>
+    <tr><td>Speed and durability</td><td>How often the running Pipeline saves its state. <em>Server default</em>; <em>Performance-optimized</em> is fastest but a running build is lost if the server stops without a clean shutdown; <em>Less durable, a bit faster</em>; <em>Maximum survivability</em> saves every step.</td><td>Server default</td><td>Maximum survivability</td></tr>
+    <tr><td>Keep stashes of completed builds</td><td>Stashes are normally deleted when a build ends. Keep them to restart a later stage from a finished build. <strong>Number of completed builds</strong> says how many.</td><td>Off</td><td><code>3</code></td></tr>
+  </tbody>
+</table>
+<p>To remove a workspace before a build, use the build feature <a href="feature-delete-workspace.html">Delete the workspace before the build</a>.</p><h2>A worked example</h2>
+<p>The Unity project <strong>Unity Windows Build</strong> keeps its sources in <code>E:\ws\skyforge-unity</code> so the Unity <code>Library</code> folder survives. <strong>Retry count</strong> is <code>2</code> because the Perforce server sometimes drops the first connection.</p><h2>What you see when it runs</h2>
+<p>The log shows each retry of the checkout. With a custom workspace the log shows that folder as the workspace.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>Two builds break each other</td><td>They share the custom folder. Use <strong>Run one build at a time</strong> in Build options.</td></tr>
+    <tr><td>The folder is refused</td><td>Enter the directory, or turn the option off.</td></tr>
+    <tr><td>The retry count is refused</td><td>It must be 0 or a whole number above it.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="settings-homes.html">Settings homes</a></li>
+  <li><a href="bc-general.html">General</a></li>
+  <li><a href="feature-delete-workspace.html">Delete the workspace before the build</a></li>
+  <li><a href="type-pipeline.html">Pipeline</a></li>
+</ul>
+</main>
+</body>
+</html>

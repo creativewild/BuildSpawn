@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Requirements · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/bc-agent-requirements">
+<main class="doc">
+<h1>Agent Requirements</h1>
+<p class="lead">Which agents may run this build configuration, as rules on agent parameters.</p>
+<h2>When to use it</h2>
+<p>Use it when only some machines can build: an agent with Windows and Visual Studio, or a PS5 devkit agent. Builds wait for an agent that meets every rule. The page also lists the compatible agents. It is under <strong>More</strong> on the Settings tabs.</p>
+<figure class="shot">
+  <img src="../../assets/shots/projects/bc-agent-requirements.png" alt="The Agent Requirements tab of Windows Build">
+  <figcaption>The Agent Requirements tab.</figcaption>
+</figure>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings</strong>. Then click <strong>More › Agent Requirements</strong>.</li>
+  <li>Click <strong>Add requirement</strong>.</li>
+  <li>Choose the <strong>Parameter</strong> (for example <code>agent.os.name</code>), the <strong>Condition</strong> and the <strong>Value</strong>.</li>
+  <li>Check the list of <strong>Compatible agents</strong> on the right. Click <strong>Save requirement</strong>.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Parameter name</td><td>An agent parameter: <code>agent.name</code>, <code>agent.pool</code>, <code>agent.labels</code>, <code>agent.os.family</code>, <code>agent.os.name</code>, <code>agent.os.arch</code>, <code>agent.java.version</code>, <code>agent.cpu.count</code>, <code>agent.memory.total.mb</code>, or a tool the agent found. An administrator can add custom ones on the agent.</td><td>-</td><td><code>agent.pool</code></td></tr>
+    <tr><td>Condition</td><td><em>exists</em>, <em>does not exist</em>, <em>equals</em>, <em>does not equal</em>, <em>more than</em>, <em>no more than</em>, <em>less than</em>, <em>no less than</em>, <em>starts with</em>, <em>ends with</em>, <em>contains</em>, <em>does not contain</em>, <em>matches</em>, <em>does not match</em>, and the version forms <em>version more than</em>, <em>version no more than</em>, <em>version less than</em>, <em>version no less than</em>.</td><td>-</td><td>equals</td></tr>
+    <tr><td>Value</td><td>What to compare with. Not used for exists and does not exist. A <em>matches</em> value is a regular expression.</td><td>-</td><td><code>Unreal</code></td></tr>
+    <tr><td>Label expression</td><td>The older Labels field. It shows as one row of kind <em>label</em> when it has a value, for example <code>windows &amp;&amp; gpu</code>.</td><td>Empty</td><td><code>windows &amp;&amp; gpu</code></td></tr>
+    <tr><td>From a step</td><td>Rows that come from the enabled build steps, for example a tool the Unity step needs. Change the step to change them, or <strong>Ignore</strong> one when the tool is somewhere the agent cannot see.</td><td>-</td><td>-</td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p><strong>Windows Build</strong> needs <code>agent.os.family</code> equals <code>Windows</code> and <code>agent.pool</code> equals <code>Unreal</code>. The page shows 3 of 8 agents are compatible.</p><h2>What you see when it runs</h2>
+<p>A queued build that no agent can run says why on the Queue page. The <strong>Compatible agents</strong> list shows each agent as compatible or incompatible with the reason.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>The build waits forever</td><td>No agent meets all rules. Open this tab and look at <strong>Incompatible</strong> and <strong>Why</strong>.</td></tr>
+    <tr><td>A tool requirement from a step blocks builds</td><td>The agent cannot see the tool. Fix the agent, or <strong>Ignore</strong> the requirement.</td></tr>
+    <tr><td>A name is refused</td><td>A parameter name has letters, digits, dots, dashes and underscores. A condition other than exists needs a value.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="settings-homes.html">Settings homes</a></li>
+  <li><a href="../agents/pools.html">Agent pools</a></li>
+  <li><a href="../parameters/param-agent.html">Agent parameters</a></li>
+  <li><a href="../agents/agents-page.html">Agents</a></li>
+</ul>
+</main>
+</body>
+</html>

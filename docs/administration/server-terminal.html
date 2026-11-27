@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The server terminal program · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="administration/server-terminal">
+<main class="doc">
+<h1>The server terminal program</h1>
+<p class="lead"><code>buildspawn</code> is a program for the command line that sets up, starts, watches and changes your Buildspawn server on Linux, macOS and Windows.</p>
+
+<p>It is in every server download: <code>bin/buildspawn</code> on Linux and macOS, <code>bin\buildspawn.exe</code> on Windows. The Linux packages and the Windows setup also put it on the PATH, so you type just <code>buildspawn</code>. A short introduction is in <a href="../get-started/terminal-program.html">Get started: the terminal program</a>. The table of every command, flag and key is in <a href="../reference/terminal-commands.html">Terminal program commands</a>. This page explains how the program behaves.</p>
+
+<h2>When to use it</h2>
+<p>Use it on a server you reach over SSH, on a Mac or Linux box without a desktop, or when you want to script checks. It manages the same service, settings file and folders as the other tools, so it never disagrees with them. On Windows it works next to <a href="windows-launcher.html">the Windows app</a>.</p>
+
+<h2>Two modes: the interface and single commands</h2>
+<p>Type <code>buildspawn</code> with no command to open the full-screen interface. It opens the <strong>launch flow</strong> on a first run, and the <strong>live monitor</strong> after that. A first run means: no settings file, no service installed and no server running.</p>
+<p>The interface opens only in a real terminal. In a scheduled task, a pipe or with <code>--no-tui</code>, the program prints the status as text instead. A command such as <code>buildspawn status</code> does one job and exits.</p>
+
+<pre class="terminal" data-title="buildspawn"><span class="t-bold">Buildspawn 1.9.3</span> · <span class="t-green">●</span> Serving http://127.0.0.1:8080 · up 23s             <span class="t-green">LIVE</span>
+ <span class="t-inverse"> 1 Overview </span>  2 Builds   3 Queue   4 Agents   5 Logs   6 Service   7 Settings
+────────────────────────────────────────────────────────────────────────────────
+ ┌─ Server ───────────────┐┌─ Builds running ───────┐┌─ Queue ────────────────┐
+ │ <span class="t-green">●</span> Running  up 23s     ││ 0 of 2 executors       ││ 0 waiting · old 0:00   │
+ │ 2.589-buildspawn.21    ││ ░░░░░░░░░░░░░░░░ 0%    ││ ▁ 30 m                 │
+ └────────────────────────┘└────────────────────────┘└────────────────────────┘
+ ┌─ JVM heap ─────────────┐┌─ CPU ──────────────────┐┌─ Disk free · home ─────┐
+ │ 1.7 / 15.0 GB          ││ 0 %                    ││ 913 GB free of 1006 GB │
+ └────────────────────────┘└────────────────────────┘└────────────────────────┘</pre>
+
+<h2>The launch flow</h2>
+<p>The launch flow sets Buildspawn up in five steps. <strong>Nothing is changed until you press Start on the last step.</strong> At any time: <kbd>Enter</kbd> goes on, <kbd>Esc</kbd> goes back, <kbd>Tab</kbd> moves between fields, <kbd>Space</kbd> ticks a box, <kbd>?</kbd> is help and <kbd>q</kbd> quits.</p>
+
+<h3>The start screen: presets</h3>
+<p>If you have saved presets they are listed first, each with its home, port and how it runs, plus three more choices: <strong>Set up from the beginning</strong>, <strong>Use an existing home folder…</strong> (pick a folder that already holds Buildspawn data) and <strong>Open the monitor only</strong>. Press <kbd>e</kbd>, <kbd>d</kbd> or <kbd>n</kbd> to edit, delete or rename the selected preset. A preset keeps the home, port, who can connect, memory and the run options, so you can set up a second server the same way.</p>
+<p>Preset names may use letters, digits, space, dot, dash and underscore, up to 40 characters. The file is <code>presets.json</code> in your user configuration folder. See <a href="../reference/terminal-commands.html#presets">Where presets are saved</a>.</p>
+<pre><code>buildspawn launch --preset build-box --yes
+buildspawn preset list
+buildspawn preset save build-box
+buildspawn preset delete build-box</code></pre>
+<p><code>--preset</code> skips the start screen. <code>--yes</code> accepts every default.</p>
+
+<h3>The five steps</h3>
+<table>
+  <thead><tr><th>Step</th><th>What you choose</th></tr></thead>
+  <tbody>
+    <tr><td><strong>1. Home</strong></td><td><em>Where does Buildspawn keep its data?</em> Type a folder. <kbd>Tab</kbd> completes the path, the arrow keys pick a suggestion, and <kbd>b</kbd> browses folders (<kbd>s</kbd> uses the folder you are in). The program checks the folder as you type. The folder is made when you press Start. Suggestions include the default for a service and the homes of your presets.</td></tr>
+    <tr><td><strong>2. Port &amp; memory</strong></td><td>The <strong>Port</strong> (checked for use as you type), <strong>Who can connect</strong>: <em>This PC only</em> (127.0.0.1, recommended) or <em>The network</em> (0.0.0.0, opens it to other computers), and <strong>Java memory (max)</strong>: 2g, 4g, 8g, 16g or a number you type. A bar shows the choice against the computer's memory. Automatic is a quarter of the computer, between 2 and 16 GB.</td></tr>
+    <tr><td><strong>3. Run as</strong></td><td>A service (a systemd service on Linux, a LaunchAgent on macOS, a Windows service on Windows), marked recommended, or <em>Portable</em>, which runs in this window, stops when you close it, needs no administrator rights and suits a try-out. Service options: <strong>Start at boot</strong>, <strong>Open the firewall</strong> (Windows only: a rule named Buildspawn for the port), <strong>Run as a named account</strong> (a hint only: change it in Windows Services, or the service user is <code>buildspawn</code> on Linux) and <strong>Start now after installing</strong>.</td></tr>
+    <tr><td><strong>4. Admin password</strong></td><td>Shows the one-time password for the user <code>admin</code>, the address and the file it is stored in (<code>secrets/initialAdminPassword</code> in the home). <kbd>v</kbd> shows or hides it and <kbd>c</kbd> copies it (the clipboard is cleared 30 seconds later). <kbd>e</kbd> lets you set your own password now, at least 8 characters. Forgot it later? Run <code>buildspawn admin-password</code>.</td></tr>
+    <tr><td><strong>5. Start</strong></td><td>A summary of home, port, memory, how it runs, firewall and admin, and a <em>What happens</em> list, for example <em>Install the systemd unit (sudo asks for your password)</em> and <em>Start Buildspawn and wait for http://localhost:8080/ (about 40 s)</em>. Press <kbd>Enter</kbd> to start. When the page answers, <kbd>Enter</kbd> opens the monitor.</td></tr>
+  </tbody>
+</table>
+<pre class="terminal" data-title="buildspawn"><span class="t-bold">Buildspawn 1.9.3</span> · Set up                                          step 3 of 5
+ <span class="t-green">✓</span> Home › <span class="t-green">✓</span> Port &amp; memory › <span class="t-inverse"> 3 Run as </span> › 4 Admin password › 5 Start
+
+ <span class="t-bold">How should Buildspawn run?</span>
+
+ <span class="t-cyan">(•)</span> systemd service  <span class="t-green">recommended</span>
+     <span class="t-dim">Starts at boot, runs without anyone signed in, restarts after a crash.</span>
+     <span class="t-dim">Needs administrator rights once to install.</span>
+
+ ( ) Portable  <span class="t-dim">runs in this window</span>
+
+ Service options
+ [x] Start at boot (Automatic)
+ [ ] Open the firewall (not changed by Buildspawn on this system)
+ [x] Start now after installing</pre>
+<div class="callout note"><p>Actions that need root or administrator rights say so first. On Linux the program runs <code>sudo</code> only after you answer <kbd>y</kbd>. On Windows you see the permission prompt (UAC).</p></div>
+
+<h2>The live monitor</h2>
+<p>The monitor reads the server's REST API and refreshes every 2 seconds (change it with <code>--interval</code>). The top line shows the version, the state and address, how long it has run, and <strong>LIVE</strong> or <strong>FROZEN</strong>. Press <kbd>1</kbd> to <kbd>7</kbd> or <kbd>Tab</kbd> to change view. Two layouts exist: 110 columns or wider, and a narrow one from 80 to 109 columns.</p>
+<table>
+  <thead><tr><th>View</th><th>What it shows</th></tr></thead>
+  <tbody>
+    <tr><td><strong>1 Overview</strong></td><td>Tiles: <em>Server</em>, <em>Builds running</em> (executors in use), <em>Queue</em>, <em>Builds / hour</em>, <em>Success rate</em> (24 hours), <em>Agents</em>, <em>JVM heap</em>, <em>CPU</em> and <em>Disk free · home</em>, each with a bar or trend strip, and a <em>Recent builds</em> list. <kbd>Tab</kbd> moves between tiles, <kbd>Enter</kbd> opens a build's log.</td></tr>
+    <tr><td><strong>2 Builds</strong></td><td>The last 24 hours: start time, build configuration, number, result, time and agent. <kbd>/</kbd> filters by name, agent or cause. <kbd>f</kbd> cycles the result filter (all, running, failed, unstable and more), <kbd>g</kbd> groups by build configuration, <kbd>Enter</kbd> shows the selected build's log, <kbd>o</kbd> opens it in the browser and <kbd>x</kbd> stops it.</td></tr>
+    <tr><td><strong>3 Queue</strong></td><td>Every waiting item, how long it has waited, and <em>why it waits</em>. Filter by reason: blocked, waiting, offline, quiet period, lock. <kbd>c</kbd> cancels the item, <kbd>p</kbd> moves it to the front.</td></tr>
+    <tr><td><strong>4 Agents</strong></td><td>Each agent with its state, executors in use, labels, system and free disk. <kbd>Enter</kbd> shows executors, <kbd>o</kbd> opens the agent page, <kbd>d</kbd> takes it offline and <kbd>n</kbd> starts adding a new agent.</td></tr>
+    <tr><td><strong>5 Logs</strong></td><td>A log with a <strong>Source</strong> (<kbd>Tab</kbd>): the systemd journal (Linux service) or <code>buildspawn.log</code>, <code>gc.log</code> (the Java memory log) or a build log. <kbd>l</kbd> sets the level (ALL, INFO, WARN, SEVERE), <kbd>/</kbd> filters, <kbd>f</kbd> turns follow on and off, <kbd>PgUp</kbd> and <kbd>PgDn</kbd> scroll, <kbd>c</kbd> clears and <kbd>s</kbd> saves.</td></tr>
+    <tr><td><strong>6 Service</strong></td><td>The service: <em>Unit</em>, <em>State</em>, <em>Start at boot</em>, <em>Runs as</em>, <em>Listens on</em>, <em>Home</em>, <em>Settings file</em>, <em>Java</em> and <em>Recent unit events</em>. See below.</td></tr>
+    <tr><td><strong>7 Settings</strong></td><td>The settings form. See below.</td></tr>
+  </tbody>
+</table>
+<pre class="terminal" data-title="buildspawn"> ┌─ Agents ─────────────────────────────────────────────1 online · 0 offline──┐
+ │   Agent           State     Executors      Free Ping / since               │
+ │<span class="t-cyan">▸</span>  built-in        <span class="t-green">●</span> idle    0/2 ░░░░░    913 GB —                          │
+ └────────────────────────────────────────────────────────────────────────────┘</pre>
+
+<h3>Read only, and the token</h3>
+<p>Without an API token the monitor is read only. Stopping a build (<kbd>x</kbd>), cancelling or moving a queue item (<kbd>c</kbd>, <kbd>p</kbd>) and taking an agent offline (<kbd>d</kbd>) need one, and the status line says so. The Service and Settings views work without a token. Give a token with <code>--token-file PATH</code> or the variable <code>BUILDSPAWN_TOKEN_FILE</code>. The file holds one line: <code>user:token</code>. The program never prints the token. Create one in your user's <strong>Security</strong> page, as described in <a href="../reference/api-tokens.html">API tokens</a>.</p>
+<pre><code>echo "dana.k:11a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6" &gt; ~/.buildspawn-token
+chmod 600 ~/.buildspawn-token
+buildspawn --token-file ~/.buildspawn-token --view queue</code></pre>
+<p>Stop, cancel and restart always ask first and name what they end.</p>
+
+<h3>The Service view</h3>
+<p>It controls the service for this copy of Buildspawn: <kbd>s</kbd> start, <kbd>t</kbd> stop, <kbd>r</kbd> restart, <kbd>i</kbd> install or update the unit, <kbd>u</kbd> remove it (all data stays) and <kbd>a</kbd> start at boot on or off. A note warns that Stop and Restart end the running builds. Windows asks for permission (UAC) when needed.</p>
+
+<h3>The Settings view</h3>
+<p>The view edits the settings file and keeps its comments. The fields are <strong>Port</strong>, <strong>Listen address</strong>, <strong>Home folder</strong>, <strong>Logs folder</strong>, <strong>Java memory (max)</strong>, <strong>Java options</strong> and <strong>Extra arguments</strong>. <kbd>↑</kbd> <kbd>↓</kbd> select a field, <kbd>Enter</kbd> edits it and <kbd>Esc</kbd> cancels the edit. Each row shows <em>saved</em> or what is pending, and a <strong>Checks</strong> box warns about a port in use or memory that is too big. A memory bar shows the heap against the computer's memory.</p>
+<ul>
+  <li><kbd>a</kbd> applies and restarts. A box <em>Restart with these settings?</em> asks first and names the builds that would end.</li>
+  <li><kbd>w</kbd> saves and applies later (at the next restart).</li>
+  <li><kbd>u</kbd> undoes your changes.</li>
+</ul>
+<p>The box also shows the matching text command, for example <code>buildspawn set port=9090 memory=6g --apply</code>. See <a href="../reference/settings-files.html">Settings files</a> for what each key does.</p>
+
+<h3>Quitting</h3>
+<p><kbd>q</kbd> opens <strong>Close the monitor</strong>. It says how the server runs. <kbd>k</kbd> keeps the server serving, <kbd>s</kbd> stops the server (with the number of running builds), and <kbd>Esc</kbd> stays. If the monitor itself started the server, only Stop or Stay is offered. <kbd>Ctrl</kbd> + <kbd>C</kbd> quits and keeps the server running.</p>
+
+<h3>Look and feel</h3>
+<ul>
+  <li><kbd>t</kbd> cycles the colour theme: <code>color</code>, <code>light</code> and <code>mono</code>. <kbd>G</kbd> cycles the symbols: <code>unicode</code>, <code>ascii</code> and <code>solid</code>. <kbd>Space</kbd> freezes the screen.</li>
+  <li>Without a terminal, or with <code>NO_COLOR</code> or <code>--no-color</code>, you get the <code>mono</code> theme.</li>
+  <li>The old Windows console gets ASCII symbols and 16 colours, with a note in the status line. Windows Terminal gets unicode and full colour. <code>BUILDSPAWN_GLYPHS=unicode|ascii|solid</code> changes it.</li>
+</ul>
+
+<h2>The text twins</h2>
+<p>Every view has a command that prints the same facts as text, or as JSON with <code>--json</code>:</p>
+<table>
+  <thead><tr><th>Command</th><th>Twin of</th></tr></thead>
+  <tbody>
+    <tr><td><code>buildspawn status</code></td><td>Overview. Exit code 0 when the server runs, 3 when it is stopped.</td></tr>
+    <tr><td><code>buildspawn builds [--running | --failed] [--limit N]</code></td><td>Builds</td></tr>
+    <tr><td><code>buildspawn queue</code></td><td>Queue, with the reason each item waits</td></tr>
+    <tr><td><code>buildspawn agents</code></td><td>Agents</td></tr>
+    <tr><td><code>buildspawn logs [-f] [--level warn] [--filter TEXT] [--source gc]</code></td><td>Logs. With no option it follows the log.</td></tr>
+    <tr><td><code>buildspawn service status | install | remove | enable | disable</code></td><td>Service</td></tr>
+    <tr><td><code>buildspawn set key=value ... [--apply] [--yes]</code></td><td>Settings</td></tr>
+  </tbody>
+</table>
+<pre><code>buildspawn status --json
+buildspawn builds --failed --limit 5
+buildspawn --once --view agents --no-color</code></pre>
+<p><code>--once</code> draws one frame of a view as plain text and exits, which suits a log file or a chat message.</p>
+
+<h2>Watching another server</h2>
+<p>Add <code>--url</code> (or <code>BUILDSPAWN_URL</code>) to watch a server on another computer. The Service and Settings views, and <code>start</code>, <code>stop</code> and <code>set</code>, always act on the server of the computer you run the program on.</p>
+<pre><code>buildspawn --url https://build.example.com/ --token-file ~/.buildspawn-token --view builds</code></pre>
+
+<h2>Start, stop and the service</h2>
+<ul>
+  <li><code>buildspawn run</code> runs the server in this terminal until <kbd>Ctrl</kbd> + <kbd>C</kbd>. The services use this command.</li>
+  <li><code>buildspawn start</code>, <code>stop</code> and <code>restart</code> use the service when one is installed for this copy, otherwise they start or stop a background server.</li>
+  <li><code>buildspawn install-service [--user NAME] [--no-start] [--dry-run]</code> installs and starts the service. <code>--user</code> is for Linux: the system user to run as (default <code>buildspawn</code>). <code>uninstall-service [--remove-user]</code> removes it and keeps the home, logs and settings. <code>--dry-run</code> only says what would be done.</li>
+  <li><code>buildspawn check</code> checks the settings file and Java, and prints the full Java command.</li>
+  <li><code>buildspawn admin-password [--copy]</code> prints, or copies, the initial admin password while it exists.</li>
+</ul>
+<p>Buildspawn runs either as the service or in the terminal or background on one home, never both. The program keeps a lock file, <code>buildspawn.pid</code>, in the home folder and refuses to start a second server on it.</p>
+
+<h2>Trusted certificates: <code>buildspawn certs</code></h2>
+<p>This command manages the same trust folder as <a href="trusted-certificates.html">Settings › Security › Trusted certificates</a>, for company root certificates that Java must trust. It works on this computer's home folder, and does not need the server to run. Changes take effect when the server starts again.</p>
+<table>
+  <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>buildspawn certs list</code></td><td>Shows the trust folder, the state of the Windows store setting, the added certificates, and whether a restart is needed.</td></tr>
+    <tr><td><code>buildspawn certs add &lt;file&gt;</code></td><td>Adds the certificates in a <code>.pem .crt .cer .der .p7b</code> or <code>.p7c</code> file. It shows each one first and asks before adding. Use <code>-</code> instead of a file to read the text from standard input (this needs <code>--yes</code>).</td></tr>
+    <tr><td><code>buildspawn certs remove &lt;fingerprint or name&gt;</code></td><td>Removes one added certificate. The fingerprint may be just its start, with or without colons. If several match, the program lists them.</td></tr>
+    <tr><td><code>buildspawn certs windows-store on|off</code></td><td>Also trust the certificates the Windows certificate store trusts. Windows only.</td></tr>
+  </tbody>
+</table>
+<p>Options: <code>--yes</code> does not ask, <code>--include-expired</code> (with <code>add</code>) also adds expired certificates, and <code>--home DIR</code> names the home folder when it cannot be found from the settings file. A private key in the input is refused and not kept.</p>
+<pre><code>buildspawn certs add company-root.crt
+buildspawn certs list
+buildspawn certs remove 3F:9A:C1</code></pre>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>The monitor says <em>the server asks for sign-in (HTTP 403): pass --token-file</em>.</td><td>The server needs a user for its API. Give a token file as described above.</td></tr>
+    <tr><td>The status shows <em>Not reachable</em>.</td><td>The server is not running, or listens on another port. Run <code>buildspawn status</code> and <code>buildspawn check</code>.</td></tr>
+    <tr><td>Start says another server holds the home folder.</td><td>Stop the service or the background server first. One home, one server.</td></tr>
+    <tr><td>The screen is garbled in a very old console.</td><td>Use <code>--glyphs ascii</code> and <code>--theme mono</code>, or <code>--once</code>.</td></tr>
+    <tr><td><code>buildspawn</code> prints text and does not open the interface.</td><td>The program saw no terminal. Run it in a real terminal window and leave out <code>--no-tui</code>.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../reference/terminal-commands.html">Terminal program commands</a>: the full tables.</li>
+  <li><a href="../how-to/monitor-from-terminal.html">Watch the server from a terminal</a></li>
+  <li><a href="linux-macos-install.html">Install on Linux and macOS</a></li>
+  <li><a href="windows-launcher.html">The Windows app</a></li>
+  <li><a href="../agents/agent-terminal.html">The agent terminal program</a></li>
+  <li><a href="running-the-server.html">Running the server</a></li>
+</ul>
+</main>
+</body>
+</html>

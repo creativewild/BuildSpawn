@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dependencies · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/bc-dependencies">
+<main class="doc">
+<h1>Dependencies</h1>
+<p class="lead">What a build waits for, which files it takes from other builds, and how it behaves while the builds around it are running.</p>
+<h2>When to use it</h2>
+<p>Use it to build a chain: the game build needs the engine build first and takes its files. A suitable earlier build is reused, so a chain does not rebuild what did not change. <em>Dependencies</em> is under <strong>More</strong> on the Settings tabs.</p>
+<figure class="shot">
+  <img src="../../assets/shots/projects/bc-dependencies.png" alt="The Dependencies settings of Release Candidate, with one snapshot and one artifact dependency on Windows Build">
+  <figcaption>The Dependencies tab.</figcaption>
+</figure>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings</strong>. Then click <strong>More › Dependencies</strong>.</li>
+  <li>Under <strong>Snapshot Dependencies</strong> click <strong>Add snapshot dependency</strong>. Choose the build configuration this one needs.</li>
+  <li>Choose the options and what happens when the dependency fails.</li>
+  <li>Under <strong>Artifact Dependencies</strong> click <strong>Add artifact dependency</strong> to copy files from another build.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<h2>Every field</h2>
+<h3>Snapshot dependency</h3><table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Dependency</td><td>The build configuration to run first.</td><td>None</td><td><code>Engine/Linux Server Build</code></td></tr>
+    <tr><td>Do not run new build if there is a suitable one</td><td>Reuse a suitable existing build instead of starting a new one.</td><td>On</td><td>On</td></tr>
+    <tr><td>Only use successful builds from suitable ones</td><td>Failed builds are never reused, even if they are otherwise suitable.</td><td>On</td><td>On</td></tr>
+    <tr><td>On failed dependency</td><td>What this build does when the dependency fails: <em>Run build, but add problem</em>, <em>Run build, but do not add problem</em>, <em>Make build failed to start</em> or <em>Cancel build</em>.</td><td>Run build, but add problem</td><td>Cancel build</td></tr>
+  </tbody>
+</table>
+<h3>Artifact dependency</h3><table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Get artifacts from</td><td>Which build to take files from: <em>Build from the same chain</em> (needs a snapshot dependency on the same build configuration), <em>Last successful build</em>, <em>Last pinned build</em>, <em>Last finished build</em> or <em>Build number</em>.</td><td>Build from the same chain</td><td>Last successful build</td></tr>
+    <tr><td>Artifact rules</td><td>One rule per line: a path or pattern in the build's artifacts, optionally <code>=&gt;</code> a folder in the workspace. Lines that start with <code>-:</code> exclude files.</td><td>Empty</td><td><code>dist/**/*.zip =&gt; packages</code></td></tr>
+    <tr><td>Clean destination paths before downloading artifacts</td><td>Delete the contents of each target folder before copying. Never the workspace root.</td><td>Off</td><td>On</td></tr>
+  </tbody>
+</table>
+<h3>Dependency options</h3><table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Wait while an upstream build configuration is building</td><td>This build configuration does not start while a build configuration it depends on is building or waiting in the queue.</td><td>Off</td><td>On</td></tr>
+    <tr><td>Wait while a downstream build configuration is building</td><td>This one does not start while a build configuration that follows it is building or waiting.</td><td>Off</td><td>Off</td></tr>
+    <tr><td>Keep the build logs of dependencies</td><td>While a build of this build configuration is kept, the builds it used from other build configurations are kept too.</td><td>Off</td><td>On</td></tr>
+  </tbody>
+</table>
+<h3>When is a build suitable?</h3><ul>
+  <li>It succeeded (when the dependency only uses successful builds) and was started after the dependency's configuration was last saved.</li>
+  <li>It used the same parameter values the chain asks for.</li>
+  <li>It is the dependency's newest build: no newer build is running or queued.</li>
+  <li>The builds of its own snapshot dependencies are reused too.</li>
+</ul>
+<p><strong>Run</strong> on the build configuration can rebuild failed and incomplete dependencies, or all of them, whatever these options say.</p><h2>A worked example</h2>
+<p><strong>Windows Build</strong> has a snapshot dependency on <strong>Engine/Linux Server Build</strong> and an artifact dependency that copies <code>dist/**/*.zip =&gt; packages</code>. When you run the game build, the engine build runs first if there is no suitable one.</p><h2>What you see when it runs</h2>
+<p>A chain shows the builds as a graph on the <strong>Build Chains</strong> tab. The log says which builds were reused. A build started this way says <em>Started as a snapshot dependency of Windows Build</em>.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>The dependency is rebuilt every time</td><td>Its parameters differ from the chain's, or a newer build is queued. See the list of what makes a build suitable.</td></tr>
+    <tr><td>An artifact rule fails</td><td>Enter at least one rule. A target path must be inside the workspace and must not contain <code>..</code>.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="settings-homes.html">Settings homes</a></li>
+  <li><a href="../parameters/dependencies.html">Snapshot and artifact dependencies</a></li>
+  <li><a href="../parameters/build-chains.html">Build chains</a></li>
+  <li><a href="../how-to/params-use-other-build-artifacts.html">Use another build's artifacts</a></li>
+</ul>
+</main>
+</body>
+</html>

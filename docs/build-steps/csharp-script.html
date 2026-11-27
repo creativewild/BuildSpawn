@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>C# Script · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/csharp-script">
+<main class="doc">
+<h1>C# Script</h1>
+<p class="lead">Runs a C# script, typed into the step or from a <code>.csx</code> file, with <code>dotnet-script</code> or <code>csi</code>.</p>
+
+<h2>When to use it</h2>
+<p>Use it for build logic you would rather write in C# than in a shell script, such as editing a version file or checking asset names. It needs <code>dotnet-script</code> or <code>csi</code> on the agent.</p>
+
+<h2>How to set it up</h2>
+
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>. Type <code>C# Script</code> in <strong>Filter step types</strong> if you like, then click the <strong>C# Script</strong> tile (group <strong>Build tools</strong>).</li>
+  <li>Type a <strong>Step name</strong>, for example <code>Stamp version</code>.</li>
+  <li>Fill in the fields described below.</li>
+  <li>Optional: set <strong>Execute step</strong>, <strong>Conditions</strong> and <strong>Retry on failure</strong>. See <a href="step-list.html">The steps list and the step editor</a>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<figure class="shot small">
+  <img src="../../assets/shots/build-steps/csharp-script.png" alt="The fields of the C# Script step in the step editor">
+  <figcaption>The fields of the C# Script step, as the step editor shows them.</figcaption>
+</figure>
+
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Tool</strong></td><td><strong>dotnet-script</strong> (a .NET global tool) or <strong>csi</strong>. Both must be installed on the agent and found on its <code>PATH</code>.</td><td>dotnet-script</td><td>dotnet-script</td></tr>
+    <tr><td><strong>Path to the tool</strong></td><td>Path of the tool chosen above. Empty finds it on the agent's <code>PATH</code>, and the build configuration then needs an agent that has it. May use <code>%name%</code> parameters.</td><td>Empty</td><td><code>C:\Users\build\.dotnet\tools\dotnet-script.exe</code></td></tr>
+    <tr><td><strong>Script in this step / File</strong></td><td>Choose one. <strong>Script</strong> is the C# text, in a code editor. <strong>Script file</strong> is a <code>.csx</code> file relative to the working directory.</td><td>Script in this step</td><td><code>Build/stamp.csx</code></td></tr>
+    <tr><td><strong>NuGet package sources</strong></td><td>One source per line, a URL or a folder, each passed to <code>dotnet-script</code> as <code>-s</code>. <code>csi</code> has no such switch and the step stops. Put no user name or password in an address: use a <code>NuGet.Config</code> on the agent.</td><td>Empty</td><td><code>https://nuget.studio.example/v3/index.json</code></td></tr>
+    <tr><td><strong>Arguments</strong></td><td>One argument per line, passed to the script. Other processes on the agent can see them, so pass a secret through the environment.</td><td>Empty</td><td><code>%build.number%</code></td></tr>
+    <tr><td><strong>Working directory, Environment variables, Test reports, Run step within container</strong></td><td>The same in every runner. See <a href="common-step-fields.html">Fields every runner has</a>.</td><td></td><td></td></tr>
+  </tbody>
+</table>
+
+
+<h2>A worked example</h2>
+<p>Write the build number into a version file. Step name <code>Stamp version</code>, choose <strong>Script in this step</strong>:</p><pre><code>var version = "1.4." + Args[0];
+System.IO.File.WriteAllText("Build/version.txt", version);
+Console.WriteLine("Version " + version);</code></pre><p>Set <strong>Arguments</strong> to <code>%build.number%</code>.</p>
+
+<h2>What you see when it runs</h2>
+<p>The console shows the <code>dotnet-script</code> command after a <code>$</code>, then the script output: <code>Version 1.4.57</code>.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong><em>… was not found on this agent</em></strong></td><td>Install the tool and put it on the <code>PATH</code>, or set <strong>Path to the tool</strong>.</td></tr>
+    <tr><td><strong><em>NuGet package sources need dotnet-script</em></strong></td><td>Choose <strong>dotnet-script</strong>, or empty the sources.</td></tr>
+    <tr><td><strong><em>A NuGet package source must not start with a dash or hold a user name or password</em></strong></td><td>Move the credentials to a <code>NuGet.Config</code> on the agent.</td></tr>
+    <tr><td><strong><em>The C# Script step has no script / no script file</em></strong></td><td>Fill in the field for the mode you chose.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="script-editor.html">The script editor</a></li>
+  <li><a href="dotnet.html">.NET</a></li>
+  <li><a href="command-line.html">Command Line</a></li>
+  <li><a href="runners.html">Runners</a></li>
+  <li><a href="common-step-fields.html">Fields every runner has</a></li>
+</ul>
+</main>
+</body>
+</html>

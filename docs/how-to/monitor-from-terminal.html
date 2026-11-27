@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Watch the server from a terminal · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/monitor-from-terminal">
+<main class="doc">
+<h1>Watch the server from a terminal</h1>
+<p class="lead">Point the <code>buildspawn</code> terminal program at any Buildspawn server to watch its builds, queue and agents live, and stop builds or take agents offline, with no browser.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>You have the terminal program. It comes with every server download: <code>bin\buildspawn.exe</code> on Windows, <code>bin/buildspawn</code> on Linux and macOS. The Windows setup and the Linux packages put it on the PATH. You don't need a server on your own computer to use it.</li>
+  <li>You can reach the server's address from your computer, for example <code>http://buildserver:8080</code>.</li>
+  <li>A terminal at least 80 columns wide. From 110 columns the monitor uses its wide layout. Windows Terminal shows colours and symbols best.</li>
+  <li>To stop builds, cancel queue items or take agents offline, you need an API token. Without one the monitor is read only.</li>
+</ul>
+
+<h2>Steps</h2>
+<ol class="steps">
+  <li>In the web interface, make an API token: your initial at the top right, <strong>Security</strong>, <strong>Add new token</strong>, a name such as <code>terminal on studio-pc</code>, <strong>Generate</strong>. Copy the token. See <a href="../reference/api-tokens.html">API tokens</a>.</li>
+  <li>Save the token in a text file with one line: your user name, a colon and the token. Keep the file private.
+<p>On Windows, in PowerShell:</p>
+<pre><code>Set-Content -NoNewline -Path "$env:USERPROFILE\.buildspawn-token" -Value "docs:11f3c9a0e5b27d48c6a1f09e3b7d5c2a84"</code></pre>
+<p>On Linux and macOS:</p>
+<pre><code>echo "docs:11f3c9a0e5b27d48c6a1f09e3b7d5c2a84" &gt; ~/.buildspawn-token
+chmod 600 ~/.buildspawn-token</code></pre>
+  </li>
+  <li>Start the monitor with the server's address and the token file:
+<pre><code>buildspawn --url http://buildserver:8080 --token-file ~/.buildspawn-token</code></pre>
+  <p>On Windows, in the program folder, type <code>.\bin\buildspawn.exe</code> instead of <code>buildspawn</code>, and <code>$env:USERPROFILE\.buildspawn-token</code> for the file.</p></li>
+  <li>The <strong>Overview</strong> opens. Press <kbd>2</kbd> for <strong>Builds</strong>: every build of the last 24 hours, newest first.</li>
+  <li>Press <kbd>f</kbd> to show only one result, for example only failed builds. Press <kbd>/</kbd> and type to filter by job, agent or cause, such as <code>HT3</code>.</li>
+  <li>Use <kbd>↑</kbd> and <kbd>↓</kbd> to select a build. The card below the list shows its agent, cause and last five results. Press <kbd>Enter</kbd> to read its log, <kbd>o</kbd> to open it in your browser, or <kbd>x</kbd> to stop a running build.</li>
+  <li>Press <kbd>3</kbd> for <strong>Queue</strong> to see why each build waits. Press <kbd>c</kbd> to cancel the selected item or <kbd>p</kbd> to move it to the front.</li>
+  <li>Press <kbd>4</kbd> for <strong>Agents</strong>. Select an agent and press <kbd>d</kbd> to take it offline, for example before you restart the machine.</li>
+  <li>Press <kbd>q</kbd> to quit.</li>
+</ol>
+
+<pre class="terminal" data-title="buildspawn --view builds"> Buildspawn 1.9.3 · <span class="t-green">● Serving</span> http://127.0.0.1:8090 · 0 of 10 executors busy · 1 queued                  LIVE
+  1 Overview  <span class="t-inverse">[2 Builds]</span>   3 Queue 1   4 Agents 6/7   5 Logs   6 Service   7 Settings
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ / type to filter jobs, agents, causes                     all  running 0  failed 7  unstable 1  aborted 0
+ ┌─ Builds · last 24 h ─────────────────────────────────────────────────────────────────────────1-15 of 36──┐
+ │   Start Job                              # Result              Time Agent                   Cause        │
+ │▸  11:36 How-to/HT3 Scripted build       #4 <span class="t-green">✓ success</span>           0:03 ht3-win-agent           docs         │
+ │   11:36 How-to/HT3 Scripted build       #3 <span class="t-green">✓ success</span>           0:03 ht3-win-agent           docs         │
+ │   11:35 How-to/HT2 Release Build        #1 <span class="t-green">✓ success</span>           0:14 ht-win-agent-01         docs         │
+ │   11:31 How-to/HT2 Devkit Build         #2 <span class="t-green">✓ success</span>           0:20 ht-win-agent-01         docs         │
+ │   11:27 How-to/HT3 Scripted build       #2 <span class="t-green">✓ success</span>           0:03 ht3-win-agent           docs         │
+ │   11:27 How-to/HT3 Scripted build       #1 <span class="t-green">✓ success</span>           0:05 ht3-win-agent           docs         │
+ │   11:26 How-to/HT3 Nightly upload       #2 <span class="t-green">✓ success</span>           0:01 ht3-win-agent           Resumed #1…  │
+ │   11:25 How-to/HT1 Shelf Check          #3 <span class="t-green">✓ success</span>           0:08 ht3-win-agent           docs         │
+ │   11:25 How-to/HT1 Unity Windows Bu…    #2 <span class="t-green">✓ success</span>           3:07 ht3-win-agent           docs         │
+ │   11:23 How-to/HT2 Parallel Cook        #1 <span class="t-green">✓ success</span>           0:30 win-build-01            docs         │
+ │   11:22 How-to/HT1 Unity Windows Bu…    #1 <span class="t-red">✗ failed</span>            0:00 ht-win-agent-01         docs         │
+ │   11:22 How-to/HT1 Shelf Check          #2 <span class="t-green">✓ success</span>           0:10 ht3-win-agent           docs         │
+ │   11:22 How-to/HT1 Every Submit         #2 <span class="t-green">✓ success</span>           0:07 ht3-win-agent           docs         │
+ │   11:22 How-to/HT1 Shared/HT1 Windo…    #2 <span class="t-green">✓ success</span>           0:00 ht3-win-agent           docs       ▼ │
+ │   11:21 How-to/HT1 Secrets/HT1 Stor…    #1 <span class="t-green">✓ success</span>           0:00 ht3-win-agent           docs         │
+ └──────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+ ┌─ How-to/HT3 Scripted build #4 ───────────────────────────────────────────────────────────────────────────┐
+ │ <span class="t-green">✓ success</span> in 0:03 · started Nov 23 11:36                                                                 │
+ │ Agent ht3-win-agent · Cause Started by user docs                                                         │
+ │ Last 5 ✓✓✓ · avg 0:04                                                                                    │
+ └──────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+ ↑↓ select  Enter log  o open  x stop  f result filter  g group by job
+ 1-7 views  / filter  Space freeze  r refresh  t theme  b open in browser  ? help  q quit
+ Signed in docs | x stops the selected build                                           refresh 2 s · 11:37:17</pre>
+<p>The <strong>Builds</strong> view, here on a server at <code>http://127.0.0.1:8090</code>. The chips at the top count the results; <code>Resumed #1…</code> in the <strong>Cause</strong> column is a build resumed from a failed one.</p>
+
+<pre class="terminal" data-title="buildspawn --view agents"> Buildspawn 1.9.3 · <span class="t-green">● Serving</span> http://127.0.0.1:8090 · 0 of 10 executors busy · 1 queued                  LIVE
+  1 Overview   2 Builds   3 Queue 1  <span class="t-inverse">[4 Agents]</span> 6/7   5 Logs   6 Service   7 Settings
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ ┌─ Agents ───────────────────────────────────────────────────────────────────────────6 online · 1 offline──┐
+ │   Agent            State     Executors        Labels               System          Free Ping / since     │
+ │▸  built-in         <span class="t-green">● idle</span>    0/0 ░░░░░░░░     built-in             Windows 11 …  348 GB —                │
+ │   ht-win-agent-01  <span class="t-green">● idle</span>    0/2 ░░░░░░░░     win64 windows        Windows 11 …  348 GB 1044 ms          │
+ │   ht3-win-agent    <span class="t-green">● idle</span>    0/2 ░░░░░░░░     win64 ht3 windows    Windows 11 …  348 GB 92 ms            │
+ │   linux-build-01   <span class="t-red">○ offline</span> 0 of 2           server linux         —                  — offline 05:31    │
+ │   ps5-devkit-01    <span class="t-green">● idle</span>    0/2 ░░░░░░░░     console ps5 windows  Windows 11 …  348 GB 750 ms           │
+ │   win-build-01     <span class="t-green">● idle</span>    0/2 ░░░░░░░░     win64 vs2022 windows Windows 11 …  348 GB 261 ms           │
+ │   win-build-02     <span class="t-green">● idle</span>    0/2 ░░░░░░░░     win64 vs2022 windows Windows 11 …  348 GB 242 ms           │
+ │Executors 10 online · 0 busy · 10 idle   Offline linux-build-01 Disk replacement, back on Monday 05:31    │
+ └──────────────────────────────────────────────────────────────────────────────────────────────────────────┘</pre>
+<p>The <strong>Agents</strong> view: state, busy executors, labels, free disk and ping. The line at the bottom says why an agent is offline.</p>
+
+<h3>Use it in scripts</h3>
+<p>Every view has a text twin that prints once and exits. Use them in scheduled tasks or chat bots:</p>
+<pre><code>buildspawn builds --failed --limit 5 --url http://buildserver:8080 --token-file ~/.buildspawn-token</code></pre>
+<pre class="terminal" data-title="buildspawn builds --failed">Start  Job                             #   Result  Time  Agent            Cause
+11:22  How-to/HT1 Unity Windows Build  #1  <span class="t-red">failed</span>  0:00  ht-win-agent-01  docs
+11:20  How-to/HT1 Every Submit         #1  <span class="t-red">failed</span>  0:00  ht-win-agent-01  docs
+11:20  How-to/HT1 Shelf Check          #1  <span class="t-red">failed</span>  0:23  ht3-win-agent    docs
+11:20  How-to/HT3 Nightly upload       #1  <span class="t-red">failed</span>  0:21  ht3-win-agent    docs
+05:40  Game/PS5 Build                  #2  <span class="t-red">failed</span>  7:00  ps5-devkit-01    docs</pre>
+<table>
+  <thead><tr><th>Command or option</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>builds --failed</code>, <code>--running</code>, <code>--limit N</code></td><td>The Builds table as text.</td></tr>
+    <tr><td><code>queue</code></td><td>The Queue table, with the reason each item waits.</td></tr>
+    <tr><td><code>agents</code></td><td>The Agents table.</td></tr>
+    <tr><td><code>--json</code></td><td>Prints the table as JSON instead, for other programs to read.</td></tr>
+    <tr><td><code>--once --view builds --cols 110</code></td><td>Draws one frame of the monitor as text and exits, for a log file or a quick look.</td></tr>
+    <tr><td><code>--no-color</code></td><td>Plain text without colours.</td></tr>
+  </tbody>
+</table>
+<div class="callout tip"><p>Set <code>BUILDSPAWN_URL</code> and <code>BUILDSPAWN_TOKEN_FILE</code> once in your shell profile. Then plain <code>buildspawn</code> opens the monitor on that server with your token.</p></div>
+
+<h2>Check it worked</h2>
+<ul>
+  <li>The top line says <strong>● Serving</strong> and the server's address, with <strong>LIVE</strong> at the right. The time in the bottom right corner moves every 2 seconds.</li>
+  <li>The bottom line says <strong>Signed in</strong> and your user name.</li>
+  <li>In the Builds view, the hint at the bottom says <em>x stops the selected build</em>. That means your token is used and actions work.</li>
+</ul>
+
+<h2>Troubleshooting</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>Typing <code>buildspawn</code> on Windows opens the Buildspawn app instead.</td><td>In the program folder, Windows finds <code>Buildspawn.exe</code> first. Type <code>.\bin\buildspawn.exe</code>, or open a new terminal anywhere else after the Windows setup.</td></tr>
+    <tr><td><kbd>x</kbd>, <kbd>c</kbd> or <kbd>d</kbd> is refused, and the Builds view hint does not say <em>x stops the selected build</em>.</td><td>The token file is missing, has more than one line, or holds a revoked token. Check the file and the token's <strong>Last used</strong> time on your <strong>Security</strong> page.</td></tr>
+    <tr><td>The monitor can't connect.</td><td>Open the same address in a browser on the same computer. Include the port and <code>http://</code> or <code>https://</code>. A firewall or a server that listens on <code>127.0.0.1</code> only blocks other computers.</td></tr>
+    <tr><td>Boxes are drawn with odd characters.</td><td>The old Windows console can't draw them. Use Windows Terminal, or add <code>--glyphs ascii</code>.</td></tr>
+  </tbody>
+</table>
+
+<h2>Next steps</h2>
+<ul>
+  <li><a href="../get-started/terminal-program.html">The terminal program</a>: the launch flow and all seven views.</li>
+  <li><a href="../reference/terminal-commands.html">Terminal program commands</a>: every command, option and key.</li>
+  <li><a href="script-with-api-token.html">Start builds from a script</a>.</li>
+  <li><a href="../agents/agents-page.html">The Agents page</a>: the same agents in the browser, with telemetry.</li>
+</ul>
+</main>
+</body>
+</html>

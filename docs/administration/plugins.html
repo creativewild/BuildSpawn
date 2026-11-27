@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plugins and updates · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="administration/plugins">
+<main class="doc">
+<h1>Plugins and updates</h1>
+<p class="lead">See which features are installed, turn them on or off, and add more with plugins.</p>
+
+<p>A <strong>plugin</strong> adds a feature to Buildspawn, such as a build step, a version control system or a way to publish files. Buildspawn ships with all its plugins inside the download, already tested together. You don't need to install anything to start.</p>
+<p>The plugin pages are under <strong>Settings › Plugins</strong>. Each page, with its fields, is also described in <a href="management-pages.html#plugins-installed">Management pages</a>.</p>
+<table>
+  <thead><tr><th>Page</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Installed plugins</strong></td><td>Lists every plugin with its version. Turn plugins on or off, or remove them.</td></tr>
+    <tr><td><strong>Available plugins</strong></td><td>Lists plugins from the update site that are not installed yet.</td></tr>
+    <tr><td><strong>Download progress</strong></td><td>Shows plugins that are being downloaded and installed.</td></tr>
+    <tr><td><strong>Advanced settings</strong></td><td>Install a plugin from a file, and choose the update site.</td></tr>
+  </tbody>
+</table>
+
+<h2 id="installed">Installed plugins</h2>
+<p>Open <strong>Settings › Installed plugins</strong>. Type in <strong>Search installed plugins</strong> to find one by name.</p>
+<figure class="shot">
+  <img src="../../assets/shots/administration/plugins-installed.png" alt="The Installed plugins page filtered on Publish Over, showing four plugins with version, description, health, an Enabled switch and an uninstall button">
+  <figcaption>Installed plugins, filtered by name.</figcaption>
+</figure>
+<p>Each row shows:</p>
+<table>
+  <thead><tr><th>Column</th><th>What it shows</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Name</strong></td><td>The plugin, its version and what it does.</td></tr>
+    <tr><td><strong>Health</strong></td><td>A score for how well the plugin is kept up.</td></tr>
+    <tr><td><strong>Enabled</strong></td><td>The switch turns the plugin on or off. A greyed switch means other plugins need this one, so it cannot be turned off.</td></tr>
+    <tr><td><strong>Uninstall</strong></td><td>The bin removes the plugin.</td></tr>
+  </tbody>
+</table>
+<div class="callout warning"><p>Turning a plugin off or removing it takes effect after a restart. Build configurations that use its steps or settings stop working, so check first.</p></div>
+
+<h3 id="from-the-update-site">Add a plugin from the update site</h3>
+<ol class="steps">
+  <li>Open <strong>Settings › Available plugins</strong>. Click <strong>Check now</strong> to refresh the list.</li>
+  <li>Search for the plugin and tick it.</li>
+  <li>Click <strong>Install</strong>, or <strong>Install after restart</strong> to finish it on the next restart.</li>
+</ol>
+
+<h3 id="from-a-file">Add a plugin from a file</h3>
+<ol class="steps">
+  <li>Open <strong>Settings › Advanced settings</strong>.</li>
+  <li>Under <strong>Deploy Plugin</strong>, choose the plugin <strong>File</strong> on your computer, or type a <strong>URL</strong>.</li>
+  <li>Click <strong>Deploy</strong>, then restart Buildspawn.</li>
+</ol>
+
+<h3 id="download-progress">Watch the download</h3>
+<p>After you click <strong>Install</strong>, the <strong>Download progress</strong> page opens. Each plugin shows its state until it is done. When all are done you can use the new plugins at once, or restart if one asks for it. See <a href="management-pages.html#plugins-downloads">Download progress</a>.</p>
+
+<h2>Updates</h2>
+<p>Buildspawn ships its plugins and does not update them one by one. A new Buildspawn version brings new versions of the plugins, tested with the rest. To update plugins, <a href="backups.html">upgrade Buildspawn</a>.</p>
+<ul>
+  <li>A file for a plugin that is already installed is refused. To replace a bundled plugin on purpose, tick <strong>Replace the installed plugin</strong> under Deploy Plugin.</li>
+  <li>The <strong>Update Site</strong> field in Advanced settings sets where <strong>Available plugins</strong> comes from.</li>
+</ul>
+<div class="callout tip"><p>Plugins you add yourself are kept in the data folder, so they survive an upgrade. After an upgrade, check that they still work with the new version.</p></div>
+
+<h2>Tips</h2>
+<ul>
+  <li>Add as few extra plugins as you can. Every plugin is code that runs inside your server.</li>
+  <li>Try a new plugin on a test server first.</li>
+  <li>Back up the data folder before you add or remove plugins. See <a href="backups.html">Backups and upgrades</a>.</li>
+  <li>Plugins can add fields to the System page. See <a href="system-settings.html">System settings</a>.</li>
+  <li>For a proxy that sits between the server and the update site, set the <a href="system-settings.html#proxy">HTTP Proxy Configuration</a>.</li>
+</ul>
+</main>
+</body>
+</html>

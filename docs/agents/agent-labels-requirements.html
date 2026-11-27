@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Labels and agent requirements · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="agents/agent-labels-requirements">
+<main class="doc">
+<h1>Labels and agent requirements</h1>
+<p class="lead">Labels and requirements decide which agent may run which build. A label is a tag you put on an agent. A requirement is a rule on a build configuration that an agent must meet, such as "Windows, at least 32 GB of memory, in the Unreal pool".</p>
+
+<h2>When to use it</h2>
+<p>Use a label when one word is enough: <code>windows</code>, <code>ps5</code>, <code>gpu</code>. Use a requirement when the rule is about a value that the agent reports, such as its operating system version, its free disk space, its name or its pool. Requirements need no tagging by hand. The agents report the values themselves.</p>
+
+<h2>Labels</h2>
+<p>A label is a word, or several words separated by spaces, in the agent's <strong>Labels</strong> field (see <a href="agent-settings.html">Agent settings</a>). Example: <code>windows unreal-5.4 gpu</code> gives the agent three labels.</p>
+<ul>
+  <li>A label can have any characters but spaces. Avoid <code>! &amp; | &lt; &gt; ( )</code>, because label expressions use them.</li>
+  <li>Every agent also has a label that is its own name. The built-in node has the label <code>built-in</code>.</li>
+  <li>Labels need not be about the operating system. They can say what is installed: <code>vs2022</code>, <code>docker</code>.</li>
+</ul>
+
+<h3>Label expressions</h3>
+<p>A build configuration can ask for agents with a <em>label expression</em>. The expression is true for an agent when its labels match.</p>
+<table>
+  <thead><tr><th>Write</th><th>Meaning</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><code>a</code></td><td>The agent has label <code>a</code>.</td><td><code>windows</code></td></tr>
+    <tr><td><code>a &amp;&amp; b</code></td><td>Both labels.</td><td><code>windows &amp;&amp; gpu</code></td></tr>
+    <tr><td><code>a || b</code></td><td>Either label.</td><td><code>ps5 || xbox</code></td></tr>
+    <tr><td><code>!a</code></td><td>The agent does not have <code>a</code>.</td><td><code>!devkit</code></td></tr>
+    <tr><td><code>( … )</code></td><td>Group parts.</td><td><code>windows &amp;&amp; (gpu || cpu-only)</code></td></tr>
+    <tr><td><code>a -&gt; b</code></td><td>If it has <code>a</code>, it must have <code>b</code>.</td><td><code>gpu -&gt; vulkan</code></td></tr>
+    <tr><td><code>a &lt;-&gt; b</code></td><td>It has both or neither.</td><td><code>ps5 &lt;-&gt; devkit</code></td></tr>
+  </tbody>
+</table>
+<p>A wrong expression is refused with <em>That is not a label expression: …</em>. An empty expression lets any agent run the build configuration.</p>
+<p>Click a label on an agent's page to see its label page: which agents have it and which build configurations use it.</p>
+
+<h2>Agent requirements</h2>
+<p>Requirements are rules on parameters. Every build configuration has a page for them.</p>
+
+<h3>How to set it up</h3>
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings</strong>.</li>
+  <li>Open <strong>Agent Requirements</strong>. (Reading it needs permission to read the build configuration; changing it needs <strong>Configure</strong>.)</li>
+  <li>Click <strong>Add</strong> to add a rule. Pick a <strong>parameter</strong> (the field offers all the parameters that agents report, and you can type your own name), a <strong>condition</strong>, and a <strong>value</strong>.</li>
+  <li>Save the row. The page shows <em>N of M agents can run this configuration</em> and updates as you change the rules.</li>
+  <li>To change the label expression, click <strong>Edit label expression</strong> on the row of kind <em>label</em>. The old <strong>Labels</strong> field shows as one such row.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/agents/agent-requirements.png" alt="Agent Requirements of Windows Build with the Add requirement form and the list of compatible agents"><figcaption>Agent Requirements, with the compatible agents listed below.</figcaption></figure>
+<p>A build runs only on an agent whose parameters satisfy <strong>every</strong> row. A build configuration has at most 100 rules. A rule that is already there is refused (<em>This requirement is already there</em>).</p>
+
+<h3>Conditions</h3>
+<table>
+  <thead><tr><th>Condition</th><th>True when the agent's value…</th></tr></thead>
+  <tbody>
+    <tr><td><strong>exists</strong></td><td>is there (the agent has the parameter).</td></tr>
+    <tr><td><strong>does not exist</strong></td><td>is not there.</td></tr>
+    <tr><td><strong>equals</strong>, <strong>does not equal</strong></td><td>is the same as, or different from, the value.</td></tr>
+    <tr><td><strong>more than</strong>, <strong>no more than</strong>, <strong>less than</strong>, <strong>no less than</strong></td><td>compares as numbers. The value must be a number (<em>This condition compares numbers, and this is not one</em>).</td></tr>
+    <tr><td><strong>starts with</strong>, <strong>ends with</strong>, <strong>contains</strong>, <strong>does not contain</strong></td><td>compares text.</td></tr>
+    <tr><td><strong>matches</strong>, <strong>does not match</strong></td><td>matches a regular expression, for example <code>WIN-BUILD-0[1-4]</code>.</td></tr>
+    <tr><td><strong>version more than</strong>, <strong>version no more than</strong>, <strong>version less than</strong>, <strong>version no less than</strong></td><td>compares as version numbers, so <code>10.0.9</code> is less than <code>10.0.10</code>.</td></tr>
+  </tbody>
+</table>
+<p>Except for <em>exists</em> and <em>does not exist</em>, a condition needs a value (<em>This condition needs a value</em>).</p>
+
+<h3>Rules that come from build steps</h3>
+<p>Some build steps need a program on the agent's search path: for example a .NET step needs <code>dotnet</code>, a Docker step needs <code>docker</code>. These steps add rules by themselves. They show on the page as rows marked <strong>From a step</strong> (and <em>inherited from</em> a template when they come from one). You cannot delete them, because the step needs them. To remove one, change or disable the step. If the tool is on an agent in an unusual place, click <strong>Ignore</strong> on the row. Builds of the build configuration may then start on an agent without it, and fail there.</p>
+<p>If no known agent meets a rule, the queue says <em>No known agent meets this requirement, so builds will wait</em>. For a waiting build, <em>Requirement not met: NAME is missing</em> or <em>Requirement not met: …</em> names the rule that kept an agent out.</p>
+
+<h3>Compatible agents</h3>
+<p>The <strong>Compatible Agents</strong> tab of the build configuration lists which agents can run it, and why each of the others cannot. Each agent's page has a similar list of the build configurations it can run.</p>
+
+<h2>Agent parameters</h2>
+<p>Each agent has a <strong>Parameters</strong> page: open the agent, then <strong>Parameters</strong>. It lists what the agent reported when it connected, grouped as <strong>Agent</strong>, <strong>System</strong>, <strong>Folders</strong> and <strong>Environment</strong>, then your custom parameters, then what the agent found on its search path (<code>agent.tool.NAME</code>, with <code>agent.tool.NAME.version</code> where cheap to read), then what plug-ins found (for example Unity Editors and Unreal Engines). An offline agent shows its last report with its age.</p>
+<table>
+  <thead><tr><th>Parameter</th><th>What it holds</th></tr></thead>
+  <tbody>
+    <tr><td><code>agent.name</code></td><td>Name of the agent.</td></tr>
+    <tr><td><code>agent.labels</code></td><td>Labels of the agent, separated by spaces.</td></tr>
+    <tr><td><code>agent.pool</code></td><td>Pool the agent is in.</td></tr>
+    <tr><td><code>agent.type</code></td><td><code>permanent</code>, <code>cloud</code> or <code>personal</code>.</td></tr>
+    <tr><td><code>agent.owner</code></td><td>Owner of a personal machine.</td></tr>
+    <tr><td><code>agent.executors</code></td><td>Number of executors.</td></tr>
+    <tr><td><code>agent.hostname</code></td><td>Host name of the machine.</td></tr>
+    <tr><td><code>agent.os.name</code></td><td>Operating system name.</td></tr>
+    <tr><td><code>agent.os.family</code></td><td><code>windows</code>, <code>linux</code> or <code>macos</code>.</td></tr>
+    <tr><td><code>agent.os.version</code></td><td>Operating system version.</td></tr>
+    <tr><td><code>agent.os.arch</code></td><td>Processor architecture.</td></tr>
+    <tr><td><code>agent.cpu.count</code></td><td>Number of processors.</td></tr>
+    <tr><td><code>agent.memory.total.mb</code></td><td>Total memory in MB.</td></tr>
+    <tr><td><code>agent.java.version</code></td><td>Java version of the agent.</td></tr>
+    <tr><td><code>agent.version</code></td><td>Agent program version.</td></tr>
+    <tr><td><code>agent.work.dir</code></td><td>Work folder of the agent.</td></tr>
+    <tr><td><code>agent.work.dir.free.mb</code></td><td>Free space of the work folder in MB.</td></tr>
+    <tr><td><code>agent.home.dir</code></td><td>Folder the agent runs from.</td></tr>
+    <tr><td><code>agent.temp.dir</code></td><td>Temporary folder of the agent.</td></tr>
+    <tr><td><code>env.NAME</code></td><td>An environment variable that an administrator chose to show (see below).</td></tr>
+  </tbody>
+</table>
+<p>The same names work in build steps as <code>%agent.name%</code> (see <a href="../parameters/parameters.html">Parameters</a>), so a step can use the name of the agent it runs on.</p>
+<div class="callout note"><p>Plug-ins can add parameters. The Unity and Unreal plug-ins report the editors and engines found on the agent, and a build configuration can require one.</p></div>
+
+<h3>Custom parameters</h3>
+<p>Add your own parameters in the agent's <strong>Custom parameters</strong> property (<code>rack=a3</code>). Use them for facts that Buildspawn cannot read, such as the devkit's SDK version. See <a href="agent-settings.html#custom-parameters">Agent settings</a> for the rules.</p>
+
+<h3>Exposed environment variables</h3>
+<p>An agent's environment variables are not shown by default. An administrator picks which ones appear as <code>env.NAME</code> parameters.</p>
+<ol class="steps">
+  <li>Open <strong>Settings › System</strong> and find <strong>Agent environment variables</strong> (see <a href="../administration/system-settings.html">System settings</a>).</li>
+  <li>In <strong>Variables to show</strong>, type one name per line, for example <code>UE_ROOT</code> or <code>VULKAN_SDK</code>.</li>
+  <li>Click <strong>Save</strong>. Each name shows as <code>env.NAME</code> on every agent's Parameters page, and requirements can use it.</li>
+</ol>
+<p>Nothing is shown unless it is listed. At most 50 names are allowed. A name has letters, digits and underscores and does not start with a digit. A name with <code>password</code>, <code>passwd</code>, <code>secret</code>, <code>token</code>, <code>key</code> or <code>credential</code> in it is refused, so a secret never becomes a parameter.</p>
+
+<h2>A worked example</h2>
+<p>The studio builds a Windows client of the game that needs an NVIDIA graphics card for shader tests, and it must run on one of the machines <code>WIN-BUILD-01</code> to <code>WIN-BUILD-04</code>.</p>
+<ol class="steps">
+  <li>On each of the four agents, set <strong>Labels</strong> to <code>windows gpu</code>.</li>
+  <li>In <strong>Game / Windows Client</strong>, open <strong>Settings › Agent Requirements</strong>.</li>
+  <li>Edit the label expression to <code>windows &amp;&amp; gpu</code>.</li>
+  <li>Add a rule: <code>agent.name</code> <strong>matches</strong> <code>WIN-BUILD-0[1-4]</code>.</li>
+  <li>Add a rule: <code>agent.memory.total.mb</code> <strong>no less than</strong> <code>32768</code>.</li>
+  <li>Add a rule: <code>agent.pool</code> <strong>equals</strong> <code>Windows</code>.</li>
+</ol>
+<p>The page now says <em>3 of 12 agents can run this configuration</em>, or whatever your count is.</p>
+
+<h2>What you see when it runs</h2>
+<ul>
+  <li>The queue entry of a waiting build names the agents that were rejected and why, for example <em>Requirement not met: agent.memory.total.mb</em> or <em>Not in a pool assigned to this project (pool: Linux)</em>.</li>
+  <li>The build page names the agent the build ran on.</li>
+  <li>A rule that no agent can meet is shown on the Agent Requirements page as <em>No known agent meets this requirement, so builds will wait</em>.</li>
+</ul>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>A build waits and says no agent meets the requirement.</td><td>Open the Compatible Agents tab. Check the spelling of the label, and whether the agents are online and in a pool of the project.</td></tr>
+    <tr><td><em>That is not a label expression</em></td><td>Check <code>&amp;&amp;</code>, <code>||</code> and the brackets.</td></tr>
+    <tr><td>A numeric condition is refused.</td><td>The value is not a number. Use a regular expression or a text condition instead.</td></tr>
+    <tr><td>A rule "From a step" blocks every agent.</td><td>No agent has the tool on its search path. Install it, or use <strong>Ignore</strong> and point the step at the tool.</td></tr>
+    <tr><td>An <code>env.NAME</code> parameter is missing.</td><td>Add the name under <strong>Agent environment variables</strong> in Settings. The agent reports it the next time it connects.</td></tr>
+    <tr><td>An offline agent shows old values.</td><td>It shows its last report with the age. It reads the values again when it connects.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="agent-settings.html">Agent settings</a></li>
+  <li><a href="pools.html">Pools</a></li>
+  <li><a href="agent-executors.html">Builds at a time</a></li>
+  <li><a href="../administration/system-settings.html">System settings</a></li>
+</ul>
+</main>
+</body>
+</html>

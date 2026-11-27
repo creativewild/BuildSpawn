@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Steps shared from a project or template · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/shared-steps">
+<main class="doc">
+<h1>Steps shared from a project or template</h1>
+<p class="lead">A project or a template can hold build steps that every build configuration under it gets. You can override or switch off a shared step in one build configuration without touching the others.</p>
+<h2>When to use it</h2>
+<p>Use shared steps when many build configurations do the same work, for example the same Unity build for Windows, PS5 and Xbox. Write the steps once in the project (the <em>settings home</em>) or in a template. See <a href="../projects/projects.html">Projects</a>, <a href="../projects/settings-homes.html">Settings homes</a> and <a href="../projects/templates.html">Templates</a>.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the project (or the template) and click <strong>Settings › Build Steps</strong>.</li>
+  <li>Add the steps with <strong>Add build step</strong> and click <strong>Save</strong>.</li>
+  <li>Open a build configuration under it and click <strong>Settings › Build Steps</strong>. The shared steps are in the list, tagged <em>From project Game</em>, <em>From template …</em> or <em>From Root project</em>.</li>
+  <li>To change a shared step for this build configuration only, click <strong>Override</strong>, change the fields and click <strong>Save</strong>. The row now says <strong>Overridden</strong>.</li>
+  <li>To switch it off here, click <strong>Disable in this build configuration</strong>.</li>
+  <li>To go back, click <strong>Reset to inherited</strong>. The step is then as the project or template defines it.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/build-steps/shared-steps.png" alt="A build configuration whose list shows steps from its project">
+  <figcaption>A build configuration whose list shows steps from its project.</figcaption>
+</figure><h2>Every option</h2>
+<table>
+  <thead><tr><th>Action</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Override</strong></td><td>Copies the shared step into this build configuration so you can change it. Other build configurations keep the shared version.</td><td>Not overridden</td><td>Change the Unity build method for one platform</td></tr>
+    <tr><td><strong>Edit override</strong></td><td>Opens the overridden step again.</td><td></td><td></td></tr>
+    <tr><td><strong>Disable in this build configuration</strong></td><td>Skips the shared step here. It stays enabled everywhere else.</td><td>Enabled</td><td>No Steam upload in the test build configuration</td></tr>
+    <tr><td><strong>Reset to inherited</strong></td><td>Throws away the override and gives the step back as the project defines it.</td><td></td><td></td></tr>
+    <tr><td><strong>Disabled above</strong></td><td>The step was switched off higher up.</td><td></td><td></td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p>The project <strong>HT1 Shared</strong> holds the steps <code>Compile</code> and <code>Package</code>. <strong>HT1 Windows Build</strong> uses both. <strong>HT1 PS5 Build</strong> overrides <code>Package</code> to add the console tool and keeps <code>Compile</code> as it is. When you change <code>Compile</code> in the project, both build configurations get the change. <code>Package</code> in the PS5 build stays as overridden until you click <strong>Reset to inherited</strong>.</p>
+<h2>What you see when it runs</h2>
+<p>A shared step runs like any other step, in the order of the list. The console block carries the step name, and the build page shows it in the <strong>Build steps</strong> card with the others.</p>
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong>A shared step does not show in a build configuration</strong></td><td>Check that the build configuration is inside the project, or uses the template.</td></tr>
+    <tr><td><strong>You changed the project and one build configuration did not change</strong></td><td>That build configuration overrides the step. Click <strong>Reset to inherited</strong> there.</td></tr>
+    <tr><td><strong>A shared step has no edit option</strong></td><td>It belongs to the project. Edit it in the project, or use <strong>Override</strong>.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../projects/projects.html#passes-down">What a project passes down</a></li>
+  <li><a href="../projects/templates.html">Templates</a></li>
+  <li><a href="../projects/settings-homes.html">Settings homes</a></li>
+  <li><a href="../how-to/share-settings-with-a-project.html">Share settings with a project</a></li>
+  <li><a href="step-list.html">The steps list and the step editor</a></li>
+</ul>
+</main>
+</body>
+</html>

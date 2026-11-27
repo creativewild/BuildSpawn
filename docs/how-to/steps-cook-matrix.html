@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cook several platforms with a Matrix block · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/steps-cook-matrix">
+<main class="doc">
+<h1>Cook several platforms with a Matrix block</h1>
+<p class="lead">Write the cook step once and let Buildspawn run it for every platform and configuration.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>A build configuration with a script that takes a platform and a configuration, here <code>Build\Cook.bat</code>.</li>
+  <li>Agents or a pool for each platform.</li>
+</ul>
+
+<h2>Steps</h2>
+<ol class="steps">
+  <li>Open <strong>Settings › Build Steps</strong> and click <strong>Add Parallel block</strong>. Name it <code>Cook</code>.</li>
+  <li>Click <strong>Change to Matrix</strong>.</li>
+  <li>Add the axis <code>platform</code> with the values <code>Win64, PS5, XboxSeriesX</code> and the axis <code>config</code> with <code>Development, Shipping</code>.</li>
+  <li>Under <strong>Exclude</strong> add a row for <code>platform = PS5</code> and <code>config = Development</code>.</li>
+  <li>Add a Command Line step in the block: <code>Build\Cook.bat %platform% %config%</code>.</li>
+  <li>Under <strong>Run on</strong> send PS5 and XboxSeriesX to <code>pool:Consoles</code>.</li>
+  <li>Set <strong>Max at once</strong> to <code>3</code> and <strong>Files sent back</strong> to <code>Saved/StagedBuilds/%platform%/**</code>.</li>
+  <li>Click <strong>Save block</strong> and run the build.</li>
+</ol>
+
+<h2>Check it worked</h2>
+<p>The build page shows a grid with one cell per combination. <strong>Re-run</strong> in a cell runs that combination again. The console has one lane per combination.</p>
+
+<h2>Troubleshooting</h2>
+<ul>
+  <li><strong>Too many combinations.</strong> The limit is 256. Add exclude rows or remove values.</li>
+  <li><strong>A step does not see the value.</strong> Use <code>%platform%</code> in the field, or read the environment variable <code>platform</code>.</li>
+</ul>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../build-steps/matrix-mode.html">Matrix mode</a></li>
+  <li><a href="run-steps-in-parallel.html">Run steps in parallel</a></li>
+  <li><a href="../running-builds/parallel-and-composite.html">Parallel and composite builds</a></li>
+</ul>
+</main>
+</body>
+</html>

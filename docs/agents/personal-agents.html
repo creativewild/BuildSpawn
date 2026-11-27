@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Personal agents · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="agents/personal-agents">
+<main class="doc">
+<h1>Personal agents</h1>
+<p class="lead">A personal agent is your own computer, connected to Buildspawn so that you can run a build on it. Only you can build there. Use it to try a build configuration, or to check a shelf, on your own hardware before the change goes to the build farm.</p>
+
+<h2>When to use it</h2>
+<p>Use a personal machine when a build needs your hardware (your graphics card, your devkit) or when you do not want to wait for a free farm agent. The most common use in a game studio is the <em>shelf check</em>: you shelve your Perforce change, then build it on your own PC to see that it compiles and cooks before you submit.</p>
+
+<h2>How personal machines work</h2>
+<ul>
+  <li>Each personal machine has one <strong>owner</strong>. Only builds that the owner starts by hand run on it.</li>
+  <li>Nothing automatic lands on it: triggers, schedules, finished-build chains and other people's builds never use a personal machine.</li>
+  <li>Other users do not see it in the Run dialog. Only the owner and administrators see it.</li>
+  <li>A build on a personal machine is a <strong>personal build</strong>. It does not change the status of the build configuration, is never the "last successful" build, and starts no other builds. See <a href="../running-builds/personal-builds.html">Personal builds</a>.</li>
+  <li>The Pool Scheduler never moves a personal machine (see <a href="pool-scheduler.html">The Pool Scheduler</a>), and it shows as <em>Personal</em> on the board.</li>
+  <li>The agent connects out to the server over WebSocket. There is no port to open on your side.</li>
+</ul>
+
+<h2>Before you start</h2>
+<ul>
+  <li>An administrator must turn personal machines on (see <a href="#allow-personal-machines">Allow personal machines</a> below). It is off by default.</li>
+  <li>You need the permission <strong>Use a personal machine</strong>.</li>
+</ul>
+
+<h2>How to add your machine</h2>
+<ol class="steps">
+  <li>Open your user menu in the top bar and click <strong>My machines</strong>.</li>
+  <li>Click <strong>Add this machine</strong>.</li>
+  <li>Type a <strong>Machine name</strong>, for example <code>dana-pc</code>. If an agent with that name exists, the page says <em>There is already an agent named dana-pc. Choose another name.</em></li>
+  <li>Pick the <strong>System</strong>: <strong>Windows</strong>, <strong>macOS</strong> or <strong>Linux</strong>. Click <strong>Next</strong>.</li>
+  <li>Step <strong>1. Download</strong>: download the agent made for this machine. Unzip it and start it (on Windows run <code>bin\Buildspawn Agent.exe</code> from the folder, see <a href="windows-tray-app.html">Windows tray app</a>). It connects by itself.</li>
+  <li>Step <strong>2. Your secret</strong>: the secret is shown once. Click <strong>Copy</strong> if you need it for a manual start. <em>You won't see this again. Revoke it any time.</em></li>
+  <li>The page says <em>Waiting for dana-pc to connect…</em> and changes to <em>dana-pc is connected.</em> Click <strong>Done</strong>.</li>
+</ol>
+<p>If the server has no agent download set up, the dialog says so and tells you to start the agent you already have with the secret shown.</p>
+<figure class="shot"><img src="../../assets/shots/agents/personal-machines.png" alt="The My machines page with the machine studio-workstation online and the Add this machine button"><figcaption>My machines, with one machine online.</figcaption></figure>
+<figure class="shot"><img src="../../assets/shots/agents/personal-add.png" alt="The Add this machine dialog with the Machine name field and the Windows, Linux and macOS choice"><figcaption>The Add this machine dialog.</figcaption></figure>
+
+<h2>The My machines page</h2>
+<p>The page says <em>Your own computers. Only you can run builds on them.</em> It lists your machines with these columns:</p>
+<table>
+  <thead><tr><th>Column</th><th>What it shows</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Name</strong></td><td>The machine's name. Click it to open the machine.</td></tr>
+    <tr><td><strong>System</strong></td><td>Operating system.</td></tr>
+    <tr><td><strong>CPU</strong></td><td>Number of cores.</td></tr>
+    <tr><td><strong>Free disk</strong></td><td>Free space in the work folder.</td></tr>
+    <tr><td><strong>Last seen</strong></td><td>How long ago the machine was last online, or <em>Never</em>.</td></tr>
+    <tr><td><strong>Builds at a time</strong></td><td>How many builds may run on it at once. Default 1. You can change it.</td></tr>
+    <tr><td><strong>State</strong></td><td>Online, offline, paused or stopped.</td></tr>
+    <tr><td><strong>Actions</strong></td><td>Pause, Resume, Revoke secret, Remove.</td></tr>
+  </tbody>
+</table>
+<p>An administrator sees the machines of other users too, headed <em>Computers that belong to NAME. Only NAME can run builds on them.</em></p>
+
+<h3>One machine</h3>
+<p>Open a machine to see its status, CPU, free disk and these parts:</p>
+<table>
+  <thead><tr><th>Part</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Builds at a time</strong></td><td>Raise or lower the number of builds that run together.</td></tr>
+    <tr><td><strong>Pause</strong> / <strong>Resume</strong></td><td>Stop new builds on this machine. The running one finishes. Use it when you need your CPU.</td></tr>
+    <tr><td><strong>Revoke secret</strong></td><td>Asks <em>Revoke secret for NAME?</em> The agent on that machine disconnects. It connects again only with the new secret, which you see next.</td></tr>
+    <tr><td><strong>Remove</strong></td><td>Asks <em>Remove NAME?</em> This deletes the machine and its secret. Builds waiting for it are cancelled.</td></tr>
+    <tr><td><strong>Workspaces per build configuration</strong></td><td>Choose where each build configuration builds here. See below.</td></tr>
+    <tr><td><strong>Allowed credentials</strong></td><td>Read only list of the credentials this machine may use. An administrator chooses them. <em>No credentials are allowed on personal machines.</em> when the list is empty.</td></tr>
+    <tr><td><strong>My builds on this machine</strong></td><td>Your builds here, with result and time, and a <strong>Share</strong> link for each.</td></tr>
+  </tbody>
+</table>
+
+<h3>Workspace options</h3>
+<p>A game project can be hundreds of gigabytes, so you choose where it builds. In <strong>Workspaces per build configuration</strong>, pick a build configuration (<strong>Choose a build configuration</strong> / <strong>Add build configuration</strong>) and set its <strong>Workspace</strong>:</p>
+<table>
+  <thead><tr><th>Choice</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Own copy (first sync is full)</strong></td><td>The agent makes its own client and folder. The first sync is full, and later syncs are small. This is the default and the safest.</td></tr>
+    <tr><td><strong>My synced folder</strong></td><td>The build uses a folder you have already synced. Fill in <strong>Synced folder</strong> (for example <code>D:\Work\Game</code>) and <strong>Client</strong> (your Perforce client, for example <code>dana_LG-PC</code>). The agent unshelves into it and reverts after the build. The folder is never cleaned up or wiped.</td></tr>
+  </tbody>
+</table>
+<div class="callout warning"><p><strong>My synced folder</strong> is safe only if the client has no open files. The agent unshelves into it and reverts after the build, and it skips the revert when the workspace has other open files. Check that nothing is open before you use it.</p></div>
+<p><strong>Clean</strong> on a row empties the build's own workspace. It needs the machine to be online (<em>The machine is offline, so the folder can't be cleaned now.</em>). Click <strong>Save</strong> to keep the choice.</p>
+
+<h2>Run on my machine</h2>
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Run</strong>.</li>
+  <li>In <strong>Run on</strong>, choose <strong>My machine · dana-pc</strong>. It shows <strong>Online</strong> or <strong>Offline</strong>, and <em>Only you can see this option.</em> It also shows <em>Builds at a time: 1 · 0 running</em>.</li>
+  <li>Click <strong>Run</strong>. The build is a personal build, started on your machine.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/agents/personal-run.png" alt="The Run dialog of Local Asset Check with the Agent list open: My machine studio-workstation, the default agent, and the compatible agents"><figcaption>The Run dialog. Run on lists your own machine.</figcaption></figure>
+<p>On the build it says <em>Ran on dana-pc (your machine)</em>. An administrator sees the owner's name instead, for example <em>Ran on dana-pc (dana.k's machine)</em>.</p>
+
+<h3>If the machine is offline</h3>
+<p>The build waits for your machine, and only for it. The queue says <em>Waiting for your machine 'dana-pc' (offline). Cancelled in 30 min if it doesn't connect.</em> After the time set by the administrator, it is cancelled with <em>Cancelled: your machine 'dana-pc' was offline for 30 min</em>.</p>
+
+<h3>If a credential is not allowed</h3>
+<p>The Run dialog warns when the build configuration uses credentials that are not allowed on personal machines: <em>This build configuration uses NAME, which isn't allowed on personal machines. The build will stop before it starts.</em> A personal machine is hardware you control, so a secret sent to it could be read. Ask an administrator to allow the credential, or run on a farm agent.</p>
+
+<h2>Shelf checks</h2>
+<p>A shelf check runs your shelved Perforce change on your own machine. The agent syncs the workspace, unshelves your shelf and resolves it with the stale-shelf rules, builds, and reverts the shelved files afterwards.</p>
+<ol class="steps">
+  <li>Shelve your change in Perforce.</li>
+  <li>Open the build configuration, open the <strong>Shelves</strong> tab and pick the shelf (or several shelves).</li>
+  <li>Run the build on <strong>My machine</strong> (see above).</li>
+  <li>The build page shows <em>Shelf check · CL 48213 · unshelved and resolved</em>.</li>
+  <li>If it passes, submit your change. If it fails, fix it and shelve again.</li>
+</ol>
+<p>See <a href="../how-to/check-shelf-before-submit.html">Check a shelf before you submit</a> for the personal-build flow on the farm.</p>
+
+<h2>Share a build</h2>
+<p>Personal builds are hidden from other people. To let a colleague read one, click <strong>Share</strong> on the build (also in the tray app and the terminal program). It copies a link. Whoever opens the link can read that build, its console, its artifacts and its test results, and nothing else.</p>
+
+<h2>Credentials on personal machines</h2>
+<p>By default no credential is sent to a personal machine. An administrator turns it on for each credential with the <strong>Allowed on personal machines</strong> switch in the credential's form (it shows as a <em>Personal machines</em> tag in the list). The setting is kept outside the credential and only administrators can change it. A build that needs a credential that is not allowed stops before it starts, with a message that names it. Users who hit the block can ask an administrator from the Run dialog.</p>
+
+<h2 id="allow-personal-machines">Settings › Security › Personal machines</h2>
+<p>Administrators set the rules here.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Allow personal machines</strong></td><td>Users can connect their own computer and run their own builds on it. When off, the machines stay on the My machines page but take no builds. The page says <em>Personal machines are turned off by an administrator.</em></td><td>Off</td><td>On</td></tr>
+    <tr><td><strong>Offline machine: cancel waiting builds after</strong></td><td>A build waits for its owner's machine only. After this many minutes it is cancelled and says why. It must be at least 1.</td><td>30 minutes</td><td>20</td></tr>
+  </tbody>
+</table>
+<p>A line under the fields says: <em>Who may add a machine: the permission "Use a personal machine", under Agents in the permission table.</em> That permission is named <code>UsePersonal</code>. Give it in <strong>Settings › Security › Authorization</strong> or in a role (see <a href="../administration/authorization.html">Authorization</a> and <a href="../administration/roles.html">Roles</a>). If a user loses the permission, the queue says <em>NAME may no longer use a personal machine, so MACHINE takes no builds</em>.</p>
+<p>In the node properties of an agent, the owner is kept in a hidden property. It does not appear in the agent's Configure page. The agent's <strong>Parameters</strong> page shows <code>agent.type</code> = <code>personal</code> and <code>agent.owner</code>.</p>
+
+<h2>A worked example</h2>
+<p>Dana works on the <strong>Forest</strong> level and uses Unreal Engine with Perforce. A full cook on the farm takes 40 minutes, and the farm is busy before a milestone.</p>
+<ol class="steps">
+  <li>An administrator ticks <strong>Allow personal machines</strong> and gives Dana's group the <code>UsePersonal</code> permission.</li>
+  <li>Dana adds <code>dana-pc</code> from <strong>My machines</strong>, and starts the agent with the tray app.</li>
+  <li>For <code>Game / Windows Build</code>, Dana picks <strong>My synced folder</strong> <code>D:\Work\Game</code> with client <code>dana_LG-PC</code>, because that folder is already synced and has no open files.</li>
+  <li>Dana shelves change 48213, opens the <strong>Shelves</strong> tab and runs it on <strong>My machine · dana-pc</strong>.</li>
+  <li>The build passes with <em>Shelf check · CL 48213 · unshelved and resolved</em>. Dana submits.</li>
+</ol>
+
+<h2>What you see when it runs</h2>
+<ul>
+  <li>On the Agents page, the machine has a <em>Personal</em> mark with the owner. Only the owner and administrators see it.</li>
+  <li>The build has a <strong>Personal</strong> chip. It does not appear in other users' lists.</li>
+  <li>The tray app on the machine shows <strong>Owner</strong> and only your builds, with <strong>Share</strong>.</li>
+</ul>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>You see no <strong>My machines</strong> link, or <em>You can't add a personal machine.</em></td><td>Personal machines are off, or you lack the <code>UsePersonal</code> permission. Ask an administrator.</td></tr>
+    <tr><td>The build waits and is then cancelled.</td><td>Your machine was offline. Start the agent and run again.</td></tr>
+    <tr><td>The build stops before it starts and names a credential.</td><td>The credential is not allowed on personal machines. Ask an administrator.</td></tr>
+    <tr><td>A trigger did not use your machine.</td><td>By design. Personal machines take only builds you start by hand.</td></tr>
+    <tr><td>The machine stays offline after <strong>Revoke secret</strong>.</td><td>Start the agent with the new secret, or download the agent again from My machines.</td></tr>
+    <tr><td>Your machine does not appear in the Run dialog.</td><td>Check that it is online and that your account owns it.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="windows-tray-app.html">Windows tray app</a> and <a href="agent-terminal.html">Agent terminal program</a></li>
+  <li><a href="../running-builds/personal-builds.html">Personal builds</a></li>
+  <li><a href="../how-to/check-shelf-before-submit.html">Check a shelf before you submit</a></li>
+  <li><a href="../administration/authorization.html">Authorization</a></li>
+  <li><a href="../administration/settings-overview.html">Settings overview</a></li>
+</ul>
+</main>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Publish JUnit test result report · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="post-build/test-report">
+<main class="doc">
+<h1>Publish JUnit test result report</h1>
+<p class="lead">Reads test report files in JUnit format and shows the results on the build.</p>
+<h2>When to use it</h2>
+<p>Use it when your tests write XML reports. It is the same setting as the build feature <a href="../projects/feature-xml-report.html">XML report processing</a>. The fields are described there. This page shows the short way.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration, click <strong>Settings</strong>, then <strong>Post-build Actions</strong>. Click <strong>Add post-build action</strong> and choose <strong>Publish JUnit test result report</strong>.</li>
+  <li>In <strong>Test report XMLs</strong> type the files, for example <code>Reports/*.xml</code>. Use <strong>Validate Pattern</strong> to check.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<h2>Every field</h2>
+<p>The most used fields. All of them are in <a href="../projects/feature-xml-report.html">XML report processing</a>.</p><table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Test report XMLs</td><td>The report files as an Ant pattern.</td><td>Empty</td><td><code>Reports/*.xml</code></td></tr>
+    <tr><td>Test output retention</td><td>How much test output is kept.</td><td>Standard</td><td>Standard</td></tr>
+    <tr><td>Health report amplification factor</td><td>Effect of failed tests on build health.</td><td>1.0</td><td><code>1.0</code></td></tr>
+    <tr><td>Allow empty results</td><td>Do not fail the build when no results are found.</td><td>Off</td><td>Off</td></tr>
+    <tr><td>Skip marking build as unstable on test failure</td><td>Keep the build green on test failures.</td><td>Off</td><td>Off</td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p>The <strong>Unit Tests</strong> configuration of the Engine project writes <code>Reports/tests.xml</code>. The post-build action reads <code>Reports/*.xml</code>.</p><h2>What you see when it runs</h2>
+<p>The build page gets a <strong>Tests</strong> tab. A build with a failed test is <strong>Unstable</strong>.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>No test report files found</td><td>Check the pattern and that the test step ran.</td></tr>
+    <tr><td>Old results are counted</td><td>Turn on <strong>Skip report files older than build start</strong>.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="overview.html">After the build: overview</a></li>
+  <li><a href="../projects/bc-post-build-actions.html">Post-build actions tab</a></li>
+  <li><a href="../projects/feature-xml-report.html">XML report processing</a></li>
+</ul>
+</main>
+</body>
+</html>

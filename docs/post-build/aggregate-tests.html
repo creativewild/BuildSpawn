@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aggregate downstream test results · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="post-build/aggregate-tests">
+<main class="doc">
+<h1>Aggregate downstream test results</h1>
+<p class="lead">Collects the test results of the builds that follow this one and shows them together on this build.</p>
+<h2>When to use it</h2>
+<p>Use it when one build compiles and several others run tests, for example a PS5 test build and a Windows test build that start after <strong>Windows Build</strong>. People then see the whole test result on one page.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration, click <strong>Settings</strong>, then <strong>Post-build Actions</strong>. Click <strong>Add post-build action</strong> and choose <strong>Aggregate downstream test results</strong>.</li>
+  <li>Tick <strong>Automatically aggregate all downstream tests</strong> to take every build configuration that follows. Or type the names in <strong>Jobs to aggregate</strong>.</li>
+  <li>Tick <strong>Include failed builds in results</strong> if failed downstream builds count too.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Automatically aggregate all downstream tests</td><td>Take the tests of every build configuration that follows this one, through the whole chain. You do not need to keep a list.</td><td>Off</td><td>On</td></tr>
+    <tr><td>Jobs to aggregate</td><td>A comma separated list of build configuration names, when you do not use automatic mode.</td><td>Empty</td><td><code>Game/Unit Tests, Game/PS5 Tests</code></td></tr>
+    <tr><td>Include failed builds in results</td><td>Also count builds that failed.</td><td>Off</td><td>Off</td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p><strong>Windows Build</strong> starts <strong>Unit Tests</strong> and <strong>Smoke Tests</strong> when it passes. With automatic aggregation on, the Windows Build page shows the sum of all three.</p><h2>What you see when it runs</h2>
+<p>The build page shows an <strong>Aggregated Test Result</strong> with the counts per downstream build configuration.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>Nothing is aggregated</td><td>The following builds must be started by this build (a trigger or a dependency) and must publish test results themselves.</td></tr>
+    <tr><td>The numbers change later</td><td>Results are added as the downstream builds finish.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="overview.html">After the build: overview</a></li>
+  <li><a href="../projects/bc-post-build-actions.html">Post-build actions tab</a></li>
+  <li><a href="build-other.html">Build other build configurations</a></li>
+  <li><a href="../projects/bc-dependencies.html">Dependencies</a></li>
+</ul>
+</main>
+</body>
+</html>

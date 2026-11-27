@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Perforce shelve trigger · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="running-builds/trigger-p4-shelve">
+<main class="doc">
+<h1>Perforce shelve trigger</h1>
+<p class="lead">Starts a personal build for each new shelf that matches your rules.</p>
+
+<h2>When to use it</h2>
+<p>Use it to test a change before it is submitted. A developer shelves a change with a keyword in its description, and Buildspawn builds the shelf.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Triggers</strong>.</li>
+  <li>Click <strong>Add new trigger</strong> and click <strong>Add</strong> next to <strong>Perforce shelve trigger</strong>.</li>
+  <li>Check the <strong>Schedule</strong> and the <strong>Keyword</strong>. Add a <strong>Description pattern</strong> or <strong>Users</strong> if you need them.</li>
+  <li>Optional: open <strong>Build customization</strong> to tick <strong>Enforce clean checkout</strong> and add <strong>Parameters</strong>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/running-builds/trigger-p4-shelve.png" alt="The Perforce shelve trigger form with Schedule, Keyword, Description pattern and Users"><figcaption>The Perforce shelve trigger form.</figcaption></figure>
+
+<h2>Every field</h2>
+<table>
+<thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>Schedule</td><td>How often to look for new shelves, in cron syntax. Empty: only when a Perforce trigger calls Buildspawn.</td><td><code>H/5 * * * *</code></td><td><code>H/2 * * * *</code></td></tr><tr><td>Keyword</td><td>Only changelists whose description contains this text. Required unless a description pattern or users are set.</td><td><code>#buildspawn</code></td><td><code>#build</code></td></tr><tr><td>Description pattern</td><td>A regular expression the description must match. Empty: any description.</td><td>Empty</td><td><code>^QA:</code></td></tr><tr><td>Users</td><td>Perforce users whose shelves count, separated by spaces or commas. Empty: everyone.</td><td>Empty</td><td><code>dana.k sam.lee</code></td></tr><tr><td>Build customization › Enforce clean checkout</td><td>Every build this trigger starts begins with an empty workspace.</td><td>Off</td><td>On</td></tr><tr><td>Build customization › Parameters</td><td>Build parameters for these builds, one <code>name=value</code> per line. They win over the defaults. Names that start with <code>p4.</code> belong to Buildspawn.</td><td>Empty</td><td><code>CONFIG=Development</code></td></tr>
+</tbody>
+</table>
+
+<h2>A worked example</h2>
+<p>Add the trigger with keyword <code>#buildspawn</code>. A developer shelves changelist 51234 with the description <em>Fix crate collision #buildspawn</em>. Within five minutes a personal build starts with that shelf.</p>
+<h2>What you see when it runs</h2>
+<p>Each new revision of a matching shelf starts one personal build. The cause says <em>Started by the Perforce shelve trigger: shelf 51234 of dana.k</em>. The Shelves tab lists them. Only files in the build configuration's workspace view count. Shelves that exist when the trigger starts, or when the filters change, wait for their next revision.</p>
+<h2>Problems and fixes</h2>
+<table>
+<thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+<tbody>
+<tr><td>The keyword is required</td><td>Type a keyword, a pattern or a user.</td></tr><tr><td>A parameter name is refused</td><td>Names are letters, digits, <code>_</code> and <code>.</code>, and cannot start with <code>p4.</code>. Each line must be <code>name=value</code>.</td></tr><tr><td>No build for an old shelf</td><td>Only new revisions start a build.</td></tr>
+</tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="triggers.html">Triggers</a></li>
+  <li><a href="../version-control/perforce-shelves.html">Shelves</a></li>
+  <li><a href="../how-to/check-shelf-before-submit.html">Check a shelf before you submit</a></li>
+</ul>
+</main>
+</body>
+</html>

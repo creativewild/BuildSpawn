@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Appearance and themes · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="administration/appearance">
+<main class="doc">
+<h1>Appearance and themes</h1>
+<p class="lead">Change how Buildspawn looks for you and your team: the light or dark theme, shared icon colours and how build pages and consoles are shown.</p>
+
+<p>There are two places to change the look:</p>
+<table>
+  <thead><tr><th>Page</th><th>Who</th><th>What it changes</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Settings › Appearance</strong></td><td>Administrators</td><td>The default theme for everybody, shared icon colours and server-wide display options.</td></tr>
+    <tr><td><strong>Account menu › Appearance</strong></td><td>Every user</td><td>Your own theme and console options. They win over the server defaults, for you only.</td></tr>
+  </tbody>
+</table>
+
+<h2>Themes</h2>
+<p>Buildspawn has three themes:</p>
+<table>
+  <thead><tr><th>Theme</th><th>What it looks like</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Default</strong></td><td>The light theme: light pages with a dark side panel.</td></tr>
+    <tr><td><strong>Dark</strong></td><td>The dark theme: dark everywhere. Easier on the eyes in a dark room.</td></tr>
+    <tr><td><strong>Dark (System)</strong></td><td>Follows the operating system's light or dark setting, and switches when it does.</td></tr>
+  </tbody>
+</table>
+<figure class="shot">
+  <img src="../../assets/shots/administration/appearance.png" alt="The Appearance settings page in the light theme with three theme cards, Default, Dark and Dark (System), the box Allow theme selection for each user, and the Icon colour favourites section">
+  <figcaption>Settings › Appearance in the light theme.</figcaption>
+</figure>
+<figure class="shot">
+  <img src="../../assets/shots/administration/appearance-dark.png" alt="The same Appearance settings page in the dark theme">
+  <figcaption>The same page in the dark theme.</figcaption>
+</figure>
+
+<h3>Switch your own theme</h3>
+<p>The quickest way: click the <strong>sun / moon switch</strong> in the top bar. Your choice is saved with your account, so it follows you to other computers.</p>
+<p>Or choose it on your own Appearance page:</p>
+<ol class="steps">
+  <li>Click the account menu (the round button with your initial) and pick <strong>Appearance</strong>.</li>
+  <li>Click a theme card: <strong>Default</strong>, <strong>Dark</strong> or <strong>Dark (System)</strong>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/administration/user-appearance.png" alt="A user's own Appearance page with the three theme cards, Console URL Provider and Console line times">
+  <figcaption>Your own Appearance page.</figcaption>
+</figure>
+
+<h3>Set the theme for everybody</h3>
+<ol class="steps">
+  <li>Open <strong>Settings › Appearance</strong>.</li>
+  <li>Under <strong>Themes</strong>, click the theme new users should get.</li>
+  <li>Leave <strong>Allow theme selection for each user</strong> on so people can still pick their own, or switch it off to use one theme for everybody.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<h2>Settings &rsaquo; Appearance, every option</h2>
+<p>The page is called <strong>Appearance</strong> and says <em>Configure the look and feel of Buildspawn.</em> A <strong>Find plugins</strong> link at the top lists plugins that add more looks. Everything on the page applies to the whole server, in this order:</p>
+<table>
+  <thead><tr><th>Section and field</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Themes</strong>: <strong>Default</strong>, <strong>Dark</strong>, <strong>Dark (System)</strong></td><td>The theme people get until they pick their own. One card is selected.</td></tr>
+    <tr><td><strong>Allow theme selection for each user</strong></td><td>On: every user can pick a theme on their own Appearance page or with the switch in the top bar. Off: everybody gets the theme chosen above.</td></tr>
+    <tr><td><strong>Icon colour favourites</strong> (<em>Shared with everyone</em>)</td><td>A table with the columns <strong>Name</strong>, <strong>Colour</strong> and <strong>Shown on light / on dark</strong>. These colours appear in the <em>Favourites</em> row of the icon colour swatch of every build configuration and project, for every user. Only administrators can change them. Click <strong>Add favourite</strong> to add a row, give it a name and pick a colour. Up to 24. Removing one does not change icons already coloured with it, because the colour is stored on the icon.</td></tr>
+    <tr><td>Colour check under the favourites</td><td>A colour that is too light for the light page, or too dark for the dark side panel, is shown adjusted there. The two columns show the colour on light and on dark, and a line under the table says which colour is used where, for example that a dark green is shown a little lighter in the project tree and on the dark theme.</td></tr>
+    <tr><td><strong>Pipeline Stages</strong>: <strong>Show pipeline stages on job page</strong>, <strong>Show stage names by default</strong>, <strong>Show stage durations by default</strong></td><td>Three switches for the stage view of build configurations that run in stages. Each can be left on its default or set here for everybody.</td></tr>
+    <tr><td><strong>Pipeline Graph</strong>: <strong>Show pipeline graph on build page</strong></td><td>Shows the graph of stages on the build page.</td></tr>
+    <tr><td><strong>Prism syntax highlighting</strong>: <strong>Theme</strong></td><td>The colour scheme for code shown in the browser, such as scripts. The default, <em>PRISM</em>, follows light and dark mode.</td></tr>
+    <tr><td><strong>Console URL Provider</strong></td><td>Which view opens when someone clicks a build console link. Providers higher in the list win. If none can show the link, the default is used. Click <strong>Add</strong> to add a provider and <strong>Delete</strong> to remove one. Users can override this on their own page.</td></tr>
+  </tbody>
+</table>
+<p>Click <strong>Save</strong> or <strong>Apply</strong> at the bottom. <strong>Apply</strong> saves and keeps you on the page.</p>
+
+<h2>The sign-in page</h2>
+<p>The sign-in page (from release 1.7) has the logo on the left and the form on the right, with faint branch lines behind. It follows the theme: light, dark, or your system's setting when the default theme is in use.</p>
+
+<h2>The resizable sidebar</h2>
+<p>From release 1.9 you can change the width of the left sidebar. Drag its right edge, anywhere from 200 pixels to half the window.</p>
+<ul>
+  <li>Your width is remembered in your browser, so each person and each computer has its own.</li>
+  <li>Double-click the edge to go back to the standard width.</li>
+  <li>From the keyboard, press <kbd>Tab</kbd> until the edge is focused, then use the arrow keys. Hold <kbd>Shift</kbd> for bigger steps.</li>
+</ul>
+
+<h3>Your own console options</h3>
+<p>On your own Appearance page you can also set:</p>
+<ul>
+  <li><strong>Console URL Provider:</strong> your own choice of console view. It wins over the one the administrator set.</li>
+  <li><strong>Console line times:</strong> how the build console shows the time of each line: <em>Clock</em> (time of day), <em>Elapsed</em> (time since the build started) or <em>Off</em>. The Time control on the console page changes it too. See <a href="../build-results/build-console.html">The build console</a>.</li>
+</ul>
+
+<h2>Tips</h2>
+<ul>
+  <li>Screenshots for bug reports are easier to read in the light theme.</li>
+  <li>Use <strong>Dark (System)</strong> if your computer switches to dark mode in the evening.</li>
+  <li>Agree on a few icon colour favourites, for example one per platform, so the project tree is easy to scan.</li>
+</ul>
+</main>
+</body>
+</html>

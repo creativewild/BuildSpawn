@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kotlin Script · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/kotlin-script">
+<main class="doc">
+<h1>Kotlin Script</h1>
+<p class="lead">Runs a Kotlin script, typed into the step or from a <code>.kts</code> file, with <code>kotlinc -script</code>.</p>
+
+<h2>When to use it</h2>
+<p>Use it when your build tools are written in Kotlin or the JVM suits you better than shell. The agent needs the Kotlin compiler and a Java runtime.</p>
+
+<h2>How to set it up</h2>
+
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>. Type <code>Kotlin Script</code> in <strong>Filter step types</strong> if you like, then click the <strong>Kotlin Script</strong> tile (group <strong>Build tools</strong>).</li>
+  <li>Type a <strong>Step name</strong>, for example <code>List platforms</code>.</li>
+  <li>Fill in the fields described below.</li>
+  <li>Optional: set <strong>Execute step</strong>, <strong>Conditions</strong> and <strong>Retry on failure</strong>. See <a href="step-list.html">The steps list and the step editor</a>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<figure class="shot small">
+  <img src="../../assets/shots/build-steps/kotlin-script.png" alt="The fields of the Kotlin Script step in the step editor">
+  <figcaption>The fields of the Kotlin Script step, as the step editor shows them.</figcaption>
+</figure>
+
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Script in this step / File</strong></td><td>Choose one. <strong>Script</strong> is the Kotlin text in a code editor. <strong>Script file</strong> is a <code>.kts</code> file relative to the working directory.</td><td>Script in this step</td><td><code>Build/tools.kts</code></td></tr>
+    <tr><td><strong>Arguments</strong></td><td>One argument per line. Each line stays one argument, whatever it holds. Pass a secret through the environment.</td><td>Empty</td><td><code>Shipping</code></td></tr>
+    <tr><td><strong>Compiler</strong></td><td>Path of <code>kotlinc</code>. Empty takes <code>kotlinc</code> from the agent's <code>PATH</code>.</td><td>Empty</td><td><code>C:\kotlinc\bin\kotlinc.bat</code></td></tr>
+    <tr><td><strong>Compiler version</strong></td><td>Such as <code>2.1</code> or <code>2.1.10</code>. The build configuration then asks for an agent whose <code>kotlinc</code> reports this version. Ignored when a compiler path is set.</td><td>Empty</td><td><code>2.1</code></td></tr>
+    <tr><td><strong>JDK</strong></td><td><strong>Inherit</strong> uses the JDK of the build configuration, or the <code>java</code> of the agent. A JDK from <strong>Settings › Tools</strong> sets <code>JAVA_HOME</code> for this step. Not available in a container: the image brings its own Java.</td><td>Inherit</td><td>JDK 21</td></tr>
+    <tr><td><strong>JVM command line parameters</strong></td><td>One parameter per line, such as <code>-Xmx2g</code>. They are added to the variable the tool reads. A parameter cannot hold a space or quote. Do not put a secret here.</td><td>Empty</td><td><code>-Xmx2g</code></td></tr>
+    <tr><td><strong>Working directory, Environment variables, Test reports, Run step within container</strong></td><td>The same in every runner. See <a href="common-step-fields.html">Fields every runner has</a>.</td><td></td><td></td></tr>
+  </tbody>
+</table>
+
+
+<h2>A worked example</h2>
+<p>Print the platform list for the matrix. Step name <code>List platforms</code>, <strong>Script</strong>:</p><pre><code>val platforms = listOf("Win64", "PS5", "XboxSeriesX")
+println("Building " + platforms.joinToString())</code></pre>
+
+<h2>What you see when it runs</h2>
+<p>The console shows the <code>kotlinc -script</code> command after a <code>$</code> and then the output <code>Building Win64, PS5, XboxSeriesX</code>.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong><em>The kotlinc command was not found on this agent</em></strong></td><td>Install the Kotlin compiler or put <code>kotlinc</code> on the <code>PATH</code>.</td></tr>
+    <tr><td><strong><em>A JVM parameter holds a space, quote or one of …</em></strong></td><td>Write one parameter per line with no spaces.</td></tr>
+    <tr><td><strong><em>A JDK of the Tools configuration is on the agent and cannot be used inside a container</em></strong></td><td>Set the JDK to <strong>Inherit</strong>.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="script-editor.html">The script editor</a></li>
+  <li><a href="gradle.html">Gradle</a></li>
+  <li><a href="runners.html">Runners</a></li>
+  <li><a href="common-step-fields.html">Fields every runner has</a></li>
+</ul>
+</main>
+</body>
+</html>

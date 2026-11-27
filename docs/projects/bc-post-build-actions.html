@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Post-build Actions · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/bc-post-build-actions">
+<main class="doc">
+<h1>Post-build Actions</h1>
+<p class="lead">What happens after a build completes: keep files, report tests, send mail, start other builds.</p>
+<h2>When to use it</h2>
+<p>Use it for work that comes after the last step. Post-build actions run in the order of the list. Each one is a card that folds. See <a href="../post-build/overview.html">After the build</a> for a page on each action.</p>
+<figure class="shot">
+  <img src="../../assets/shots/projects/bc-post-build.png" alt="The Post-build Actions tab with an Archive the artifacts card">
+  <figcaption>The Post-build Actions tab.</figcaption>
+</figure>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings</strong>. Then click <strong>Post-build Actions</strong>.</li>
+  <li>Click <strong>Add post-build action</strong> and choose one from the picker. Use the search box to filter.</li>
+  <li>Fill in the card. <strong>More options</strong> shows how many options are set.</li>
+  <li>Drag the handle to change the order. The bin removes an action.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<h2>Every field</h2>
+<p>The picker offers these actions.</p><table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Archive the artifacts</td><td>Keeps files with the build.</td><td>-</td><td><a href="../post-build/archive-artifacts.html">Page</a></td></tr>
+    <tr><td>Publish JUnit test result report</td><td>Shows test results.</td><td>-</td><td><a href="../post-build/test-report.html">Page</a></td></tr>
+    <tr><td>Aggregate downstream test results</td><td>Sums the tests of following builds.</td><td>-</td><td><a href="../post-build/aggregate-tests.html">Page</a></td></tr>
+    <tr><td>Build other build configurations</td><td>Starts other builds.</td><td>-</td><td><a href="../post-build/build-other.html">Page</a></td></tr>
+    <tr><td>Record fingerprints of files to track usage</td><td>Tracks where files are used.</td><td>-</td><td><a href="../post-build/fingerprints.html">Page</a></td></tr>
+    <tr><td>E-mail Notification</td><td>Mails people.</td><td>-</td><td><a href="../post-build/email.html">Page</a></td></tr>
+    <tr><td>Git Publisher</td><td>Pushes tags and branches.</td><td>-</td><td><a href="../post-build/git-publisher.html">Page</a></td></tr>
+    <tr><td>Perforce actions</td><td>Label, publish, clean up, approve a review.</td><td>-</td><td><a href="../post-build/perforce-publish.html">Pages</a></td></tr>
+    <tr><td>Send build artifacts over SSH, FTP or to a Windows share</td><td>Copies files to a server.</td><td>-</td><td><a href="../post-build/ssh.html">Pages</a></td></tr>
+    <tr><td>Deploy war/ear to a container</td><td>Deploys a web application.</td><td>-</td><td><a href="../post-build/deploy-container.html">Page</a></td></tr>
+    <tr><td>UGS metadata server badge</td><td>Sets a badge in Unreal Game Sync.</td><td>-</td><td><a href="../post-build/ugs-badge.html">Page</a></td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p><strong>Windows Build</strong> archives <code>Output/**</code>, mails the release team, and starts <strong>Unit Tests</strong>.</p><h2>What you see when it runs</h2>
+<p>The end of the console log lists what each action did. A failed action can make the build unstable or failed, as its page says.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>An action is missing from the picker</td><td>The build configuration type does not support it. A Pipeline uses steps in its script.</td></tr>
+    <tr><td>An action shows as inherited</td><td>A project or template passes it down. Override or disable it here.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="settings-homes.html">Settings homes</a></li>
+  <li><a href="../post-build/overview.html">After the build</a></li>
+  <li><a href="bc-build-features.html">Build features</a></li>
+</ul>
+</main>
+</body>
+</html>

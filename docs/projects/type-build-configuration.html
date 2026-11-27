@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Build configuration · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/type-build-configuration">
+<main class="doc">
+<h1>Build configuration</h1>
+<p class="lead">A build configuration says what to build, where and when. It is the item you use for most builds.</p>
+<p>On the New Item page the card carries a small label, <em>Freestyle</em>. That is only its technical name. Everything in the guide calls it a build configuration.</p><h2>When to use it</h2>
+<p>Use it for one kind of build: <em>Windows Build</em>, <em>PS5 Build</em>, <em>Unit Tests</em>. It runs steps one after another, gets its sources from one or more version control roots, and keeps its own history, logs, artifacts and test results. It can inherit settings from its projects and templates.</p>
+<figure class="shot">
+  <img src="../../assets/shots/projects/new-item.png" alt="The New Item page: name, ID, where it is created, Start from, and the type cards">
+  <figcaption>The New Item page of the Game project.</figcaption>
+</figure>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the project the build belongs to and click <strong>New Item</strong>.</li>
+  <li>Type the name, for example <code>Switch Build</code>. Check the ID.</li>
+  <li>Under <strong>Type</strong> choose <strong>Build configuration</strong>. Click <strong>Create</strong>.</li>
+  <li>The new build configuration opens on its <strong>Settings</strong> tab. Work through <a href="settings-homes.html">the settings tabs</a> from left to right.</li>
+  <li>Click <strong>Run</strong> in the header to start the first build.</li>
+</ol>
+<h2>Every field</h2>
+<p>These are the fields of the New Item page. The settings of the build configuration itself are on the tab pages: <a href="bc-general.html">General</a>, <a href="bc-version-control.html">Version Control</a>, <a href="bc-build-steps.html">Build Steps</a>, <a href="bc-triggers.html">Triggers</a>, <a href="bc-parameters.html">Parameters</a>, <a href="bc-dependencies.html">Dependencies</a>, <a href="bc-agent-requirements.html">Agent Requirements</a>, <a href="bc-build-features.html">Build Features</a>, <a href="bc-post-build-actions.html">Post-build Actions</a>, <a href="bc-failure-conditions.html">Failure Conditions</a>.</p><table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Item name</td><td>The name people see. Not allowed: <code>? * / \ % ! @ # $ ^ &amp; | &lt; &gt; [ ] : ;</code>.</td><td>Empty</td><td><code>Switch Build</code></td></tr>
+    <tr><td>ID</td><td>Used in links, parameters and settings. Letters, digits and <code>_</code> only; it must start with a letter.</td><td>Project ID, <code>_</code>, name</td><td><code>Game_SwitchBuild</code></td></tr>
+    <tr><td>Created in</td><td>The project the item goes in.</td><td>The current project</td><td>Game</td></tr>
+    <tr><td>Start from</td><td>Empty, Copy of an existing item, or Template.</td><td>Empty</td><td>Copy</td></tr>
+    <tr><td>Type</td><td>The card <strong>Build configuration</strong>.</td><td>-</td><td>-</td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p>In the project <strong>Game</strong> the studio makes <strong>Switch Build</strong> by copying <strong>PS5 Build</strong> (<strong>Start from</strong> <em>Copy of an existing item</em>, <strong>Keep inheriting</strong>). It then changes the platform parameter and the icon to Nintendo Switch.</p><h2>What you see when it runs</h2>
+<p>The item appears in the project tree with its icon and a grey dot (never ran). After the first run, the dot shows the result. The page header shows the name, last result, the type chip <em>Build configuration</em> and the ID.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>Create stays off</td><td>Read the line next to it. Usually the name is empty, the name is already used in the project, or the ID is not valid.</td></tr>
+    <tr><td>The ID is not free</td><td>Another item uses it. Edit the ID, or choose another name.</td></tr>
+    <tr><td>I cannot see New Item</td><td>You need the Create permission on the project.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="item-types.html">Item types</a></li>
+  <li><a href="create-build-configuration.html">Create a build configuration</a></li>
+  <li><a href="settings-homes.html">Settings homes</a></li>
+  <li><a href="templates.html">Templates</a></li>
+</ul>
+</main>
+</body>
+</html>

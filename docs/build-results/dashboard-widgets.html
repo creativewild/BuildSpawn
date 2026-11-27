@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Dashboard · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-results/dashboard-widgets">
+<main class="doc">
+<h1>The Dashboard</h1>
+<p class="lead">The Dashboard is the first page many people open. It is a grid of widgets that show what matters most: failing builds, the queue, the agents and the numbers of the last days.</p>
+
+<figure class="shot"><img src="../../assets/shots/administration/dashboard-edit.png" alt="The dashboard in edit mode with Add widget, Cancel and Save buttons, and dashed widget frames for Metric cards, Builds per day, Build queue, Build executor status, Recent builds and Needs attention, each with arrange and size buttons"><figcaption>The suggested widgets in edit mode.</figcaption></figure>
+
+<h2>When to use it</h2>
+<p>Use the Dashboard for a quick look: is the game building? Is the queue growing? Are the agents healthy? For the full list of projects and build configurations, use <a href="project-directory.html">Projects</a>.</p>
+
+<h2>Open it</h2>
+<p>Click <strong>Dashboard</strong> in the top bar. Everybody sees the same dashboard. An administrator arranges it, and each widget shows only what the viewer may see. Widgets refresh by themselves. If the server cannot be reached, a widget keeps its last data and says <em>Showing last known data</em>.</p>
+
+<h2>The widgets</h2>
+<table>
+  <tr><th>Widget</th><th>What it shows</th></tr>
+  <tr><td><strong>Metric cards</strong></td><td>Four numbers: failing build configurations, running builds, builds waiting in the queue and available executors. Each card links to its list.</td></tr>
+  <tr><td><strong>Builds per day</strong></td><td>A bar chart of builds per day, stacked by result, with the success rate, the average duration and the average queue time. The period is the last 24 hours, 7, 14 or 30 days.</td></tr>
+  <tr><td><strong>Recent builds</strong></td><td>The latest builds of all build configurations, with result, changes, start time and duration.</td></tr>
+  <tr><td><strong>Build queue</strong></td><td>How many builds wait, the oldest wait, why each build waits, and the waits over the last hour.</td></tr>
+  <tr><td><strong>Build executor status</strong></td><td>Online, busy and offline agents, and idle executors. It can list the offline agents.</td></tr>
+  <tr><td><strong>Needs attention</strong></td><td>Everything that fails, failing first. It can include unstable builds.</td></tr>
+  <tr><td><strong>Watched builds</strong></td><td>The build configurations an administrator chose, with their status, recent history and the progress of running builds.</td></tr>
+</table>
+
+<h2>Arrange the dashboard (administrators)</h2>
+<p>An administrator clicks <strong>Edit dashboard</strong>, adds, moves, resizes or removes widgets and clicks <strong>Save</strong>. An empty dashboard offers <strong>Start with suggested widgets</strong>. The steps, with every widget option, are on <a href="../administration/dashboard.html">Dashboard</a> in the administration section.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <tr><th>Problem</th><th>What to do</th></tr>
+  <tr><td>The Dashboard says <em>Arrange the dashboard</em> and shows no widgets.</td><td>Nobody has added widgets yet. Ask an administrator, who can click <strong>Start with suggested widgets</strong>.</td></tr>
+  <tr><td>A build configuration I watch is missing from a widget.</td><td>You may not see it. Widgets hide what you may not see.</td></tr>
+  <tr><td>A widget says <em>Showing last known data</em>.</td><td>The server did not answer. Reload the page in a moment.</td></tr>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../administration/dashboard.html">Dashboard</a>: set it up.</li>
+  <li><a href="project-directory.html">The project directory</a></li>
+  <li><a href="history.html">History</a></li>
+</ul>
+
+</main>
+</body>
+</html>

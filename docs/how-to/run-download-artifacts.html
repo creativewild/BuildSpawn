@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Download artifacts · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/run-download-artifacts">
+<main class="doc">
+<h1>Download artifacts</h1>
+<p class="lead">Get the files a build kept, such as a game package or symbols: one file, a whole folder as a zip, or the files of the last good build from a script.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>The build kept files. A build configuration keeps files with the <em>Archive the artifacts</em> post-build action and a pattern such as <code>Output/**</code>. Builds that kept files have an <strong>Artifacts</strong> tab.</li>
+  <li>You can see the project (Project viewer role or more).</li>
+  <li>The build still exists. Clean-up rules delete artifacts together with their build. <strong>Pin</strong> a build to keep it.</li>
+</ul>
+
+<h2>Steps</h2>
+<h3>Download one file</h3>
+<ol class="steps">
+  <li>Open the build, for example <em>Game / Windows Build #7</em>.</li>
+  <li>On the <strong>Overview</strong> tab, the <strong>Build Artifacts</strong> card lists the files. Click the download arrow beside a file. <strong>view</strong> shows a text file in the browser.</li>
+  <li>Or click the <strong>Artifacts</strong> tab, click folders to open them, and click a file to download it.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/build-results/artifacts-tab.png" alt="The Artifacts tab of Windows Build #7 with the Output folder, a link to download all files in a zip and a Pattern box">
+  <figcaption>The Artifacts tab.</figcaption>
+</figure>
+<h3>Download everything as a zip</h3>
+<ol class="steps">
+  <li>On the Artifacts tab, click <strong>(all files in zip)</strong>. Or click it on the Overview card.</li>
+  <li>Your browser saves <code>archive.zip</code>.</li>
+</ol>
+<h3>Download only some files</h3>
+<ol class="steps">
+  <li>On the Artifacts tab, type a pattern in the <strong>Pattern</strong> box, for example <code>**/*.pdb</code>, and press the arrow.</li>
+  <li>Only the matching files are listed. Download them one by one.</li>
+</ol>
+<h3>Download the files of the last good build from a script</h3>
+<p>Files have a stable address. The words <code>lastSuccessfulBuild</code> in the address always mean the newest build that passed. Use a user name and an <a href="../reference/api-tokens.html">API token</a>:</p>
+<pre><code># PowerShell
+$cred = "docs:YOUR-API-TOKEN"
+curl.exe -u $cred -O "http://buildserver:8080/job/Game/job/Windows%20Build/lastSuccessfulBuild/artifact/Output/Skyforge-Win64-Development.txt"
+
+# The same build as a zip of every file
+curl.exe -u $cred -o archive.zip "http://buildserver:8080/job/Game/job/Windows%20Build/lastSuccessfulBuild/artifact/*zip*/archive.zip"</code></pre>
+<p>Replace <code>lastSuccessfulBuild</code> with a build number, such as <code>7</code>, to get a certain build. Personal builds are never taken as <em>last successful</em>. Spaces in names are written <code>%20</code>.</p>
+
+<h2>Check it worked</h2>
+<ul>
+  <li>The file opens, and its size matches the size shown beside it.</li>
+  <li>The zip holds the same folders as the Artifacts tab.</li>
+</ul>
+
+<h2>Problems and fixes</h2>
+<table>
+  <tr><th>Problem</th><th>What to do</th></tr>
+  <tr><td>There is no Artifacts tab.</td><td>The build kept no files. Check the <em>Archive the artifacts</em> post-build action and its pattern on the build configuration, and read the log for the line that says what was archived. A failed build may not get to that step.</td></tr>
+  <tr><td>The files are gone.</td><td>A clean-up rule deleted the build. Pin the builds you need.</td></tr>
+  <tr><td>The script gets a sign-in page.</td><td>Send the user name and API token with the request, as in the example.</td></tr>
+  <tr><td>The file is not in the artifacts, but it is in the workspace.</td><td>The pattern did not match it. Add it to the pattern. A script can also pass a folder to the pattern with <code>setParameter</code>. See <a href="../reference/service-messages.html">Service messages</a>.</td></tr>
+</table>
+
+<h2>Next steps</h2>
+<ul>
+  <li><a href="../build-results/changes-artifacts-tests.html">Changes, artifacts and tests</a></li>
+  <li><a href="script-with-api-token.html">Start builds from a script</a></li>
+  <li><a href="../build-results/build-page.html">The build page</a></li>
+</ul>
+
+</main>
+</body>
+</html>

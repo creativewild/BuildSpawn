@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SMB Upload · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/smb-upload">
+<main class="doc">
+<h1>SMB Upload</h1>
+<p class="lead">Copies files to a Windows or Samba share, with include patterns. It sends to a Windows file share.</p>
+<div class="callout note"><p>In the step picker this is called <strong>Send files to a windows share</strong>.</p></div>
+
+<h2>When to use it</h2>
+<p>Use it to publish builds to the studio file server, so testers can fetch them from a share.</p>
+
+<h2>How to set it up</h2>
+
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>. Type <code>SMB Upload</code> in <strong>Filter step types</strong> if you like, then click the <strong>SMB Upload</strong> tile (group <strong>Upload and deploy</strong>).</li>
+  <li>Type a <strong>Step name</strong>, for example <code>Publish to share</code>.</li>
+  <li>Fill in the fields described below.</li>
+  <li>Optional: set <strong>Execute step</strong>, <strong>Conditions</strong> and <strong>Retry on failure</strong>. See <a href="step-list.html">The steps list and the step editor</a>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<figure class="shot small">
+  <img src="../../assets/shots/build-steps/smb-upload.png" alt="The fields of the SMB Upload step in the step editor">
+  <figcaption>The fields of the SMB Upload step, as the step editor shows them.</figcaption>
+</figure>
+
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Name (SMB Server)</strong></td><td>The share to use, from the servers defined once under <strong>Settings › System</strong>.</td><td>First server</td><td><code>build-share</code></td></tr>
+    <tr><td><strong>Verbose output in console, Retry, Label, Fail the build if an error occurs</strong></td><td>As in <a href="ssh-upload.html">SSH Upload</a>.</td><td></td><td></td></tr>
+    <tr><td><strong>Source files</strong></td><td>Files to upload: comma-separated Ant includes, base folder is the workspace.</td><td>Empty</td><td><code>Builds/Patch/**</code></td></tr>
+    <tr><td><strong>Remove prefix</strong></td><td>The first part of the path that is not created on the server.</td><td>Empty</td><td><code>Builds/Patch</code></td></tr>
+    <tr><td><strong>Remote directory</strong></td><td>Optional destination folder, below the one in the server settings. Created if missing.</td><td>Empty</td><td><code>/patches/1.4</code></td></tr>
+    <tr><td><strong>Exclude files (More options)</strong></td><td>Comma-separated Ant excludes.</td><td>Empty</td><td><code>**/*.pdb</code></td></tr>
+    <tr><td><strong>Pattern separator (More options)</strong></td><td>Regular expression that splits the patterns.</td><td><code>[, ]+</code></td><td><code>,</code></td></tr>
+    <tr><td><strong>No default excludes, Make empty dirs, Flatten files, Remote directory is a date format (More options)</strong></td><td>As in <a href="ssh-upload.html">SSH Upload</a>.</td><td>Off</td><td></td></tr>
+  </tbody>
+</table>
+
+
+<h2>A worked example</h2>
+<p>Publish the Windows build to the share. Step name <code>Publish to share</code>, <strong>Name</strong> <code>build-share</code>, <strong>Source files</strong> <code>Builds/Windows/**</code>, <strong>Remove prefix</strong> <code>Builds/Windows</code>, <strong>Remote directory</strong> <code>Skyforge/%build.number%</code>.</p>
+
+<h2>What you see when it runs</h2>
+<p>The console says it is connecting, then <em>Transferred N file(s)</em>, then disconnecting.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Access denied</strong></td><td>The account in the server settings needs write rights on the share.</td></tr>
+    <tr><td><strong>The share list is empty</strong></td><td>An administrator must add the share under <strong>Settings › System</strong>.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="ftp-upload.html">FTP Upload</a></li>
+  <li><a href="ssh-upload.html">SSH Upload</a></li>
+  <li><a href="../administration/global-connections.html">Global connections</a></li>
+  <li><a href="runners.html">Runners</a></li>
+  <li><a href="common-step-fields.html">Fields every runner has</a></li>
+</ul>
+</main>
+</body>
+</html>

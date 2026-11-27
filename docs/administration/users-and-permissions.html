@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Users and permissions · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="administration/users-and-permissions">
+<main class="doc">
+<h1>Users and permissions</h1>
+<p class="lead">Control who can sign in to Buildspawn and what each person can see and change.</p>
+
+<p>Buildspawn controls access with four things that work together:</p>
+<table>
+  <thead><tr><th>Thing</th><th>What it is</th><th>Where</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Users</strong></td><td>The people who can sign in.</td><td><strong>Settings › Users</strong></td></tr>
+    <tr><td><strong>Groups</strong></td><td>A named set of users, so you can give rights to many people at once.</td><td><strong>Settings › Groups</strong></td></tr>
+    <tr><td><strong>Roles</strong></td><td>A named set of permissions, such as <em>Developer</em>.</td><td><strong>Settings › Roles</strong>, and the <strong>Roles</strong> tab of each project</td></tr>
+    <tr><td><strong>Permissions</strong></td><td>The single rights, such as <em>Job: Build</em>. Roles are made of them.</td><td><strong>Settings › Security</strong></td></tr>
+  </tbody>
+</table>
+<p>You need the <strong>System administrator</strong> role (the <em>Overall: Administer</em> permission) to change any of these.</p>
+
+<h2>Users</h2>
+<p><strong>Settings › Users</strong> lists everybody who can sign in, with their groups. Your own row is marked <strong>You</strong>.</p>
+<figure class="shot">
+  <img src="../../assets/shots/administration/users.png" alt="The Users page with the users docs, ht3-artist and sam.lee, an Add to group button in the Groups column and buttons to edit and delete each user">
+  <figcaption>The Users page. The buttons on the right edit or delete a user.</figcaption>
+</figure>
+
+<h3>Create a user</h3>
+<ol class="steps">
+  <li>Open <strong>Settings › Users</strong> and click <strong>Create User</strong>.</li>
+  <li>Type a <strong>Username</strong>. People sign in with it, and it cannot be changed later.</li>
+  <li>Type the <strong>Password</strong> twice, the <strong>Full name</strong> and the <strong>Email</strong>.</li>
+  <li>Click <strong>Create User</strong>.</li>
+  <li>Back in the list, click <strong>Add to group</strong> on the new row to put the user in a group.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/administration/create-user.png" alt="The Create User form with fields for username, password, confirm password, full name and email">
+  <figcaption>The Create User form.</figcaption>
+</figure>
+<div class="callout note"><p>A new user can sign in at once, but sees nothing until you give them a role or permissions. See <a href="#project-roles">Project roles</a> below.</p></div>
+
+<h3>Change or delete a user</h3>
+<ul>
+  <li>Click the settings button on a row to change the user's name, email or password.</li>
+  <li>Click the red bin to delete the user. You cannot delete yourself.</li>
+</ul>
+<p>Each person can also change their own password, theme and API tokens from the account menu (the round button with their initial). See <a href="../reference/api-tokens.html">API tokens</a>.</p>
+
+<h2>Groups</h2>
+<p>A group collects users, and other groups, so you can give a role to everybody in it at once. When someone joins the team, you add them to the group and they get the right access straight away.</p>
+<p>The group <strong>All users</strong> is built in. It means every signed-in user. You cannot rename, empty or delete it. Where a permission card says <em>Authenticated Users</em>, it means this group.</p>
+
+<h3>Create a group</h3>
+<ol class="steps">
+  <li>Open <strong>Settings › Groups</strong> and click <strong>Create group</strong>.</li>
+  <li>Type a <strong>Name</strong>, for example <code>Artists</code>. Buildspawn makes the <strong>ID</strong> from it. You can change the ID now, but not later, because roles and permissions refer to it.</li>
+  <li>Add a <strong>Description</strong> if it helps.</li>
+  <li>Optional: pick a <strong>Parent group</strong>. Members of this group then also belong to the parent.</li>
+  <li>Click <strong>Create group</strong>. Then add members from the group's row or from the Users page.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/administration/groups-create.png" alt="The Create group dialog with fields for name, ID, description and parent group, over the Groups list that shows the built-in All users group">
+  <figcaption>Create a group. The list behind shows the members, subgroups and roles of each group.</figcaption>
+</figure>
+<div class="callout tip"><p>Give roles to groups, not to single users. It is much easier to see who can do what, and to change it later.</p></div>
+
+<h2>Project roles</h2>
+<p>A role is a named set of permissions. You give a role to a user or group on a project, and it applies to that project and everything inside it: its subprojects and build configurations. Give a role at the <strong>Root</strong> project and it applies to the whole server.</p>
+<p>Buildspawn has six built-in roles:</p>
+<table>
+  <thead><tr><th>Role</th><th>What it allows</th><th>Where you can give it</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Project viewer</strong></td><td>See the project, its build configurations and builds, and download artifacts.</td><td>Any project</td></tr>
+    <tr><td><strong>Developer</strong></td><td>Everything a viewer can do, plus run and stop builds, read settings, use workspaces, edit build descriptions and tag sources.</td><td>Any project</td></tr>
+    <tr><td><strong>Project administrator</strong></td><td>Everything a developer can do, plus configure, create, move and delete build configurations and subprojects, manage views, and give roles on this project.</td><td>Any project</td></tr>
+    <tr><td><strong>Build settings administrator</strong></td><td>Change the steps, actions and parameters a project passes down to every build configuration below it.</td><td>Any project</td></tr>
+    <tr><td><strong>Agent manager</strong></td><td>Add, configure, connect, disconnect and delete agents, and move them between pools.</td><td>Root only</td></tr>
+    <tr><td><strong>System administrator</strong></td><td>Everything on the server.</td><td>Root only</td></tr>
+  </tbody>
+</table>
+<figure class="shot">
+  <img src="../../assets/shots/administration/roles.png" alt="The Roles page with the table of built-in roles and what each allows, and the form for a new custom role below">
+  <figcaption>Settings › Roles: the built-in roles, and the form to make your own.</figcaption>
+</figure>
+
+<h3>Give a role on a project</h3>
+<ol class="steps">
+  <li>Open the project (or <strong>Root project</strong> for the whole server) and click the <strong>Roles</strong> tab.</li>
+  <li>Click <strong>Assign a role</strong>.</li>
+  <li>Choose <strong>User</strong> or <strong>Group</strong>, and type the user ID or group name.</li>
+  <li>Pick the role and click <strong>Assign</strong>, then <strong>Save</strong>.</li>
+</ol>
+<p>The Roles tab also shows the roles <strong>inherited from above</strong> and <strong>Your roles here</strong>. A role given on a parent project is changed on that parent, not here.</p>
+<div class="callout note"><p>The Roles tab only appears when <strong>Settings › Security › Authorization</strong> is set to <strong>Project-based security</strong>. With any other choice, the Roles page shows a yellow note that roles are off. You can still prepare custom roles.</p></div>
+
+<h3>Make your own role</h3>
+<ol class="steps">
+  <li>Open <strong>Settings › Roles</strong>.</li>
+  <li>Under <strong>New custom role</strong>, type a <strong>Name</strong> and a <strong>Description</strong>.</li>
+  <li>Tick the permissions the role holds. They are grouped as Overall, Credentials, Agent, Job, Run, View and SCM.</li>
+  <li>Click <strong>Save role</strong>. It now appears on every project's Roles tab.</li>
+</ol>
+<ul>
+  <li>Below Root, only the project permissions of a role apply.</li>
+  <li><em>Administer</em> cannot be put in a custom role. Use <strong>System administrator</strong> instead.</li>
+  <li>To give someone a role, you must hold every permission in it yourself, unless you are a system administrator.</li>
+  <li>Changing or deleting a custom role does not change the people who already have it. Their permissions stay as they were.</li>
+</ul>
+
+<h2>Permissions</h2>
+<p>Roles write single permissions into the <strong>permission cards</strong>, one card for each user or group. You can also edit the cards directly, for rights no role covers.</p>
+<ol class="steps">
+  <li>Open <strong>Settings › Security</strong> and scroll to <strong>Authorization</strong>.</li>
+  <li>Click <strong>Add user</strong> or <strong>Add group</strong>, and type the name.</li>
+  <li>Open the card with the arrow on the right and tick the permissions.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/administration/permissions.png" alt="The Authorization section of the Security page with a filter, Add user and Add group buttons and the permission cards for the users and groups, each with a summary of what it allows">
+  <figcaption>The permission cards. Each card sums up what the user or group may do.</figcaption>
+</figure>
+<p>The two special cards are <strong>Anonymous</strong> (people who are not signed in) and <strong>Authenticated Users</strong> (everybody who is signed in, the same as the group <em>All users</em>).</p>
+<p>The main choices for <strong>Authorization</strong> are:</p>
+<table>
+  <thead><tr><th>Choice</th><th>What it means</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Matrix-based security</strong></td><td>One grid for the whole server.</td></tr>
+    <tr><td><strong>Project-based security</strong></td><td>The server grid, plus a grid and a Roles tab on each project. Choose this to use project roles.</td></tr>
+    <tr><td><strong>Logged-in users can do anything</strong></td><td>Every signed-in user is an administrator. Only for a test server.</td></tr>
+    <tr><td><strong>Entra ID Matrix-based security</strong></td><td>The same cards, with a people picker for your Entra ID directory.</td></tr>
+    <tr><td><strong>Anyone can do anything</strong>, <strong>Legacy mode</strong></td><td>No checks at all, or the old admin-or-read-only behaviour. See <a href="authorization.html">Authorization</a>.</td></tr>
+  </tbody>
+</table>
+
+<h2>Tips</h2>
+<ul>
+  <li><strong>Lock-out:</strong> before you save a new authorization choice, make sure your own user or group has <em>Overall: Administer</em>. Otherwise you lose access to Settings.</li>
+  <li>A yellow <strong>ambiguous</strong> label means the entry could match a user and a group with the same name. Open the row and choose user or group to fix it.</li>
+  <li>Use <strong>Settings › Security › Security Realm</strong> to choose where users come from: Buildspawn's own user database, or single sign-on such as Entra ID or SAML.</li>
+</ul>
+
+<h2>Go deeper</h2>
+<div class="cards">
+  <a class="card" href="security-realms.html"><h3>Security realms</h3><p>Where users come from, and how to switch safely.</p></a>
+  <a class="card" href="entra-id.html"><h3>Entra ID sign-in</h3><p>Register the app and sign in with work accounts.</p></a>
+  <a class="card" href="saml.html"><h3>SAML sign-in</h3><p>Single sign-on with your identity provider.</p></a>
+  <a class="card" href="authorization.html"><h3>Authorization</h3><p>Every strategy, the permission cards and every permission.</p></a>
+  <a class="card" href="roles.html"><h3>Roles</h3><p>Built-in and custom roles, and how to give them.</p></a>
+  <a class="card" href="users.html"><h3>Users and groups</h3><p>Create users, groups and end sessions.</p></a>
+  <a class="card" href="user-settings.html"><h3>User settings</h3><p>Every setting on a person's own pages.</p></a>
+  <a class="card" href="security-settings.html"><h3>Security settings</h3><p>The whole Security page, section by section.</p></a>
+  <a class="card" href="trusted-certificates.html"><h3>Trusted certificates</h3><p>Trust your company's root CA.</p></a>
+</div>
+</main>
+</body>
+</html>

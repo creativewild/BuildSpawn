@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IDs and the parent-ID prefix · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/project-ids">
+<main class="doc">
+<h1>IDs and the parent-ID prefix</h1>
+<p class="lead">Every project, build configuration and template has an ID that stays the same when you rename or move it.</p>
+<h2>What an ID is</h2><p>The ID is a name that is unique on the server. Dependencies, parameters such as <code>dep.&lt;id&gt;.&lt;name&gt;</code>, links and settings refer to it. A rename or a move never breaks them.</p><h2>How it is made</h2><p>On the New Item page the ID is made from the ID of the project the item goes in, an underscore and the name, until you edit it. A build configuration <em>Windows Build</em> in the project with the ID <code>Game</code> gets <code>Game_WindowsBuild</code>. This is the parent-ID prefix.</p><table>
+  <thead><tr><th>Rule</th><th>Detail</th></tr></thead>
+  <tbody>
+    <tr><td>Characters</td><td>Letters, digits and underscores only.</td></tr>
+    <tr><td>Start</td><td>A letter.</td></tr>
+    <tr><td>Length</td><td>Up to 225 characters.</td></tr>
+    <tr><td>Unique</td><td>Another item may not use it. The page checks as you type and says <em>is free</em>.</td></tr>
+    <tr><td>Edited by hand</td><td>If you change it, it no longer follows the name.</td></tr>
+  </tbody>
+</table>
+<h2>Change an ID</h2><figure class="shot">
+  <img src="../../assets/shots/projects/bc-id.png" alt="The ID tab of Windows Build">
+  <figcaption>The ID tab, with its links.</figcaption>
+</figure>
+<ol class="steps">
+  <li>Open the build configuration, then <strong>Settings › More › ID</strong>. For a project open <strong>Settings › ID</strong>.</li>
+  <li>Type the new ID, or click <strong>Regenerate from name</strong>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<p>The old ID keeps working as an <strong>alias</strong>. Aliases are listed on the page. Remove one to let another item take that ID. Links that used the alias then stop working.</p><h2>Where it shows</h2><ul>
+  <li>In the header of the page, as a chip next to the type.</li>
+  <li>In the address <code>/buildConfiguration/&lt;id&gt;</code>, which goes to the item whatever its place.</li>
+  <li>In dependency settings and in <code>dep.</code> and <code>reverse.dep.</code> parameters.</li>
+</ul>
+<h2>A worked example</h2><p>The studio moves <em>Windows Build</em> from <strong>Game</strong> to <strong>Game/Main</strong>. Its ID stays <code>Game_WindowsBuild</code>, so the dependency in <em>Release Build</em> keeps working.</p><h2>Problems and fixes</h2><table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>The ID is not valid</td><td>Remove spaces and symbols. Start with a letter.</td></tr>
+    <tr><td>The ID is not free</td><td>Choose another. Or remove the alias that holds it.</td></tr>
+    <tr><td>I changed the ID and a link broke</td><td>Use the new ID. The old one works as an alias unless you removed it.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="projects.html">Projects</a></li>
+  <li><a href="project-move-delete.html">Moving and deleting</a></li>
+  <li><a href="bc-general.html">General</a></li>
+</ul>
+</main>
+</body>
+</html>

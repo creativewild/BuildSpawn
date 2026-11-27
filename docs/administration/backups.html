@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Backups and upgrades · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="administration/backups">
+<main class="doc">
+<h1>Backups and upgrades</h1>
+<p class="lead">Keep your data safe and move to new versions of Buildspawn without losing anything.</p>
+
+<p>Everything Buildspawn knows is in one folder, the <strong>home</strong> (also called the <strong>data</strong> folder): projects, build configurations, build history, users, credentials, settings and plugins you added. The program files are separate and can be replaced at any time. Back up the home folder and you can always get back.</p>
+
+<h2>Where your data is</h2>
+<table>
+  <thead><tr><th>Download</th><th>Home (back this up)</th><th>Settings file</th><th>Logs</th></tr></thead>
+  <tbody>
+    <tr><td>Windows setup</td><td><code>C:\ProgramData\Buildspawn\data</code></td><td><code>C:\ProgramData\Buildspawn\buildspawn.cfg</code></td><td><code>C:\ProgramData\Buildspawn\logs</code></td></tr>
+    <tr><td>Windows portable zip</td><td><code>data\</code> in the Buildspawn folder</td><td><code>buildspawn.cfg</code> next to <code>Buildspawn.exe</code></td><td><code>logs\</code></td></tr>
+    <tr><td>Linux .deb and .rpm packages</td><td><code>/var/lib/buildspawn</code></td><td><code>/etc/default/buildspawn</code> (.deb) or <code>/etc/sysconfig/buildspawn</code> (.rpm)</td><td><code>/var/log/buildspawn</code></td></tr>
+    <tr><td>Linux and macOS tar.gz</td><td><code>data/</code> in the Buildspawn folder</td><td><code>buildspawn.conf</code> in the folder</td><td><code>logs/</code></td></tr>
+  </tbody>
+</table>
+<p>The same folder also holds <code>secrets\</code> (with <code>initialAdminPassword</code> on a new server), <code>trust\</code> (your trusted certificates) and <code>users\</code>. The full list is in <a href="../reference/settings-files.html#data-folder">Inside the data folder</a>.</p>
+<p>The settings file can move the home somewhere else. Check the <strong>data</strong> or <strong>BUILDSPAWN_HOME</strong> key, or see <strong>Settings › System › Home directory</strong>. The keys are listed in <a href="../reference/settings-files.html">Settings files</a>.</p>
+
+<h2>Back up</h2>
+<ol class="steps">
+  <li>Stop Buildspawn, or click <strong>Prepare for Shutdown</strong> on the <strong>Settings</strong> page so no build is writing files. A copy taken while builds run can be incomplete.</li>
+  <li>Copy the whole home folder to a safe place, for example another disk or a network share.</li>
+  <li>Copy the settings file too (<code>buildspawn.cfg</code> or <code>buildspawn.conf</code>).</li>
+  <li>Start Buildspawn again.</li>
+</ol>
+<p>Example on Linux with a package install:</p>
+<pre><code>sudo systemctl stop buildspawn
+sudo tar -czf /backup/buildspawn-$(date +%F).tar.gz -C /var/lib buildspawn /etc/default/buildspawn
+sudo systemctl start buildspawn</code></pre>
+<p>Example on Windows, in a command prompt opened as administrator:</p>
+<pre><code>cd "C:\Program Files\Buildspawn"
+buildspawn-service stop
+robocopy C:\ProgramData\Buildspawn D:\Backup\Buildspawn /MIR /XD logs
+buildspawn-service start</code></pre>
+
+<h3>What you can leave out</h3>
+<p>The home folder can be large because of build history and artifacts. If space is short, these are safe to skip:</p>
+<ul>
+  <li><code>workspace/</code>: working copies of the sources. Builds check them out again.</li>
+  <li><code>war/</code>: unpacked again when Buildspawn starts.</li>
+  <li>The logs folder.</li>
+</ul>
+<div class="callout warning"><p>Always keep the <code>secrets/</code> folder and the <code>secret.key</code> files in the home folder together with the rest. Without them, Buildspawn cannot read the saved passwords and credentials.</p></div>
+
+<h2>Prepare for shutdown, and reload</h2>
+<p>Two buttons on the <strong>Settings</strong> page help around a backup or an upgrade.</p>
+<ul>
+  <li><strong>Prepare for Shutdown</strong> stops new builds from starting so the system can be shut down safely. Running builds finish. You can type a <strong>Reason</strong>: it is shown to everybody in a banner at the top of every page until you click <strong>Cancel Shutdown</strong>. Use it before a backup, a restart or an upgrade. Click <strong>Update shutdown preparation</strong> to change the reason.</li>
+  <li><strong>Reload Configuration from Disk</strong> throws away everything the server holds in memory and reads it all again from the data folder. Use it after you changed files in the data folder by hand, or put back part of a backup, when you cannot restart the server. A restart is safer after a full restore.</li>
+</ul>
+
+<h2>Restore</h2>
+<ol class="steps">
+  <li>Install the same version of Buildspawn, or a newer one.</li>
+  <li>Stop Buildspawn.</li>
+  <li>Replace the home folder with your backup, and put back the settings file.</li>
+  <li>On Linux with a package or service, give the files back to the service user: <code>sudo chown -R buildspawn:buildspawn /var/lib/buildspawn</code>.</li>
+  <li>Start Buildspawn and sign in with your usual account.</li>
+</ol>
+<div class="callout tip"><p>Try a restore once on a spare machine. A backup you have never restored is only a hope.</p></div>
+
+<h2>Upgrade</h2>
+<p>An upgrade replaces the program and keeps your home folder and settings. Back up first, then follow the steps for your download.</p>
+
+<h3>Windows setup</h3>
+<ol class="steps">
+  <li>Download the new <code>buildspawn-&lt;version&gt;-setup.exe</code> and run it.</li>
+  <li>The setup stops the service, replaces the program files, keeps your settings and data, and starts the service again.</li>
+</ol>
+<p>For a silent upgrade, run <code>setup.exe /S</code>. <code>setup.exe /?</code> lists every switch. See <a href="windows-launcher.html">The Windows app</a>.</p>
+
+<h3>Windows portable zip</h3>
+<ol class="steps">
+  <li>Stop Buildspawn in the app (<strong>Run here › Stop</strong>, or stop the service).</li>
+  <li>Unpack the new zip into a new folder.</li>
+  <li>Copy <code>buildspawn.cfg</code> and <code>data\</code> from the old folder into the new one.</li>
+  <li>Start the new <code>Buildspawn.exe</code>. If you used the Windows service, install it again from the new folder.</li>
+</ol>
+
+<h3>Linux packages</h3>
+<p>Install the new package over the old one:</p>
+<pre><code># Debian, Ubuntu
+sudo apt install ./buildspawn_&lt;version&gt;_amd64.deb
+
+# RHEL, Rocky, Fedora
+sudo dnf install ./buildspawn-&lt;version&gt;.x86_64.rpm</code></pre>
+<p>The upgrade stops the service, replaces the program, keeps the settings file and <code>/var/lib/buildspawn</code>, and starts the service again.</p>
+
+<h3>Linux and macOS tar.gz</h3>
+<ol class="steps">
+  <li>Stop Buildspawn: <code>bin/buildspawn stop</code>.</li>
+  <li>Unpack the new version into a new folder. On macOS, clear its quarantine flag as described in <a href="../get-started/install.html">Install the server</a>.</li>
+  <li>Copy <code>buildspawn.conf</code> and <code>data/</code> into the new folder (and <code>logs/</code> if you want to keep them).</li>
+  <li>If you run Buildspawn as a service, run the new version's <code>install-service.sh</code> (with <code>sudo</code> on Linux, without on macOS). It points the service at the new folder.</li>
+  <li>Start it: <code>bin/buildspawn start</code>.</li>
+</ol>
+<pre class="terminal" data-title="buildspawn">$ bin/buildspawn stop
+$ tar -xzf buildspawn-&lt;version&gt;-linux-x64.tar.gz -C /opt
+$ cp /opt/buildspawn-old/buildspawn.conf /opt/buildspawn-&lt;version&gt;/
+$ cp -a /opt/buildspawn-old/data /opt/buildspawn-&lt;version&gt;/
+$ cd /opt/buildspawn-&lt;version&gt; &amp;&amp; sudo ./install-service.sh</pre>
+<div class="callout tip"><p>To make tar.gz upgrades simpler, set <code>BUILDSPAWN_HOME</code> to a folder outside the program folder, such as <code>/srv/buildspawn</code>. Then an upgrade only needs the settings file copied.</p></div>
+
+<h3>The war file</h3>
+<p>The war is the web application on its own, for people who run it with their own Java. It is a single file, <code>buildspawn-&lt;version&gt;.war</code>, and Java 21 or newer must be installed. The data folder is the one you name with the home setting you start Java with, so it is outside the war and an upgrade does not touch it.</p>
+<ol class="steps">
+  <li>Back up the data folder as described above.</li>
+  <li>Stop the running Buildspawn (end the <code>java</code> process or stop the service you made for it).</li>
+  <li>Start the new war with the same data folder and the same arguments, for example <code>java -jar buildspawn-&lt;version&gt;.war --httpPort=8080</code>.</li>
+</ol>
+<p>The old war can be deleted once the new one runs. Keep it until then, so you can go back.</p>
+
+<h3>After an upgrade</h3>
+<ul>
+  <li>Check <strong>Settings</strong> for new notices (the red number in the top bar).</li>
+  <li>If you changed the Java options by hand, compare them with the new recommended set. On Windows, use <strong>Reset to recommended</strong> in the app's Settings tab. See <a href="../reference/settings-files.html">Settings files</a>.</li>
+  <li>Read what changed in the <a href="../reference/release-notes.html">release notes</a>.</li>
+</ul>
+
+<h2>Tips</h2>
+<ul>
+  <li>Run Buildspawn either as the service or by hand on one home folder, never both at once.</li>
+  <li>Back up on a schedule, for example every night, and keep several copies.</li>
+  <li>Don't skip versions when the release notes say a step is needed.</li>
+</ul>
+</main>
+</body>
+</html>

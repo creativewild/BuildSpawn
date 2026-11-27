@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Timestamps in the build log · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/feature-timestamps">
+<main class="doc">
+<h1>Timestamps in the build log</h1>
+<p class="lead">Puts the time, as HH:mm:ss, in front of every line of the console output.</p>
+<div class="callout note"><p>In the list of build features this is called <strong>Add timestamps to the Console Output</strong>.</p></div>
+<h2>When to use it</h2>
+<p>Turn it on when you need to see where a build spends its time. A game build can run for an hour. With times in the log you can see that the cook took 22 minutes and the shader compile took 9. It has no settings and costs almost nothing.</p>
+<figure class="shot">
+  <img src="../../assets/shots/projects/feat-timestamps.png" alt="The Timestamps in the build log form, empty">
+  <figcaption>The Timestamps form.</figcaption>
+</figure>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration, click <strong>Settings</strong>, then <strong>Build Features</strong>. Click <strong>Add build feature</strong> and choose <strong>Timestamps in the build log</strong>.</li>
+  <li>There is nothing to fill in. Click <strong>Save</strong>.</li>
+  <li>Make sure the <strong>On</strong> switch of the feature is on.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>(no fields)</td><td>The feature only has an on and off switch.</td><td>Off</td><td>-</td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p>The <strong>Windows Build</strong> configuration of the Skyforge game takes 48 minutes and nobody knows why. The team adds <strong>Timestamps in the build log</strong>. The next build shows that the step <em>Cook content</em> starts at 00:07:12 and ends at 00:31:40.</p><h2>What you see when it runs</h2>
+<p>Every line of the console log starts with the time:</p><pre class="terminal" data-title="build log">12:04:31  Started by user dana.k
+12:04:33  Running as agent WIN-BUILD-02
+12:04:40  Cook content: start
+12:29:02  Cook content: done</pre>
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>No times show in the log</td><td>Check that the <strong>On</strong> switch of the feature is on. The times only show for builds that start after you save.</td></tr>
+    <tr><td>The feature is not in the list</td><td>The build configuration type cannot hold build features. A Pipeline does this in its script.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="bc-build-features.html">The Build Features tab</a></li>
+</ul>
+</main>
+</body>
+</html>

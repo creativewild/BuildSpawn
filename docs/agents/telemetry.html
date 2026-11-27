@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Telemetry · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="agents/telemetry">
+<main class="doc">
+<h1>Telemetry</h1>
+<p class="lead">Telemetry is live health data from your agents: CPU, memory, disk, network and GPU. It shows which machines are busy, full or struggling, before a build fails.</p>
+
+<h2>How it works</h2>
+<p>Telemetry comes from the Agent Telemetry plug-in that is built into Buildspawn. Its settings page is <strong>Agents › Configure monitors</strong>, and is also listed as <strong>Agent Telemetry</strong> in Settings.</p>
+<ul>
+  <li>Telemetry is <strong>on by default</strong>. Every agent sends a sample every 30 seconds.</li>
+  <li>While someone has an agent's <strong>Telemetry</strong> tab open, that agent sends a sample every 2 seconds.</li>
+  <li>GPU values come from the vendor's tool (<code>nvidia-smi</code>, <code>amd-smi</code> / <code>rocm-smi</code> or <code>xpu-smi</code>). They are read only on machines that have one of these tools. Other agents show "—".</li>
+</ul>
+<p>You see telemetry in three places: the live columns and expanded rows of the <a href="agents-page.html">Agents page</a>, the summary strip above it, and each agent's own Telemetry tab.</p>
+
+<h2>The agent's Telemetry tab</h2>
+<ol class="steps">
+  <li>Open an agent: click its name on the Agents page.</li>
+  <li>Click the <strong>Telemetry</strong> tab. (From the Agents page, you can also open a row and click <strong>Telemetry</strong>.)</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/agents/telemetry-tab.png" alt="The Telemetry tab of win-build-01: time range buttons, Live and Pause, cards for CPU, Memory, GPU, Disk free and Network, and charts of CPU, memory, GPU and disk with dashed Warning and Critical lines">
+  <figcaption>An agent's Telemetry tab, with the last 15 minutes.</figcaption>
+</figure>
+<h3>Time range</h3>
+<p>Pick how far back the charts go: <strong>15 min</strong>, <strong>1 h</strong>, <strong>6 h</strong> or <strong>24 h</strong>.</p>
+<h3>Live and Pause</h3>
+<ul>
+  <li><strong>Live · 2 s</strong> means new samples arrive every 2 seconds and the charts move on.</li>
+  <li>Click <strong>Pause</strong> to freeze the charts, for example to read a spike. Click it again to go live.</li>
+</ul>
+<h3>Cards and charts</h3>
+<table>
+  <thead><tr><th>Card / chart</th><th>What it shows</th></tr></thead>
+  <tbody>
+    <tr><td><strong>CPU</strong></td><td>Use in percent, and the number of logical cores.</td></tr>
+    <tr><td><strong>Memory</strong></td><td>Use in percent and in GB of the total.</td></tr>
+    <tr><td><strong>GPU</strong></td><td>Use, temperature and video memory (VRAM). The chart shows use and VRAM as two lines.</td></tr>
+    <tr><td><strong>Disk free</strong> / <strong>Disk</strong></td><td>Free space on the work drive, and read and write speed.</td></tr>
+    <tr><td><strong>Network</strong></td><td>Data in and out, over all network interfaces.</td></tr>
+  </tbody>
+</table>
+<p>The dashed lines on each chart are the <strong>Warning</strong> and <strong>Critical</strong> thresholds. A value past a line turns yellow or red.</p>
+<div class="callout note"><p>The thresholds colour the cells and charts. On the screenshots in this guide the disk is <em>Critical</em> on every agent because the demo machine's D: drive is nearly full.</p></div>
+
+<h2>Configure monitors</h2>
+<p>The switch for the whole server is labelled <strong>Collect telemetry from agents</strong>. All telemetry settings are on one page. On the Agents page, click <strong>Configure monitors</strong>.</p>
+<figure class="shot">
+  <img src="../../assets/shots/agents/configure-monitors.png" alt="The Configure monitors page: a Telemetry card with Collect telemetry from agents switched on, Background interval, Live interval, Collect GPU use, and the Thresholds table with Warning and Critical values">
+  <figcaption>The Telemetry card on the Configure monitors page.</figcaption>
+</figure>
+<table>
+  <thead><tr><th>Setting</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Collect telemetry from agents</strong></td><td>Switches telemetry on or off for the whole server. On by default.</td></tr>
+    <tr><td><strong>Background interval</strong></td><td>How often every agent sends a sample: 5 to 300 seconds. Default 30.</td></tr>
+    <tr><td><strong>Live interval</strong></td><td>How often an agent sends samples while its Telemetry tab is open: 1 to 10 seconds. Default 2.</td></tr>
+    <tr><td><strong>Collect GPU use</strong></td><td>Reads the GPU on agents that have a GPU tool. The page says how many agents have one.</td></tr>
+    <tr><td><strong>Thresholds</strong></td><td>The <strong>Warning</strong> and <strong>Critical</strong> values for CPU use, memory used, GPU use, disk and so on. Yellow from the warning value, red from the critical value.</td></tr>
+    <tr><td><strong>Agents that don't send telemetry</strong></td><td>A list of agents left out. Pick an agent and click <strong>Add</strong>.</td></tr>
+  </tbody>
+</table>
+<p>Click <strong>Save</strong> (or <strong>Apply</strong> to stay on the page).</p>
+<div class="callout warning"><p>Telemetry thresholds only colour the pages. They never fail or stop a build. The older monitors further down the page, such as <strong>Free Disk Space</strong>, can mark an agent offline when it runs low, unless you tick <strong>Don't mark agents temporarily offline</strong>.</p></div>
+
+<h2>Turn telemetry off for one agent</h2>
+<ol class="steps">
+  <li>Open the agent and click the <strong>Configure</strong> tab.</li>
+  <li>In <strong>Node Properties</strong>, untick <strong>Collect telemetry from this agent</strong>. It is ticked by default (see <a href="agent-settings.html#telemetry-opt-out">Agent settings</a>).</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<p>The agent then shows "—" in the live columns, and it is listed under <strong>Agents that don't send telemetry</strong> on the Configure monitors page.</p>
+
+<h2>Tips</h2>
+<ul>
+  <li>Use the <strong>24 h</strong> range to see a night of builds at once and spot machines that run out of memory.</li>
+  <li>Lower the warning thresholds for disk on machines that keep big Perforce workspaces, so you are warned early.</li>
+  <li>A <em>Stale</em> freshness means no sample came in for a while. Check that the agent is still connected.</li>
+</ul>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="agents-page.html">The Agents page</a></li>
+  <li><a href="agent-settings.html">Agent settings</a>: disk space thresholds and the telemetry box.</li>
+  <li><a href="../how-to/watch-agent-health.html">Spot unhealthy agents</a></li>
+</ul>
+</main>
+</body>
+</html>

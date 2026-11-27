@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XML report processing · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/feature-xml-report">
+<main class="doc">
+<h1>XML report processing</h1>
+<p class="lead">Reads test report files in JUnit format and shows the results on the build page.</p>
+<h2>When to use it</h2>
+<p>Use it when your test tool writes XML reports and does not already report to Buildspawn. Many tools can write this format: Unreal Automation, NUnit and C++ test libraries. You then get pass and fail counts, a trend, and the list of failed tests.</p>
+<figure class="shot">
+  <img src="../../assets/shots/projects/feat-xml-report.png" alt="The XML report processing form">
+  <figcaption>The XML report processing form.</figcaption>
+</figure>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration, click <strong>Settings</strong>, then <strong>Build Features</strong>. Click <strong>Add build feature</strong> and choose <strong>XML report processing</strong>.</li>
+  <li>In <strong>Test report XMLs</strong> type the files to read, relative to the workspace, for example <code>Saved/Automation/*.xml</code>. Use <strong>Validate Pattern</strong> to check it.</li>
+  <li>Choose the other options you need (see the table).</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Test report XMLs</td><td>The report files, as an Ant pattern. Several patterns are separated by commas.</td><td>Empty (a feature with no files shows a problem)</td><td><code>Saved/Automation/*.xml</code></td></tr>
+    <tr><td>Test output retention</td><td>How much standard output and error of the tests is kept. Long output of passing tests is cut by default to save disk space.</td><td>Standard</td><td>All</td></tr>
+    <tr><td>keep all the properties</td><td>Keep the properties of each test case.</td><td>Off</td><td>Off</td></tr>
+    <tr><td>Archive files attached to tests in Open Test Reporting reports</td><td>Archive files that tests attach, so they open from the page of each test.</td><td>Off</td><td>Off</td></tr>
+    <tr><td>Keep original test names, even when reporting from multiple stages</td><td>Do not add the stage name to the test names.</td><td>Off</td><td>Off</td></tr>
+    <tr><td>Health report amplification factor</td><td>How much failed tests lower the health of the build configuration. 0 turns it off; 1 means 10% failing gives 90% health.</td><td>1.0</td><td><code>1.0</code></td></tr>
+    <tr><td>Additional test report features</td><td>Extra publishers for the test data.</td><td>None</td><td>-</td></tr>
+    <tr><td>Do not fail the build on empty test results</td><td>Normally a build fails when no report file is found. Turn this on to allow it.</td><td>Off</td><td>Off</td></tr>
+    <tr><td>Skip publishing checks</td><td>Do not send the results to the checks of the code host.</td><td>Off</td><td>On</td></tr>
+    <tr><td>Checks name</td><td>The name used when results are sent to the checks of a code host.</td><td>Tests</td><td><code>Unit tests</code></td></tr>
+    <tr><td>Skip marking build as unstable on test failure</td><td>Report the failures but keep the build successful.</td><td>Off</td><td>Off</td></tr>
+    <tr><td>Skip report files older than build start</td><td>Ignore report files that existed before the build started.</td><td>Off</td><td>On</td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p>The <strong>Unit Tests</strong> build configuration of the Engine project runs <code>RunTests.exe --report-xml Reports/tests.xml</code>. The studio sets <strong>Test report XMLs</strong> to <code>Reports/*.xml</code> and turns on <strong>Skip report files older than build start</strong>, so an old report on a reused workspace never counts.</p><h2>What you see when it runs</h2>
+<p>The build gets a <strong>Tests</strong> tab with the counts and the failed tests. A build with a failed test is <strong>Unstable</strong> (yellow), unless you skip that. Failure conditions can turn it into <strong>Failed</strong>.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>No test report files found</td><td>The pattern did not match. It is relative to the workspace. Check the folder and use <strong>Validate Pattern</strong>.</td></tr>
+    <tr><td>Results are counted from an old build</td><td>Turn on <strong>Skip report files older than build start</strong>.</td></tr>
+    <tr><td>The build is yellow, I want red</td><td>On <strong>Failure Conditions</strong> set <strong>Test failures</strong> to <strong>Failed</strong>.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="bc-build-features.html">The Build Features tab</a></li>
+  <li><a href="../post-build/test-report.html">Publish JUnit test result report</a></li>
+  <li><a href="bc-failure-conditions.html">Failure conditions</a></li>
+  <li><a href="../build-results/changes-artifacts-tests.html">Tests on the build page</a></li>
+</ul>
+</main>
+</body>
+</html>

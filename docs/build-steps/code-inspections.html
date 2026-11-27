@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Code Inspections · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/code-inspections">
+<main class="doc">
+<h1>Code Inspections</h1>
+<p class="lead">Runs an analysis tool of your own, or reads reports an earlier step wrote (SARIF, Checkstyle, PMD, SpotBugs), and lists the issues on the build.</p>
+
+<h2>When to use it</h2>
+<p>Use it when your analysis tool already writes a standard report. You get the issues on the build page without a special plugin. The step keeps only path, line, rule and message, never source text.</p>
+
+<h2>How to set it up</h2>
+
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>. Type <code>Code Inspections</code> in <strong>Filter step types</strong> if you like, then click the <strong>Code Inspections</strong> tile (group <strong>Code quality and coverage</strong>).</li>
+  <li>Type a <strong>Step name</strong>, for example <code>Inspections</code>.</li>
+  <li>Fill in the fields described below.</li>
+  <li>Optional: set <strong>Execute step</strong>, <strong>Conditions</strong> and <strong>Retry on failure</strong>. See <a href="step-list.html">The steps list and the step editor</a>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<figure class="shot small">
+  <img src="../../assets/shots/build-steps/code-inspections.png" alt="The fields of the Code Inspections step in the step editor">
+  <figcaption>The fields of the Code Inspections step, as the step editor shows them.</figcaption>
+</figure>
+
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Tool</strong></td><td>Optional. The tool first, then its arguments, one per line. Each line stays one argument. Leave empty to only read reports an earlier step wrote.</td><td>Empty</td><td><code>pmd</code> then <code>check</code></td></tr>
+    <tr><td><strong>Ignore the exit code of the tool</strong></td><td>Many tools exit with a number other than 0 when they find issues. Tick this to keep going and read the report anyway.</td><td>Off</td><td>On</td></tr>
+    <tr><td><strong>Report files</strong></td><td>An Ant pattern of report files inside the workspace. SARIF, Checkstyle, PMD and SpotBugs XML are recognised by their content. A path that leaves the workspace is refused.</td><td>Empty</td><td><code>**/checkstyle-result.xml,**/*.sarif</code></td></tr>
+    <tr><td><strong>Limit</strong></td><td>Optional. The step is worse when it finds more issues than this number. Empty means no limit.</td><td>Empty</td><td><code>0</code></td></tr>
+    <tr><td><strong>When over the limit</strong></td><td><strong>The build turns unstable</strong> or <strong>The step fails</strong>.</td><td>The build turns unstable</td><td>The step fails</td></tr>
+    <tr><td><strong>Working directory, Environment variables, Test reports, Run step within container</strong></td><td>The same in every runner. See <a href="common-step-fields.html">Fields every runner has</a>.</td><td></td><td></td></tr>
+  </tbody>
+</table>
+
+
+<h2>A worked example</h2>
+<p>Read the SARIF report that the C++ analyser wrote in an earlier step. Step name <code>Inspections</code>, leave <strong>Tool</strong> empty, <strong>Report files</strong> <code>build/analysis/*.sarif</code>, <strong>Limit</strong> <code>0</code>, <strong>When over the limit</strong> <strong>The step fails</strong>.</p>
+
+<h2>What you see when it runs</h2>
+<p>The console says <em>Read build/analysis/engine.sarif as SARIF.</em> and <em>Found 14 issues.</em> The build page has a <strong>Code Inspections</strong> page with the issue counts and the list. Over the limit: <em>Found 14 issues, more than the limit of 0.</em></p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong><em>No report was read. Pattern: …</em></strong></td><td>Check the pattern and that the earlier step wrote the file.</td></tr>
+    <tr><td><strong><em>A report pattern must stay inside the workspace</em></strong></td><td>Remove absolute paths, drive letters, <code>~</code> and <code>..</code>.</td></tr>
+    <tr><td><strong><em>More than N report files matched</em></strong></td><td>Narrow the pattern.</td></tr>
+    <tr><td><strong><em>The report … is larger than N MB and is not read</em></strong></td><td>Write a smaller report, or split it.</td></tr>
+    <tr><td><strong><em>The inspection tool was not found on this agent</em></strong></td><td>Install the tool or put it on the <code>PATH</code>.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="duplicates-finder.html">Duplicates finder</a></li>
+  <li><a href="resharper-inspections.html">Inspections (ReSharper)</a></li>
+  <li><a href="fxcop.html">FxCop</a></li>
+  <li><a href="runners.html">Runners</a></li>
+  <li><a href="common-step-fields.html">Fields every runner has</a></li>
+</ul>
+</main>
+</body>
+</html>

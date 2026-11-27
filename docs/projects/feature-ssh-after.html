@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Send files or run commands over SSH after the build · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/feature-ssh-after">
+<main class="doc">
+<h1>Send files or run commands over SSH after the build</h1>
+<p class="lead">Copies files to a server, or runs commands on it, when the build steps have finished.</p>
+<h2>When to use it</h2>
+<p>Use it to stop or restart something at the end of a build, or to move files that the build left in the workspace. The form is the same as <a href="feature-ssh-before.html">before the build</a>. It runs after the build steps but before the post-build actions.</p>
+<figure class="shot">
+  <img src="../../assets/shots/projects/feat-ssh-after.png" alt="The form for sending files over SSH after the build">
+  <figcaption>The SSH after form.</figcaption>
+</figure>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration, click <strong>Settings</strong>, then <strong>Build Features</strong>. Click <strong>Add build feature</strong> and choose <strong>Send files or execute commands over SSH after the build runs</strong>.</li>
+  <li>Choose the server and add transfer sets, as on the before-the-build page.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Name</td><td>The SSH server, chosen from the servers set up in the global settings.</td><td>None</td><td><code>build-share-01</code></td></tr>
+    <tr><td>Source files</td><td>Files to send, as a comma separated Ant pattern. The base folder is the workspace.</td><td>Empty</td><td><code>Tools/**</code></td></tr>
+    <tr><td>Remove prefix</td><td>The first part of the path that is not created on the server.</td><td>Empty</td><td><code>Tools</code></td></tr>
+    <tr><td>Remote directory</td><td>A folder below the one set in the global settings. It is created if it does not exist.</td><td>Empty</td><td><code>skyforge/tools</code></td></tr>
+    <tr><td>Exec command</td><td>A command to run on the server after the files are sent.</td><td>Empty</td><td><code>sudo systemctl stop skyforge-cache</code></td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p>After the <strong>Linux Server Build</strong>, a transfer set starts the cache service again with <code>sudo systemctl start skyforge-cache</code>.</p><h2>What you see when it runs</h2>
+<p>The log shows the SSH connection and the commands after your last build step.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>It runs even when the build failed</td><td>Wrappers run around the build. Use the post-build action if you only want to send files of a good build.</td></tr>
+    <tr><td>The command needs a terminal</td><td>Tick <strong>Exec in pty</strong> in Advanced.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="bc-build-features.html">The Build Features tab</a></li>
+  <li><a href="feature-ssh-before.html">SSH before the build</a></li>
+  <li><a href="../post-build/ssh.html">Send build artifacts over SSH</a></li>
+</ul>
+</main>
+</body>
+</html>

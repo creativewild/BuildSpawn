@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Builds at a time (executors) · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="agents/agent-executors">
+<main class="doc">
+<h1>Builds at a time (executors)</h1>
+<p class="lead">An executor is one slot on an agent that runs one build. The number of executors is the number of builds that the agent runs at the same time.</p>
+
+<h2>When to use it</h2>
+<p>Set it when you add an agent, and change it when you see builds waiting while agents are half idle, or when builds slow each other down because the machine is overloaded.</p>
+
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open <strong>Agents</strong>, click the agent, then <strong>Configure</strong>.</li>
+  <li>In <strong>General</strong>, set <strong>Number of executors</strong>.</li>
+  <li>Click <strong>Save</strong>. The change applies at once. Running builds are not stopped.</li>
+</ol>
+
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Number of executors</strong></td><td>The most builds that run on this agent at the same time. An agent needs at least 1. A good first value is the number of CPU cores. A higher value raises the total work done, because one build may wait for the disk while another uses the CPU, but each build takes longer.</td><td>1</td><td><code>2</code></td></tr>
+  </tbody>
+</table>
+<p>Other places that show or set it:</p>
+<table>
+  <thead><tr><th>Place</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td>Agents list</td><td>The <strong>Status</strong> column says how many executors are free. The header counts busy executors of all executors. An opened row lists each busy executor with its build.</td></tr>
+    <tr><td>Pool page and Pools tab</td><td>Show the executors of each pool.</td></tr>
+    <tr><td><a href="personal-agents.html">My machines</a></td><td>The owner of a personal machine sets <strong>Builds at a time</strong> there. Default 1.</td></tr>
+    <tr><td><a href="windows-tray-app.html">Tray app</a>, <a href="agent-terminal.html">terminal program</a></td><td>Show <strong>Builds at a time</strong> read only. Set it on the server.</td></tr>
+    <tr><td>Agent's <strong>Load Statistics</strong></td><td>A chart of busy and total executors over time.</td></tr>
+    <tr><td>The built-in node</td><td>Set its executors to <code>0</code> so that it runs no builds itself. It still runs the light "flyweight" jobs, such as the top-level part of a pipeline.</td></tr>
+  </tbody>
+</table>
+
+<h2>How to choose a number</h2>
+<ul>
+  <li><strong>Devkits and consoles:</strong> 1. The devkit can run one thing at a time.</li>
+  <li><strong>Unreal Engine or Unity builds:</strong> usually 1 or 2. Each build uses many cores and a lot of memory, and two builds of the same project need two workspaces on disk.</li>
+  <li><strong>Small tests and scripts:</strong> up to the number of cores.</li>
+  <li><strong>Personal machine:</strong> 1, so builds do not slow your own work.</li>
+</ul>
+<div class="callout tip"><p>Every executor needs its own workspace folder, so more executors also use more disk. For a game project of 200 GB, 2 executors need about 400 GB.</p></div>
+
+<h2>A worked example</h2>
+<p>The agent <code>win-build-02</code> has 16 cores, 64 GB of memory and a 2 TB disk. It runs the studio's quick <em>Unit tests</em> build configuration and the heavy <em>Windows Client</em> build.</p>
+<ol class="steps">
+  <li>Set <strong>Number of executors</strong> to <code>2</code>.</li>
+  <li>Click <strong>Save</strong>.</li>
+  <li>Start a client build and a unit-test build together.</li>
+</ol>
+
+<h2>What you see when it runs</h2>
+<ul>
+  <li>On the Agents page, <code>win-build-02</code> shows <strong>Building</strong> and <em>0 free</em> while both run. With one running, it shows <em>1 free</em> and the pool still counts the agent as available.</li>
+  <li>The third build waits in the queue with the reason that all executors are busy, until one is free.</li>
+</ul>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>Builds are very slow since you raised the number.</td><td>The machine is overloaded. Lower it, and check CPU and memory in <a href="telemetry.html">Telemetry</a>.</td></tr>
+    <tr><td>The disk fills up.</td><td>Each executor has its own workspace. Lower the number or clean workspaces (the <a href="windows-tray-app.html">tray app</a> has <strong>Work folders</strong>).</td></tr>
+    <tr><td>The form refuses <code>0</code> for an agent.</td><td>An agent needs 1 or more. To stop builds, use <strong>Mark offline</strong>. Only the built-in node may have 0.</td></tr>
+    <tr><td>Two builds of one build configuration cannot run at once.</td><td>The build configuration may have <strong>Execute concurrent builds</strong> off. That is a setting of the build configuration, not of the agent.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="agent-settings.html">Agent settings</a></li>
+  <li><a href="agents-page.html">The Agents page</a></li>
+  <li><a href="pools.html">Pools</a></li>
+  <li><a href="personal-agents.html">Personal agents</a></li>
+</ul>
+</main>
+</body>
+</html>

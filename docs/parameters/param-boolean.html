@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boolean parameter · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="parameters/param-boolean">
+<main class="doc">
+<h1>Boolean parameter</h1>
+<p class="lead">A checkbox that is on or off.</p>
+
+<h2>When to use it</h2>
+<p>Use it for a yes or no choice: clean build, upload to the store, run the slow tests.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Parameters</strong>.</li>
+  <li>Click <strong>Add parameter</strong>.</li>
+  <li>Choose <strong>Value type › Checkbox</strong>.</li>
+  <li>Set <strong>Value</strong> to the checked or the unchecked value.</li>
+  <li>Click <strong>Save</strong>. The Parameters tab saves as you work, so there is no other Save button.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+<thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>Name</td><td>The parameter name.</td><td>Empty</td><td><code>CLEAN</code></td></tr><tr><td>Set by Default</td><td>The box starts on. In the Add parameter form: <strong>Value</strong> equal to the checked value.</td><td>Off</td><td>On</td></tr><tr><td>Checked value</td><td>What the parameter is when the box is on. A Checkbox with <code>true</code> and <code>false</code> is saved as a Boolean parameter.</td><td><code>true</code></td><td><code>-clean</code></td></tr><tr><td>Unchecked value</td><td>What it is when the box is off.</td><td>Empty</td><td><code>false</code></td></tr><tr><td>Description</td><td>Shown next to the checkbox.</td><td>Empty</td><td>Delete the workspace first</td></tr>
+</tbody>
+</table>
+
+<h2>A worked example</h2>
+<p>Parameter <code>CLEAN</code>, checked value <code>-clean</code>, unchecked value empty. The Unreal Engine step has <code>%CLEAN%</code> in its arguments. A tick adds <code>-clean</code>.</p>
+<h2>What you see when it runs</h2>
+<p>The Run dialog shows a checkbox. The step reads the checked or unchecked value as text.</p>
+<h2>Problems and fixes</h2>
+<table>
+<thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+<tbody>
+<tr><td>The step gets the word true when I wanted a flag</td><td>Set the checked value to the flag itself, for example <code>-clean</code>.</td></tr>
+</tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="parameters.html">Parameters</a></li>
+  <li><a href="param-references.html">Parameter references</a></li>
+  <li><a href="../running-builds/run-dialog.html">The Run dialog</a></li>
+</ul>
+</main>
+</body>
+</html>

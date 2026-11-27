@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Follow a build from the terminal · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/run-follow-build-from-terminal">
+<main class="doc">
+<h1>Follow a build from the terminal</h1>
+<p class="lead">Watch a running build's log scroll by in a terminal, find the build that failed last night, and stop a build, without opening a browser.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>You have the terminal program, <code>buildspawn</code>. It comes with every server download. See <a href="../get-started/terminal-program.html">The terminal program</a>.</li>
+  <li>You can reach the server's address from your computer, for example <code>http://buildserver:8080</code>.</li>
+  <li>To <em>stop</em> a build you need an API token. To only read, you need none. See <a href="monitor-from-terminal.html">Watch the server from a terminal</a> for how to make the token file.</li>
+</ul>
+
+<h2>Steps</h2>
+<h3>Follow a running build</h3>
+<ol class="steps">
+  <li>Start the monitor on your server:
+<pre><code>buildspawn --url http://buildserver:8080 --token-file ~/.buildspawn-token</code></pre>
+On Windows, from the program folder, type <code>.\bin\buildspawn.exe</code>.</li>
+  <li>Press <kbd>2</kbd> for the <strong>Builds</strong> view. It lists every build of the last 24 hours, newest first. Running builds show a progress bar and a percentage.</li>
+  <li>Press <kbd>f</kbd> and choose the result <em>running</em>, or press <kbd>/</kbd> and type part of the build configuration's name, for example <code>Windows</code>.</li>
+  <li>Select the build with <kbd>&uarr;</kbd> and <kbd>&darr;</kbd>. The card below the list shows its agent, its cause and the result of the last five builds.</li>
+  <li>Press <kbd>Enter</kbd>. The <strong>Logs</strong> view opens with this build's log.</li>
+  <li>Press <kbd>f</kbd> to follow the log. New lines appear as the build writes them. Press <kbd>PgUp</kbd> to scroll back, and <kbd>f</kbd> again to follow again.</li>
+  <li>Press <kbd>l</kbd> to change the level and <kbd>/</kbd> to filter the lines, for example <code>error</code>. Press <kbd>s</kbd> to save the log to a file.</li>
+  <li>Press <kbd>2</kbd> to go back to the build list, or <kbd>o</kbd> to open the build in your browser.</li>
+</ol>
+<h3>Stop the build</h3>
+<ol class="steps">
+  <li>In the Builds view, select the running build.</li>
+  <li>Press <kbd>x</kbd>. The bottom line says <em>x stops the selected build</em> when your token is in use. See <a href="../running-builds/stop-a-build.html">Stop a build</a>.</li>
+</ol>
+<h3>Without the live screen, for scripts</h3>
+<p>Every view has a text version that prints once and exits:</p>
+<pre><code>buildspawn builds --running --url http://buildserver:8080 --token-file ~/.buildspawn-token
+buildspawn builds --failed --limit 5 --json</code></pre>
+
+<h2>A worked example</h2>
+<p>You start the nightly <em>Game / Windows Build</em> before you leave, and want to know at home whether the cook has started. On your laptop:</p>
+<pre class="terminal" data-title="buildspawn"><span class="t-bold">Buildspawn 1.9.3</span>  <span class="t-dim">http://buildserver:8080</span>
+ <span class="t-dim">Start  Job                       #   Result            Time   Agent</span>
+<span class="t-green">&#9656;</span> 23:02  Game/Windows Build        #8  <span class="t-cyan">&#9654; &#9608;&#9608;&#9608;&#9608;&#9608;&#9608; 42%</span>   31:10  win-build-01
+  22:41  Engine/Unit Tests         #4  <span class="t-green">&#10003; success</span>         5:12   win-build-02</pre>
+<p>You press <kbd>Enter</kbd> on the running build, then <kbd>f</kbd>, and watch the <em>Cook content</em> step go by. When it says the cook is done, you press <kbd>q</kbd> and go to bed.</p>
+
+<h2>What you see when it works</h2>
+<ul>
+  <li>The Builds view refreshes by itself, every 2 seconds by default, and says <em>LIVE</em> at the top right.</li>
+  <li>The log view shows the build's lines with times, as the browser console does.</li>
+  <li>After <kbd>x</kbd>, the build ends as <em>aborted</em> in the list.</li>
+</ul>
+
+<h2>Problems and fixes</h2>
+<table>
+  <tr><th>Problem</th><th>What to do</th></tr>
+  <tr><td><kbd>x</kbd> is refused.</td><td>The monitor has no valid token. Check the token file: one line, <code>user:token</code>, and a token that was not revoked.</td></tr>
+  <tr><td>Typing <code>buildspawn</code> on Windows opens the app.</td><td>Type <code>.\bin\buildspawn.exe</code> in the program folder, or open a new terminal elsewhere after the Windows setup.</td></tr>
+  <tr><td>The log does not move.</td><td>The step may not write output. The block in the browser console says <em>Waiting for output</em> then. Press <kbd>Space</kbd> to check that the screen is not frozen.</td></tr>
+  <tr><td>The monitor can't connect.</td><td>Open the same address in a browser. Include the port and <code>http://</code> or <code>https://</code>.</td></tr>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="monitor-from-terminal.html">Watch the server from a terminal</a></li>
+  <li><a href="../reference/terminal-commands.html">Terminal program commands</a></li>
+  <li><a href="../build-results/build-console.html">The build console</a>: the browser version.</li>
+</ul>
+
+</main>
+</body>
+</html>

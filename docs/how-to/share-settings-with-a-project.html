@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Share settings between build configurations · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/share-settings-with-a-project">
+<main class="doc">
+<h1>Share settings between build configurations</h1>
+<p class="lead">Set a step or a parameter once and let many build configurations use it: through their project, or through a template.</p>
+
+<p>In this example, a Windows build and a PS5 build both print the build machine, compile and package. The project <strong>HT1 Shared</strong> gives every build configuration inside it a studio name, a drop folder and one step. The template <strong>HT1 Platform build</strong> holds the compile and package steps. The PS5 build changes one value: the platform.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>A project to hold the build configurations. See <a href="../projects/projects.html">Create a project</a>.</li>
+  <li>The <strong>build settings</strong> permission on that project, so you can change what it passes down. Without it the <strong>Build settings</strong> tab is read-only.</li>
+  <li>Two or more build configurations in the project, or the wish to make them. See <a href="../projects/create-build-configuration.html">Create a build configuration</a>.</li>
+</ul>
+
+<h2>Steps</h2>
+<h3>Give every build configuration in a project the same settings</h3>
+<ol class="steps">
+  <li>Open the project and click the <strong>Build settings</strong> tab.</li>
+  <li>Under <strong>Build steps</strong>, click <strong>Add build step</strong>. Pick <strong>Command Line</strong>, name the step <code>Show build machine</code> and type the script:
+<pre><code>echo Building %PLATFORM% on %COMPUTERNAME% for %STUDIO_NAME%</code></pre>
+  Click <strong>Save</strong>.</li>
+  <li>Under <strong>Parameters</strong>, click <strong>Add parameter</strong>. Add <code>STUDIO_NAME</code> as a configuration parameter with the value <code>Skyforge Studio</code>.</li>
+  <li>Click <strong>Add parameter</strong> again and add <code>env.DROP_SHARE</code> as an environment variable with the value <code>\\files.studio.example\builds</code>.</li>
+  <li>Click <strong>Save</strong> at the bottom of the page.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/how-to/share-settings-with-a-project-1.png" alt="The Build settings tab of the project HT1 Shared: one build step, Show build machine, and two parameters, STUDIO_NAME with the value Skyforge Studio and env.DROP_SHARE, both defined in the folder HT1 Shared">
+  <figcaption>The project's Build settings: one step and two parameters for every build configuration inside.</figcaption>
+</figure>
+
+<h3>Put the common steps in a template</h3>
+<ol class="steps" start="6">
+  <li>In the same project, click <strong>New Item</strong>. Type <code>HT1 Platform build</code>, choose <strong>Build configuration template</strong> and click <strong>Create</strong>.</li>
+  <li>On the template's <strong>Build settings</strong>, add two <strong>Command Line</strong> steps:
+<pre><code>rem Compile
+echo Compiling Skyforge for %PLATFORM% (%CONFIG%)
+
+rem Package
+echo Packaging Skyforge-%PLATFORM%-%CONFIG%.zip to %DROP_SHARE%</code></pre>
+  Use the real commands of your game here, for example an Unreal Engine or Unity step.</li>
+  <li>Add two parameters to the template: <code>PLATFORM</code> with the value <code>Win64</code> and <code>CONFIG</code> with the value <code>Development</code>. Click <strong>Save</strong>.</li>
+</ol>
+
+<h3>Attach the template to each build configuration</h3>
+<ol class="steps" start="9">
+  <li>Open the first build configuration, for example <strong>HT1 Windows Build</strong>, and click <strong>Settings</strong>.</li>
+  <li>Open <strong>More › Templates</strong>.</li>
+  <li>Pick <strong>How-to/HT1 Shared/HT1 Platform build</strong> in the list and click <strong>Attach template</strong>.</li>
+  <li>Do the same for the other build configurations, for example <strong>HT1 PS5 Build</strong>.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/how-to/share-settings-with-a-project-3.png" alt="The Templates page of HT1 Windows Build: a list with How-to/HT1 Shared/HT1 Platform build and the Attach template button, and the text This job is based on no template">
+  <figcaption>Pick the template and click Attach template. Only templates of this project and the projects above it are offered.</figcaption>
+</figure>
+
+<h3>Change one value for one build configuration</h3>
+<ol class="steps" start="13">
+  <li>Open <strong>HT1 PS5 Build</strong> and go to <strong>Settings › Parameters</strong>.</li>
+  <li>On the <code>PLATFORM</code> row, click <strong>Override</strong>.</li>
+  <li>Type <code>PS5</code> as the value and save. The template and the Windows build keep <code>Win64</code>.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/how-to/share-settings-with-a-project-4.png" alt="The Parameters page of HT1 PS5 Build: STUDIO_NAME and env.DROP_SHARE defined in the project HT1 Shared, PLATFORM with the value PS5 and CONFIG with the value Development defined in the template, each with an Override button">
+  <figcaption>The PS5 build: two parameters from the project, two from the template, and PLATFORM set to PS5.</figcaption>
+</figure>
+
+<h2>Check it worked</h2>
+<ul>
+  <li>Open a build configuration and go to <strong>Settings › Build Steps</strong>. The steps carry a chip that says where they come from: <strong>From folder How-to/HT1 Shared</strong> and <strong>From template HT1 Platform build</strong>. The project's step runs first, then the template's steps, then the build configuration's own.</li>
+  <li>Open the template. The <strong>Used by</strong> tab lists both build configurations.</li>
+  <li>Click <strong>Run</strong> on <strong>HT1 Windows Build</strong>. The log shows <code>Building Win64 on … for Skyforge Studio</code>, then the compile and package lines.</li>
+</ul>
+<figure class="shot">
+  <img src="../../assets/shots/how-to/share-settings-with-a-project-5.png" alt="The Build Steps page of HT1 Windows Build: Show build machine from folder How-to/HT1 Shared, then Compile and Package from template HT1 Platform build">
+  <figcaption>Inherited steps show where they come from.</figcaption>
+</figure>
+<figure class="shot">
+  <img src="../../assets/shots/how-to/share-settings-with-a-project-2.png" alt="The template HT1 Platform build: Owned by How-to » HT1 Shared, Used by 2 jobs, with HT1 PS5 Build and HT1 Windows Build listed under Used by">
+  <figcaption>The template's Used by list shows who a change reaches.</figcaption>
+</figure>
+
+<h2>Troubleshooting</h2>
+<ul>
+  <li><strong>The template is not in the list on the Templates page.</strong>
+  A build configuration can only use templates of its own project and the projects above it. Move the template up, or make it in a project the build configuration sits in.</li>
+  <li><strong>The Build settings tab is read-only.</strong>
+  You need the build settings permission on that project, not just Configure. Ask an administrator; see <a href="../administration/users-and-permissions.html">Users, groups and permissions</a>.</li>
+  <li><strong>A parameter has the wrong value.</strong>
+  The nearer setting wins: the build configuration beats its templates, the templates beat the projects. When two templates define the same parameter, the one higher in the list wins. Look at the <strong>Defined in</strong> column on the Parameters page.</li>
+  <li><strong>A trigger or build feature did not carry over.</strong>
+  Templates carry steps, parameters, post-build actions and version control roots. Set triggers and build features on each build configuration.</li>
+</ul>
+
+<h2>Next steps</h2>
+<ul><li><a href="projects-from-template.html">Create a build configuration from a template</a></li></ul>
+<ul>
+  <li><a href="../projects/projects.html">Projects</a>: everything a project passes down.</li>
+  <li><a href="../projects/templates.html">Templates</a>: order rules, detach and the Used by list.</li>
+  <li><a href="../parameters/parameters.html">Parameters</a>: configuration, <code>env.</code> and <code>system.</code> parameters.</li>
+  <li><a href="pass-values-between-steps.html">Pass a version number between steps</a>.</li>
+  <li><a href="use-a-secret.html">Use a secret in a build</a>: put shared passwords on the project too.</li>
+</ul>
+</main>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent service scripts · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="agents/windows-service">
+<main class="doc">
+<h1>Agent service scripts</h1>
+<p class="lead">A service starts the agent at boot, restarts it when it stops and keeps it running after you sign out. This page covers the Windows service scripts and the matching scripts for Linux and macOS.</p>
+
+<h2>When to use it</h2>
+<p>Use a service on every build machine that nobody signs in to. Run the agent in a window (<code>run-agent</code>) only to try it, or on a personal computer where the owner's tray app starts it.</p>
+
+<h2>The scripts</h2>
+<p>All scripts sit in the agent folder, for example <code>C:\buildspawn-agent\</code>.</p>
+<table>
+  <thead><tr><th>Script (Windows)</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>install-service.bat</code></td><td>Installs the <strong>Buildspawn Agent</strong> service and starts it. Needs an administrator prompt.</td></tr>
+    <tr><td><code>uninstall-service.bat</code></td><td>Stops and removes the service. Needs an administrator prompt.</td></tr>
+    <tr><td><code>stop-agent.bat</code></td><td>Stops the service (<code>sc.exe stop buildspawn-agent</code>). Run it as administrator.</td></tr>
+    <tr><td><code>run-agent.bat</code></td><td>Runs the agent in the window, in the foreground. Closing the window stops it.</td></tr>
+  </tbody>
+</table>
+<table>
+  <thead><tr><th>Script (Linux and macOS)</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>install-service.sh</code></td><td>Linux: writes <code>/etc/systemd/system/buildspawn-agent.service</code>, then enables and starts it. Needs <code>sudo</code>. macOS: with <code>sudo</code> installs a LaunchDaemon (starts at boot); as yourself installs a LaunchAgent (starts when you sign in). The name is <code>com.buildspawn.agent</code>.</td></tr>
+    <tr><td><code>uninstall-service.sh</code></td><td>Stops and removes the service.</td></tr>
+    <tr><td><code>stop-agent.sh</code></td><td>Stops the service.</td></tr>
+    <tr><td><code>run-agent.sh</code></td><td>Runs the agent in the foreground. Press <kbd>Ctrl</kbd> + <kbd>C</kbd> to stop.</td></tr>
+  </tbody>
+</table>
+
+<h3>Options of install-service</h3>
+<table>
+  <thead><tr><th>Option</th><th>What it does</th><th>Systems</th></tr></thead>
+  <tbody>
+    <tr><td><code>--url URL</code></td><td>Sets <code>serverUrl</code> in the settings file.</td><td>All</td></tr>
+    <tr><td><code>--token TOKEN</code></td><td>Sets <code>registrationToken</code> (see <a href="agent-connection.html#registration-token">Registration token</a>).</td><td>All</td></tr>
+    <tr><td><code>--name NAME</code></td><td>Sets the agent's name. Default: the machine's host name.</td><td>All</td></tr>
+    <tr><td><code>--user USER</code></td><td>The account the service runs as. Default: the user who ran <code>sudo</code>.</td><td>Linux, macOS</td></tr>
+    <tr><td><code>--print</code></td><td>Writes the service definition to the screen and changes nothing. No administrator needed.</td><td>All</td></tr>
+  </tbody>
+</table>
+<p><code>run-agent</code> also takes <code>--url</code>, <code>--name</code>, <code>--token</code> and <code>--work-dir</code>.</p>
+
+<h2>How to install the service</h2>
+<ol class="steps">
+  <li>Unzip the agent download (see <a href="install-agent.html">Install an agent</a>).</li>
+  <li>Open an <strong>administrator</strong> command prompt in the agent folder. On Linux and macOS, use a terminal with <code>sudo</code>.</li>
+  <li>Run:
+<pre><code>install-service.bat --url https://buildspawn.example.com/ --name win-build-04</code></pre>
+  Leave out the options when you downloaded the zip made for one agent (<strong>New Node</strong>). It already holds the address and the secret.</li>
+  <li>The script says <em>Service "Buildspawn Agent" installed and started. Logs: C:\buildspawn-agent\logs</em>.</li>
+</ol>
+<p>What the Windows script does, in order:</p>
+<ol>
+  <li>Checks that it runs as administrator.</li>
+  <li>Finds Java: the <code>java</code> folder in the agent folder first, then <code>JAVA_HOME</code>, then the search path. Java 17 or later.</li>
+  <li>Writes the options you gave into <code>conf\buildspawn-agent.properties</code> and stops with an error if <code>serverUrl</code> is empty.</li>
+  <li>Locks the settings file so that only the system account and administrators can read it. It holds the agent's secret.</li>
+  <li>Writes <code>bin\buildspawn-agent-service.xml</code> with the Java it found and your <code>javaOptions</code>. The secret is not in it.</li>
+  <li>Registers the service with WinSW, a small open-source service wrapper (MIT licence, see <code>bin\LICENSE-WinSW.txt</code>), and starts it.</li>
+</ol>
+<p>The service is set to start automatically. If the agent stops, it restarts after 10 seconds, then 30, then 60. The failure count resets after an hour.</p>
+
+<h2>Run install-service again</h2>
+<p>You can run <code>install-service.bat</code> again on a machine where the service already exists. It stops the old service, removes it and installs it again from the folder you are in. Do this:</p>
+<ul>
+  <li>after you <strong>upgrade</strong> the agent files (see <a href="../how-to/admin-upgrade-agents.html">Upgrade agents</a>);</li>
+  <li>after you <strong>move</strong> or replace the agent folder, because the service points at the old folder;</li>
+  <li>after you change <code>javaOptions</code>, because the Windows service definition holds the Java options;</li>
+  <li>when the service does not start and <code>logs</code> is empty.</li>
+</ul>
+<p>The script then says <em>Service "Buildspawn Agent" installed again from C:\buildspawn-agent\ and started.</em> If it says <em>could not remove the old service definition</em>, close the Services window (<code>services.msc</code>) and try again.</p>
+<p>The same applies to Linux and macOS: run <code>install-service.sh</code> again after you change <code>javaOptions</code>, because the installed definition holds the options.</p>
+
+<h2>Upgrade an agent without registering it again</h2>
+<p>The agent's registration lives in <code>conf\buildspawn-agent.properties</code> (the name and the secret). As long as you keep that file, the agent stays the same agent on the server, in the same pool and with the same history. See <a href="../how-to/admin-upgrade-agents.html">Upgrade agents</a> for the steps.</p>
+
+<h2>Logs</h2>
+<table>
+  <thead><tr><th>Where</th><th>What is in it</th></tr></thead>
+  <tbody>
+    <tr><td><code>logs\</code> (Windows service)</td><td>The service wrapper's files. They roll over at 10 MB and the last 8 are kept.</td></tr>
+    <tr><td><code>logs\run-agent.log</code></td><td>Output of an agent that the <a href="windows-tray-app.html">tray app</a> started.</td></tr>
+    <tr><td><code>logs\tray.log</code></td><td>Errors of the tray app.</td></tr>
+    <tr><td><code>logs/agent.log</code> (Linux, macOS)</td><td>Everything the service prints.</td></tr>
+    <tr><td><code>work\remoting\logs\</code></td><td>The agent's own log, which the tray app's <strong>Agent log</strong> tab and view 7 of the <a href="agent-terminal.html">terminal program</a> read.</td></tr>
+  </tbody>
+</table>
+
+<h2>A worked example</h2>
+<p>A studio moves its build agents from <code>C:\buildspawn-agent</code> to <code>D:\agents\win-build-02</code> because the C: drive is small.</p>
+<ol class="steps">
+  <li>On <code>win-build-02</code>, run <code>stop-agent.bat</code> as administrator.</li>
+  <li>Move the whole folder, with <code>conf</code> and <code>work</code>, to <code>D:\agents\win-build-02</code>.</li>
+  <li>Open an administrator prompt in the new folder and run <code>install-service.bat</code>. It replaces the old registration with one that points at the new folder.</li>
+  <li>The agent comes back online under the same name and pool.</li>
+</ol>
+
+<h2>What you see when it runs</h2>
+<ul>
+  <li>In <code>services.msc</code>: <strong>Buildspawn Agent</strong>, Status <strong>Running</strong>, Startup type <strong>Automatic</strong>.</li>
+  <li>On the server's Agents page: the agent turns <strong>Idle</strong> within seconds.</li>
+  <li>On Linux, <code>systemctl status buildspawn-agent</code> shows <strong>active (running)</strong>. The unit restarts the agent after 10 seconds if it stops.</li>
+</ul>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><em>run this from an administrator prompt</em></td><td>Open the prompt with <strong>Run as administrator</strong>.</td></tr>
+    <tr><td><em>serverUrl is not set</em></td><td>Pass <code>--url</code> or set <code>serverUrl</code> in <code>conf\buildspawn-agent.properties</code>.</td></tr>
+    <tr><td><em>Java 17 or newer is required</em></td><td>Use the download with Java inside, or set <code>JAVA_HOME</code>.</td></tr>
+    <tr><td>The service does not start and <code>logs</code> is empty.</td><td>Check that <code>bin\buildspawn-agent-service.xml</code> exists, then run <code>install-service.bat</code> again.</td></tr>
+    <tr><td><em>The Buildspawn Agent service is not installed.</em></td><td><code>uninstall-service.bat</code> found nothing to remove. It is safe.</td></tr>
+    <tr><td><em>ERROR: run with sudo</em> (Linux)</td><td>Run <code>sudo ./install-service.sh</code>.</td></tr>
+    <tr><td><em>systemd (systemctl) not found</em></td><td>This Linux has no systemd. Run <code>run-agent.sh</code> from your own init system.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="install-agent.html">Install an agent</a></li>
+  <li><a href="agent-connection.html">Connect an agent</a></li>
+  <li><a href="windows-tray-app.html">Windows tray app</a></li>
+  <li><a href="../how-to/add-windows-agent.html">Add a Windows build agent</a></li>
+  <li><a href="../how-to/admin-upgrade-agents.html">Upgrade agents</a></li>
+</ul>
+</main>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Copying settings · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/project-copy-settings">
+<main class="doc">
+<h1>Copying settings</h1>
+<p class="lead">Make a new build configuration from an existing one, from a template, or copy settings from a project, and choose what happens to the settings it inherits.</p>
+<h2>Copy an existing item</h2><ol class="steps">
+  <li>Open the project where the copy should go and click <strong>New Item</strong>.</li>
+  <li>Type the new name. Check the ID.</li>
+  <li>Under <strong>Start from</strong> choose <strong>Copy of an existing item</strong>. In <strong>Copy from</strong> type part of a name and pick the item. Every item you can read is listed.</li>
+  <li>Under <strong>Settings of the copy</strong> choose one of the two cards (below).</li>
+  <li>Click <strong>Create</strong>.</li>
+</ol>
+<table>
+  <thead><tr><th>Choice</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td>Keep inheriting</td><td>The copy uses the settings of the project it is created in. Pick this when the copy should follow its new project.</td></tr>
+    <tr><td>Make inherited settings its own</td><td>The copy keeps running the same steps and parameters, whatever the project holds. Pick this when you copy into another project and want the build to stay the same.</td></tr>
+  </tbody>
+</table>
+<p>Overrides are kept either way. The copy gets a new ID and starts with no build history.</p><h2>Start from a template</h2><ol class="steps">
+  <li>Under <strong>Start from</strong> choose <strong>Template</strong>. The list shows the templates you can use in this project, with how many steps and parameters each has.</li>
+  <li>Pick one. Leave <strong>Keep linked to the template</strong> on if the new item should follow later changes to the template. Clear it to copy the steps once.</li>
+  <li>Choose the type and click <strong>Create</strong>.</li>
+</ol>
+<h2>Share settings with a project</h2><p>To give many build configurations the same steps or parameters, put them on the project instead of copying. See <a href="../how-to/share-settings-with-a-project.html">Share settings with a whole project</a>.</p><h2>A worked example</h2><p>The studio copies <em>Windows Build</em> into <strong>Game</strong> as <em>Switch Build</em> with <strong>Keep inheriting</strong>. The copy picks up the steps of the project <strong>Game</strong>. A copy of <em>Windows Build</em> into the project <strong>Tools</strong> with <strong>Make inherited settings its own</strong> keeps the Game steps as its own.</p><h2>Problems and fixes</h2><table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>Copy of an existing item is missing</td><td>The server has no items that you can read.</td></tr>
+    <tr><td>Template is missing</td><td>No template is within reach of this project. Templates of a project can be used in it and in the projects below.</td></tr>
+    <tr><td>The copy builds differently</td><td>You chose <strong>Keep inheriting</strong> and the new project passes other steps. Choose <strong>Make inherited settings its own</strong>.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="projects.html">Projects</a></li>
+  <li><a href="create-build-configuration.html">Create a build configuration</a></li>
+  <li><a href="templates.html">Templates</a></li>
+</ul>
+</main>
+</body>
+</html>

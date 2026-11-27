@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Notifications · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/feature-notifications">
+<main class="doc">
+<h1>Notifications</h1>
+<p class="lead">Sends an email when a build fails, and when it is fixed.</p>
+<h2>When to use it</h2>
+<p>Use it when someone must hear about a broken build without opening Buildspawn. It sends an email for every failed build, for the first successful build after a failure, and for an unstable build after a successful one. An administrator sets the mail server once in the global settings.</p>
+<figure class="shot">
+  <img src="../../assets/shots/projects/feat-notifications.png" alt="The Notifications form">
+  <figcaption>The Notifications form.</figcaption>
+</figure>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration, click <strong>Settings</strong>, then <strong>Build Features</strong>. Click <strong>Add build feature</strong> and choose <strong>Notifications</strong>.</li>
+  <li>In <strong>Recipients</strong> type the email addresses, separated by spaces.</li>
+  <li>Tick <strong>Send separate e-mails to individuals who broke the build</strong> if the people who changed the code should hear too.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Recipients</td><td>Whitespace-separated email addresses. You can use build variables.</td><td>Empty</td><td><code>build-team@studio.example</code></td></tr>
+    <tr><td>Send e-mail for every unstable build</td><td>On: every unstable build sends an email. Off: only the first one after a successful build.</td><td>On</td><td>On</td></tr>
+    <tr><td>Send separate e-mails to individuals who broke the build</td><td>Email the people whose changes were in the broken build. With no recipients, only they get the mail.</td><td>Off</td><td>On</td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p>The nightly <strong>Release Build</strong> notifies <code>release-team@studio.example</code> and the people who submitted since the last good build. On a Monday the build fails; the team gets one email. After the fix the team gets one email that the build is good again.</p><h2>What you see when it runs</h2>
+<p>Emails come from the mail server in the global settings. The Build Features card says, for example, <em>Email to release-team@studio.example when a build fails and when it is fixed</em>.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>Give at least one recipient, or send to who broke the build</td><td>Both are empty. Fill one.</td></tr>
+    <tr><td>No email arrives</td><td>Ask an administrator to check the mail server settings and to send a test email. Check the spam folder.</td></tr>
+    <tr><td>Individuals do not get email</td><td>Their user must have an email address in their profile, or the server must have a default suffix set.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="bc-build-features.html">The Build Features tab</a></li>
+  <li><a href="../post-build/email.html">E-mail Notification (post-build action)</a></li>
+</ul>
+</main>
+</body>
+</html>

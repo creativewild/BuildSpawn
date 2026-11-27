@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rake · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/rake">
+<main class="doc">
+<h1>Rake</h1>
+<p class="lead">Runs <code>rake</code> with tasks, a Rakefile and arguments.</p>
+
+<h2>When to use it</h2>
+<p>Use it for Ruby tooling in your pipeline. It can record test reports from RSpec, Cucumber and Test::Unit.</p>
+
+<h2>How to set it up</h2>
+
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>. Type <code>Rake</code> in <strong>Filter step types</strong> if you like, then click the <strong>Rake</strong> tile (group <strong>Build tools</strong>).</li>
+  <li>Type a <strong>Step name</strong>, for example <code>Run specs</code>.</li>
+  <li>Fill in the fields described below.</li>
+  <li>Optional: set <strong>Execute step</strong>, <strong>Conditions</strong> and <strong>Retry on failure</strong>. See <a href="step-list.html">The steps list and the step editor</a>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<figure class="shot small">
+  <img src="../../assets/shots/build-steps/rake.png" alt="The fields of the Rake step in the step editor">
+  <figcaption>The fields of the Rake step, as the step editor shows them.</figcaption>
+</figure>
+
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Tasks</strong></td><td>One task per line, such as <code>spec</code> or <code>db:migrate</code>. Empty runs the default task.</td><td>Empty</td><td><code>spec</code></td></tr>
+    <tr><td><strong>Rakefile from</strong></td><td><strong>Path to a Rakefile</strong> or <strong>Content written here</strong>.</td><td>Path to a Rakefile</td><td>Path to a Rakefile</td></tr>
+    <tr><td><strong>Rakefile</strong></td><td>Passed as <code>-f</code>. Empty lets rake look for a Rakefile in the working directory.</td><td>Empty</td><td><code>tools/Rakefile</code></td></tr>
+    <tr><td><strong>Rakefile content</strong></td><td>The Rakefile itself. It is written to a temporary file in the working directory, passed as <code>-f</code> and removed afterwards.</td><td>Empty</td><td>A Rakefile</td></tr>
+    <tr><td><strong>Bundler: run bundle exec rake</strong></td><td>Runs <code>bundle exec rake</code>, so the gems of the Gemfile apply. The agent must have bundler.</td><td>Off</td><td>On</td></tr>
+    <tr><td><strong>Debug: track invoke and execute stages</strong></td><td>Adds <code>--trace</code>: logs when each task is invoked and executed and prints the full backtrace of a failure.</td><td>Off</td><td>Off</td></tr>
+    <tr><td><strong>RSpec test report</strong></td><td>Asks RSpec for JUnit XML through <code>SPEC_OPTS</code>, written to <code>buildspawn-reports/rspec.xml</code> and recorded as test results. The project needs the <code>rspec_junit_formatter</code> gem.</td><td>Off</td><td>On</td></tr>
+    <tr><td><strong>Cucumber test report</strong></td><td>Asks Cucumber for JUnit XML through <code>CUCUMBER_OPTS</code>, written under <code>buildspawn-reports</code>. Cucumber has this formatter built in.</td><td>Off</td><td>Off</td></tr>
+    <tr><td><strong>Test::Unit test report</strong></td><td>Adds the <code>ci:setup:testunit</code> task before the tasks and sets <code>CI_REPORTS</code>. The project needs the <code>ci_reporter_test_unit</code> gem.</td><td>Off</td><td>Off</td></tr>
+    <tr><td><strong>Test-Spec test report, Shoulda test report</strong></td><td>Both run on Test::Unit and use the same setup task and gem. Tick any of the three and the task is added once.</td><td>Off</td><td>Off</td></tr>
+    <tr><td><strong>Additional interpreter parameters</strong></td><td>Options for the <code>ruby</code> interpreter, one per line, such as <code>-W0</code> or <code>-Ilib</code>. Rake then starts as <code>ruby</code>, the options, <code>-S rake</code>.</td><td>Empty</td><td><code>-Ilib</code></td></tr>
+    <tr><td><strong>Arguments</strong></td><td>One argument per line, placed before the tasks, such as <code>--trace</code>.</td><td>Empty</td><td><code>--trace</code></td></tr>
+    <tr><td><strong>Working directory, Environment variables, Test reports, Run step within container</strong></td><td>The same in every runner. See <a href="common-step-fields.html">Fields every runner has</a>.</td><td></td><td></td></tr>
+  </tbody>
+</table>
+
+
+<h2>A worked example</h2>
+<p>Run the specs of the patch-notes generator. Step name <code>Run specs</code>, <strong>Tasks</strong> <code>spec</code>, tick <strong>Bundler</strong> and <strong>RSpec test report</strong>.</p>
+
+<h2>What you see when it runs</h2>
+<p>The console shows <code>$ bundle exec rake spec</code>. The RSpec results are recorded as test results on the build.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong><em>The rake command was not found on this agent</em></strong></td><td>Install Ruby with rake there or put <code>rake</code> on the <code>PATH</code>.</td></tr>
+    <tr><td><strong><em>The Rake step is set to a Rakefile written in the step, and it is empty</em></strong></td><td>Type the Rakefile or choose a path.</td></tr>
+    <tr><td><strong>No test results from RSpec</strong></td><td>Add the <code>rspec_junit_formatter</code> gem to the Gemfile.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="command-line.html">Command Line</a></li>
+  <li><a href="runners.html">Runners</a></li>
+  <li><a href="common-step-fields.html">Fields every runner has</a></li>
+</ul>
+</main>
+</body>
+</html>

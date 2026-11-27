@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Run nightly at 02:00 · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/params-nightly-0200">
+<main class="doc">
+<h1>Run nightly at 02:00</h1>
+<p class="lead">Build every night at two o'clock on weekdays.</p>
+
+<h2>When to use this</h2>
+<p>Use it for a nightly build, cook or test run.</p>
+<h2>Steps</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Triggers</strong>.</li>
+  <li>Click <strong>Add new trigger</strong>, then <strong>Add</strong> next to <strong>Schedule Trigger</strong>.</li>
+  <li>Choose <strong>Custom</strong>.</li>
+  <li>In <strong>Cron line</strong> type <code>0 2 * * 1-5</code>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<h2>A worked example</h2>
+<p>For every day at 02:00, choose <strong>Every day</strong>, hour <code>2</code>, minute <code>0</code>. To spread several builds, leave the minute empty: it becomes <code>H</code>.</p>
+<h2>What you see when it runs</h2>
+<p>The Triggers page shows <em>On a cron schedule</em> or <em>Daily at 02:00</em>, and the summary says <em>Runs every day at 02:00</em>.</p>
+<h2>Problems and fixes</h2>
+<table>
+<thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+<tbody>
+<tr><td>It runs at the wrong hour</td><td>The time zone of the server is used. Add <code>TZ=Europe/London</code> as the first line of a custom schedule.</td></tr>
+</tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../running-builds/trigger-schedule.html">Schedule trigger</a></li>
+</ul>
+</main>
+</body>
+</html>

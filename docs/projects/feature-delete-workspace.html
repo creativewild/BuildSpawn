@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Delete the workspace before the build · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/feature-delete-workspace">
+<main class="doc">
+<h1>Delete the workspace before the build</h1>
+<p class="lead">Empties the workspace folder on the agent before the sources are fetched, so every build starts clean.</p>
+<h2>When to use it</h2>
+<p>Use it when old files cause strange results: stale cooked content, a half-finished Unity <code>Library</code> folder, or files that were deleted in version control but are still on disk. The price is time: every build fetches and rebuilds everything. If only some folders are slow to rebuild, keep them with the <strong>Keep</strong> field.</p>
+<figure class="shot">
+  <img src="../../assets/shots/projects/feat-delete-workspace.png" alt="The Delete the workspace before the build form with the Keep field">
+  <figcaption>The Delete the workspace before the build form.</figcaption>
+</figure>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration, click <strong>Settings</strong>, then <strong>Build Features</strong>. Click <strong>Add build feature</strong> and choose <strong>Delete the workspace before the build</strong>.</li>
+  <li>In <strong>Keep</strong>, type one pattern per line for the files you want to keep, for example <code>Library/**</code>. Leave it empty to delete everything.</li>
+  <li>Tick <strong>Also delete directories that match</strong> only if you want the matching folders themselves removed too.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<h2>Every field</h2>
+<p>An Ant pattern is a path with wildcards: <code>*</code> matches any text in one folder name, <code>**</code> matches any number of folders.</p><table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Keep</td><td>Files that stay. One Ant pattern per line, relative to the workspace. Empty keeps nothing.</td><td>Empty</td><td><code>Library/**</code></td></tr>
+    <tr><td>Also delete directories that match</td><td>Remove the directories that the patterns match, not only the files.</td><td>Off</td><td>On</td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p>The <strong>Unity Windows Build</strong> keeps its <code>Library</code> folder, because importing the project takes 25 minutes. It still needs a clean output folder. The studio sets <strong>Keep</strong> to <code>Library/**</code>. Everything else in the workspace, including old <code>Builds/</code> output, is deleted before each build.</p><h2>What you see when it runs</h2>
+<pre class="terminal" data-title="build log">Deleting the workspace before the build, keeping Library/**
+Cleaning E:\ws\Game_UnityWindows ...
+Checking out from Perforce ...</pre>
+<p>When <strong>Keep</strong> is empty the line says <em>Deleting the workspace before the build</em>.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>The build is much slower</td><td>The workspace is fetched in full each time. Use <strong>Keep</strong> for folders that are expensive to make again.</td></tr>
+    <tr><td>A file I wanted to keep is gone</td><td>Check the pattern. It is relative to the workspace root and case matters on Linux and macOS.</td></tr>
+    <tr><td>Two builds fail on the same agent</td><td>Builds that share a workspace folder cannot run at the same time. Run them one at a time, or give each its own workspace.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="bc-build-features.html">The Build Features tab</a></li>
+  <li><a href="bc-workspace-options.html">Workspace options</a></li>
+</ul>
+</main>
+</body>
+</html>

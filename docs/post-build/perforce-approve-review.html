@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Perforce: ApproveImpl review · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="post-build/perforce-approve-review">
+<main class="doc">
+<h1>Perforce: ApproveImpl review</h1>
+<p class="lead">Changes the state of a Helix Swarm review when the build ends, for example to approve it.</p>
+<h2>When to use it</h2>
+<p>Use it in a build that checks a review. A good build approves it. You can also use a vote or a change of state.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration, click <strong>Settings</strong>, then <strong>Post-build Actions</strong>. Click <strong>Add post-build action</strong> and choose <strong>Perforce: ApproveImpl review</strong>.</li>
+  <li>Choose the <strong>P4 Credentials</strong>.</li>
+  <li>Type the <strong>Swarm Review</strong> number, usually as a variable such as <code>${review}</code>.</li>
+  <li>Choose the <strong>Approve Status</strong>.</li>
+  <li>Type a <strong>Description</strong>. Click <strong>Save</strong>.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>P4 Credentials</td><td>The Perforce credential to use. It must be allowed to change the review.</td><td>None</td><td><code>p4-swarm-bot</code></td></tr>
+    <tr><td>Swarm Review</td><td>The review ID.</td><td>Empty</td><td><code>${review}</code></td></tr>
+    <tr><td>Approve Status</td><td>What to set: Needs Review, Needs Revision, Approve, Approve and Commit, Reject, Archive, Vote Up or Vote Down.</td><td>None</td><td>Approve</td></tr>
+    <tr><td>Description</td><td>A comment saved with the change.</td><td>Empty</td><td><code>Build ${BUILD_NUMBER} passed</code></td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p>The shelf check build runs on a Swarm review and, if it passes, uses <strong>Vote Up</strong> with the description <code>Build ${BUILD_NUMBER} passed</code>.</p><h2>What you see when it runs</h2>
+<p>The review shows the new state and your description.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>Review not found</td><td>Check the review ID.</td></tr>
+    <tr><td>Approve and Commit is refused</td><td>The user needs permission to commit from Swarm.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="overview.html">After the build: overview</a></li>
+  <li><a href="../projects/bc-post-build-actions.html">Post-build actions tab</a></li>
+  <li><a href="../how-to/check-shelf-before-submit.html">Check a shelf before submit</a></li>
+  <li><a href="../version-control/perforce-shelves.html">Shelves and personal builds</a></li>
+</ul>
+</main>
+</body>
+</html>

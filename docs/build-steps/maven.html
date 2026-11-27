@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maven · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/maven">
+<main class="doc">
+<h1>Maven</h1>
+<p class="lead">Runs Maven goals with a POM, a Maven version, JVM options and properties.</p>
+<div class="callout note"><p>In the step picker this is called <strong>Invoke top-level Maven targets</strong>.</p></div>
+
+<h2>When to use it</h2>
+<p>Use it for Java services in your pipeline, such as a matchmaking backend. A non-zero exit code from Maven fails the step. Surefire and Failsafe test reports are recorded for you.</p>
+
+<h2>How to set it up</h2>
+
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>. Type <code>Maven</code> in <strong>Filter step types</strong> if you like, then click the <strong>Maven</strong> tile (group <strong>Build tools</strong>).</li>
+  <li>Type a <strong>Step name</strong>, for example <code>Build lobby</code>.</li>
+  <li>Fill in the fields described below.</li>
+  <li>Optional: set <strong>Execute step</strong>, <strong>Conditions</strong> and <strong>Retry on failure</strong>. See <a href="step-list.html">The steps list and the step editor</a>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<figure class="shot small">
+  <img src="../../assets/shots/build-steps/maven.png" alt="The fields of the Maven step in the step editor">
+  <figcaption>The fields of the Maven step, as the step editor shows them.</figcaption>
+</figure>
+
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Maven Version</strong></td><td>The Maven installation, chosen from <strong>Settings › Tools</strong>. <strong>Default (version)</strong> uses the default installation, <strong>Agent PATH</strong> uses <code>mvn</code> from the agent. Shown when an installation exists.</td><td>Default</td><td>Maven 3.9</td></tr>
+    <tr><td><strong>JDK</strong></td><td><strong>(Inherit)</strong> uses the JDK of the build configuration or the <code>java</code> of the agent. Not used inside a container.</td><td>Inherit</td><td>JDK 21</td></tr>
+    <tr><td><strong>Goals</strong></td><td>The goals and options, such as <code>clean install</code>. Build parameters and environment variables work as <code>${env.NAME}</code>.</td><td>Empty</td><td><code>clean verify</code></td></tr>
+    <tr><td><strong>Record test reports</strong></td><td>Records Surefire and Failsafe reports after the run, unless the build configuration has a JUnit publisher.</td><td>On</td><td>On</td></tr>
+    <tr><td><strong>Code coverage, Include classes, Exclude classes, JaCoCo version (More options)</strong></td><td>JaCoCo. Maven fetches <code>jacoco-maven-plugin</code> from the repositories it is configured with. The goals <code>prepare-agent</code> and <code>report</code> run from the command line and the POM is not changed. A surefire <code>argLine</code> in the POM must keep the <code>argLine</code> property. JaCoCo version empty uses 0.8.15.</td><td>None</td><td>JaCoCo</td></tr>
+    <tr><td><strong>Incremental building (More options)</strong></td><td>Builds only the modules with changed files and the modules that depend on them, with <code>-pl</code> and <code>-amd</code>. A change in the root folder, a path outside the workspace, or a build with no changes builds everything. Modules the changed ones depend on must be in the local repository.</td><td>Off</td><td>On</td></tr>
+    <tr><td><strong>POM (More options)</strong></td><td>The root POM file, if it is not <code>pom.xml</code>.</td><td>Empty</td><td><code>services/pom.xml</code></td></tr>
+    <tr><td><strong>Properties (More options)</strong></td><td>One <code>name=value</code> per line, passed as <code>-Dname=value</code>. Lines starting with <code>#</code> are comments.</td><td>Empty</td><td><code>skipITs=true</code></td></tr>
+    <tr><td><strong>JVM Options (More options)</strong></td><td>Options for the JVM that runs Maven.</td><td>Empty</td><td><code>-Xmx1g</code></td></tr>
+    <tr><td><strong>Additional command line parameters (More options)</strong></td><td>Placed before the goals and split on white space.</td><td>Empty</td><td><code>-T 4 -P release</code></td></tr>
+    <tr><td><strong>Working directory (More options)</strong></td><td>A folder in the workspace to run Maven in. Empty runs it in the workspace.</td><td>Empty</td><td><code>services/lobby</code></td></tr>
+    <tr><td><strong>Inject build variables (More options)</strong></td><td>Passes all build variables to Maven as Java properties. Seldom needed, because they are environment variables anyway. Better map the ones you need in <strong>Properties</strong>: <code>MY_VAR=${MY_VAR}</code>.</td><td>Off</td><td>Off</td></tr>
+    <tr><td><strong>Use private Maven repository (More options)</strong></td><td>Gives this build its own local repository, so builds do not share downloaded files.</td><td>Off</td><td>On</td></tr>
+    <tr><td><strong>Settings file, Global Settings file (More options)</strong></td><td>Which Maven <code>settings.xml</code> to use. By default the settings of the Maven installation and the user on the agent.</td><td>Default settings</td><td>A settings file in the workspace</td></tr>
+  </tbody>
+</table>
+
+
+<h2>A worked example</h2>
+<p>Build and test the lobby service. Step name <code>Build lobby</code>, <strong>Goals</strong> <code>clean verify</code>, <strong>Working directory</strong> <code>services/lobby</code>, <strong>Record test reports</strong> on.</p>
+
+<h2>What you see when it runs</h2>
+<p>The console shows the <code>mvn clean verify</code> command and Maven's output. Test results show on the build. With incremental building on, the log says <em>Incremental building: N changed module(s), and the modules that depend on them: M</em>.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong>The Maven Version list is missing</strong></td><td>No installation is defined. Add one under <strong>Settings › Tools</strong>, or use <code>mvn</code> from the agent.</td></tr>
+    <tr><td><strong>Everything is built although incremental building is on</strong></td><td>The log says why: no changes, a change in the root folder, or a path outside the workspace.</td></tr>
+    <tr><td><strong>JaCoCo reports no coverage</strong></td><td>A surefire <code>argLine</code> in the POM must keep the <code>argLine</code> property.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="gradle.html">Gradle</a></li>
+  <li><a href="ant.html">Ant</a></li>
+  <li><a href="../administration/tools.html">Tools</a></li>
+  <li><a href="runners.html">Runners</a></li>
+  <li><a href="common-step-fields.html">Fields every runner has</a></li>
+</ul>
+</main>
+</body>
+</html>

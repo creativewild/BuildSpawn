@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Execute Windows batch command · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/batch-file">
+<main class="doc">
+<h1>Execute Windows batch command</h1>
+<p class="lead">Runs a Windows batch script with <code>cmd</code>. It is the classic step, kept as it was.</p>
+
+<h2>When to use it</h2>
+<p>Use it on Windows agents for plain <code>.bat</code> scripts. For new work, <a href="command-line.html">Command Line</a> does the same and adds a code editor, stderr colours and container settings.</p>
+
+<h2>How to set it up</h2>
+
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>. Type <code>Execute Windows batch command</code> in <strong>Filter step types</strong> if you like, then click the <strong>Execute Windows batch command</strong> tile (group <strong>Other</strong>).</li>
+  <li>Type a <strong>Step name</strong>, for example <code>Run build script</code>.</li>
+  <li>Type the script into <strong>Command</strong>. Open <strong>More options</strong> for the unstable error level.</li>
+  <li>Optional: set <strong>Execute step</strong>, <strong>Conditions</strong> and <strong>Retry on failure</strong>. See <a href="step-list.html">The steps list and the step editor</a>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Command</strong></td><td>The batch script. It runs with the workspace as the current directory. <code>%name%</code> build parameters are put into the text before it runs; <code>%NAME%</code> for an environment variable is left for <code>cmd</code>. See <a href="script-editor.html">The script editor</a> for the safeguards.</td><td>Empty</td><td><code>call Build\build.bat %CONFIG%</code></td></tr>
+    <tr><td><strong>ERRORLEVEL to set build unstable (More options)</strong></td><td>A batch error level that makes the build unstable instead of failed. The next steps still run. The value 0 is ignored. Allowed values go from -2147483648 to 2147483647.</td><td>Empty</td><td><code>2</code></td></tr>
+    <tr><td><strong>Environment filters (More options)</strong></td><td>Rules that remove variables from what this step sees. A parameter that a filter removes stays removed.</td><td>None</td><td></td></tr>
+  </tbody>
+</table>
+
+
+<h2>A worked example</h2>
+<p>A Windows agent runs the studio's build script and treats exit code 2 (warnings) as unstable. Step name <code>Run build script</code>, <strong>Command</strong>:</p><pre><code>call Build\build.bat %CONFIG% || exit /b %errorlevel%</code></pre>
+
+<h2>What you see when it runs</h2>
+<p>The console block is titled <code>[Step 1/1] Run build script (Execute Windows batch command)</code>. The script is saved as a temporary <code>buildspawn….bat</code> file and run with <code>cmd /c call</code>. When the exit code equals the unstable value, the step is shown as unstable and the build continues.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong>The script ends with exit code 1 but you wanted success</strong></td><td>End the script with <code>exit /b 0</code>, or fix the failing command.</td></tr>
+    <tr><td><strong>A variable shows as <code>%NAME%</code> text</strong></td><td>Name it in the build configuration's parameters, or set it in an earlier step.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="command-line.html">Command Line</a></li>
+  <li><a href="shell-script.html">Execute shell</a></li>
+  <li><a href="step-statuses.html">Step statuses</a></li>
+  <li><a href="runners.html">Runners</a></li>
+  <li><a href="common-step-fields.html">Fields every runner has</a></li>
+</ul>
+</main>
+</body>
+</html>

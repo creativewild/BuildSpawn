@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Steam: workshop item · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="game-builds/steam-workshop">
+<main class="doc">
+<h1>Steam: workshop item</h1>
+<p class="lead">Create or update a Steam Workshop item from a folder of files.</p>
+
+<h2>When to use it</h2>
+<p>Use it when you publish mods or content packs to the Steam Workshop from a build. Only the fields you fill in are changed, so you can update the files and leave the title alone.</p>
+<div class="callout note"><p>Valve calls this route of SteamCMD a route for testing. A studio that uploads Workshop items often should look at the tools Valve made for it.</p></div>
+
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Build steps › Add build step › Steam: workshop item</strong>.</li>
+  <li>Choose the <strong>Steam build account</strong>.</li>
+  <li>Type the <strong>App ID</strong>. For a new item leave <strong>Item ID</strong> empty and fill in <strong>Content folder</strong>.</li>
+  <li>Fill in the other fields you want to set. Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/game-builds/steam-workshop.png" alt="The Steam: workshop item step form with App ID, Item ID and Content folder"><figcaption>The Steam: workshop item step.</figcaption></figure>
+
+<h2>Every field</h2>
+<table>
+  <tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr>
+  <tr><td><strong>Steam build account</strong></td><td>The credential to sign in with. It must be allowed to publish to the app.</td><td>None</td><td><code>steam-build</code></td></tr>
+  <tr><td><strong>SteamCMD program</strong></td><td>Path of SteamCMD.</td><td>Found on the agent</td><td><code>D:\tools\steamcmd\steamcmd.exe</code></td></tr>
+  <tr><td><strong>App ID</strong></td><td>Your app number.</td><td>None</td><td><code>1000480</code></td></tr>
+  <tr><td><strong>Item ID</strong></td><td>The Workshop item to update. Empty creates a new item. Must be a number.</td><td>Empty (new item)</td><td><code>2841190077</code></td></tr>
+  <tr><td><strong>Content folder</strong></td><td>Folder with the item's files. A new item needs it.</td><td>Empty</td><td><code>Workshop/PackA</code></td></tr>
+  <tr><td><strong>Preview image</strong></td><td>Picture shown on the item's page.</td><td>Empty</td><td><code>Workshop/preview.png</code></td></tr>
+  <tr><td><strong>Visibility</strong></td><td><strong>Leave as it is</strong>, <strong>Public</strong>, <strong>Friends only</strong>, <strong>Private</strong> or <strong>Unlisted</strong>.</td><td>Leave as it is</td><td>Private</td></tr>
+  <tr><td><strong>Title</strong></td><td>Item title.</td><td>Empty</td><td><code>Skyforge Starter Pack</code></td></tr>
+  <tr><td><strong>Description</strong></td><td>Item description.</td><td>Empty</td><td><code>New skins for the hangar.</code></td></tr>
+  <tr><td><strong>Change note</strong></td><td>Note for this update.</td><td>Empty</td><td><code>Build %build.number%</code></td></tr>
+  <tr><td><strong>Stop after (minutes)</strong></td><td>Stops the step after this time.</td><td><code>120</code></td><td><code>60</code></td></tr>
+  <tr><td><strong>Hands on to later steps</strong></td><td><code>ITEM_ID</code>: the item's ID, also after it was created.</td><td>Not editable</td><td></td></tr>
+</table>
+
+<h2>A worked example</h2>
+<p>Publish a content pack for Skyforge as a private item to test it. Set <strong>Content folder</strong> to <code>Workshop/PackA</code>, <strong>Visibility</strong> to <strong>Private</strong>, <strong>Title</strong> to <code>Skyforge Starter Pack</code> and leave <strong>Item ID</strong> empty. Later builds set <strong>Item ID</strong> to the number from the first run and only the content folder changes.</p>
+
+<h2>What you see when it runs</h2>
+<ul>
+  <li>The Steam sign-in lines, then SteamCMD output.</li>
+  <li><em>Step output ITEM_ID = …</em>. Copy that number into <strong>Item ID</strong> for later updates.</li>
+</ul>
+
+<h2>Problems and fixes</h2>
+<table>
+  <tr><th>Message</th><th>What to do</th></tr>
+  <tr><td>The item ID … is not a number</td><td>Type digits only, or leave it empty for a new item.</td></tr>
+  <tr><td>A new item needs a content folder</td><td>Fill in <strong>Content folder</strong>.</td></tr>
+  <tr><td>Steam did not report the ID of the item</td><td>Read the SteamCMD output above it. Check that the account may publish to the app.</td></tr>
+  <tr><td>Steam asked for a Steam Guard code</td><td>Sign in again on the <a href="steam-account.html">credential</a>.</td></tr>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="steam-account.html">Steam build account</a></li>
+  <li><a href="steam-overview.html">Steam upload: overview</a></li>
+</ul>
+</main>
+</body>
+</html>

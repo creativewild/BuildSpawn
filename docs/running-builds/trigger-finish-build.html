@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Finish Build trigger · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="running-builds/trigger-finish-build">
+<main class="doc">
+<h1>Finish Build trigger</h1>
+<p class="lead">Starts a build when builds of other build configurations finish.</p>
+<div class="callout note"><p>In the trigger picker this is called <strong>Build after other build configurations are built</strong>.</p></div>
+
+<h2>When to use it</h2>
+<p>Use it to run tests after a build, or to package after the asset pipeline. If the second build must use the same code as the first, add a snapshot dependency as well: this trigger only starts a build and does not pin the revision.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Triggers</strong>.</li>
+  <li>Click <strong>Add new trigger</strong> and click <strong>Add</strong> next to <strong>Finish Build Trigger</strong>.</li>
+  <li>Type the build configurations in <strong>Build configurations to watch</strong>, separated by commas.</li>
+  <li>Choose the result in <strong>Start a build when the watched build is</strong>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/running-builds/trigger-finish-build.png" alt="The Finish Build Trigger form with the build configurations to watch and the result that starts the build"><figcaption>The Finish Build Trigger form.</figcaption></figure>
+
+<h2>Every field</h2>
+<table>
+<thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>Build configurations to watch</td><td>Names of build configurations, separated by commas. A name is checked as you save. Use a path from the project, such as <code>Game/Windows Build</code>.</td><td>Empty</td><td><code>Game/Windows Build, Game/Linux Server Build</code></td></tr><tr><td>Start a build when the watched build is</td><td><strong>Stable</strong> (successful only), <strong>Unstable or better</strong>, <strong>Failed or better</strong> or <strong>Any result</strong>.</td><td>Stable</td><td>Unstable or better</td></tr>
+</tbody>
+</table>
+
+<h2>A worked example</h2>
+<p>The Unit Tests build watches <code>Game/Linux Server Build</code> with <strong>Stable</strong>. Each good server build starts a test build.</p>
+<h2>What you see when it runs</h2>
+<p>The row says <em>After the watched builds finish, at least SUCCESS</em> and lists the names. The build's cause says it was started by an upstream build, and the log of the watched build says <em>Triggering</em> the new build.</p>
+<h2>Problems and fixes</h2>
+<table>
+<thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+<tbody>
+<tr><td>No such build configuration</td><td>Check the name and path. You need permission to see it.</td></tr><tr><td>The build did not start although the other finished</td><td>The result was worse than the level you chose, or the trigger is disabled.</td></tr><tr><td>The new build used other code</td><td>Add a snapshot dependency for the same revision. See <a href="../parameters/build-chains.html">Build chains</a>.</td></tr>
+</tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="triggers.html">Triggers</a></li>
+  <li><a href="../how-to/params-run-b-after-a.html">Run B when A succeeds</a></li>
+  <li><a href="../parameters/build-chains.html">Build chains</a></li>
+</ul>
+</main>
+</body>
+</html>

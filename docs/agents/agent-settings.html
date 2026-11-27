@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent settings · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="agents/agent-settings">
+<main class="doc">
+<h1>Agent settings</h1>
+<p class="lead">The Configure page of an agent holds everything that you can set for one machine: its name, how many builds it runs, its labels, how it connects, when it is online and a list of extra properties.</p>
+
+<h2>When to use it</h2>
+<p>Use it when you add an agent with <strong>New Node</strong>, and later when you want to change its labels, its work folder, its number of builds, its schedule, or tell Buildspawn where a tool lives on that machine.</p>
+
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open <strong>Agents</strong> and click the agent's name. (To create one, click <strong>New Node</strong>, type a name, choose <strong>Permanent Agent</strong> and click <strong>Create</strong>; the same form opens.)</li>
+  <li>Open the agent's <strong>Configure</strong> page. From the Agents list you can also use the row menu entry <strong>Settings</strong> of an opened row.</li>
+  <li>Fill in the fields described below.</li>
+  <li>Click <strong>Save</strong>. <strong>Apply</strong> saves and stays on the page.</li>
+</ol>
+<p>The page has a summary card at the top (name, executors, labels, launch method and availability) and four sections: <strong>General</strong>, <strong>Launch</strong>, <strong>Availability</strong> and <strong>Node Properties</strong>. You need the <strong>Configure</strong> permission on the agent.</p>
+<figure class="shot"><img src="../../assets/shots/agents/agent-configure.png" alt="The agent Configure page"><figcaption>The agent Configure page: General, Launch and Availability.</figcaption></figure>
+
+<h2>Every field</h2>
+
+<h3>General</h3>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Name</strong></td><td>The name that identifies the agent on this server. It need not match the host name. These characters are not allowed: <code>? * / \ % ! @ # $ ^ &amp; | &lt; &gt; [ ] : ;</code></td><td>What you typed in New Node</td><td><code>win-build-04</code></td></tr>
+    <tr><td><strong>Description</strong></td><td>Free text. Plain text with a preview.</td><td>empty</td><td>Rack 3, RTX 4080, Unreal 5.4 builds</td></tr>
+    <tr><td><strong>Number of executors</strong></td><td>How many builds may run on this agent at the same time. At least 1. See <a href="agent-executors.html">Builds at a time</a>.</td><td>1</td><td><code>2</code></td></tr>
+    <tr><td><strong>Remote root directory</strong></td><td>A folder on the agent machine that Buildspawn uses for workspaces and tools. Use a full path. It must be local to the agent. If you use a relative path, it starts from the folder where the agent runs. Keep it where a reboot does not delete it, so that workspaces and tools stay cached.</td><td>empty</td><td><code>D:\buildspawn-agent\work</code></td></tr>
+    <tr><td><strong>Labels</strong></td><td>Words, separated by spaces, that tag the agent. Build configurations pick agents by label. Avoid <code>! &amp; | &lt; &gt; ( )</code> in a label, because label expressions use them. See <a href="agent-labels-requirements.html">Labels and agent requirements</a>.</td><td>empty</td><td><code>windows unreal-5.4 gpu</code></td></tr>
+    <tr><td><strong>Usage</strong></td><td><strong>Use this node as much as possible</strong>: any build that the pool and labels allow may run here. <strong>Only run build configurations with label expressions matching this node</strong>: reserves the agent for build configurations that ask for one of its labels.</td><td>Use this node as much as possible</td><td>Reserved, for a devkit host</td></tr>
+  </tbody>
+</table>
+
+<h3>Launch</h3>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Launch method</strong></td><td>How the agent starts and connects. Two choices, described next.</td></tr>
+  </tbody>
+</table>
+<h4>Launch agent by connecting it to the controller</h4>
+<p>The inbound agent. The agent machine opens the connection to the server. The server does not need to reach the agent, so it works behind a firewall or home router. This is what the downloads and the <strong>New Node</strong> zip use. The agent page shows <strong>Connect the agent</strong> with the commands, the download for this node and the secret. See <a href="agent-connection.html">Connect an agent</a>.</p>
+<p>The launcher has no field of its own in the current version. Give the options to the agent itself (for example <code>webSocket=false</code> in its settings file). If an old agent still has launcher properties, a note says setting them is deprecated.</p>
+
+<h4>Launch agent via execution of command on the controller</h4>
+<p>The server runs a command that starts the agent on the other machine, for example over SSH. The command's input and output carry the connection.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Launch command</strong></td><td>The command that the server runs on itself. It must start <code>java -jar agent.jar</code> on the target machine and keep its standard input and output connected.</td><td><code>ssh build@mac-mini-02 java -jar /Users/build/agent.jar</code></td></tr>
+  </tbody>
+</table>
+<div class="callout note"><p>Use the inbound agent when you can. The command launcher needs the server to reach the machine, and the command runs with the server's rights.</p></div>
+
+<h3>Availability</h3>
+<p>Controls when Buildspawn starts and stops this agent. The field <strong>Availability</strong> offers three choices.</p>
+<table>
+  <thead><tr><th>Choice</th><th>What it does</th><th>Fields</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Keep this agent online as much as possible</strong></td><td>The agent stays online. If it drops (a network fault, for example), Buildspawn tries to start it again from time to time.</td><td>none</td></tr>
+    <tr><td><strong>Bring this agent online according to a schedule</strong></td><td>The agent comes online at set times and stays online for a set time. If it goes offline during its scheduled time, Buildspawn tries to restart it. When the time is over, it goes offline.</td><td><strong>Startup Schedule</strong>: when to start, in the same format as the schedule of a trigger, for example <code>H 20 * * 1-5</code>. <strong>Scheduled Uptime</strong>: minutes to stay up. If longer than the gap between starts, the agent stays online all the time. <strong>Keep online while builds are running</strong>: ticked by default; when the uptime ends, wait for the running builds to finish.</td></tr>
+    <tr><td><strong>Bring this agent online when in demand, and take offline when idle</strong></td><td>The agent comes online when builds that it can run have waited in the queue for the <strong>In demand delay</strong>. It goes offline when it has run nothing for the <strong>Idle delay</strong>.</td><td><strong>In demand delay</strong>: minutes a build must wait (0 or more). <strong>Idle delay</strong>: minutes idle before it goes offline (1 or more).</td></tr>
+  </tbody>
+</table>
+<p>The schedule and demand choices only work when the server can start the agent itself, which means the command launcher. An inbound agent connects on its own, so use <strong>Keep this agent online as much as possible</strong> for it. If you want an inbound agent to rest at night, use a service schedule on the machine or <strong>Mark offline</strong>.</p>
+
+<h3>Node Properties</h3>
+<p>Each property is a block you can tick or fill in. Some come from plug-ins that are included in Buildspawn. The next table is every property you can see on the page.</p>
+<table>
+  <thead><tr><th>Property</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><a href="#disk-space">Disk Space Monitoring Thresholds</a></td><td>Mark the agent offline, or warn, when free space gets low.</td></tr>
+    <tr><td><a href="#environment-variables">Environment variables</a></td><td>Variables set for every build on this agent.</td></tr>
+    <tr><td><a href="#tool-locations">Tool Locations</a></td><td>Where a configured tool is installed on this agent.</td></tr>
+    <tr><td><a href="#custom-parameters">Custom parameters</a></td><td>Your own name=value facts that requirements can check.</td></tr>
+    <tr><td><a href="#telemetry-opt-out">Collect telemetry from this agent</a></td><td>A box, ticked by default. Untick it to stop CPU, memory, disk and GPU samples from this agent. (The property is called <em>Don't collect telemetry from this agent</em>: unticking the box adds it.)</td></tr>
+    <tr><td><a href="#bpt-folder">BuildPatch Tool folder</a></td><td>Where the Epic BuildPatch Tool lives on this agent.</td></tr>
+    <tr><td><a href="#node-security">Enable node-based security</a></td><td>Who may do what with this one agent.</td></tr>
+    <tr><td><a href="#cifs">Publish Over CIFS</a></td><td>A WINS server for this agent's file-share uploads.</td></tr>
+  </tbody>
+</table>
+
+<h4 id="disk-space">Disk Space Monitoring Thresholds</h4>
+<p>Four optional fields. A size such as <code>1.5GB</code> or <code>100KiB</code>. Empty means use the global value (set in Settings, under the node monitors). <code>0</code> turns that check off for this agent.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Free Disk Space Threshold</strong></td><td>If the agent has less free space than this, it is marked temporarily offline.</td><td><code>20GB</code></td></tr>
+    <tr><td><strong>Free Disk Space Warning Threshold</strong></td><td>Below this, a warning shows on the agent's page. It stays online.</td><td><code>50GB</code></td></tr>
+    <tr><td><strong>Free Temp Space Threshold</strong></td><td>Same as the first, for the temp folder.</td><td><code>2GB</code></td></tr>
+    <tr><td><strong>Free Temp Space Warning Threshold</strong></td><td>Same as the second, for the temp folder.</td><td><code>5GB</code></td></tr>
+  </tbody>
+</table>
+<p>A game studio's agents often hold huge workspaces. Set a bigger threshold than the default so that the agent goes offline before a build runs out of space.</p>
+
+<h4 id="environment-variables">Environment variables</h4>
+<p><strong>List of variables</strong>: click <strong>Add</strong> for each. Each row has a <strong>Name</strong> and a <strong>Value</strong>. Every build on this agent gets them as environment variables. Example: <code>UE_ROOT</code> = <code>D:\UE\UE_5.4</code>. They are visible to anyone who can read the agent, so never put a secret here.</p>
+
+<h4 id="tool-locations">Tool Locations</h4>
+<p><strong>List of tool locations</strong>: for each row, choose a <strong>Name</strong> from the list of tools configured in Settings (shown as <em>(type) name</em>), then give its <strong>Home</strong> on this machine. The build then uses that path on this agent and skips installing the tool. Example: tool <em>(Git) Default</em>, home <code>C:\Program Files\Git</code>.</p>
+
+<h4 id="custom-parameters">Custom parameters</h4>
+<p><strong>Parameters</strong>: one <code>name=value</code> per line, such as <code>rack=a3</code>. Build configuration requirements can check them. They are listed on the agent's <strong>Parameters</strong> page. See <a href="agent-labels-requirements.html">Labels and agent requirements</a>.</p>
+<table>
+  <thead><tr><th>Rule</th><th>Detail</th></tr></thead>
+  <tbody>
+    <tr><td>Name</td><td>Letters, digits, dots, dashes and underscores. It starts with a letter or digit.</td></tr>
+    <tr><td>Reserved</td><td>Names that start with <code>agent.</code> are the ones the agent reports itself. You cannot use them.</td></tr>
+    <tr><td>Secrets</td><td>A name that looks like a secret is refused, because anyone who can see the agent can read the parameters.</td></tr>
+    <tr><td>Size</td><td>At most 100 parameters, and a value of at most 1000 characters.</td></tr>
+  </tbody>
+</table>
+<p>Errors read, for example, <em>Expected name=value: …</em>, <em>… names starting with agent. are the ones agents report</em> or <em>An agent has at most 100 custom parameters</em>.</p>
+
+<h4 id="telemetry-opt-out">Collect telemetry from this agent</h4>
+<p>The box is ticked by default. Untick it so that this agent sends no CPU, memory, disk, network or GPU data. Its Telemetry tab and the live columns of the Agents list then read <em>Off</em>. The agent is also listed under <strong>Agents that don't send telemetry</strong> on the Configure monitors page. See <a href="telemetry.html">Telemetry</a>. Default: ticked, so telemetry is collected.</p>
+
+<h4 id="bpt-folder">BuildPatch Tool folder</h4>
+<p><strong>Folder</strong>: where this agent keeps the Epic BuildPatch Tool, for example on a fast disk. The Epic steps look for the program here, and the <em>Install BuildPatch Tool</em> step installs here unless the step names another folder. Empty: <code>tools/buildpatchtool</code> in the agent folder. Example: <code>E:\tools\bpt</code>.</p>
+
+<h4 id="node-security">Enable node-based security</h4>
+<p>Gives this one agent its own permission table. The table has two groups of options:</p>
+<ul>
+  <li><strong>Inheritance Strategy</strong>: <strong>Inherit globally defined permissions</strong> (the default) or <strong>Do not inherit permission grants from other ACLs</strong>.</li>
+  <li>A matrix of users and groups with the agent permissions <strong>Build</strong>, <strong>Configure</strong>, <strong>Connect</strong>, <strong>Delete</strong> and <strong>Disconnect</strong>, a filter, and <strong>Add user</strong> and <strong>Add group</strong>.</li>
+</ul>
+<p>If your server signs people in with Microsoft Entra ID, there is a second block called <strong>Entra ID Authorization Matrix</strong> with the same table and an extra <strong>Add from Entra ID</strong> button. The two blocks are alternatives. See <a href="../administration/authorization.html">Authorization</a> and <a href="../administration/roles.html">Roles</a> for the global tables.</p>
+
+<h4 id="cifs">Publish Over CIFS</h4>
+<p><strong>WINS server</strong>: the IP address of a WINS server that this agent should use to find shared folders. Leave it empty to turn WINS off. Default values for the server and for agents come from the global settings of the Publish Over CIFS plug-in.</p>
+
+<h2>Properties that are not on the form</h2>
+<p>One more node property exists but has no fields: the <strong>owner</strong> of a personal machine. It is set when a user adds a machine from <strong>My machines</strong> and is not shown on the Configure page. See <a href="personal-agents.html">Personal agents</a>.</p>
+
+<h2>A worked example</h2>
+<p>You add a console devkit host for the studio's PlayStation builds.</p>
+<ol class="steps">
+  <li>Click <strong>New Node</strong>, name it <code>ps5-devkit-02</code>, choose <strong>Permanent Agent</strong>.</li>
+  <li>Set <strong>Number of executors</strong> to <code>1</code>, because a devkit runs one build at a time.</li>
+  <li>Set <strong>Remote root directory</strong> to <code>D:\buildspawn-agent\work</code>.</li>
+  <li>Set <strong>Labels</strong> to <code>ps5 devkit</code> and <strong>Usage</strong> to <strong>Only run build configurations with label expressions matching this node</strong>, so that ordinary builds never use it.</li>
+  <li>Leave <strong>Launch method</strong> on the inbound agent and <strong>Availability</strong> on <strong>Keep this agent online as much as possible</strong>.</li>
+  <li>Under <strong>Custom parameters</strong>, add <code>rack=b2</code> and <code>sdk=9.00</code>. A build configuration can then require <code>sdk</code> to be <em>version no less than</em> <code>9.00</code>.</li>
+  <li>Under <strong>Disk Space Monitoring Thresholds</strong>, set <strong>Free Disk Space Threshold</strong> to <code>40GB</code>.</li>
+  <li>Click <strong>Save</strong>, then download the zip for this node and install it (see <a href="install-agent.html">Install an agent</a>).</li>
+</ol>
+
+<h2>What you see when it runs</h2>
+<ul>
+  <li>The agent page says <em>Waiting for the agent to connect</em> until the machine connects, then shows it online with its labels and executors.</li>
+  <li>On the Agents list the row shows the pool, status and live values.</li>
+  <li>When the disk threshold is passed the agent shows <em>Offline</em> with a reason such as <em>Disk space is below threshold of 20 GiB</em>, and comes back by itself when space is freed.</li>
+</ul>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>The name is refused.</td><td>It holds a forbidden character, or another agent has the name.</td></tr>
+    <tr><td>Builds never run on the agent.</td><td>Check its pool (see <a href="pools.html">Pools</a>), its labels, and that <strong>Usage</strong> is not reserving it.</td></tr>
+    <tr><td>All builds fail at once with a path error.</td><td><strong>Remote root directory</strong> is not a full path the service account can write to.</td></tr>
+    <tr><td>The agent went offline with a disk-space reason.</td><td>Free space or lower the threshold. It returns on its own.</td></tr>
+    <tr><td>A custom parameter is rejected.</td><td>Read the message under the field: a bad name, a reserved <code>agent.</code> name, a secret-like name or too long.</td></tr>
+    <tr><td>The schedule choice does not start the agent.</td><td>The server can start only agents that use the command launcher. Inbound agents start from their own machine.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="agent-labels-requirements.html">Labels and agent requirements</a></li>
+  <li><a href="agent-executors.html">Builds at a time</a></li>
+  <li><a href="agent-connection.html">Connect an agent</a></li>
+  <li><a href="telemetry.html">Telemetry</a></li>
+  <li><a href="pools.html">Pools</a></li>
+</ul>
+</main>
+</body>
+</html>

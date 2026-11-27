@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Epic Games Store · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="game-builds/epic-overview">
+<main class="doc">
+<h1>Epic Games Store</h1>
+<p class="lead">Upload your game to Epic, label it live and manage its binaries from a build, with the Epic BuildPatch Tool.</p>
+
+<h2>What it is</h2>
+<p>Epic publishes games through <strong>artifacts</strong> and <strong>binaries</strong>. An <em>artifact</em> is one product you ship, for example your game on Windows. A <em>binary</em> is one uploaded version of it. Epic's command line program, the <strong>BuildPatch Tool</strong>, uploads and manages binaries. Buildspawn runs it for you in build steps, so a successful build can publish itself.</p>
+<p>Buildspawn keeps the secret keys in a <a href="epic-credentials.html">credential</a>. They never appear in a step, a file or the log.</p>
+
+<h2>When to use it</h2>
+<p>Use these steps when your studio ships on the Epic Games Store and you want the build machine, not a person, to upload and label builds.</p>
+
+<h2>The steps</h2>
+<table>
+<thead><tr><th>Step</th><th>What it does</th></tr></thead>
+<tbody>
+<tr><td><a href="install-buildpatch-tool.html">Install BuildPatch Tool</a></td><td>Puts the tool on an agent that does not have it.</td></tr>
+<tr><td><a href="epic-upload.html">Epic Games Store upload</a></td><td>Uploads a packaged game as a new binary.</td></tr>
+<tr><td><a href="epic-label.html">Epic: label binary</a></td><td>Puts a binary live for a platform, or takes the label away.</td></tr>
+<tr><td><a href="epic-optimise.html">Epic: optimise patch</a></td><td>Makes the update between two binaries smaller for players.</td></tr>
+<tr><td><a href="epic-inspect.html">Epic: inspect binaries</a></td><td>Lists binaries, compares two builds, or reads the metadata of a build.</td></tr>
+<tr><td><a href="epic-download.html">Epic: download binary</a></td><td>Downloads a binary to test it before release.</td></tr>
+<tr><td><a href="epic-copy.html">Epic: copy binary</a></td><td>Copies a binary to another artifact without uploading it again.</td></tr>
+<tr><td><a href="epic-delete.html">Epic: delete binary</a></td><td>Removes a binary at once.</td></tr>
+</tbody>
+</table>
+
+<h2>How the steps fit together</h2>
+<ol class="steps">
+  <li>An administrator adds an <a href="epic-credentials.html">Epic Games Store credential</a> once.</li>
+  <li>An administrator uploads the BuildPatch Tool ZIP once, under <strong>Manage › Tools › BuildPatch Tool</strong>.</li>
+  <li>Your build makes the package, for example with an <a href="unreal.html">Unreal Engine</a> or <a href="unity.html">Unity</a> step.</li>
+  <li><strong>Epic Games Store upload</strong> sends it. It hands the new version on to later steps as <code>${EPIC_BUILD_VERSION}</code>.</li>
+  <li><strong>Epic: optimise patch</strong> and <strong>Epic: label binary</strong> use that version by default.</li>
+</ol>
+<p>Each step hands values on to the steps after it. The log shows them as <em>Epic: Step output NAME = value</em>. Later steps can use them as <code>${NAME}</code> or <code>%NAME%</code>.</p>
+<figure class="shot"><img src="../../assets/shots/game-builds/epic-add-step.png" alt="The Add build step page filtered with the word Epic, showing seven Epic step tiles"><figcaption>The Add build step page filtered to Epic.</figcaption></figure>
+
+<h2>Where things are set</h2>
+<table>
+<thead><tr><th>What</th><th>Where</th></tr></thead>
+<tbody>
+<tr><td>Keys, product, default artifact</td><td>A credential of the kind <strong>Epic Games Store</strong>. See <a href="epic-credentials.html">Epic Games Store credential</a>.</td></tr>
+<tr><td>The BuildPatch Tool ZIP, and which agent has it</td><td><strong>Manage › Tools › BuildPatch Tool</strong>. See <a href="epic-credentials.html#tools-page">The BuildPatch Tool page</a>.</td></tr>
+<tr><td>Where an agent keeps the tool</td><td>The <strong>BuildPatch Tool folder</strong> setting of the agent. See <a href="epic-credentials.html#tool-folder">BuildPatch Tool folder</a>.</td></tr>
+<tr><td>Who may set a binary live or delete one</td><td>The permissions <strong>Epic Games Store / Set Live</strong> and <strong>Epic Games Store / Delete binary</strong>.</td></tr>
+</tbody>
+</table>
+
+<h2>Rules that apply to every step</h2>
+<ul>
+  <li>The <strong>Build version</strong> must be new for the artifact, for every platform. Put the platform in it, for example <code>1.4.${BUILD_NUMBER}-Windows</code>.</li>
+  <li>Epic deletes a binary with no label after about a week. Label what you want to keep.</li>
+  <li>When a step fails, the log says why in plain words and names the credential or artifact. The tool's own logs are kept in <code>epic-logs</code> when you ask for them.</li>
+  <li>The tool runs with the secret in the environment of that one process. Use a build user of its own on the agent, because a process of the same user can read the environment of another one.</li>
+</ul>
+
+<h2>Related pages</h2>
+<div class="cards">
+  <a class="card" href="epic-upload.html"><h3>Epic Games Store upload</h3><p>Every setting of the upload step.</p></a>
+  <a class="card" href="../how-to/game-publish-epic.html"><h3>Publish a build to Epic</h3><p>Upload, optimise and label in one build.</p></a>
+  <a class="card" href="steam-overview.html"><h3>Steam</h3><p>Ship the same build on Steam.</p></a>
+  <a class="card" href="../version-control/perforce.html"><h3>Perforce</h3><p>Where the game comes from.</p></a>
+</div>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The build page · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-results/build-page">
+<main class="doc">
+<h1>The build page</h1>
+<p class="lead">Each build has its own page. It shows how the build went, where it ran, what it built and what to do next.</p>
+
+<figure class="shot">
+  <img src="../../assets/shots/build-results/build-page-success.png" alt="The Overview tab of build #7 of Windows Build: the header with Success, Re-run and the other buttons, the Build steps card, the Summary card, and the Changes, Build Artifacts and Description cards on the right">
+  <figcaption>The Overview tab of a finished build.</figcaption>
+</figure>
+
+<h2>Open a build</h2>
+<ul>
+  <li>Click a build number in the <strong>History</strong> tab of a build configuration, or on the <a href="history.html">History</a> page in the top bar.</li>
+  <li>Click a build in the chart or list on the build configuration's <strong>Overview</strong> tab.</li>
+  <li>On the <strong>Agents</strong> page, click the build an agent is running.</li>
+  <li>Click a build in the <strong>Queue</strong> once it has started.</li>
+  <li>Press <kbd>Ctrl</kbd> + <kbd>K</kbd> and type the build configuration's name.</li>
+</ul>
+
+<h2>The header</h2>
+<p>The band at the top is the same on every tab of the build.</p>
+<table>
+  <tr><th>Part</th><th>What it shows</th></tr>
+  <tr><td>Build number and status chip</td><td>For example <strong>#7</strong> <em>Success</em>. Other states are <em>Running</em>, <em>Failed</em>, <em>Unstable</em> and <em>Aborted</em>. A script can give the build a different name and status text. See <a href="build-name-and-status.html">The build name and status text</a>.</td></tr>
+  <tr><td>Build configuration chip</td><td>The project and build configuration, with its platform icon. Click it to go to the build configuration. A <strong>Personal</strong> chip marks a <a href="../running-builds/personal-builds.html">personal build</a>.</td></tr>
+  <tr><td>Info line</td><td>When it started, how long it took, who or what started it, the agent it ran on, and the Perforce changelist or Git commit it built.</td></tr>
+  <tr><td>Previous / next</td><td>The two arrow buttons step to the build before and after this one.</td></tr>
+  <tr><td><strong>Resume from step N</strong></td><td>On a failed or stopped build: starts a new build at the failed step. Greyed out, with the reason, when it cannot resume. See <a href="../running-builds/resume.html">Resume a build</a>.</td></tr>
+  <tr><td><strong>Re-run</strong></td><td>Runs the build again with the same settings. It reads <strong>Re-run from the start</strong> and is the main button when a resume is not possible. The button beside it, with the sliders, opens the dialog <em>Re-run with changes&hellip;</em>. See <a href="../running-builds/rerun.html">Re-run a build</a>.</td></tr>
+  <tr><td><strong>Stop</strong></td><td>Replaces Re-run while the build runs. See <a href="../running-builds/stop-a-build.html">Stop a build</a>.</td></tr>
+  <tr><td><strong>Share</strong> / <strong>Stop sharing</strong></td><td>On a personal build you started. See <a href="../running-builds/shared-builds.html">Shared builds</a>.</td></tr>
+  <tr><td><strong>Promote&hellip;</strong></td><td>On a finished build that other build configurations depend on: starts the builds that use it, with this build as their source.</td></tr>
+  <tr><td>Pin</td><td>Keeps this build forever, so clean-up rules never delete it. Its tooltip says <em>Keep this build forever</em>. A pinned build shows a filled pin.</td></tr>
+  <tr><td><strong>Visual</strong></td><td>Opens the build in the visual editor's run view, drawn over the graph of steps. See <a href="../visual-editor/run-view.html">Run view</a>.</td></tr>
+  <tr><td>&hellip; (More actions)</td><td>Edit the build's name and description, label the build in Perforce, or delete it.</td></tr>
+</table>
+<p>On a personal build, a note under the title says who can see it: <em>Only you can see this build</em>, <em>Only name and admins can see this build</em> or, on a shared one, that people with the link can view it. It also says that the build does not change the build configuration's status or <em>Last successful</em>, and does not start other build configurations.</p>
+
+<h2>A running build</h2>
+<p>While a build runs, the header shows <strong>Running</strong>, a <strong>Stop</strong> button instead of Re-run, and a progress bar. The bar compares the time so far with the usual duration of this build configuration. When the build takes longer than usual, the bar says so. The fastest way to see what a running build does is the <strong>Console Output</strong> tab. It follows the output live. See <a href="build-console.html">The build console</a>.</p>
+
+<figure class="shot"><img src="../../assets/shots/build-results/build-page-running.png" alt="The Overview of build #1 of Shader Warmup while it runs: a Running badge, a Stop button, the progress bar, the step Warm up the shader cache running, and the summary"><figcaption>A running build: the progress bar, the running step and a Stop button.</figcaption></figure>
+<h2>The Overview tab</h2>
+<table>
+  <tr><th>Card</th><th>What it holds</th></tr>
+  <tr><td><strong>Build steps</strong></td><td>Every step with its status, a short reason, and its duration, for example <em>Failed &mdash; the batch script exited with code 1</em> or <em>Skipped &mdash; a previous step failed</em>. Click <strong>Log</strong> on a step to jump to it in the console. A step whose tests failed shows <em>Unstable</em>. Post-build actions are on the last line. Steps of a resumed build show <em>Done in #1</em>.</td></tr>
+  <tr><td><strong>Summary</strong></td><td>Started at, Duration, Waited in queue, Executed on (agent and executor), Cause, Parameters, and for a failed build <strong>Decided by</strong>, which says what made it fail, for example <em>Failed: Step "Compile" exited with code 1</em>. A personal build has a <strong>Personal build</strong> row. A re-run says <em>Re-run of #6 by you</em> with a link to the original.</td></tr>
+  <tr><td>Version control details</td><td>The revision, repository and branch, or the changelist.</td></tr>
+  <tr><td><strong>Resume from here</strong> / <strong>Resumed from</strong></td><td>On a failed build, the three checks for a resume. On a resumed build, the agent and workspace it continued in.</td></tr>
+  <tr><td><strong>Matrix</strong></td><td>For a build with a Matrix block: a grid of the combinations. See <a href="../running-builds/side-builds.html">Side builds</a>.</td></tr>
+  <tr><td><strong>Parallel tests</strong></td><td>For a build with the Parallel tests feature: one row for each batch.</td></tr>
+  <tr><td><strong>Console Output</strong></td><td>The last lines of the log, with a link <strong>View full console output</strong>.</td></tr>
+  <tr><td>Tests</td><td>A one-line summary of the test results.</td></tr>
+  <tr><td><strong>Changes</strong></td><td>The newest changes in this build. <strong>View all</strong> opens the Changes tab.</td></tr>
+  <tr><td><strong>Build Artifacts</strong></td><td>The files this build kept, with <em>all files in zip</em>. Shown when the build kept any.</td></tr>
+  <tr><td><strong>Description</strong></td><td>A note about the build. Click <strong>Add description</strong> to write one, for example <em>Release candidate for QA</em>.</td></tr>
+</table>
+
+<h2>The tabs</h2>
+<p>Which tabs you see depends on the build configuration. The usual ones are:</p>
+<table>
+  <tr><th>Tab</th><th>What it holds</th></tr>
+  <tr><td><strong>Overview</strong></td><td>Steps, summary, changes and description.</td></tr>
+  <tr><td><strong>Changes</strong></td><td>The commits or changelists that are new since the previous build. See <a href="changes-artifacts-tests.html">Changes, artifacts and tests</a>.</td></tr>
+  <tr><td><strong>Console Output</strong></td><td>The full log, in blocks, with times, filters and search.</td></tr>
+  <tr><td><strong>Parameters</strong></td><td>The parameter values this build used, with a description and where each value came from (for example <em>Default</em>). A password shows <em>password value not shown</em>.</td></tr>
+  <tr><td><strong>Artifacts</strong></td><td>The files the build kept, when it kept any.</td></tr>
+  <tr><td><strong>Test Result</strong></td><td>Passed, failed and skipped tests, when the build published a test report.</td></tr>
+  <tr><td><strong>Git Build Data</strong></td><td>The Git revisions and branches the build saw (Git roots only).</td></tr>
+</table>
+<figure class="shot">
+  <img src="../../assets/shots/build-results/parameters-tab.png" alt="The Parameters tab of build #7, listing the parameter values the build used, with the password value hidden">
+  <figcaption>The Parameters tab lists every value the build used.</figcaption>
+</figure>
+
+<h2>A failed build</h2>
+<figure class="shot">
+  <img src="../../assets/shots/build-results/build-page-failed.png" alt="The Overview tab of failed build #3: the failed step is marked in red with its reason, the steps after it are skipped, and the Summary names the step that decided the result">
+  <figcaption>A failed build. The failed step is marked, the steps after it show <em>Skipped</em>, and <em>Decided by</em> names the cause.</figcaption>
+</figure>
+<p>See <a href="../how-to/find-why-build-failed.html">Find out why a build failed</a> for the quickest way from here to the cause.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <tr><th>Problem</th><th>What to do</th></tr>
+  <tr><td>A tab you expect is missing.</td><td>Artifacts appears only when the build kept files, and Test Result only when it published a test report.</td></tr>
+  <tr><td>The build page says page not found.</td><td>It may be a personal build of someone else, or you may not see the project. Ask for a <a href="../running-builds/shared-builds.html">share link</a> or the project viewer role.</td></tr>
+  <tr><td>The progress bar never fills.</td><td>The bar uses the usual duration. A build configuration with few builds has no usual duration yet.</td></tr>
+</table>
+
+<h2>Tips</h2>
+<ul>
+  <li>The address of a build page is easy to share: send it to a colleague and they land on the same tab.</li>
+  <li>To step through builds quickly, use the previous / next arrows in the header.</li>
+  <li>Compare two builds side by side: see <a href="../how-to/run-compare-two-builds.html">Compare two builds</a>.</li>
+</ul>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="build-console.html">The build console</a></li>
+  <li><a href="changes-artifacts-tests.html">Changes, artifacts and tests</a></li>
+  <li><a href="statistics.html">The Statistics tab</a></li>
+</ul>
+
+</main>
+</body>
+</html>

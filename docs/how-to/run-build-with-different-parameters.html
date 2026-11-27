@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Run a build with different parameters · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/run-build-with-different-parameters">
+<main class="doc">
+<h1>Run a build with different parameters</h1>
+<p class="lead">Start one build with other values than the defaults, for example a Shipping build instead of Development, without changing the build configuration.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>A build configuration with at least one parameter that people may set. See <a href="../parameters/parameters.html">Parameters</a>. In this guide it is <em>Game / Windows Build</em>, with the parameters <code>CONFIG</code> (default <code>Development</code>) and <code>CLEAN</code> (default <code>false</code>).</li>
+  <li>The permission to run the build configuration, for example through the Developer role.</li>
+</ul>
+
+<h2>Steps</h2>
+<ol class="steps">
+  <li>Open the build configuration, for example <strong>Game &rsaquo; Windows Build</strong>.</li>
+  <li>Click the small button with the sliders, right beside <strong>Run</strong>. Its tooltip says <em>Run custom build</em>. If a parameter is set to <em>Prompt</em>, click <strong>Run&hellip;</strong> instead.</li>
+  <li>Open the <strong>Parameters</strong> tab. The number on the tab says how many parameters you can set.</li>
+  <li>Change <code>CONFIG</code> to <code>Shipping</code>. Type it, or pick it from the list if the parameter is a list.</li>
+  <li>Leave the others as they are. To go back to a default, click <strong>Reset</strong> beside the field.</li>
+  <li>For a password parameter, click <strong>Change Password</strong> and type the value for this build only. The stored value stays as it is.</li>
+  <li>On the <strong>General</strong> tab, you can write a <strong>Comment</strong>, such as <code>Shipping check for the demo</code>. It shows on the build page and in the build list.</li>
+  <li>Click <strong>Run Build</strong>.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/running-builds/run-dialog-general.png" alt="The Run custom build dialog with the General tab and the Parameters tab with a count of 4">
+  <figcaption>The Run custom build dialog. The Parameters tab shows how many values you can set.</figcaption>
+</figure>
+
+<h2>Change the parameters of a build that already ran</h2>
+<p>To run an older build again with one value changed, use <strong>Re-run with changes</strong>. Open the build, click the button with the sliders beside <strong>Re-run</strong>, open <strong>Parameters</strong> (filled in from that build), change a value and click <strong>Re-run</strong>. See <a href="../running-builds/rerun.html">Re-run a build</a>.</p>
+
+<h2>Check it worked</h2>
+<ol class="steps">
+  <li>Open the new build and its <strong>Summary</strong>. The <strong>Parameters</strong> row lists the values it used, for example <code>CONFIG = Shipping</code>. A password shows as <code>****</code>.</li>
+  <li>Click the <strong>Parameters</strong> tab for the full list.</li>
+  <li>In the <strong>Console Output</strong>, find the line of your step that prints the configuration.</li>
+  <li>Your comment is shown on the build page.</li>
+</ol>
+
+<h2>Problems and fixes</h2>
+<table>
+  <tr><th>Problem</th><th>What to do</th></tr>
+  <tr><td>There is no Parameters tab.</td><td>The build configuration has no parameters that people may set, or they are all hidden. Add one under <strong>Settings &rsaquo; Parameters</strong>, and set its display so it is not hidden.</td></tr>
+  <tr><td>A field is read only.</td><td>The parameter is set to read only. A project administrator can change that on its settings.</td></tr>
+  <tr><td>The dialog refuses my value.</td><td>The parameter has a rule, for example a list of allowed values or a text that must not be empty. The dialog opens on the Parameters tab and says why.</td></tr>
+  <tr><td>The dialog refuses to change a value and mentions script text or Vault.</td><td>Only people who can configure the build configuration may change values that end up in script text, and Vault values.</td></tr>
+  <tr><td>The step still used the default.</td><td>Check that the step reads the value by its exact name, for example <code>%CONFIG%</code>. Names are case sensitive.</td></tr>
+</table>
+
+<h2>Next steps</h2>
+<ul>
+  <li><a href="../running-builds/run-dialog.html">The Run dialog</a>: every option.</li>
+  <li><a href="../parameters/parameters.html">Parameters</a>: the types and how to add them.</li>
+  <li><a href="rerun-from-failed-step.html">Re-run a failed build from the failing step</a></li>
+</ul>
+
+</main>
+</body>
+</html>

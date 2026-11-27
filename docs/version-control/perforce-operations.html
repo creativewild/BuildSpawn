@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Perforce operations · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="version-control/perforce-operations">
+<main class="doc">
+<h1>Perforce operations</h1>
+<p class="lead">A build step that runs Perforce commands for you: sync, clean, submit, shelve, copy a stream and more, without a password in any script.</p>
+
+<h2>When to use it</h2>
+<p>Use it when a build must do more than the first sync. Typical jobs: clean the workspace before a build, submit a version file after the build, shelve generated files, copy one stream to another, or label what you built. The step uses the <a href="perforce-roots.html">Perforce root</a> of the build configuration, so the server, user and workspace are already set. The password stays in the <a href="perforce-connections.html">connection</a>. It is never typed into the step, put in a script or shown in the log.</p>
+<p>The step does not start the <code>p4</code> program. Buildspawn sends the commands to the server itself, so the agent does not need <code>p4</code> installed.</p>
+
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Build steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>, type <code>Perforce</code> in <strong>Filter step types</strong> and click <strong>Perforce operations</strong>.</li>
+  <li>Under <strong>Connection</strong>, leave <strong>Use the project's Perforce root</strong>. The card below shows the root, server, user and workspace the step will use. Click <strong>Test connection</strong> to check them.</li>
+  <li>Under <strong>Operation</strong>, click the card of the operation you want. The fields under <strong>Settings</strong> change to fit it.</li>
+  <li>Fill in the fields. The <strong>Command</strong> box at the bottom shows the Perforce command the step will run.</li>
+  <li>Under <strong>Options</strong>, choose what counts as a failure and what the step hands to the next steps.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/version-control/perforce-operations-step.png" alt="The Perforce operations step of Promote to Drop: the Connection card with the Perforce root, the operation cards with Copy chosen, the settings with the stream and Preview only, and the command preview at the bottom">
+  <figcaption>The Perforce operations step. The Connection card shows the root the step uses.</figcaption>
+</figure>
+<div class="callout note"><p>The build configuration needs a Perforce root as its version control. Without one the step stops with <em>This job has no Perforce root</em>.</p></div>
+
+<h2>Connection</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Connection</strong></td><td><strong>Use the project's Perforce root</strong> runs the commands with the root's connection and workspace. <strong>Administrator connection</strong> runs them as an administrator, without the workspace. It is shown only when an administrator has allowed it (see below), you have the Perforce permission to use it, and one exists.</td><td>Use the project's Perforce root</td></tr>
+    <tr><td><strong>Administrator connection</strong></td><td>Which administrator connection to use. It must be defined where the Perforce root is, or above.</td><td>None</td></tr>
+    <tr><td><strong>Test connection</strong></td><td>Signs in and shows <em>Connected as user@server</em>.</td><td></td></tr>
+  </tbody>
+</table>
+<p>An administrator connection has no workspace, so the operations that work on workspace files (sync, clean, reconcile, submit and the like) are not offered with it.</p>
+
+<h2>Every operation</h2>
+<p>The operations are in four groups. Each one lists the Perforce command it runs. Build parameters such as <code>${BUILD_NUMBER}</code> can be used in the text fields.</p>
+
+<h3>Files</h3>
+
+<h4>Sync: get files from the depot</h4>
+<p>Runs <code>p4 sync</code>. Use it to get a different revision, or more paths, after the first sync.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Files</strong></td><td>One path per line, a depot path or a path in the workspace. Empty means the whole workspace.</td></tr>
+    <tr><td><strong>Revision</strong></td><td>A changelist, label or date, for example <code>@48200</code> or <code>@release-1.3</code>. It is added to each path.</td></tr>
+    <tr><td><strong>Force sync</strong></td><td>Gets every file again, even those the workspace already has (<code>-f</code>).</td></tr>
+    <tr><td><strong>Preview only</strong></td><td>Lists what would change and changes nothing (<code>-n</code>).</td></tr>
+  </tbody>
+</table>
+
+<h4>Clean: put the workspace back to what the depot has</h4>
+<p>Runs <code>p4 clean</code>. It removes files the depot does not have (build output, for example), restores files you changed on disk and restores files that were removed. Before it changes anything it runs a preview and counts the files, so it can stop before it deletes too many.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Files</strong></td><td>Which paths to clean. Empty means the whole workspace, and the form shows a warning: <em>This touches the whole workspace</em>.</td></tr>
+    <tr><td><strong>Added files</strong></td><td>Delete local files the depot does not have (<code>-a</code>).</td></tr>
+    <tr><td><strong>Edited files</strong></td><td>Restore files changed on disk to the depot version (<code>-e</code>).</td></tr>
+    <tr><td><strong>Deleted files</strong></td><td>Restore files removed from disk (<code>-d</code>).</td></tr>
+    <tr><td><strong>Ignore .p4ignore</strong></td><td>Off keeps the files your <code>.p4ignore</code> lists, such as <code>Intermediate/</code>, <code>Saved/</code> and <code>DerivedDataCache</code> in an Unreal project. On cleans those too (<code>-I</code>).</td></tr>
+    <tr><td><strong>Fail if more files would be deleted than</strong></td><td>A safety limit. If the check finds more files to delete, nothing is deleted and the step fails. <code>0</code> means no limit.</td></tr>
+    <tr><td><strong>Preview only</strong></td><td>Lists what would change and changes nothing.</td></tr>
+  </tbody>
+</table>
+<p>The three file kinds are all on when you open the form. If none is switched on, the step does all three.</p>
+
+<h4>Reconcile: open added, edited and deleted files</h4>
+<p>Runs <code>p4 reconcile</code>. Use it after a build that changed files you want to submit: it finds the changes on disk and opens the files in Perforce.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Files</strong></td><td>Paths to look at. Empty means the whole workspace.</td></tr>
+    <tr><td><strong>Changelist</strong></td><td>Put the opened files in this pending changelist. Empty uses the default changelist.</td></tr>
+    <tr><td><strong>Added files</strong>, <strong>Edited files</strong>, <strong>Deleted files</strong></td><td>Open new files for add, changed files for edit, missing files for delete.</td></tr>
+    <tr><td><strong>Preview only</strong></td><td>Lists what would be opened and opens nothing.</td></tr>
+  </tbody>
+</table>
+
+<h4>Edit files, Add files, Delete files</h4>
+<p>Run <code>p4 edit</code>, <code>p4 add</code> and <code>p4 delete</code>. They open the files you name. The step stops with <em>Enter the files, one per line</em> if <strong>Files</strong> is empty.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Files</strong></td><td>One path per line. Required.</td></tr>
+    <tr><td><strong>Changelist</strong></td><td>The pending changelist to open them in. Empty uses the default changelist.</td></tr>
+    <tr><td><strong>Preview only</strong></td><td>Shows what would be opened.</td></tr>
+  </tbody>
+</table>
+
+<h4>Revert: undo opened files</h4>
+<p>Runs <code>p4 revert</code>. With no <strong>Files</strong> and <strong>Only files that are unchanged</strong> off, it reverts everything under the workspace (<code>...</code>).</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Files</strong></td><td>Paths to revert.</td></tr>
+    <tr><td><strong>Changelist</strong></td><td>Revert only the files of this changelist.</td></tr>
+    <tr><td><strong>Only files that are unchanged</strong></td><td>Reverts only files with no edits. Files with edits stay open (<code>-a</code>).</td></tr>
+    <tr><td><strong>Preview only</strong></td><td>Shows what would be reverted.</td></tr>
+  </tbody>
+</table>
+
+<h3>Changelists</h3>
+
+<h4>Submit: submit opened files</h4>
+<p>Runs <code>p4 submit</code>. You must give a <strong>Description</strong> or a <strong>Changelist</strong>, or the step stops with <em>Enter a description or the number of a pending changelist</em>. It hands the new changelist number to the next steps.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Description</strong></td><td>The changelist description, for example <code>Version bump for build ${BUILD_NUMBER}</code>.</td></tr>
+    <tr><td><strong>Changelist</strong></td><td>A pending changelist number to submit. If you fill it in, it is used and the description is not.</td></tr>
+    <tr><td><strong>Keep files checked out</strong></td><td>Reopens the files after the submit, so later steps can go on editing them (<code>-r</code>).</td></tr>
+  </tbody>
+</table>
+
+<h4>Shelve: store opened files on the server</h4>
+<p>Runs <code>p4 shelve</code>. With no changelist number, it moves the files of the default changelist into a new changelist with your description, and shelves that. It hands the changelist number to the next steps.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Description</strong></td><td>The description of the new changelist. Needed when <strong>Changelist</strong> is empty.</td></tr>
+    <tr><td><strong>Changelist</strong></td><td>An existing pending changelist to shelve.</td></tr>
+    <tr><td><strong>Replace the shelf</strong></td><td>Removes the files already shelved in that changelist first (<code>-r</code>).</td></tr>
+  </tbody>
+</table>
+
+<h4>Unshelve: bring a shelf into the workspace</h4>
+<p>Runs <code>p4 unshelve</code>. Use it to put a shelved change into the workspace during a build.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Files</strong></td><td>Which files of the shelf. Empty means every file of the shelf.</td></tr>
+    <tr><td><strong>Changelist</strong></td><td>The shelved changelist, for example <code>${CHANGELIST}</code>. Required.</td></tr>
+    <tr><td><strong>Target</strong></td><td>The pending changelist to unshelve into. Empty means the default changelist.</td></tr>
+    <tr><td><strong>Overwrite writable files</strong></td><td>Unshelves over files that are open or writable (<code>-f</code>).</td></tr>
+    <tr><td><strong>Preview only</strong></td><td>Shows what would be unshelved.</td></tr>
+  </tbody>
+</table>
+<div class="callout tip"><p>To add a shelf to a build's changes as well, use <a href="perforce-root-unshelve.html">Perforce root: unshelve</a>.</p></div>
+
+<h4>Delete shelf: remove a shelf</h4>
+<p>Runs <code>p4 shelve -d -c</code>. Give the number of the shelved <strong>Changelist</strong>. Use it to tidy up shelves a build made.</p>
+
+<h4>Tag build changelist: add the build to a changelist description</h4>
+<p>Adds a line to the description of a changelist, so people looking at the changelist see which build used it.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Changelist</strong></td><td>The changelist to tag. Empty means the changelist the build synced.</td></tr>
+    <tr><td><strong>Description</strong></td><td>The line to add. Empty adds the build configuration name, the build number and its address.</td></tr>
+  </tbody>
+</table>
+
+<h3>Branching and labels</h3>
+
+<h4>Integrate, Copy, Merge</h4>
+<p>Run <code>p4 integrate</code>, <code>p4 copy</code> and <code>p4 merge</code>. Integrate branches or merges between paths. Copy makes one path the same as another. Merge brings changes from a source into the target. The files are opened in your workspace. Use a <strong>Submit</strong> step after them to finish.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Source</strong></td><td>A depot path. Leave it empty if you name a branch mapping or stream below.</td></tr>
+    <tr><td><strong>Target</strong></td><td>The target path.</td></tr>
+    <tr><td><strong>Branch mapping or stream</strong></td><td>A name uses a branch mapping (<code>-b</code>). A path that starts with <code>//</code> uses a stream (<code>-S</code>); the Source is then the parent stream (<code>-P</code>).</td></tr>
+    <tr><td><strong>Changelist</strong></td><td>Open the files in this pending changelist.</td></tr>
+    <tr><td><strong>Preview only</strong></td><td>Shows what would happen.</td></tr>
+  </tbody>
+</table>
+<p>If you give no branch or stream, you must give both a <strong>Source</strong> and a <strong>Target</strong>. See <a href="../how-to/game-copy-stream.html">Copy a stream</a>.</p>
+
+<h4>Resolve: resolve files after a merge</h4>
+<p>Runs <code>p4 resolve</code> in automatic mode.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Files</strong></td><td>Paths to resolve. Empty means all files that need it.</td></tr>
+    <tr><td><strong>How to resolve</strong></td><td><strong>Safe</strong> (<code>-as</code>) resolves only files with no conflict. <strong>Merge</strong> (<code>-am</code>) merges what it can. <strong>Take theirs</strong> (<code>-at</code>) keeps the source. <strong>Keep yours</strong> (<code>-ay</code>) keeps the target. Default: Safe.</td></tr>
+    <tr><td><strong>Preview only</strong></td><td>Shows what would be resolved.</td></tr>
+  </tbody>
+</table>
+
+<h4>Label: create or update a label</h4>
+<p>Runs <code>p4 labelsync</code>, and <code>p4 label</code> first when you tick <strong>Create the label first</strong>.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Label name</strong></td><td>The label. Required, for example <code>skyforge-build-${BUILD_NUMBER}</code>.</td></tr>
+    <tr><td><strong>Files</strong></td><td>Which files to label. Empty labels everything in the label's view.</td></tr>
+    <tr><td><strong>Description</strong></td><td>The label's description. Empty gives <em>Created by the build</em>.</td></tr>
+    <tr><td><strong>Create the label first</strong></td><td>Off updates a label that exists already. On makes a new one that maps <code>//...</code>.</td></tr>
+  </tbody>
+</table>
+
+<h3>Anything else</h3>
+<h4>Custom command</h4>
+<p>Runs any other Perforce command.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Command</strong></td><td>The command alone, for example <code>changes</code> or <code>fstat</code>. It runs inside Buildspawn, not in a shell. A leading <code>p4 </code> is removed. A command with spaces, or one that starts with <code>-</code>, is refused.</td></tr>
+    <tr><td><strong>Arguments</strong></td><td>One argument per line, so spaces never need quoting. Example: <code>-m</code> on one line and <code>5</code> on the next.</td></tr>
+  </tbody>
+</table>
+
+<h2>Options (all operations)</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Working folder</strong></td><td>Relative paths of this step start here. Empty means the root of the workspace.</td><td>(the workspace)</td></tr>
+    <tr><td><strong>Fail the build on Perforce errors</strong></td><td>A command that Perforce refuses stops the step and fails the build.</td><td>On</td></tr>
+    <tr><td><strong>Fail the build on Perforce warnings</strong></td><td>Also fail on warnings such as <em>file(s) up-to-date</em> or <em>no such file(s)</em>.</td><td>Off</td></tr>
+    <tr><td><strong>Save the result as a step output</strong></td><td>A name, for example <code>VERSION_CL</code>. Later steps read it as <code>${VERSION_CL}</code>. A submit or shelve gives the changelist number. Other operations give the last line of the output. Even with this empty, a submit, shelve, delete shelf or tag saves the number as <code>CHANGELIST</code>.</td><td>Empty</td></tr>
+    <tr><td><strong>Also save the output to a file</strong></td><td>A path inside the workspace, for example <code>out/p4-output.txt</code>. A path outside the workspace is refused.</td><td>Empty</td></tr>
+  </tbody>
+</table>
+
+<h2>Rules about dangerous commands</h2>
+<p>An administrator sets rules for every Perforce operations step in the <strong>Perforce operations</strong> section of the system settings.</p>
+<table>
+  <thead><tr><th>Setting</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Allow destructive custom commands</strong></td><td>Off (default): the custom command refuses <code>obliterate</code>, <code>protect</code>, <code>triggers</code>, <code>typemap</code>, <code>admin</code>, <code>configure</code>, <code>unload</code>, <code>archive</code>, deleting users, groups and depots, and <code>-f</code> on deleting a spec. Turn it on only on an instance you trust.</td></tr>
+    <tr><td><strong>Allow Administrator connection</strong></td><td>Off (default): steps use the Perforce root only. On: a step can choose an Administrator connection, when the person who sets it up has the Perforce permission <strong>Use administrator connection</strong>. Such a step runs without a workspace.</td></tr>
+  </tbody>
+</table>
+<p>Commands that show or change a login (<code>passwd</code>, <code>tickets</code>, <code>trust</code>, <code>set</code>, <code>logout</code>, <code>login -p</code>) are always refused. A password or ticket in the output is replaced by <code>********</code> in the log.</p>
+
+<h2>A worked example</h2>
+<p>The Skyforge team builds an Unreal Engine game. Before each build they want a clean workspace but must keep <code>Intermediate/</code> and <code>Saved/</code> to save compile time. After a good build they submit a version file.</p>
+<p>Step 1, <strong>Clean workspace</strong>:</p>
+<table>
+  <tbody>
+    <tr><td><strong>Operation</strong></td><td>Clean</td></tr>
+    <tr><td><strong>Files</strong></td><td><code>//skyforge-win64-${NODE_NAME}/Game/...</code></td></tr>
+    <tr><td><strong>Ignore .p4ignore</strong></td><td>Off</td></tr>
+    <tr><td><strong>Fail if more files would be deleted than</strong></td><td><code>2000</code></td></tr>
+  </tbody>
+</table>
+<p>The last step, <strong>Submit version file</strong>, comes after an <strong>Edit files</strong> step that opened <code>Config/Version.ini</code>:</p>
+<table>
+  <tbody>
+    <tr><td><strong>Operation</strong></td><td>Submit</td></tr>
+    <tr><td><strong>Description</strong></td><td><code>Version file for build ${BUILD_NUMBER}</code></td></tr>
+    <tr><td><strong>Save the result as a step output</strong></td><td><code>VERSION_CL</code></td></tr>
+  </tbody>
+</table>
+
+<h2>What you see when it runs</h2>
+<pre class="terminal" data-title="build log">P4: buildbot@ssl:perforce.studio.example:1666 (Perforce root Skyforge Main) client buildspawn-win-build-01-Game-Windows-Build-0
+$ p4 clean -a -e -d //skyforge-win64-win-build-01/Game/...
+deleted: 214 files
+    C:\ws\Game\Intermediate\Build\Win64\...
+restored: 0 files
+refreshed: 3 files</pre>
+<p>Each command is shown after a <code>$</code>. A clean prints how many files were deleted, restored and refreshed, then each file. A step output prints as <code>P4: Step output VERSION_CL = 48512</code>.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>You see</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><em>This job has no Perforce root</em></td><td>Choose a Perforce root as the build configuration's version control.</td></tr>
+    <tr><td><em>Clean would delete 5231 files, more than the limit of 2000. Nothing was deleted.</em></td><td>Check the <strong>Files</strong> path. If the count is right, raise the limit or set it to <code>0</code>.</td></tr>
+    <tr><td><em>Enter a description or the number of a pending changelist.</em></td><td>Fill in <strong>Description</strong> for Submit or Shelve.</td></tr>
+    <tr><td><em>The command "obliterate" is refused</em></td><td>An administrator has to turn on <strong>Allow destructive custom commands</strong>.</td></tr>
+    <tr><td><em>This operation needs the workspace of the project's Perforce root.</em></td><td>Switch <strong>Connection</strong> back to <strong>Use the project's Perforce root</strong>.</td></tr>
+    <tr><td><em>No files are open in the default changelist.</em></td><td>A Shelve with a description needs opened files. Add an Edit, Add or Reconcile step before it.</td></tr>
+    <tr><td><em>Cannot connect to the Perforce server</em></td><td>Click <strong>Test connection</strong>. Check the <a href="perforce-connections.html">connection</a> of the Perforce root.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="perforce-roots.html">Perforce roots</a>: the connection and workspace this step uses.</li>
+  <li><a href="perforce-root-unshelve.html">Perforce root: unshelve</a> and <a href="perforce-unshelve.html">Perforce: Unshelve</a>.</li>
+  <li><a href="../how-to/game-clean-workspace.html">Clean a Perforce workspace</a> and <a href="../how-to/game-copy-stream.html">Copy a stream</a>.</li>
+  <li><a href="../build-steps/runners.html">Runners</a>.</li>
+</ul>
+</main>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Use P4 commands in a script with the P4 ticket · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/game-p4-ticket-script">
+<main class="doc">
+<h1>Use P4 commands in a script with the P4 ticket</h1>
+<p class="lead">Run the <code>p4</code> program in a PowerShell or shell step, signed in with the ticket Buildspawn gives the build, with no password in the script.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>A build configuration with a <a href="../version-control/perforce-roots.html">Perforce root</a> or <a href="../version-control/perforce-software.html">Perforce Software</a>.</li>
+  <li>The <code>p4</code> program installed on the agent.</li>
+  <li>The setting <strong>Hide TICKET</strong> in the Perforce part of the system settings is <strong>off</strong> (the default). If it is on, <code>P4_TICKET</code> is not given to steps.</li>
+</ul>
+<div class="callout note"><p>For common jobs (sync, clean, submit, shelve) the <a href="../version-control/perforce-operations.html">Perforce operations</a> step needs no <code>p4</code> program and no ticket. Use a script only for something it cannot do.</p></div>
+
+<h2>Steps</h2>
+<ol class="steps">
+  <li>Open <strong>Settings › Build steps</strong> and add a <strong>PowerShell</strong> step. Name it <code>List my changes</code>.</li>
+  <li>Type the script:
+<pre><code>$ErrorActionPreference = 'Stop'
+# P4_PORT, P4_USER and P4_CLIENT are set for you.
+p4 -p $env:P4_PORT -u $env:P4_USER -P $env:P4_TICKET -c $env:P4_CLIENT changes -m 5 "...#head"</code></pre>
+  </li>
+  <li>Click <strong>Save</strong> and <strong>Run</strong>.</li>
+</ol>
+<p><code>-P</code> gives the ticket as the password, <code>-p</code> the server, <code>-u</code> the user and <code>-c</code> the workspace. In a batch step use <code>%P4_TICKET%</code>.</p>
+<figure class="shot"><img src="../../assets/shots/how-to/game-p4-ticket-script-step.png" alt="The PowerShell step form with the script box"><figcaption>The PowerShell step.</figcaption></figure>
+<div class="callout warning"><p>Do not print the ticket. Do not write it to a file that stays after the build, and do not pass it on the command line of programs that log their arguments. A ticket in the output is hidden in the log only when Buildspawn knows it, so keep it out of <code>echo</code> lines.</p></div>
+
+<h2>Check it worked</h2>
+<p>The log shows the five changelists. If the ticket is wrong you see <em>Your session has expired, please login again</em>.</p>
+<pre class="terminal" data-title="build log">Change 48512 on 2026/11/26 by dana.k@skyforge-win64 'Fix door collision'
+Change 48508 on 2026/11/26 by t.osei@skyforge-art 'Update fog settings'</pre>
+
+<h2>Troubleshooting</h2>
+<table>
+  <thead><tr><th>You see</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><code>P4_TICKET</code> is empty</td><td>Check <strong>Hide TICKET</strong>. Check that the step runs after the checkout, which happens before the steps start, and that the connection can log in.</td></tr>
+    <tr><td><em>The term 'p4' is not recognized</em></td><td>Install the <code>p4</code> command line on the agent and add it to the path.</td></tr>
+    <tr><td>Session expired</td><td>Use a ticket credential made with <code>p4 login -ap</code>, or a password credential, so Buildspawn logs in for each build.</td></tr>
+  </tbody>
+</table>
+
+<h2>Next steps</h2>
+<div class="cards">
+  <a class="card" href="../version-control/perforce-variables.html"><h3>Perforce variables</h3><p>All the P4 variables.</p></a>
+  <a class="card" href="../version-control/perforce-connections.html"><h3>Perforce connections</h3><p>Password and ticket credentials.</p></a>
+</div>
+</main>
+</body>
+</html>

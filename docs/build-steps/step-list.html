@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The steps list and the step editor · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/step-list">
+<main class="doc">
+<h1>The steps list and the step editor</h1>
+<p class="lead">The Build Steps page lists what a build does, in order. Here you add, edit, switch off, copy, delete and reorder steps.</p>
+<h2>When to use it</h2>
+<p>Use this page whenever you change what a build configuration does: add a compile step, turn off a slow step for one test run, or move packaging after the tests. Steps run from top to bottom on the build's agent. Post-build actions, such as archiving files, run after all steps and have their own page.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Steps</strong>. The list shows each step with its name, its runner, its <strong>Step ID</strong> and, when set, how many conditions and retries it has.</li>
+  <li>Click <strong>Add build step</strong>. The <strong>Add build step</strong> page opens with a tile for each runner. Type in <strong>Filter step types</strong> to narrow them. See <a href="runners.html">Runners</a>.</li>
+  <li>Click a tile. The editor opens. Type a <strong>Step name</strong>, such as <code>Compile</code>. Leave <strong>Step ID</strong> empty to have it made from the name.</li>
+  <li>Fill in the runner's fields, then the <strong>Execution</strong> section (when the step runs, conditions, retry). Click <strong>Save</strong>.</li>
+  <li>Back in the list, drag a row by its handle to reorder it, or use <strong>Move up</strong> and <strong>Move down</strong> in its <strong>More actions</strong> menu.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/build-steps/steps-list.png" alt="The Build Steps list of a build configuration">
+  <figcaption>The Build Steps list of a build configuration.</figcaption>
+</figure>
+<h2>The list</h2>
+<p>The line under the title says how many steps will run, for example <em>3 of 4 steps run, in this order; the others are disabled.</em> Each row has:</p>
+<ul>
+  <li><strong>Enable</strong> and <strong>Disable</strong>: a switch. A disabled step stays in the list and shows <strong>Disabled</strong>. The build does not run it and the console says <em>Disabled — not run</em>.</li>
+  <li><strong>Edit</strong>: opens the step editor.</li>
+  <li><strong>More actions</strong>: <strong>Copy step</strong>, <strong>Move up</strong>, <strong>Move down</strong> and <strong>Delete step</strong>. Deleting asks first and cannot be undone.</li>
+  <li>Tags such as <strong>Retry 2×</strong> and <strong>1 condition</strong> when the step has them.</li>
+</ul>
+<p>A <strong>Parallel block</strong> is one row with a tag such as <em>Block · 2 sides</em>. See <a href="parallel-blocks.html">Parallel blocks</a> and <a href="matrix-mode.html">Matrix mode</a>. A step that comes from a project or a template shows where it came from, for example <em>From project Game</em>. See <a href="shared-steps.html">Steps shared from a project or template</a>.</p>
+<h2>Every field in the step editor</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Runner type</strong></td><td>The kind of work. <strong>Change</strong> beside it picks another runner.</td><td>The tile you clicked</td><td><code>Command Line</code></td></tr>
+    <tr><td><strong>Step name</strong></td><td>The name shown in the list, on the build page and in the console.</td><td>The runner name</td><td><code>Compile shaders</code></td></tr>
+    <tr><td><strong>Step ID</strong></td><td>A short name. Start with a letter, then use lowercase letters, digits and <code>_</code>. It cannot change once the step exists. Later steps read the result in <code>BUILD_STEP_STATUS_&lt;ID&gt;</code>. See <a href="step-statuses.html">Step statuses</a>.</td><td>Made from the name</td><td><code>compile_shaders</code></td></tr>
+    <tr><td><strong>Enabled</strong></td><td>Switch the step on or off.</td><td>On</td><td>Off while you test</td></tr>
+    <tr><td><strong>(the runner's own fields)</strong></td><td>See the page of each runner.</td><td></td><td></td></tr>
+    <tr><td><strong>Execute step</strong></td><td>When the step runs. See below.</td><td>If all previous steps finished successfully</td><td>Always, even if build stop command was issued</td></tr>
+    <tr><td><strong>Conditions</strong></td><td>The step runs only if all conditions are met. Each has a <strong>Parameter</strong>, an <strong>Operator</strong> and a <strong>Value</strong>. Parameters are build parameters and environment variables.</td><td>None</td><td><code>CONFIG</code> equals <code>Shipping</code></td></tr>
+    <tr><td><strong>Retry on failure</strong></td><td>How many extra tries a failed step gets, 0 to 10.</td><td>0</td><td>2</td></tr>
+    <tr><td><strong>Wait between attempts</strong></td><td>Seconds between tries. The agent keeps the workspace.</td><td>0</td><td>30</td></tr>
+    <tr><td><strong>Only for exit codes</strong></td><td>Retry only for these codes. Empty retries for any failure.</td><td>Empty</td><td><code>-1, 3221225477</code></td></tr>
+    <tr><td><strong>Outputs</strong></td><td>Values the step sets for later steps. See <a href="../parameters/set-from-build.html">Setting parameters from a build</a>.</td><td>None</td><td><code>version</code> (Text)</td></tr>
+    <tr><td><strong>Run on</strong></td><td>Run the step on another machine. See <a href="parallel-blocks.html">Parallel blocks and overrides</a>.</td><td>Same machine as before</td><td>A pool or label: pool Consoles</td></tr>
+    <tr><td><strong>Files sent back</strong></td><td>When the step runs elsewhere, which changed files come back.</td><td>All changed files</td><td><code>Saved/Logs/**</code></td></tr>
+  </tbody>
+</table>
+<h3>Execute step: when a step runs</h3>
+<p>By default a failed step stops the build and the steps after it are skipped. <strong>Execute step</strong> changes this for one step:</p>
+<table>
+  <thead><tr><th>Choice</th><th>Meaning</th></tr></thead>
+  <tbody>
+    <tr><td><strong>If all previous steps finished successfully</strong></td><td>The default. The step runs only when nothing before it failed.</td></tr>
+    <tr><td><strong>Only if build status is successful</strong></td><td>Runs only while the build result is still successful. A step that made the build unstable stops it.</td></tr>
+    <tr><td><strong>Even if some of the previous steps failed</strong></td><td>Runs after a failure. Use it for a report step that must always run.</td></tr>
+    <tr><td><strong>Always, even if build stop command was issued</strong></td><td>Runs even when someone stopped the build. Use it for clean-up, such as shutting down a test server.</td></tr>
+    <tr><td><strong>Only if build status is failed</strong></td><td>Runs only after a failure. Use it to collect crash dumps or send alerts.</td></tr>
+  </tbody>
+</table>
+<p>Conditions are checked too. A step whose condition is not met is skipped, and the console says <em>condition not met</em> and shows the condition. The operators are: equals, does not equal, contains, does not contain, matches regex, exists, does not exist.</p>
+<h2>A worked example</h2>
+<p>The build configuration <strong>Game / Windows Build</strong> has four steps. The cook step must run only for a Shipping build, and a clean-up step must always run.</p><ol class="steps">
+  <li>Open <strong>Game › Windows Build › Settings › Build Steps</strong>.</li>
+  <li>Edit <strong>Cook content</strong>. Under <strong>Conditions</strong> click <strong>Add condition</strong>. Pick the parameter <code>CONFIG</code>, the operator <strong>equals</strong> and the value <code>Shipping</code>. Click <strong>Save</strong>.</li>
+  <li>Edit <strong>Stop test server</strong>. Set <strong>Execute step</strong> to <strong>Always, even if build stop command was issued</strong>. Click <strong>Save</strong>.</li>
+  <li>Drag <strong>Stop test server</strong> to the end of the list.</li>
+</ol>
+<h2>What you see when it runs</h2>
+<p>The build page has a <strong>Build steps</strong> card. Each step shows <em>succeeded</em>, <em>failed</em>, <em>unstable</em>, <em>stopped</em>, <em>skipped</em> or <em>disabled</em>, with its time. A skipped step says why, for example <em>Skipped: a previous step failed (execution policy: If all previous steps finished successfully)</em>. The console has one block per step, titled like <code>[Step 2/4] Cook content (Command Line)</code>.</p>
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong><em>Step IDs start with a letter and use only lowercase letters, digits and _</em></strong></td><td>Change the ID. <code>Cook-Content</code> is refused; <code>cook_content</code> is fine.</td></tr>
+    <tr><td><strong><em>Another step already uses the ID …</em></strong></td><td>Every step in a build configuration needs its own ID.</td></tr>
+    <tr><td><strong>A step is skipped and you do not know why</strong></td><td>Open the build. The <strong>Build steps</strong> card and the console give the reason next to the step.</td></tr>
+    <tr><td><strong>A step from a project has no edit option</strong></td><td>Use <strong>Override</strong> to change it for this build configuration only. See <a href="shared-steps.html">Steps shared from a project or template</a>.</td></tr>
+    <tr><td><strong><em>Not an exit code</em></strong></td><td>Use whole numbers from -2147483648 to 4294967295, or <code>0x</code> and hexadecimal digits.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="runners.html">Runners</a></li>
+  <li><a href="common-step-fields.html">Fields every runner has</a></li>
+  <li><a href="configured-build-step.html">Configured build step</a></li>
+  <li><a href="step-statuses.html">Step statuses</a></li>
+  <li><a href="resume-and-retry.html">Resume and retry</a></li>
+  <li><a href="../how-to/rerun-from-failed-step.html">Re-run from the failed step</a></li>
+</ul>
+</main>
+</body>
+</html>

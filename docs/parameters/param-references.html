@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parameter references · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="parameters/param-references">
+<main class="doc">
+<h1>Parameter references</h1>
+<p class="lead">Write %name% in a step to put a value there when the build runs.</p>
+
+<h2>When to use them</h2>
+<p>Use a reference whenever a runner field or a script needs a value you keep in a parameter, a value the build knows (such as the changelist), or a value from another build in the chain.</p>
+<h2>How to use them</h2>
+<ol class="steps">
+  <li>Open the step: <strong>Settings › Build steps</strong>, then the step.</li>
+  <li>Type <code>%</code> in the script editor. It lists the parameters of the build. Pick one, or type the name.</li>
+  <li>Save. At run time, Buildspawn replaces each reference with its value.</li>
+</ol>
+<h2>Every kind of reference</h2>
+<table>
+<thead><tr><th>Reference</th><th>What it is</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td><code>%NAME%</code></td><td>A build parameter (configuration kind). Also a value an earlier step set with <code>setParameter</code>; the latest value wins.</td><td><code>%CONFIG%</code></td></tr><tr><td><code>%env.NAME%</code></td><td>An environment parameter. In a batch file it becomes <code>%NAME%</code>, which the batch file reads from the environment itself.</td><td><code>%env.UE_SDK_ROOT%</code></td></tr><tr><td><code>%system.name%</code></td><td>A system property.</td><td><code>%system.build.flavour%</code></td></tr><tr><td><code>%build.*%</code></td><td>A value the build knows: number, counter, changelist, branch, who started it, checkout folder. See <a href="../reference/build-values.html">Build values</a>.</td><td><code>%build.vcs.number%</code></td></tr><tr><td><code>%vcsroot.*%</code></td><td>A property of a version control root: <code>%vcsroot.url%</code> with one root, <code>%vcsroot.&lt;id&gt;.url%</code> with several.</td><td><code>%vcsroot.branch%</code></td></tr><tr><td><code>%agent.*%</code></td><td>A parameter of the agent. See <a href="param-agent.html">Agent parameters</a>.</td><td><code>%agent.name%</code></td></tr><tr><td><code>%tool.&lt;id&gt;%</code></td><td>The path of a tool on the agent. Not allowed in a container.</td><td><code>%tool.msbuild%</code></td></tr><tr><td><code>%dep.&lt;ID&gt;.&lt;name&gt;%</code></td><td>A value of a dependency build in this chain. See <a href="build-chains.html">Build chains</a>.</td><td><code>%dep.Game_Cook.build.number%</code></td></tr><tr><td><code>%vault:path!/key%</code></td><td>A secret fetched from HashiCorp Vault when the build starts. See <a href="secrets.html#vault">Vault</a>.</td><td><code>%vault:secret/data/game!/key%</code></td></tr><tr><td><code>%reverse.dep.…%</code></td><td>Not a reference but a parameter name that sends a value to a dependency. See <a href="build-chains.html">Build chains</a>.</td><td><code>reverse.dep.*.config</code></td></tr><tr><td><code>%%</code></td><td>One percent sign, where something else was replaced.</td><td><code>50%%</code></td></tr>
+</tbody>
+</table>
+<h2>Rules</h2>
+<ul>
+  <li>One pass from left to right. A value is never read again, so <code>%other%</code> inside a value stays as written.</li>
+  <li>A reference to a name Buildspawn does not know stays as written. A name such as <code>%PATH%</code> is left for the shell.</li>
+  <li>A secret is never written into a script. A reference to a password parameter fails the step, and the message names the environment variable to read instead. In a batch file the reference is left for <code>cmd</code>.</li>
+  <li>A value that someone who may not configure the build configuration typed is not written into code. The step fails and names the parameter. A value at its default is always allowed.</li>
+  <li>In a Windows batch script a value has each percent sign doubled, so <code>cmd</code> reads it once.</li>
+</ul>
+<h2>A worked example</h2>
+<pre><code>powershell -File Build\ci.ps1 -Stage package -Version %version% -Changelist %build.vcs.number% -Agent %agent.name%</code></pre>
+<h2>What you see when it runs</h2>
+<p>The log shows the command with the values filled in. Secrets show as dots.</p>
+<h2>Problems and fixes</h2>
+<table>
+<thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+<tbody>
+<tr><td>The reference stays as written</td><td>The name is wrong or the value does not exist yet (for example a <code>%dep.…%</code> of a build that was not in the chain).</td></tr><tr><td>The step fails with a secret message</td><td>Read the secret from the environment variable the message names.</td></tr><tr><td>The step fails with "changed value"</td><td>Someone without Configure permission typed a value that is not the default. Ask a person who may configure the build configuration to run it.</td></tr>
+</tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="parameters.html">Parameters</a></li>
+  <li><a href="../reference/build-values.html">Build values</a></li>
+  <li><a href="../build-steps/script-editor.html">The script editor</a></li>
+</ul>
+</main>
+</body>
+</html>

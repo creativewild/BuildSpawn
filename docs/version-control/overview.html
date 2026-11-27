@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Version control overview · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="version-control/overview">
+<main class="doc">
+<h1>Version control overview</h1>
+<p class="lead">Choose where a build configuration gets its code: nothing, Git, Perforce or several places at once.</p>
+
+<h2>When to use it</h2>
+<p>Every build configuration has a <strong>Version Control</strong> setting. It decides what a build checks out, how changes are found, and which builds start when someone submits.</p>
+
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Version Control</strong>.</li>
+  <li>Choose one of the options below.</li>
+  <li>Fill in its fields and click <strong>Save</strong>.</li>
+</ol>
+
+<h2>The choices</h2>
+<table>
+  <thead><tr><th>Choice</th><th>What it is</th><th>Page</th></tr></thead>
+  <tbody>
+    <tr><td><strong>None</strong></td><td>The build checks out nothing. It has no fields. Use it for builds that fetch their own files in a step.</td><td></td></tr>
+    <tr><td><strong>Git</strong></td><td>One Git repository, with branches and extra behaviours.</td><td><a href="git.html">Git</a></td></tr>
+    <tr><td><strong>Perforce root</strong></td><td>A shared Perforce connection and workspace, defined once.</td><td><a href="perforce-roots.html">Perforce roots</a></td></tr>
+    <tr><td><strong>Perforce Software</strong></td><td>A Perforce workspace defined in this build configuration.</td><td><a href="perforce-software.html">Perforce Software</a></td></tr>
+    <tr><td><strong>Several roots</strong></td><td>More than one of the above, each in its own folder.</td><td><a href="several-roots.html">Several roots</a></td></tr>
+  </tbody>
+</table>
+
+<h2>More about version control</h2>
+<ul>
+  <li><a href="perforce.html">Perforce</a>: the hub for everything Perforce.</li>
+  <li><a href="vcs-parameters.html">Version control parameters</a>: the commit, changelist and branch of a build.</li>
+  <li><a href="versioned-settings.html">Versioned settings</a>: keep settings in your repository.</li>
+</ul>
+
+<h2>A worked example</h2>
+<p>Skyforge uses Perforce for the game (<strong>Perforce root</strong> <code>skyforge-main</code>) and Git for small tools (<strong>Git</strong>). The <strong>Tools Unit Tests</strong> build configuration uses Git only. <strong>Windows Build</strong> uses the Perforce root. The <strong>Release</strong> build configuration uses <strong>Several roots</strong> for both.</p>
+
+<h2>What you see when it runs</h2>
+<p>The log starts with the checkout. The build page shows the revision, and the <strong>Changes</strong> tab lists what is new since the last build.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>You see</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>Builds do not start on a submit</td><td>Add a trigger. See <a href="../running-builds/triggers.html">Triggers</a>.</td></tr>
+    <tr><td>Problems with the connection show on the build configuration page</td><td>Open <strong>Version Control</strong> and read the message.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../running-builds/triggers.html">Triggers</a>, <a href="../projects/templates.html">Templates</a></li>
+</ul>
+</main>
+</body>
+</html>

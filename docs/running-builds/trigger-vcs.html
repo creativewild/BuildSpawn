@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VCS trigger · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="running-builds/trigger-vcs">
+<main class="doc">
+<h1>VCS trigger</h1>
+<p class="lead">Starts a build when someone commits or submits a change to a version control root of the build configuration.</p>
+
+<h2>When to use it</h2>
+<p>Use it so every change is built. It is one trigger over every version control system the build configuration uses (Git, Perforce and others). It checks on a schedule, and a hook from the server can start a check sooner.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Triggers</strong>.</li>
+  <li>Click <strong>Add new trigger</strong> and click <strong>Add</strong> next to <strong>VCS Trigger</strong>.</li>
+  <li>Check the <strong>Poll schedule</strong> (a cron line).</li>
+  <li>Optional: set the <strong>Quiet period</strong> and tick <strong>Ignore post-commit hooks</strong>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/running-builds/trigger-vcs.png" alt="The VCS Trigger form with the poll schedule, quiet period and Ignore post-commit hooks"><figcaption>The VCS Trigger form.</figcaption></figure>
+
+<h2>Every field</h2>
+<table>
+<thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>Poll schedule</td><td>A cron line that says how often to look for changes. It uses the same syntax as the <a href="trigger-schedule.html#cron">Schedule trigger</a>, with <code>H</code> and an optional first line <code>TZ=Europe/London</code>.</td><td><code>H/15 * * * *</code> (about every 15 minutes)</td><td><code>H/5 * * * *</code></td></tr><tr><td>Quiet period (seconds)</td><td>How long to wait after a change before the build is queued. Changes that arrive in that time go into one build. Empty uses the quiet period of the build configuration. A whole number, 0 or more.</td><td>Empty</td><td><code>60</code></td></tr><tr><td>Ignore post-commit hooks</td><td>Do not start a check when the version control system sends a hook. Only the schedule checks. The version control integration must support this.</td><td>Off</td><td>On</td></tr>
+</tbody>
+</table>
+
+<h2>A worked example</h2>
+<p>The Linux Server Build is on a Git root. The trigger polls every five minutes with a quiet period of 60 seconds. Three commits in two minutes give one build with all three changes.</p>
+<h2>What you see when it runs</h2>
+<p>The trigger's row on the Triggers page reads <em>Quiet period: 60 s</em> and shows the schedule. The build's cause says it was started by the version control trigger. The <strong>Change Log</strong> lists the changes.</p>
+<h2>Problems and fixes</h2>
+<table>
+<thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+<tbody>
+<tr><td>Builds start late</td><td>The poll schedule is long, or the quiet period is. Shorten them, or set up a hook so the server tells Buildspawn at once.</td></tr><tr><td>No build after a commit</td><td>The change is outside the root's view or path filter, or the trigger is disabled.</td></tr><tr><td>The quiet period is refused</td><td>Use a whole number of seconds.</td></tr>
+</tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="triggers.html">Triggers</a></li>
+  <li><a href="../version-control/git.html">Git</a></li>
+  <li><a href="../version-control/perforce.html">Perforce</a></li>
+  <li><a href="trigger-p4.html">Perforce trigger (P4)</a></li>
+</ul>
+</main>
+</body>
+</html>

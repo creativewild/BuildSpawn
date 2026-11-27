@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MSBuild · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/msbuild">
+<main class="doc">
+<h1>MSBuild</h1>
+<p class="lead">Builds a Visual Studio project or solution with MSBuild. MSBuild installations are defined once, under Tools.</p>
+
+<h2>When to use it</h2>
+<p>Use it for C# and C++ solutions that need the full Visual Studio build tools: your engine tools, plugins and anything with a <code>.sln</code>. Run it on a Windows agent that has Visual Studio or the Build Tools.</p>
+
+<h2>How to set it up</h2>
+
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>. Type <code>MSBuild</code> in <strong>Filter step types</strong> if you like, then click the <strong>MSBuild</strong> tile (group <strong>Build tools</strong>).</li>
+  <li>Type a <strong>Step name</strong>, for example <code>Build tools</code>.</li>
+  <li>Fill in the fields described below.</li>
+  <li>Optional: set <strong>Execute step</strong>, <strong>Conditions</strong> and <strong>Retry on failure</strong>. See <a href="step-list.html">The steps list and the step editor</a>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<figure class="shot small">
+  <img src="../../assets/shots/build-steps/msbuild.png" alt="The fields of the MSBuild step in the step editor">
+  <figcaption>The fields of the MSBuild step, as the step editor shows them.</figcaption>
+</figure>
+
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>MSBuild Version</strong></td><td>The MSBuild installation to use, chosen from the ones defined under <strong>Settings › Tools</strong>. <strong>(Default)</strong> uses the default installation. If none is defined, the step asks you to add one.</td><td>(Default)</td><td>MSBuild 17</td></tr>
+    <tr><td><strong>Project File</strong></td><td>The <code>.proj</code> or <code>.sln</code> file, from the workspace root. You can use build variables as <code>${var}</code>.</td><td>Empty</td><td><code>Tools/BuildTools.sln</code></td></tr>
+    <tr><td><strong>Command Line Arguments</strong></td><td>A whitespace-separated list, the same as you would type after <code>msbuild</code>. The installation's default parameters are added too.</td><td>Empty</td><td><code>/p:Configuration=Release /m</code></td></tr>
+    <tr><td><strong>Pass build variables as properties</strong></td><td>Passes build variables to MSBuild as <code>/p:name=value</code> pairs. Passwords and other sensitive variables are not added.</td><td>Off</td><td>Off</td></tr>
+    <tr><td><strong>Do not use chcp command</strong></td><td>Tick to leave out the <code>chcp</code> code page change that normally runs before MSBuild.</td><td>Off</td><td>Off</td></tr>
+    <tr><td><strong>Continue build on build failure</strong></td><td>Keep the build going even when MSBuild fails.</td><td>Off</td><td>Off</td></tr>
+    <tr><td><strong>Set build to unstable if there are warnings</strong></td><td>A compile with warnings makes the build unstable.</td><td>Off</td><td>On</td></tr>
+  </tbody>
+</table>
+
+
+<h2>A worked example</h2>
+<p>Build the engine tools solution in Release. Step name <code>Build tools</code>, <strong>MSBuild Version</strong> <code>MSBuild 17</code>, <strong>Project File</strong> <code>Tools/BuildTools.sln</code>, <strong>Command Line Arguments</strong> <code>/p:Configuration=Release /m</code>.</p>
+
+<h2>What you see when it runs</h2>
+<p>The console shows the MSBuild command line, then its output. Compiler errors and warnings are marked in the log as <em>MSBuild error</em> and <em>MSBuild warning</em>. A failed build fails the step unless you ticked <strong>Continue build on build failure</strong>.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong>The <strong>MSBuild Version</strong> list is empty</strong></td><td>Add an installation under <strong>Settings › Tools</strong> (open <strong>More tool types</strong> if MSBuild is not listed). Its <strong>Path to MSBuild Installation</strong> is the folder with <code>MSBuild.exe</code>, for example <code>C:\Program Files\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin</code>.</td></tr>
+    <tr><td><strong>Warnings do not change the result</strong></td><td>Tick <strong>Set build to unstable if there are warnings</strong>.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="dotnet.html">.NET</a></li>
+  <li><a href="../administration/tools.html">Tools</a></li>
+  <li><a href="../how-to/steps-build-sln-with-msbuild.html">Build a .sln with MSBuild</a></li>
+  <li><a href="runners.html">Runners</a></li>
+  <li><a href="common-step-fields.html">Fields every runner has</a></li>
+</ul>
+</main>
+</body>
+</html>

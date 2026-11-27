@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Perforce root: unshelve · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="version-control/perforce-root-unshelve">
+<main class="doc">
+<h1>Perforce root: unshelve</h1>
+<p class="lead">A build step that unshelves a shelved changelist into the workspace of a build configuration that uses a Perforce root.</p>
+
+<h2>When to use it</h2>
+<p>Use it when the build configuration gets its code from a <a href="perforce-roots.html">Perforce root</a> and a step must put a named shelf on top of the synced files. It does the same as <a href="perforce-unshelve.html">Perforce: Unshelve</a>, which does not work with a Perforce root. For one-off tests of a shelf, use the <strong>Shelved changes</strong> tab of the Run dialog instead (see <a href="perforce-shelves.html">Shelves</a>).</p>
+
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Build steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>, type <code>unshelve</code> in <strong>Filter step types</strong> and click <strong>Perforce root: unshelve</strong>.</li>
+  <li>Fill in the fields below.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/version-control/perforce-root-unshelve.png" alt="The Perforce root: unshelve step form"><figcaption>The Perforce root: unshelve step.</figcaption></figure>
+
+<h2>Every field</h2>
+<p>The form is the same as for <a href="perforce-unshelve.html">Perforce: Unshelve</a>.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Unshelve Changelist</strong></td><td>The number of the shelved changelist. Build parameters can be used.</td><td>Empty</td><td><code>${SHELF}</code></td></tr>
+    <tr><td><strong>Resolve Options</strong></td><td>None, Safe (<code>-as</code>), Merge (<code>-am</code>), Force Merge (<code>-af</code>), Yours (<code>-ay</code>, keep your edits) or Theirs (<code>-at</code>, keep the shelf content).</td><td>The first in the list</td><td>Resolve: Safe (-as)</td></tr>
+    <tr><td><strong>Clean up Review actions</strong></td><td>Removes review actions the unshelve left behind.</td><td>Off</td><td>Off</td></tr>
+    <tr><td><strong>Ignore this step if ChangeList value not set.</strong></td><td>An empty changelist makes the step do nothing and succeed.</td><td>Off</td><td>On</td></tr>
+  </tbody>
+</table>
+<p>The step uses the root's connection and its workspace. With <a href="several-roots.html">several roots</a>, it uses the Perforce root's own checkout folder.</p>
+
+<h2>A worked example</h2>
+<p>On <strong>Windows Build</strong>, a parameter <code>SHELF</code> is empty for normal builds. The unshelve step has <strong>Unshelve Changelist</strong> <code>${SHELF}</code> and <strong>Ignore this step if ChangeList value not set</strong> on. A build started with <code>SHELF=48790</code> tests that shelf on top of the latest code.</p>
+
+<h2>What you see when it runs</h2>
+<p>The log shows the unshelve and resolve. The build's <strong>Changes</strong> list the shelved changelist first, then the changelists since the last build.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>You see</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>The step fails with a number error</td><td>The field is empty or not a number. Fill it in, or tick <strong>Ignore this step if ChangeList value not set</strong>.</td></tr>
+    <tr><td>A credential error</td><td>The root's connection is not usable here. Check it on the <a href="perforce-connections.html">connection</a> page.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="perforce-unshelve.html">Perforce: Unshelve</a></li>
+  <li><a href="perforce-operations.html">Perforce operations</a></li>
+  <li><a href="perforce-shelves.html">Shelves</a></li>
+</ul>
+</main>
+</body>
+</html>

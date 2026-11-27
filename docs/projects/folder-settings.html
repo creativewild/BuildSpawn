@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project settings · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/folder-settings">
+<main class="doc">
+<h1>Project settings</h1>
+<p class="lead">Every setting of a project, what it holds and where to find it.</p>
+<h2>The project settings page</h2><p>Open <strong>Settings</strong> on a project. It has sub-tabs. <strong>General</strong> has the name, description, documentation, icon, views, order of items and health metrics. The properties below are on the full form. <strong>ID</strong>, <strong>Versioned Settings</strong> and <strong>Connections</strong> follow. <strong>Build settings</strong> and <strong>Templates</strong> pass steps, parameters and templates down. <strong>Perforce roots</strong> and <strong>Credentials</strong> are shared with the build configurations below.</p><figure class="shot">
+  <img src="../../assets/shots/projects/project-settings.png" alt="The Settings tab of the Game project">
+  <figcaption>The project settings.</figcaption>
+</figure>
+<h2>General</h2><table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Name</td><td>Read-only here. Change it with <strong>Rename</strong> in the page header, which also moves the address.</td><td>The name you gave</td><td><code>Game</code></td></tr>
+    <tr><td>Configuration ID</td><td>Stable and unique. See <a href="project-ids.html">IDs</a>.</td><td>Parent ID plus name</td><td><code>Game</code></td></tr>
+    <tr><td>Display name</td><td>Shown in lists, the tree and the page title instead of the name. Optional.</td><td>Empty</td><td><code>Skyforge</code></td></tr>
+    <tr><td>Description</td><td>Text under the name. Used as the summary of build configurations in this project that have none of their own.</td><td>Empty</td><td><code>Skyforge, the game.</code></td></tr>
+    <tr><td>Documentation</td><td>Links for every build configuration in this project, up to 50. See <a href="documentation-links.html">Documentation links</a>.</td><td>No links</td><td>-</td></tr>
+    <tr><td>Icon and Icon colour</td><td>The same picker and colour as build configurations. See <a href="project-icons.html">Project icons</a>.</td><td>Project</td><td>Tools</td></tr>
+    <tr><td>Views</td><td>Appearance: the views of the project. <strong>Edit views</strong> opens them.</td><td>All</td><td>-</td></tr>
+    <tr><td>Order of items</td><td>Alphabetical or Custom. <strong>Reorder...</strong> opens the dialog. See <a href="project-tree-order.html">Tree order and separators</a>.</td><td>Alphabetical</td><td>-</td></tr>
+    <tr><td>Health metrics</td><td>What decides the weather icon of the project: <em>Child item with the given name</em>, <em>Child item with worst health</em>. <strong>Add metric</strong> adds one; <strong>Remove</strong> removes one.</td><td>Worst child health</td><td>-</td></tr>
+    <tr><td>Open the full form</td><td>Administrators only. Every setting of the project on one long page, including Properties such as Pipeline libraries.</td><td>-</td><td>-</td></tr>
+  </tbody>
+</table>
+<h2>Project name</h2>
+<p>The name of a project made by a scan of a code host (Multibranch or Organization Folder). It keeps the name of the repository.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Project name</td><td>The name shown for the project.</td><td>The repository name</td><td>-</td></tr>
+  </tbody>
+</table>
+<h2>Credentials</h2>
+<p>Secrets that only build configurations in this project may use. On the <strong>Credentials</strong> tab of the project.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Credentials</td><td>Add a password, token or key. See <a href="../parameters/credentials.html">Credentials</a>.</td><td>None</td><td><code>steam-build-account</code></td></tr>
+  </tbody>
+</table>
+<h2>Perforce roots</h2>
+<p>Perforce connections that the build configurations below can share. On the <strong>Perforce roots</strong> tab.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Perforce roots</td><td>Server, credential, workspace and view. See <a href="../version-control/perforce-roots.html">Perforce roots</a>.</td><td>None</td><td><code>Main</code></td></tr>
+  </tbody>
+</table>
+<h2>List of project properties</h2>
+<p>Name and value pairs for every build configuration below. They are read when the build feature <a href="feature-project-properties.html">Project Properties</a> is on.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Name</td><td>The property name.</td><td>Empty</td><td><code>DROP_SHARE</code></td></tr>
+    <tr><td>Value</td><td>The property value.</td><td>Empty</td><td><code>\\files\skyforge\drops</code></td></tr>
+  </tbody>
+</table>
+<h2>Pipeline libraries (FolderLibraries)</h2>
+<p>Shared libraries for Pipelines in this project. They are untrusted: their code runs in the Groovy sandbox.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Name</td><td>The name used in <code>@Library</code>.</td><td>Empty</td><td><code>skyforge-lib</code></td></tr>
+    <tr><td>Default version</td><td>The branch, tag or commit used when a script names none.</td><td>Empty</td><td><code>main</code></td></tr>
+    <tr><td>Load implicitly</td><td>Every Pipeline gets the library without <code>@Library</code>.</td><td>Off</td><td>Off</td></tr>
+    <tr><td>Allow default version to be overridden</td><td>A script may name another version.</td><td>Off</td><td>On</td></tr>
+    <tr><td>Include @Library changes in job recent changes</td><td>Show changes of the library in recent changes.</td><td>Off</td><td>Off</td></tr>
+    <tr><td>Cache fetched versions on controller for quick retrieval</td><td>Keep fetched versions on the server.</td><td>Off</td><td>Off</td></tr>
+    <tr><td>Refresh time in minutes</td><td>How long a cached version is kept.</td><td>0</td><td><code>30</code></td></tr>
+    <tr><td>Versions to exclude / include</td><td>Patterns that limit the versions a script may use.</td><td>Empty</td><td><code>release/*</code></td></tr>
+    <tr><td>Retrieval method</td><td>Modern SCM or Legacy SCM.</td><td>Modern SCM</td><td>Modern SCM</td></tr>
+  </tbody>
+</table>
+<h2>Project-based security (AuthorizationMatrixProperty, and the Entra ID matrix)</h2>
+<p>Who may do what in this project and below.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Users and groups</td><td>One card per user or group with every permission grouped inside. See <a href="../administration/users-and-permissions.html">Users, groups and permissions</a>.</td><td>None</td><td><code>art-team</code>: Read, Build</td></tr>
+  </tbody>
+</table>
+<h2>Child Health metrics</h2>
+<p>Health metrics for the projects that a scan makes inside an Organization Folder.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Health metrics</td><td>The list of metrics, as in the project's own Health metrics.</td><td>Worst child health</td><td>-</td></tr>
+  </tbody>
+</table>
+<h2>Child Orphaned Item Strategy</h2>
+<p>What the repositories found by a scan do with branches that no longer exist in version control.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Strategy</td><td>Inherited, or Discard old items with days and number to keep.</td><td>Inherited</td><td>-</td></tr>
+  </tbody>
+</table>
+<h2>Child Scan Triggers</h2>
+<p>The scan triggers that the repositories get, for example scan periodically if not otherwise run.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Triggers</td><td>The list of scan triggers.</td><td>Periodically</td><td>Interval 1 day</td></tr>
+  </tbody>
+</table>
+<h2>Suppress automatic SCM triggering</h2>
+<p>Say which branches are built automatically and which only by hand.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Branch names to build automatically</td><td>A regular expression of branch names. Others can only be started by hand or by the API. To stop all automatic builds use <code>^$</code>.</td><td><code>.*</code></td><td><code>(?!release.*).*</code></td></tr>
+    <tr><td>Suppression strategy</td><td>For which events the matching branches are not triggered.</td><td>None</td><td>-</td></tr>
+  </tbody>
+</table>
+<h2>Problems and fixes</h2><table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>A section is missing</td><td>It belongs to a type of project that you do not have. The scan settings only show on a Multibranch Pipeline or Organization Folder.</td></tr>
+    <tr><td>I cannot save</td><td>Changing settings needs the Configure permission on the project.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="projects.html">Projects</a></li>
+  <li><a href="job-settings.html">Job settings</a></li>
+  <li><a href="settings-homes.html">Settings homes</a></li>
+</ul>
+</main>
+</body>
+</html>

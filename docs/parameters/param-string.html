@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>String parameter · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="parameters/param-string">
+<main class="doc">
+<h1>String parameter</h1>
+<p class="lead">A single line of text with a default value.</p>
+
+<h2>When to use it</h2>
+<p>Use it for short free text: a branch name, a version, a platform. A Text parameter with <strong>Any</strong> and no run dialog settings is saved as this type.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Parameters</strong>.</li>
+  <li>Click <strong>Add parameter</strong>.</li>
+  <li>Choose <strong>Value type › Text</strong>.</li>
+  <li>Type the <strong>Name</strong> and the <strong>Value</strong>.</li>
+  <li>Click <strong>Save</strong>. The Parameters tab saves as you work, so there is no other Save button.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+<thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>Name</td><td>The parameter name.</td><td>Empty</td><td><code>BRANCH</code></td></tr><tr><td>Default Value</td><td>Used when nobody types another value.</td><td>Empty</td><td><code>main</code></td></tr><tr><td>Description</td><td>Shown under the field in the Run dialog.</td><td>Empty</td><td>Stream to build</td></tr><tr><td>Trim the string</td><td>Cuts spaces and line breaks from both ends of the value. A String parameter from a Pipeline <code>parameters</code> block has this option.</td><td>Off</td><td>On</td></tr>
+</tbody>
+</table>
+
+<h2>A worked example</h2>
+<p>A parameter <code>BRANCH</code> with default <code>main</code>. A step uses <code>%BRANCH%</code>. For a release, someone types <code>release/1.4</code> in the Run dialog.</p>
+<h2>What you see when it runs</h2>
+<p>The Run dialog shows a text box with the default. The step receives the value as <code>%BRANCH%</code> and, for an <code>env.</code> parameter, as an environment variable.</p>
+<h2>Problems and fixes</h2>
+<table>
+<thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+<tbody>
+<tr><td>A space at the end of the value breaks a script</td><td>Tick <strong>Trim the string</strong>, or use a Text parameter with a Regex rule.</td></tr>
+</tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="parameters.html">Parameters</a></li>
+  <li><a href="param-references.html">Parameter references</a></li>
+  <li><a href="../running-builds/run-dialog.html">The Run dialog</a></li>
+</ul>
+</main>
+</body>
+</html>

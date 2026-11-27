@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Add a Linux or macOS agent · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/add-linux-mac-agent">
+<main class="doc">
+<h1>Add a Linux or macOS agent</h1>
+<p class="lead">Add a Linux server or a Mac as a build agent that runs as a service: systemd on Linux, launchd on macOS.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>You are an administrator in Buildspawn, and you can use <code>sudo</code> on the machine.</li>
+  <li>The machine can reach the server's address, for example <code>http://buildserver:8080/</code>.</li>
+  <li>You know the machine's CPU. Run <code>uname -m</code>: <code>x86_64</code> means x64 (Intel or AMD); <code>aarch64</code> or <code>arm64</code> means ARM64 (Apple silicon on a Mac).</li>
+  <li>Nothing else needs to be installed: the download includes Java.</li>
+</ul>
+
+<h2>Steps</h2>
+<ol class="steps">
+  <li>Open <strong>Agents</strong>, click <strong>New Node</strong>, type a name such as <code>linux-build-02</code>, choose <strong>Permanent Agent</strong> and click <strong>Create</strong>.</li>
+  <li>Set <strong>Remote root directory</strong> to a full path on the machine, for example <code>/opt/buildspawn-agent/work</code> on Linux or <code>/Users/build/buildspawn-agent/work</code> on a Mac. Add <strong>Labels</strong> such as <code>linux</code> or <code>macos</code>, and click <strong>Save</strong>.</li>
+  <li>Open the agent. Under <strong>Download the agent for this node</strong>, pick the CPU on the row for the machine's system: <strong>Apple silicon</strong> or <strong>Intel</strong> for macOS, <strong>x64</strong> or <strong>ARM64</strong> for Linux. The file name below changes to match. Click <strong>Download</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/how-to/add-windows-agent-2.png" alt="The agent page: Download the agent for this node, with a Windows row, a macOS row with Apple silicon and Intel buttons, and a Linux row with x64 and ARM64 buttons"><figcaption>Pick the CPU on the macOS or Linux row, then click Download.</figcaption></figure>
+
+<h3>On Linux</h3>
+<ol class="steps" start="4">
+  <li>Copy the zip to the machine and unzip it into <code>/opt</code>:
+<pre><code>sudo unzip buildspawn-agent-linux-x64-linux-build-02.zip -d /opt</code></pre></li>
+  <li>To try it first, run it in the foreground. Press <kbd>Ctrl</kbd> + <kbd>C</kbd> to stop:
+<pre><code>cd /opt/buildspawn-agent
+./run-agent.sh</code></pre></li>
+  <li>Install the systemd service:
+<pre><code>sudo ./install-service.sh</code></pre>
+  The zip already holds the server address. The script writes <code>/etc/systemd/system/buildspawn-agent.service</code>, then enables and starts it. The service runs as the user who ran <code>sudo</code>; add <code>--user build</code> to choose another account.</li>
+</ol>
+
+<h3>On macOS</h3>
+<ol class="steps" start="4">
+  <li>Copy the zip to the Mac and unzip it into your home folder:
+<pre><code>unzip buildspawn-agent-macos-aarch64-mac-build-01.zip -d ~</code></pre></li>
+  <li>To try it first, run <code>./run-agent.sh</code> in <code>~/buildspawn-agent</code>. Press <kbd>Ctrl</kbd> + <kbd>C</kbd> to stop.</li>
+  <li>Install the launchd service. Choose one:
+    <ul>
+      <li><code>./install-service.sh</code> as yourself: a LaunchAgent that runs while you are logged in. Use it for builds that need the screen, such as iOS simulators.</li>
+      <li><code>sudo ./install-service.sh</code>: a LaunchDaemon that starts at boot, with nobody logged in. Add <code>--user build</code> to run it as another account.</li>
+    </ul>
+  The service is named <code>com.buildspawn.agent</code>.</li>
+</ol>
+<div class="callout tip"><p>On both systems, <code>./install-service.sh --print</code> shows the systemd unit or the launchd plist and changes nothing.</p></div>
+<div class="callout warning"><p>The zip holds this agent's secret. The install script makes the settings file readable only by the service's account.</p></div>
+
+<h3>Watch it from the terminal</h3>
+<p>Every download holds a terminal program. Run it on the machine, or over SSH:</p>
+<pre><code>./bin/buildspawn-agent-tui</code></pre>
+<p>Press <kbd>1</kbd> to <kbd>8</kbd> to move between Overview, Builds, Connection log, Work folders, Service, Settings, Agent log and Certificates. Press <kbd>p</kbd> to pause the agent and <kbd>q</kbd> to leave. The agent keeps running. See <a href="../agents/agent-terminal.html">Agent terminal program</a>.</p>
+
+<h2>Check it worked</h2>
+<ol class="steps">
+  <li>Open <strong>Agents</strong>. The agent shows <strong>Idle</strong>, with Linux or macOS under its name and live CPU, memory and disk values.</li>
+  <li>On Linux, <code>systemctl status buildspawn-agent</code> shows <strong>active (running)</strong>.</li>
+  <li>On macOS, <code>launchctl list | grep buildspawn</code> lists <code>com.buildspawn.agent</code>.</li>
+  <li>The log is in <code>logs/agent.log</code> inside the agent folder.</li>
+</ol>
+
+<h2>Troubleshooting</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><em>cannot execute binary file</em> or <em>Exec format error</em>.</td><td>You picked the wrong CPU. Check <code>uname -m</code> and download the other zip.</td></tr>
+    <tr><td><em>ERROR: run with sudo</em> on Linux.</td><td>Run <code>sudo ./install-service.sh</code>. Without sudo, the script can't write the systemd unit.</td></tr>
+    <tr><td>macOS says the Java in the folder can't be opened.</td><td>The download was quarantined. Run <code>xattr -dr com.apple.quarantine ~/buildspawn-agent</code> and start again.</td></tr>
+    <tr><td>The agent connects but builds fail at once.</td><td>The service account can't write to <strong>Remote root directory</strong>. Give it the folder, for example <code>sudo chown -R build /opt/buildspawn-agent</code>.</td></tr>
+  </tbody>
+</table>
+<p>To stop the agent, run <code>./stop-agent.sh</code>. To remove the service, run <code>./uninstall-service.sh</code> (with <code>sudo</code> if you installed it with <code>sudo</code>).</p>
+
+<h2>Next steps</h2>
+<ul>
+  <li><a href="../agents/install-agent.html">Install an agent</a>: all downloads, self-registration and approval.</li>
+  <li><a href="add-windows-agent.html">Add a Windows build agent</a>.</li>
+  <li><a href="../agents/pools.html">Pools</a>: put the agent in the pool that builds its platform.</li>
+  <li><a href="../agents/windows-service.html">Agent service scripts</a> and <a href="admin-upgrade-agents.html">Upgrade agents</a>.</li>
+</ul>
+</main>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Build other build configurations · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="post-build/build-other">
+<main class="doc">
+<h1>Build other build configurations</h1>
+<p class="lead">Starts other build configurations when this build ends.</p>
+<h2>When to use it</h2>
+<p>Use it for a simple chain: after the code build, start the tests. For chains that must wait for each other and share files, use <a href="../projects/bc-dependencies.html">dependencies</a> instead. They are easier to follow, and a build is not started twice.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration, click <strong>Settings</strong>, then <strong>Post-build Actions</strong>. Click <strong>Add post-build action</strong> and choose <strong>Build other build configurations</strong>.</li>
+  <li>In <strong>Build configurations to build</strong> type the names, separated by commas.</li>
+  <li>Choose when to start them: only if this build is stable, even if unstable, or even if it fails.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Build configurations to build</td><td>Comma separated names (or paths such as <code>Game/Unit Tests</code>).</td><td>Empty</td><td><code>Unit Tests, Smoke Tests</code></td></tr>
+    <tr><td>Trigger only if build is stable</td><td>Start them only when this build succeeded.</td><td>Selected</td><td>Selected</td></tr>
+    <tr><td>Trigger even if the build is unstable</td><td>Start them when this build succeeded or was unstable.</td><td>Off</td><td>-</td></tr>
+    <tr><td>Trigger even if the build fails</td><td>Always start them.</td><td>Off</td><td>-</td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p>After <strong>Windows Build</strong> succeeds, <strong>Unit Tests</strong> and <strong>Smoke Tests</strong> start. If the build fails, they do not.</p><h2>What you see when it runs</h2>
+<p>The new builds show <em>Started by upstream build Windows Build #142</em>. The log of this build lists the builds it started.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>A name is not found</td><td>Check the spelling and the path. Names are relative to the project.</td></tr>
+    <tr><td>Builds start twice</td><td>Another trigger also starts them. Use only one way.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="overview.html">After the build: overview</a></li>
+  <li><a href="../projects/bc-post-build-actions.html">Post-build actions tab</a></li>
+  <li><a href="../running-builds/trigger-finish-build.html">Finish Build trigger</a></li>
+  <li><a href="../projects/bc-dependencies.html">Dependencies</a></li>
+</ul>
+</main>
+</body>
+</html>

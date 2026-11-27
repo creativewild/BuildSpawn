@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Docker · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/docker">
+<main class="doc">
+<h1>Docker</h1>
+<p class="lead">Runs the <code>docker</code> command: build an image, push it, or run any other docker command.</p>
+
+<h2>When to use it</h2>
+<p>Use it to build and push images, for example the image of your dedicated game server. The agent needs Docker running. To run a <em>step</em> inside a container instead, use <strong>Run step within container</strong> in any other runner.</p>
+
+<h2>How to set it up</h2>
+
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>. Type <code>Docker</code> in <strong>Filter step types</strong> if you like, then click the <strong>Docker</strong> tile (group <strong>Containers</strong>).</li>
+  <li>Type a <strong>Step name</strong>, for example <code>Build server image</code>.</li>
+  <li>Fill in the fields described below.</li>
+  <li>Optional: set <strong>Execute step</strong>, <strong>Conditions</strong> and <strong>Retry on failure</strong>. See <a href="step-list.html">The steps list and the step editor</a>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<figure class="shot small">
+  <img src="../../assets/shots/build-steps/docker.png" alt="The fields of the Docker step in the step editor">
+  <figcaption>The fields of the Docker step, as the step editor shows them.</figcaption>
+</figure>
+
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Command</strong></td><td><strong>Build an image</strong>, <strong>Push an image</strong> or <strong>Other command</strong>.</td><td>Build an image</td><td>Push an image</td></tr>
+    <tr><td><strong>Dockerfile source</strong></td><td><strong>File</strong>, <strong>URL</strong> or <strong>File content</strong>. Build only.</td><td>File</td><td>File</td></tr>
+    <tr><td><strong>Dockerfile</strong></td><td>Build only. Path of the Dockerfile. Empty uses the Dockerfile in the build context.</td><td>Empty</td><td><code>Docker/Server.Dockerfile</code></td></tr>
+    <tr><td><strong>Dockerfile URL</strong></td><td>Build only. An <code>http</code> or <code>https</code> address of a Dockerfile. It replaces the build context, which is then empty, so the Dockerfile cannot copy files. Put no user name or password in the address.</td><td>Empty</td><td><code>https://example.com/Dockerfile</code></td></tr>
+    <tr><td><strong>Dockerfile content</strong></td><td>Build only. The Dockerfile itself. It is written to a temporary file in the working directory, passed as <code>-f</code> and removed afterwards. Do not put a secret here: use a build argument from the environment.</td><td>Empty</td><td>A Dockerfile</td></tr>
+    <tr><td><strong>Image platform</strong></td><td>Build only. Passed as <code>--platform</code>, such as <code>linux/amd64</code> or <code>linux/arm64</code>. Empty builds for the platform of the Docker daemon.</td><td>Empty</td><td><code>linux/amd64</code></td></tr>
+    <tr><td><strong>Build context</strong></td><td>Build only. Folder to build from, relative to the working directory. Empty uses the working directory.</td><td>Empty</td><td><code>Builds/LinuxServer</code></td></tr>
+    <tr><td><strong>Tags</strong></td><td>Build only. One <code>name:tag</code> per line, each passed as <code>-t</code>.</td><td>Empty</td><td><code>registry.studio.example/skyforge/server:%build.number%</code></td></tr>
+    <tr><td><strong>Image</strong></td><td>Push only. The image to push, as <code>name:tag</code>. The agent must be signed in to the registry already.</td><td>Empty (required)</td><td><code>registry.studio.example/skyforge/server:57</code></td></tr>
+    <tr><td><strong>Arguments</strong></td><td>One argument per line. Each line stays one argument. For <strong>Other command</strong> this is everything after <code>docker</code>. Pass a secret through the environment.</td><td>Empty</td><td><code>--build-arg</code> then <code>CONFIG=Shipping</code></td></tr>
+    <tr><td><strong>Working directory, Environment variables, Test reports</strong></td><td>The same in every runner. See <a href="common-step-fields.html">Fields every runner has</a>. This runner has no container settings.</td><td></td><td></td></tr>
+  </tbody>
+</table>
+
+
+<h2>A worked example</h2>
+<p>Build the Linux server image from the staged build. Step name <code>Build server image</code>, <strong>Command</strong> <strong>Build an image</strong>, <strong>Dockerfile</strong> <code>Docker/Server.Dockerfile</code>, <strong>Build context</strong> <code>Builds/LinuxServer</code>, <strong>Tags</strong> <code>registry.studio.example/skyforge/server:%build.number%</code>. A second Docker step with <strong>Push an image</strong> pushes the same name.</p>
+
+<h2>What you see when it runs</h2>
+<p>The console shows <code>$ docker build -f … -t …</code> and Docker's build output, then <code>$ docker push …</code>.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong><em>The docker command was not found on this agent</em></strong></td><td>Install Docker there or put <code>docker</code> on the <code>PATH</code>.</td></tr>
+    <tr><td><strong><em>The Docker step has no command / no image name</em></strong></td><td>Fill in <strong>Arguments</strong> for Other command, or <strong>Image</strong> for push.</td></tr>
+    <tr><td><strong><em>The Docker build step is set to a Dockerfile written in the step, and it is empty</em></strong></td><td>Type the Dockerfile or change the source.</td></tr>
+    <tr><td><strong><em>The Dockerfile address must start with http:// or https://</em></strong></td><td>Fix the address and remove any user name or password.</td></tr>
+    <tr><td><strong><em>The image platform holds letters, digits, dot, dash, underscore, slash and comma only</em></strong></td><td>Use a value like <code>linux/arm64</code>.</td></tr>
+    <tr><td><strong>Push is denied</strong></td><td>Sign the agent in to the registry first, as the account the agent runs as.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="docker-compose.html">Docker Compose</a></li>
+  <li><a href="../how-to/steps-run-in-docker-container.html">Run steps in a Docker container</a></li>
+  <li><a href="runners.html">Runners</a></li>
+  <li><a href="common-step-fields.html">Fields every runner has</a></li>
+</ul>
+</main>
+</body>
+</html>

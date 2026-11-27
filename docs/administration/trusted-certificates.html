@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trusted certificates · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="administration/trusted-certificates">
+<main class="doc">
+<h1>Trusted certificates</h1>
+<p class="lead">Add your company’s root certificates, so that the server and its agents trust your internal Perforce, Git, proxy and artifact servers.</p>
+
+<p>When a server uses HTTPS or TLS, it shows a <em>certificate</em> that proves who it is. A <em>root CA</em> (certificate authority) is the company that signs such certificates. Java, which runs Buildspawn, knows the public root CAs. It does not know your own company’s root CA, so it refuses to connect to a server signed by it, with errors such as <em>PKIX path building failed</em>. This page fixes that.</p>
+<p>Buildspawn never changes the <code>cacerts</code> file of the Java it ships with, because an upgrade would replace it. It keeps its own folder of certificates instead.</p>
+
+<h2>When to use it</h2>
+<p>Use it when a build or a plugin fails to reach an internal server because the certificate is not trusted: a Perforce server over SSL, a Git server, a package feed, or a proxy that re-signs traffic. To do the whole job with an example, follow <a href="../how-to/admin-trust-root-ca.html">Trust your company’s root CA</a>.</p>
+
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Ask your IT team for the root certificate (a <code>.crt</code>, <code>.cer</code>, <code>.pem</code>, <code>.der</code> or <code>.p7b</code> file) and for its <strong>SHA-256 fingerprint</strong> (a code like <code>3F:9A:C1:07:…</code>).</li>
+  <li>Open <strong>Settings › Security › Trusted certificates</strong> (<code>/manage/trustedCertificates/</code>). Only administrators see it.</li>
+  <li>Click <strong>Add certificates</strong>.</li>
+  <li>Paste the certificate text, or click <strong>Choose file…</strong> and pick the file.</li>
+  <li>Each certificate found appears as a card. Compare its <strong>SHA-256</strong> with the one from your IT team. Untick any you do not want.</li>
+  <li>Click <strong>Add 1 certificate</strong> (or <strong>Add n certificates</strong>).</li>
+  <li>Click <strong>Restart the server</strong> in the yellow bar, at a time that suits you. Java reads trusted certificates only when it starts.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/administration/trusted-certificates.png" alt="The Trusted certificates page with the Added to this server table, the Windows certificate store switch and the Agents table">
+  <figcaption>The Trusted certificates page.</figcaption>
+</figure>
+<div class="callout note"><p>The page shows <em>Restart needed</em> as long as the certificates on disk differ from what the running server loaded.</p></div>
+
+<h2>The page</h2>
+<h3>Added to this server</h3>
+<p>A table of the certificates you added, with a count such as <em>3 · plus 117 built into Java</em>. Until you add one it says <em>No certificates added yet. The server trusts the certificates built into Java.</em></p>
+<table>
+  <tr><th>Column or button</th><th>What it shows or does</th></tr>
+  <tr><td><strong>Name</strong></td><td>The subject of the certificate (its common name).</td></tr>
+  <tr><td><strong>Issued by</strong></td><td>Who signed it.</td></tr>
+  <tr><td><strong>Expires</strong></td><td>The last day it is valid. An <strong>Expired</strong> badge shows if the date has passed.</td></tr>
+  <tr><td><strong>SHA-256</strong></td><td>The fingerprint, shortened. A copy button copies the whole thing.</td></tr>
+  <tr><td><strong>Added on</strong>, <strong>Added by</strong></td><td>When and by whom.</td></tr>
+  <tr><td><strong>Add certificates</strong></td><td>Opens the add dialog.</td></tr>
+  <tr><td><strong>Remove</strong></td><td>Tick one or more rows, then click it. It asks <em>Remove … ? The server stops trusting it after the next restart.</em></td></tr>
+  <tr><td><strong>View</strong></td><td>Tick one row to see all its details.</td></tr>
+</table>
+
+<h3>The Add certificates dialog</h3>
+<p>You can paste text that has one or more <code>-----BEGIN CERTIFICATE-----</code> blocks (other text around them is ignored), or choose a file of these types: <code>.pem</code>, <code>.crt</code>, <code>.cer</code>, <code>.der</code> and <code>.p7b</code> (also <code>.p7c</code>). Text (Base64) and binary files both work. A file that holds a whole chain adds every certificate in it. The dialog closes only with <strong>Cancel</strong>, <kbd>Esc</kbd> or the add button. Nothing is added until you press the button.</p>
+<p>Each certificate found shows its name, who issued it, its dates and its full SHA-256 fingerprint, with a reminder to compare it with your IT team. It also gets badges:</p>
+<table>
+  <tr><th>Badge</th><th>Meaning</th><th>What happens</th></tr>
+  <tr><td><strong>Root CA</strong></td><td>A certificate authority that signed itself.</td><td>Ticked, can be added.</td></tr>
+  <tr><td><strong>Intermediate CA</strong></td><td>A certificate authority signed by another one.</td><td>Ticked, can be added.</td></tr>
+  <tr><td><strong>Not a CA certificate</strong></td><td>The certificate of one server, not of an authority. A warning explains that you trust a single server certificate, and that it must be replaced when the server’s certificate changes.</td><td>Can be added after the warning.</td></tr>
+  <tr><td><strong>Expired</strong></td><td>The valid-until date has passed.</td><td>Not ticked by default. You can still tick it.</td></tr>
+  <tr><td><strong>Already trusted, skipped</strong></td><td>It is already in your added list or is built into Java.</td><td>Never added twice.</td></tr>
+</table>
+<p>Messages you may see: <em>1 certificate found</em> or <em>n certificates found</em>; <em>No certificate found. Paste text that starts with -----BEGIN CERTIFICATE----- or choose a certificate file.</em>; and <em>This is a private key. Buildspawn only needs the public certificate; the key was not kept.</em> Buildspawn refuses the whole text if it holds a private key, never keeps it, and clears the box.</p>
+
+<h3>Windows certificate store</h3>
+<p>Shown only when the server runs on Windows. The switch <strong>Also trust Windows’ certificate store</strong> makes Java trust the roots that Windows trusts. It is for companies whose IT team pushes the root certificate to every computer with group policy. No import is needed. It is off by default.</p>
+
+<h3>Agents</h3>
+<p>The switch <strong>Send these to agents</strong> sends the added certificates to every agent. The agent adds them to its own trust folder and restarts after its current build, so that it trusts them too. It is on by default. A table lists every agent:</p>
+<table>
+  <tr><th>Column</th><th>What it shows</th></tr>
+  <tr><td><strong>Agent</strong>, <strong>Platform</strong>, <strong>Agent version</strong></td><td>Which agent, its system and its version.</td></tr>
+  <tr><td><strong>Certificates</strong></td><td>The state, in the table below.</td></tr>
+  <tr><td><strong>Note</strong></td><td>What happens next.</td></tr>
+</table>
+<table>
+  <tr><th>State</th><th>Meaning</th></tr>
+  <tr><td><strong>Up to date</strong></td><td>The agent loaded the same set as the server sent. The note says when it received them.</td></tr>
+  <tr><td><strong>Waiting for restart</strong></td><td>The agent got the certificates but has not restarted. It restarts when it is idle, or after its current build (the note names the build). If it cannot restart by itself, the note says <em>Restart the agent to use them.</em></td></tr>
+  <tr><td><strong>Older agent</strong></td><td>The agent is too old to take certificates. Update it to 1.9 or later.</td></tr>
+  <tr><td><strong>Offline</strong></td><td>The agent gets them when it connects.</td></tr>
+  <tr><td><strong>Sending</strong></td><td>The server is sending them now.</td></tr>
+</table>
+<p>With the switch off, <em>Agents keep only their own certificates.</em> The cards have <strong>Save</strong> and <strong>Cancel</strong> buttons. Click <strong>Save</strong> after you change a switch.</p>
+
+<h2>The expiry notice</h2>
+<p>An administrator notice appears on the Settings overview when an added certificate expires within 30 days, or has expired. It names the certificate and links here. Add the new certificate from your IT team before the date.</p>
+
+<h2>Where the files are</h2>
+<pre class="terminal" data-title="Buildspawn home folder">trust/
+  trust.properties       windowsStore=true|false, sendToAgents=true|false
+  added/
+    &lt;SHA-256&gt;.pem        one certificate
+    &lt;SHA-256&gt;.properties who added it, when, and from where (web, launcher or cli)</pre>
+<p>Agents have the same layout in their work folder (<code>trust/</code>), with one more folder, <code>from-server/</code>, that the server replaces each time it sends. The server and agents read these folders only when they start. A bad or unreadable file is skipped with one warning in the log. It never stops the start.</p>
+
+<h2>Other places to manage certificates</h2>
+<table>
+  <tr><th>Where</th><th>What you can do</th></tr>
+  <tr><td>The terminal: <code>buildspawn certs</code></td><td>Works on the local server’s folder. See the next section.</td></tr>
+  <tr><td>The Windows launcher, tab <strong>Certificates</strong></td><td>Shows <strong>Certificates you added</strong>, with <strong>Add…</strong>, <strong>Remove</strong>, <strong>View…</strong> and <strong>Copy fingerprint</strong>, the switch <strong>Also trust Windows’ certificate store</strong>, and <strong>Restart now</strong>. See <a href="windows-launcher.html">Windows launcher</a>.</td></tr>
+  <tr><td>The agent tray app, tab <strong>Certificates</strong></td><td>Two lists: <strong>From the server</strong> (sent by the server, read-only) and <strong>Added on this machine</strong> (<strong>Add…</strong>, <strong>Remove</strong>, <strong>View…</strong>). <strong>Restart agent now</strong> applies them. See <a href="../agents/windows-tray-app.html">Windows tray app</a>.</td></tr>
+</table>
+
+<h3>The terminal command</h3>
+<table>
+  <tr><th>Command</th><th>What it does</th></tr>
+  <tr><td><code>buildspawn certs list</code></td><td>Shows the trust folder, the Windows store setting, the added certificates and whether a restart is needed.</td></tr>
+  <tr><td><code>buildspawn certs add &lt;file&gt;</code></td><td>Reads <code>.pem</code>, <code>.crt</code>, <code>.cer</code>, <code>.der</code>, <code>.p7b</code> or <code>.p7c</code>. It shows each certificate (name, issuer, dates, SHA-256, badges) and asks <code>[y/N]</code> before it adds. Use <code>-</code> as the file to read text from standard input; that needs <code>--yes</code>.</td></tr>
+  <tr><td><code>buildspawn certs remove &lt;fingerprint or name&gt;</code></td><td>Removes one. You can give the start of the fingerprint, with or without colons. If several match, it lists them.</td></tr>
+  <tr><td><code>buildspawn certs windows-store on|off</code></td><td>Turns the Windows store switch on or off. Windows only.</td></tr>
+  <tr><td><code>--yes</code></td><td>Do not ask.</td></tr>
+  <tr><td><code>--include-expired</code></td><td>With <code>add</code>: also add expired certificates.</td></tr>
+  <tr><td><code>--home DIR</code></td><td>The Buildspawn home folder, when it cannot be found from the settings file.</td></tr>
+</table>
+<pre class="terminal" data-title="buildspawn"><span class="t-dim">$</span> buildspawn certs add studio-root-ca.crt
+Found 1 certificate in studio-root-ca.crt.
+
+Studio Root CA   <span class="t-green">Root CA</span>
+  Issued by  Studio Root CA
+  Valid      2024-03-01 to 2034-03-01
+  SHA-256    3F:9A:C1:07:…
+
+SHA-256. Compare this with your IT team before you continue.
+Add 1 certificate? [y/N] y
+Added 1 certificate. Changes take effect when the server starts again.</pre>
+<p>See also <a href="server-terminal.html">Server terminal</a>.</p>
+
+<h2>A worked example</h2>
+<p>Nightlight Games runs Perforce over SSL with a certificate signed by <em>Nightlight Root CA</em>. Builds fail with <em>PKIX path building failed</em>. The administrator downloads <code>nightlight-root-ca.crt</code> from the IT portal, adds it on this page and checks the fingerprint against the portal. The yellow bar says <em>Restart needed</em>. After a night-time restart the server connects. Four agents are listed as <strong>Waiting for restart</strong>, and a few minutes later each says <strong>Up to date</strong>. One old agent says <strong>Older agent</strong> and is upgraded.</p>
+
+<h2>What you see when it runs</h2>
+<ul>
+  <li>The yellow bar <strong>Restart needed</strong> until the server starts again, with a button <strong>Restart the server</strong>.</li>
+  <li>Agent rows change from <strong>Sending</strong> to <strong>Waiting for restart</strong> to <strong>Up to date</strong>.</li>
+  <li>After the restart, connections to the internal server work and the PKIX errors are gone.</li>
+</ul>
+
+<h2>Problems and fixes</h2>
+<table>
+  <tr><th>Problem</th><th>What to do</th></tr>
+  <tr><td>The errors continue after you added the certificate.</td><td>Restart the server. Java reads the certificates only at start. Do the same for agents (see <strong>Waiting for restart</strong>).</td></tr>
+  <tr><td>You added a server certificate and it stopped working later.</td><td>It was <strong>Not a CA certificate</strong>. When the server gets a new certificate, add the new one, or add the root that signed it.</td></tr>
+  <tr><td>An agent says <strong>Older agent</strong>.</td><td>Update the agent to 1.9 or later.</td></tr>
+  <tr><td>An agent says <strong>Waiting for restart</strong> for a long time.</td><td>It restarts when idle. If the note says <em>Restart the agent to use them</em>, restart it yourself.</td></tr>
+  <tr><td>Adding a file says <em>No certificate found</em>.</td><td>The file is not a certificate. Ask IT for the public certificate, not a key or a <code>.pfx</code> file.</td></tr>
+  <tr><td>The notice says a certificate expires soon.</td><td>Get the new one from IT, add it, and remove the old one.</td></tr>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../how-to/admin-trust-root-ca.html">Trust your company’s root CA</a></li>
+  <li><a href="security-settings.html">Security settings</a></li>
+  <li><a href="windows-launcher.html">Windows launcher</a></li>
+  <li><a href="../agents/windows-tray-app.html">Windows tray app</a></li>
+  <li><a href="../agents/agent-terminal.html">Agent terminal</a></li>
+  <li><a href="server-terminal.html">Server terminal</a></li>
+</ul>
+</main>
+</body>
+</html>

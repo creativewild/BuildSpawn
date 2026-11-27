@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Re-run a build · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="running-builds/rerun">
+<main class="doc">
+<h1>Re-run a build</h1>
+<p class="lead">Run a finished build again with exactly the same code and parameters, or change some of them first.</p>
+
+<p>Every finished build can be re-run, whatever its result: successful, failed, unstable, stopped or personal. A re-run is a new build with a new number. You need the permission to run the build configuration.</p>
+
+<h2>Re-run</h2>
+<ol class="steps">
+  <li>Open the build, for example <strong>Windows Build #6</strong>.</li>
+  <li>Click <strong>Re-run</strong>, the main button at the top right.</li>
+</ol>
+<p>You can also use the <strong>⋯</strong> menu of a row in the build history: it has <strong>Re-run</strong> and <strong>Re-run with changes</strong>.</p>
+<p>A re-run builds <strong>the same sources</strong> as the original:</p>
+<ul>
+  <li>the same Git commit and the same Perforce changelist, for every root;</li>
+  <li>the same shelves, for a personal build;</li>
+  <li>the same parameters, passwords included (reused, never shown);</li>
+  <li>by default, the same dependency builds.</li>
+</ul>
+<p>If a revision no longer exists, for example a deleted branch, the re-run stops with a clear message instead of building something else.</p>
+<p>The new build says <em>Re-run of #6 by &lt;you&gt;</em> with a link to the original and lists its sources. The original lists its re-runs.</p>
+<div class="callout note"><p>A re-run uses the build configuration's <strong>current</strong> settings and steps, not the ones from the time of the original. File parameters are not reused.</p></div>
+
+<h2>Re-run with changes</h2>
+<p>Use this when you want the same build, but with one thing different: another changelist, another value, another shelf.</p>
+<ol class="steps">
+  <li>Open the build.</li>
+  <li>Click the button with the sliders beside <strong>Re-run</strong>. Its tooltip says <em>Re-run with changes…</em>.</li>
+  <li>The <strong>Re-run</strong> dialog opens, filled in from the original. Change what you need (see below).</li>
+  <li>Click <strong>Re-run</strong>. Click <strong>Cancel</strong> to close without starting anything.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/running-builds/rerun-dialog.png" alt="The Re-run #7 dialog of the Windows Build with the Start from step choices, the Agent list, the queue and clean checkout options, a Comment box and the Re-run button">
+  <figcaption>The Re-run dialog has the same tabs as the <a href="run-dialog.html">Run dialog</a>, filled in from build #6.</figcaption>
+</figure>
+<table>
+  <thead><tr><th>Tab</th><th>What you can change</th></tr></thead>
+  <tbody>
+    <tr><td><strong>General</strong></td><td>The agent, queue top, clean checkout and comment, as in the Run dialog. For each Git root a <strong>Source</strong> row: <em>Same as #6</em>, <em>Latest</em>, or <em>Other commit…</em> (a commit, tag or branch such as <code>main</code>). For dependencies: <em>Reuse the dependency builds of #6</em>, or rebuild them.</td></tr>
+    <tr><td><strong>Parameters</strong></td><td>The values of the original. Change any of them.</td></tr>
+    <tr><td><strong>Changes</strong></td><td>For Perforce: the original changelist, the latest, or another changelist.</td></tr>
+    <tr><td><strong>Shelved changes</strong></td><td>Pick other shelves, or remove the original's shelf.</td></tr>
+  </tbody>
+</table>
+<p>The agent, queue position, clean checkout and comment are not taken from the original. Choose them again if you need them.</p>
+
+<h2>Resume a failed build</h2>
+<p>A failed or stopped build can also be <strong>resumed</strong>: the new build starts at the failed step and reuses the sources, agent and workspace of the original, instead of running every step again. That is much faster for a long build that failed near the end. When resume is not possible, the main button changes to <strong>Re-run from the start</strong>. In the Re-run dialog of such a build, <strong>Start from step</strong> lets you choose <em>The beginning</em> (a re-run) or a step (a resume). See <a href="resume.html">Resume a build</a> and <a href="../build-steps/resume-and-retry.html">Resume and retry</a>.</p>
+<figure class="shot">
+  <img src="../../assets/shots/running-builds/rerun-dialog-failed.png" alt="The Re-run #3 dialog of a failed build, with Start from step, The beginning, the blue summary box and the message that resume is not available because the agent is offline">
+  <figcaption>The Re-run dialog of a failed build. Here the agent is offline, so only <em>The beginning</em> can be chosen.</figcaption>
+</figure>
+
+<h2>Re-run a Matrix combination</h2>
+<p>For a build with a Matrix block, the build page shows a grid of the results. Each combination has its own <strong>Re-run</strong>. See <a href="parallel-and-composite.html">Parallel and composite builds</a>.</p>
+
+<h2>Re-run a shared personal build</h2>
+<p>Someone who views a personal build only through a share link cannot re-run it. See <a href="shared-builds.html">Shared builds</a>.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <tr><th>Problem</th><th>What to do</th></tr>
+  <tr><td>The re-run stops with a message about a revision.</td><td>The revision no longer exists, for example a deleted branch. Re-run with changes and pick <em>Latest</em> or another commit.</td></tr>
+  <tr><td>There is no Re-run button.</td><td>You may not run this build configuration, or you only view a shared personal build.</td></tr>
+  <tr><td>The re-run behaves differently from the original.</td><td>It uses the build configuration's current steps and settings. File parameters are not reused.</td></tr>
+</table>
+
+<h2>Tips</h2>
+<ul>
+  <li>Re-run a failed build to check whether a failure is flaky: same code, same values.</li>
+  <li>Use <em>Latest</em> on the Source row to build today's code with last week's parameters.</li>
+  <li>To retry failed builds on their own, add a <strong>Retry build trigger</strong>. See <a href="triggers.html">Triggers</a>.</li>
+</ul>
+</main>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clean a Perforce workspace · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/game-clean-workspace">
+<main class="doc">
+<h1>Clean a Perforce workspace</h1>
+<p class="lead">Remove old build output and restore changed files before a build, with a safety limit so a wrong path cannot wipe a big workspace.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>A build configuration that uses a <a href="../version-control/perforce-roots.html">Perforce root</a>.</li>
+  <li>You know what to keep. In an Unreal Engine project, <code>Intermediate/</code>, <code>Saved/</code> and <code>DerivedDataCache</code> are slow to rebuild, so they are usually kept.</li>
+</ul>
+
+<h2>Steps</h2>
+<h3>Clean only what you choose</h3>
+<ol class="steps">
+  <li>Open <strong>Settings › Build steps</strong> and click <strong>Add build step</strong>. Add <strong>Perforce operations</strong>.</li>
+  <li>Name it <code>Clean workspace</code> and click the <strong>Clean</strong> card.</li>
+  <li>In <strong>Files</strong> type the folder, for example <code>//skyforge-win64-${NODE_NAME}/Game/...</code>. If you leave it empty, the whole workspace is cleaned and the form warns you.</li>
+  <li>Leave <strong>Added files</strong>, <strong>Edited files</strong> and <strong>Deleted files</strong> on.</li>
+  <li>Leave <strong>Ignore .p4ignore</strong> off, so the files your <code>.p4ignore</code> lists are kept.</li>
+  <li>In <strong>Fail if more files would be deleted than</strong> type <code>2000</code>.</li>
+  <li>Drag the step to the top, then click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/how-to/game-clean-workspace-step.png" alt="The Perforce operations step with the Clean operation chosen"><figcaption>The Perforce operations step with Clean chosen.</figcaption></figure>
+<h3>Try it first</h3>
+<p>Tick <strong>Preview only</strong> and run the build. The log counts the files that would be deleted, restored and refreshed, and changes nothing. Then turn it off.</p>
+
+<h3>Or clean in the root</h3>
+<p>On the <a href="../version-control/perforce-roots.html">Perforce root</a>, set <strong>How to sync</strong> to <strong>Auto Clean</strong> to clean at every checkout, or switch on <strong>Remove the workspace after each build</strong> for a fresh workspace every time. For one clean build, use the build configuration action that enforces a clean checkout; the next build then starts with an empty workspace.</p>
+
+<h2>Check it worked</h2>
+<pre class="terminal" data-title="build log">$ p4 clean -a -e -d //skyforge-win64-win-build-01/Game/...
+deleted: 214 files
+restored: 0 files
+refreshed: 3 files</pre>
+<p>The counts tell you what happened. The next compile step finds a clean tree.</p>
+
+<h2>Troubleshooting</h2>
+<table>
+  <thead><tr><th>You see</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><em>Clean would delete N files, more than the limit</em></td><td>Nothing was deleted. Check the <strong>Files</strong> path. Raise the limit if the number is right.</td></tr>
+    <tr><td>The cache is gone after every build</td><td>Switch <strong>Ignore .p4ignore</strong> off and list the cache folders in <code>.p4ignore</code>.</td></tr>
+    <tr><td>The step cannot run</td><td>The build configuration needs a Perforce root. See <a href="../version-control/perforce-operations.html">Perforce operations</a>.</td></tr>
+  </tbody>
+</table>
+
+<h2>Next steps</h2>
+<div class="cards">
+  <a class="card" href="../version-control/perforce-operations.html"><h3>Perforce operations</h3><p>All operations.</p></a>
+  <a class="card" href="build-unreal-from-perforce.html"><h3>Build an Unreal Engine game</h3><p>Sync, cook and package.</p></a>
+</div>
+</main>
+</body>
+</html>

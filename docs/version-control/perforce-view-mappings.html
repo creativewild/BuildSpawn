@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>View Mappings · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="version-control/perforce-view-mappings">
+<main class="doc">
+<h1>View Mappings</h1>
+<p class="lead">The View Mappings editor says which depot files a Perforce workspace gets and where they go on the agent.</p>
+
+<h2>When to use it</h2>
+<p>You use it whenever a workspace is not a plain stream: the <strong>Client mapping</strong> card of a <a href="perforce-roots.html">Perforce root</a>, and <strong>View Mappings</strong> in a manual workspace of <a href="perforce-software.html">Perforce Software</a>. A <em>view</em> is a list of lines. Each line maps a depot path to a path in the workspace. Game depots are big, so a good view saves sync time: a cook job only needs <code>Content</code> and <code>Config</code>.</p>
+
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the root or the manual workspace settings and find <strong>View Mappings</strong> (or <strong>Client mapping</strong>).</li>
+  <li>Click <strong>Add mapping</strong>, or use <strong>Quick add</strong> for a ready-made set of lines.</li>
+  <li>For each row, choose the <strong>Mode</strong>, type the <strong>Depot path</strong>, or click the folder button to browse the depot. The <strong>Workspace path</strong> fills in from the depot path and the workspace name. You can change it.</li>
+  <li>Drag the handle of a row to move it. <strong>Later lines win.</strong></li>
+  <li>Open <strong>Preview what the workspace gets</strong> to check the result.</li>
+  <li>Click <strong>Save</strong> on the page.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/version-control/perforce-view-mappings.png" alt="The Client mapping table with four rows, one of them an exclusion, and the Quick add buttons"><figcaption>The view mapping table.</figcaption></figure>
+
+<h2>The table</h2>
+<table>
+  <thead><tr><th>Column</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td>Drag handle and line number</td><td>Drag to reorder. A later line wins over an earlier one.</td></tr>
+    <tr><td><strong>Mode</strong></td><td><strong>Include</strong> maps the path. <strong>Exclude</strong> leaves it out (a <code>-</code> in front of the line). <strong>Overlay</strong> adds the files on top of earlier lines, in the same place (a <code>+</code> in front).</td></tr>
+    <tr><td><strong>Depot path</strong></td><td>Starts with <code>//</code>. It has a folder button to browse the depot and suggests paths as you type.</td></tr>
+    <tr><td><strong>Workspace path</strong></td><td>Starts with <code>//&lt;workspace name&gt;/</code>. In a root, write <code>//${P4_CLIENT}/</code>, which stands for the workspace name of each build. Wildcards <code>...</code>, <code>*</code> and <code>%%1</code> must match on both sides. Paths with spaces get quotes for you.</td></tr>
+  </tbody>
+</table>
+<p>The editor checks each row and says what is wrong, for example a depot path that does not start with <code>//</code>, or a workspace path of another workspace.</p>
+
+<h2>Quick add</h2>
+<table>
+  <thead><tr><th>Button</th><th>What it adds</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Skip Saved, Intermediate, DerivedDataCache</strong></td><td>Exclude rows after your includes, so they win.</td></tr>
+    <tr><td><strong>Content only (cook job)</strong></td><td>Only <code>Content</code> and <code>Config</code> come down.</td></tr>
+    <tr><td><strong>Source only</strong></td><td>Code and project files, no Content.</td></tr>
+    <tr><td><strong>Skip Binaries and Platforms</strong></td><td>Leaves out built output and platforms you do not build.</td></tr>
+    <tr><td><strong>Engine and game</strong></td><td>Game, Engine and Shared into the workspace root.</td></tr>
+    <tr><td><strong>Whole depot, one folder</strong></td><td>Every folder of the depot, under its own name.</td></tr>
+  </tbody>
+</table>
+<p>Type the <strong>Game folder in the depot</strong>, for example <code>//depot/Skyforge</code>, so the rows use it.</p>
+
+<h2>Text view and pasting</h2>
+<p>The <strong>Text</strong> view shows the same lines as plain text, one mapping per line: depot path, a space, workspace path. The table and the text stay in step. Lines that start with <code>#</code> are comments and are kept. Lines the table cannot show stay as text until you fix them. <strong>Paste from a client spec</strong> takes the <code>View:</code> lines of a workspace spec.</p>
+
+<h2>Preview</h2>
+<p><strong>Preview what the workspace gets</strong> has two parts.</p>
+<ul>
+  <li><strong>Check paths:</strong> type a depot path and the editor shows which line decides about it and where the file lands. This runs in Buildspawn, with no call to the server.</li>
+  <li><strong>Count from the server:</strong> asks the server for the size and number of files of each line, with a sample of files. Use <strong>Count again</strong> after a change. The server cannot subtract excludes from includes, so the counts of lines are shown side by side.</li>
+</ul>
+
+<h2>Streams, Limit View and Change View</h2>
+<ul>
+  <li>On a stream workspace the view comes from the stream and is shown read only under <strong>From the stream</strong>, with the share, import and exclude tags.</li>
+  <li><strong>Limit View</strong> (manual workspaces) restricts the paths of the view. It is a list of single paths. Use exclusion lines starting with <code>-</code> to leave out paths or file types. It is useful for streams, where the view cannot be edited.</li>
+  <li><strong>Change View</strong> restricts depot paths to a point in time, for example <code>//depot/path/...@1000</code>. Files that match cannot be submitted.</li>
+</ul>
+
+<h2>A worked example</h2>
+<p>A cook build for Skyforge only needs content. Workspace name <code>skyforge-cook-${NODE_NAME}</code>:</p>
+<pre><code>//depot/Skyforge/Content/... //skyforge-cook-${NODE_NAME}/Content/...
+//depot/Skyforge/Config/... //skyforge-cook-${NODE_NAME}/Config/...
+-//depot/Skyforge/Content/Movies/... //skyforge-cook-${NODE_NAME}/Content/Movies/...</code></pre>
+<p>The last line leaves out the cinematics folder. Because later lines win, it overrides the first line for that folder.</p>
+
+<h2>What you see when it runs</h2>
+<p>The sync only transfers files the view maps. The log of the sync shows the workspace name with the agent's name filled in.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>You see</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>A row is marked as wrong</td><td>Read the message on the row. Usual causes: the depot path does not start with <code>//</code>, or the workspace path does not start with the workspace name.</td></tr>
+    <tr><td>Two agents share one workspace</td><td>Put <code>${NODE_NAME}</code> in the workspace name and in the right side of every line.</td></tr>
+    <tr><td>The file count is bigger than expected</td><td>An exclude line must come after the include it removes. Check the order.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="perforce-roots.html">Perforce roots</a>, <a href="perforce-software.html">Perforce Software</a>, <a href="perforce-streams.html">Streams</a></li>
+</ul>
+</main>
+</body>
+</html>

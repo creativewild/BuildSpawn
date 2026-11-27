@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Several roots · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="version-control/several-roots">
+<main class="doc">
+<h1>Several roots</h1>
+<p class="lead">Check out more than one repository or depot in one build, each into its own folder.</p>
+
+<h2>When to use it</h2>
+<p>Use it when a build needs code from more than one place: the game in Perforce and a tools repository in Git, or two Perforce roots such as game and engine. A <strong>root</strong> is one repository or depot a build checks out.</p>
+
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Version Control</strong>.</li>
+  <li>Choose <strong>Several roots</strong>. Your present root moves into a card named <code>root1</code>. A yellow note reminds you that build steps now find its files in <code>root1/</code>, for example <code>root1/build.sh</code>. Files already at the top of the workspace are not deleted.</li>
+  <li>Click <strong>Add root</strong> to add a card.</li>
+  <li>On each card click <strong>Edit root</strong> and choose the <strong>Version control</strong> (<strong>Git</strong>, <strong>Perforce Software</strong> or <strong>Perforce root</strong>), then fill in its settings.</li>
+  <li>Set the <strong>Checkout directory</strong> of each card. Use <strong>Move up</strong> and <strong>Move down</strong> to set the order.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/version-control/several-roots.png" alt="The Several roots option with two root cards, main and release"><figcaption>Several roots with two root cards.</figcaption></figure>
+<p>To go back to one root, remove cards until one is left. The build configuration then keeps that root at the top of the workspace and the directory is dropped.</p>
+
+<h2>Every field of a root card</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Name</strong></td><td>The name of the root in the lists. Under <strong>Edit root</strong>.</td><td>The version control type, or the directory</td><td><code>Engine</code></td></tr>
+    <tr><td><strong>Version control</strong></td><td>The kind of root. Under <strong>Edit root</strong>.</td><td></td><td>Git</td></tr>
+    <tr><td><strong>Checkout directory</strong></td><td>Relative to the workspace. Each root needs its own folder, not inside another root.</td><td><code>root1</code> for the moved root</td><td><code>tools</code></td></tr>
+    <tr><td><strong>Poll this root for changes</strong></td><td>Whether a change in this root starts a build.</td><td>On</td><td>On</td></tr>
+    <tr><td><strong>Move up</strong>, <strong>Move down</strong>, <strong>Edit root</strong>, <strong>Remove</strong></td><td>Order, edit the root's own settings, or delete the card.</td><td></td><td></td></tr>
+  </tbody>
+</table>
+<p>Each root keeps the rules of its own version control. Perforce roots take view lines or checkout rules, so only those files are synced. Git roots check out the whole repository: path filters only limit which commits count as changes, unless you add sparse checkout.</p>
+
+<h2>Variables of several roots</h2>
+<ul>
+  <li>Each root adds its variables with its number at the end: <code>GIT_COMMIT_1</code>, <code>P4_CHANGELIST_2</code>. The first root that sets a variable also sets the plain name, such as <code>GIT_COMMIT</code>, so steps that read the plain name still work.</li>
+  <li><code>VCS_ROOT_DIR_1</code>, <code>VCS_ROOT_DIR_2</code>, … say where each root is. Put the root you want to be "first" at the top.</li>
+  <li>With two Perforce roots, each gets its own workspace. Add something to the name, for example <code>-root2</code>.</li>
+  <li><strong>Changes</strong> are grouped by root, and the build page shows all roots together. You can view changes by time or by root. A change in one root starts a build without noise from the others.</li>
+</ul>
+<div class="callout note"><p>Two branches of the same Git repository as two roots of one build configuration are not supported. Use one root and fetch the second branch in a step, or use two build configurations.</p></div>
+<div class="callout note"><p>With several Perforce roots, unshelving uses the first Perforce root and the label feature labels the last one. Choose the root in the <strong>VCS labeling</strong> feature.</p></div>
+
+<h2>A worked example</h2>
+<p>The Skyforge build checks out the game from Perforce into <code>game</code> and the shared tools from Git into <code>tools</code>.</p>
+<table>
+  <tbody>
+    <tr><td>Root 1, Perforce root <code>skyforge-main</code></td><td><strong>Checkout directory</strong> <code>game</code></td></tr>
+    <tr><td>Root 2, Git <code>https://git.studio.example/skyforge/tools.git</code>, <code>*/main</code></td><td><strong>Checkout directory</strong> <code>tools</code></td></tr>
+  </tbody>
+</table>
+<p>A PowerShell step runs <code>tools\pack.ps1 -Source game -Changelist $env:P4_CHANGELIST</code>.</p>
+
+<h2>What you see when it runs</h2>
+<p>The log shows each root being checked out in turn. The build page lists the changes of both roots, with the root name on each change.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>You see</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>Steps cannot find files after adding a second root</td><td>The files moved to the root's directory. Change the step paths, for example <code>root1/build.sh</code>.</td></tr>
+    <tr><td>A message that a directory is not allowed</td><td>A directory must be relative, and not inside another root's directory.</td></tr>
+    <tr><td>Both Perforce roots fight over a workspace</td><td>Each root needs its own client; add something to one of the names.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="git.html">Git</a>, <a href="perforce-roots.html">Perforce roots</a>, <a href="vcs-parameters.html">Version control parameters</a>, <a href="../projects/templates.html">Templates</a></li>
+</ul>
+</main>
+</body>
+</html>

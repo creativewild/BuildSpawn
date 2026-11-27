@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sign in with Entra ID · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/admin-sign-in-entra-id">
+<main class="doc">
+<h1>Sign in with Entra ID</h1>
+<p class="lead">Let your studio sign in to Buildspawn with Microsoft work accounts, and give the Game Dev group its rights, from the first click to the first sign-in.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>You are a system administrator of Buildspawn, and you can reach the Entra admin centre with a role that may register applications (for example <em>Application Administrator</em>). Someone with the <em>Global Administrator</em> or <em>Privileged Role Administrator</em> role must grant admin consent in step 9.</li>
+  <li><strong>Buildspawn URL</strong> on <strong>Settings › System</strong> is the address people really use, for example <code>https://build.nightlight.example/</code>. See <a href="../administration/system-settings.html">System settings</a>.</li>
+  <li>The group <em>Game Dev</em> exists in Entra ID and holds the developers.</li>
+  <li>Keep a second browser window open and signed in to Buildspawn while you work.</li>
+</ul>
+
+<h2>Steps</h2>
+<h3>In the Entra admin centre</h3>
+<ol class="steps">
+  <li>Open <code>entra.microsoft.com</code>, go to <strong>Identity › Applications › App registrations</strong> and click <strong>New registration</strong>.</li>
+  <li>Name it <code>Buildspawn</code>. Choose <strong>Accounts in this organizational directory only</strong>.</li>
+  <li>Under <strong>Redirect URI</strong> choose <strong>Web</strong> and type <code>https://build.nightlight.example/securityRealm/finishLogin</code>. Click <strong>Register</strong>.</li>
+  <li>Copy the <strong>Application (client) ID</strong> and the <strong>Directory (tenant) ID</strong> from the <strong>Overview</strong>.</li>
+  <li>Open <strong>Certificates &amp; secrets › New client secret</strong>, add it, and copy the secret <strong>Value</strong> at once.</li>
+  <li>Open <strong>API permissions › Add a permission › Microsoft Graph › Application permissions</strong>. Add <code>User.Read.All</code> and <code>Group.Read.All</code>, then click <strong>Grant admin consent</strong>.</li>
+</ol>
+<h3>In Buildspawn</h3>
+<ol class="steps" start="7">
+  <li>Open <strong>Settings › Security</strong>. Under <strong>Security Realm</strong> choose <strong>Entra ID</strong>.</li>
+  <li>Paste the <strong>Client ID</strong>, keep <strong>Client Secret</strong> and paste the <strong>Secret</strong>, paste the <strong>Tenant</strong>.</li>
+  <li>Type your own work account, <code>dana.k@nightlight.example</code>, in <strong>Test user principal name or object id</strong>, and click <strong>Verify configuration</strong>. Wait for the green message.</li>
+  <li>Under <strong>Authorization</strong> choose <strong>Entra ID Matrix-based security</strong>.</li>
+  <li>In <strong>Add from Entra ID</strong> type your name, pick yourself and click <strong>Add</strong>. Open the card and tick <strong>Administer</strong>.</li>
+  <li>Add the group <em>Game Dev</em> in the same way. Tick <strong>Read</strong> under <strong>Overall</strong>, and under <strong>Build configuration</strong> tick <strong>Read</strong>, <strong>Build</strong>, <strong>Cancel</strong> and <strong>Workspace</strong>.</li>
+  <li>On <strong>Authenticated Users</strong> tick <strong>Read</strong> under <strong>Overall</strong>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/administration/authorization-cards.png" alt="Permission cards in the matrix: one card closed and one open, with the permissions grouped"><figcaption>Permission cards. With Entra ID, the same cards show people and groups from your directory.</figcaption></figure>
+
+<h2>Check it worked</h2>
+<ol class="steps">
+  <li>Open a private browser window and go to the Buildspawn address. You are sent to the Microsoft page.</li>
+  <li>Sign in with your work account. You come back to Buildspawn and the top bar shows your name.</li>
+  <li>Open <strong>Settings</strong>. You can, because you have <strong>Administer</strong>.</li>
+  <li>Ask a developer from <em>Game Dev</em> to sign in. They see the projects and can run builds, but <strong>Settings</strong> is missing.</li>
+</ol>
+
+<h2>Troubleshooting</h2>
+<table>
+  <tr><th>Problem</th><th>What to do</th></tr>
+  <tr><td>Microsoft says the redirect URI does not match.</td><td>It must be exactly <code>&lt;Buildspawn URL&gt;/securityRealm/finishLogin</code>. Fix it in the app registration under <strong>Authentication</strong>, or tick <strong>Callback URL from request</strong> under <strong>Advanced</strong>.</td></tr>
+  <tr><td><strong>Verify configuration</strong> fails.</td><td>Check the client ID, tenant and secret. Copy the secret <em>Value</em>, not its ID.</td></tr>
+  <tr><td>You are locked out after saving.</td><td>Follow the recovery steps on <a href="../administration/security-realms.html">Security realms</a>.</td></tr>
+  <tr><td>The picker finds nobody.</td><td>Admin consent for the Graph permissions is missing.</td></tr>
+  <tr><td>A developer signs in but sees nothing.</td><td>Add <strong>Read</strong> under <strong>Overall</strong> for the group or for <strong>Authenticated Users</strong>.</td></tr>
+</table>
+
+<h2>Next steps</h2>
+<ul>
+  <li><a href="../administration/entra-id.html">Entra ID sign-in</a>: every field of the form.</li>
+  <li><a href="../administration/authorization.html">Authorization</a>: permission cards and project-based security.</li>
+  <li>Put a calendar reminder before the client secret expires. Sign-in stops on that day.</li>
+</ul>
+</main>
+</body>
+</html>

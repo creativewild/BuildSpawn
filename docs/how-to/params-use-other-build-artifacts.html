@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Use another build's artifacts · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/params-use-other-build-artifacts">
+<main class="doc">
+<h1>Use another build's artifacts</h1>
+<p class="lead">Copy the files of a cook build into your installer build.</p>
+
+<h2>When to use this</h2>
+<p>Use it when a build needs files that another build made.</p>
+<h2>Steps</h2>
+<ol class="steps">
+  <li>Open the <code>Game/Installer</code> build configuration and go to <strong>Settings › Dependencies</strong>.</li>
+  <li>Add a snapshot dependency on <code>Game/Cook Content</code>, so both build the same revision.</li>
+  <li>Click <strong>Add artifact dependency</strong>, choose <code>Game/Cook Content</code> and <strong>Get artifacts from › Build from the same chain</strong>.</li>
+  <li>In <strong>Artifact rules</strong> type <code>Cooked/**/* =&gt; Content</code>. Tick <strong>Clean destination paths before downloading artifacts</strong>.</li>
+  <li>Click <strong>Save</strong>. Make sure the cook build keeps <code>Cooked/**</code> as artifacts.</li>
+</ol>
+<h2>A worked example</h2>
+<p>A step in the installer reads <code>Content\...</code> in its workspace.</p>
+<h2>What you see when it runs</h2>
+<p>The installer's console lists the files copied before the steps begin.</p>
+<h2>Problems and fixes</h2>
+<table>
+<thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+<tbody>
+<tr><td>Same chain is refused</td><td>Add the snapshot dependency first.</td></tr><tr><td>No artifacts found</td><td>The cook build did not keep them. Check its artifact settings.</td></tr>
+</tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../parameters/dependencies.html">Dependencies</a></li>
+  <li><a href="../parameters/build-chains.html">Build chains</a></li>
+</ul>
+</main>
+</body>
+</html>

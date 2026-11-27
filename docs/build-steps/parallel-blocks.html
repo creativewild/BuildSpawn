@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parallel blocks and overrides · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/parallel-blocks">
+<main class="doc">
+<h1>Parallel blocks and overrides</h1>
+<p class="lead">Run steps side by side and choose where each one runs. Cook three platforms at once, or send the shader compile to a bigger machine.</p>
+
+<h2>Parallel blocks</h2>
+<p>A <strong>Parallel block</strong> is one entry in the step list that holds two or more <strong>sides</strong>. Each side is a list of steps. The sides run at the same time; the steps after the block wait until all sides are done.</p>
+<ol class="steps">
+  <li>Open <strong>Settings › Build Steps</strong>.</li>
+  <li>Click <strong>Add Parallel block</strong>. A block named <strong>Parallel</strong> with two empty sides is added to the list.</li>
+  <li>Under <strong>How the sides run</strong>, choose <strong>Separate machines</strong> or <strong>This machine</strong> (below).</li>
+  <li>Under <strong>If one side fails</strong>, choose <strong>Let the others finish</strong> or <strong>Stop the others</strong>.</li>
+  <li>Give each side a name, such as <code>PS5</code> and <code>Xbox</code>, and add its steps with <strong>Add step</strong> in the side's header. <strong>Add side</strong> adds another side.</li>
+  <li>Set <strong>Run on</strong> and <strong>Files sent back</strong> for each side, and <strong>Passes on</strong> and <strong>Fallback after</strong> for the block.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/build-steps/parallel-list.png" alt="The Build Steps home with a Parallel block, tagged Separate machines and Block, 2 sides, opened to show How the sides run with Separate machines chosen, If one side fails with Let the others finish chosen, and two sides each with Run on a specific agent and Files sent back">
+  <figcaption>A new Parallel block in the step list, opened. The tags show its mode and how many sides it has.</figcaption>
+</figure>
+<p>You can also drag <strong>Parallel</strong> from the <strong>Flow</strong> group of the <a href="../visual-editor/canvas.html">visual editor</a>'s palette.</p>
+
+<h3>This machine or Separate machines</h3>
+<table>
+  <thead><tr><th>Mode</th><th>What happens</th></tr></thead>
+  <tbody>
+    <tr><td><strong>This machine</strong></td><td>The sides run at the same time on the build's agent, in the same workspace. Each side has its own block in the build console. The editor warns you when the sides write to the same files.</td></tr>
+    <tr><td><strong>Separate machines</strong></td><td>Each side runs as a side build on its own agent, fetching the same revision as the main build. While the sides run, the main build frees its agent slot and keeps its workspace. When the sides finish, it comes back to the same agent, copies in the files the sides sent back, and goes on.</td></tr>
+  </tbody>
+</table>
+<p>For <strong>Separate machines</strong> you also set:</p>
+<ul>
+  <li><strong>Run on</strong> for each side, for example the pool <em>Consoles</em> for the PS5 side.</li>
+  <li><strong>Files sent back</strong> for each side, as rules such as <code>Saved/StagedBuilds/**</code>.</li>
+  <li><strong>If one side fails</strong>: <strong>let the others finish</strong> (the default) or <strong>stop the others</strong>. Either way, the build fails after the block.</li>
+  <li><strong>Fallback</strong>: if the first agent is not free again within 10 minutes (you can change this, or choose never), or it went offline, the build goes on on any matching agent. It fetches the same revision there and copies in the files it needs.</li>
+</ul>
+<div class="callout note"><p>Side builds show under their main build in the build list and the queue, never as builds of their own. Links such as <em>Last successful build</em> skip them.</p></div>
+
+<h2>Matrix mode</h2>
+<p>Instead of writing each side by hand, you can write the steps once and give values such as platform and configuration. Every combination then runs as its own side. Open the block and click <strong>Change to Matrix</strong>. See <a href="matrix-mode.html">Matrix mode for Parallel blocks</a>.</p>
+
+<h2>Per-step "Runs on"</h2>
+<p>Any step can run on another machine than the rest of the build. Open the step and find <strong>Run on</strong>:</p>
+<table>
+  <thead><tr><th>Choice</th><th>Meaning</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Same machine as before</strong></td><td>The default. No new fetch.</td></tr>
+    <tr><td><strong>Any matching machine</strong></td><td>Any agent that meets the build configuration's agent requirements.</td></tr>
+    <tr><td><strong>A pool or label</strong></td><td>For example <em>pool Consoles</em> or <em>label vs2022</em>. <strong>Another expression…</strong> lets you type a label expression.</td></tr>
+    <tr><td><strong>A specific agent</strong></td><td>One agent by name. If it is offline, the step waits for it and shows why, unless you set a fallback.</td></tr>
+  </tbody>
+</table>
+<ul>
+  <li><strong>Fallback after … minutes</strong>, or <strong>Never fall back</strong>: how long to wait for the chosen machine.</li>
+  <li><strong>Passes on</strong>: files that later steps need if they run on another machine, such as <code>Intermediate/**</code>. They are copied only when a later step really lands elsewhere.</li>
+  <li><strong>Files sent back</strong>: when the step runs on another machine, the files it creates or changes there come back to the build's own workspace. Rules such as <code>Saved/Logs/**</code> narrow them; choose <strong>Nothing</strong> to bring nothing back.</li>
+</ul>
+
+<h2>Overrides</h2>
+<p>A step can override environment values at run time, for one step only:</p>
+<ul>
+  <li><strong>Environment variables</strong> on the step: one <code>NAME=value</code> per line, added for this step's process only.</li>
+  <li><strong>Environment filters</strong>, under <strong>Advanced</strong>: keep only the variables you name. A parameter that a filter removes stays removed.</li>
+  <li><strong>Outputs</strong>: a step can declare values it sets, such as <code>version</code> (text, number, true/false or file). The script sets them with a <code>##buildspawn[setParameter …]</code> message, and later steps read them as <code>%version%</code>. A step that ends without setting a declared output fails with <em>did not set output version</em>. See <a href="../parameters/set-from-build.html">Setting parameters from a build</a>.</li>
+</ul>
+<div class="callout tip"><p>Steps inherited from a project or template can be overridden too: the override changes them in this build configuration only. See <a href="../projects/projects.html#passes-down">What a project passes down</a>.</p></div>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="matrix-mode.html">Matrix mode for Parallel blocks</a></li>
+  <li><a href="step-list.html">The steps list and the step editor</a></li>
+  <li><a href="../running-builds/parallel-and-composite.html">Parallel and composite builds</a></li>
+  <li><a href="../how-to/run-steps-in-parallel.html">Run steps in parallel</a></li>
+  <li><a href="../how-to/steps-cook-matrix.html">Cook several platforms with a Matrix block</a></li>
+</ul>
+</main>
+</body>
+</html>

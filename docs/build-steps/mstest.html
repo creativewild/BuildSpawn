@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MSTest · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/mstest">
+<main class="doc">
+<h1>MSTest</h1>
+<p class="lead">Runs unit tests with the MSTest command line tool and can report the results. Installations are defined once, under Tools.</p>
+
+<h2>When to use it</h2>
+<p>Use it for older Visual Studio test projects that run with <code>MSTest.exe</code>. For new projects prefer <a href="dotnet.html">.NET</a> <code>test</code> or <a href="vstest.html">VSTest</a>.</p>
+
+<h2>How to set it up</h2>
+
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>. Type <code>MSTest</code> in <strong>Filter step types</strong> if you like, then click the <strong>MSTest</strong> tile (group <strong>Tests</strong>).</li>
+  <li>Type a <strong>Step name</strong>, for example <code>MSTest</code>.</li>
+  <li>Fill in the fields described below.</li>
+  <li>Optional: set <strong>Execute step</strong>, <strong>Conditions</strong> and <strong>Retry on failure</strong>. See <a href="step-list.html">The steps list and the step editor</a>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<figure class="shot small">
+  <img src="../../assets/shots/build-steps/mstest.png" alt="The fields of the MSTest step in the step editor">
+  <figcaption>The fields of the MSTest step, as the step editor shows them.</figcaption>
+</figure>
+
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>MsTest Version</strong></td><td>The MSTest installation, from <strong>Settings › Tools</strong>.</td><td>Default installation</td><td>MSTest 2022</td></tr>
+    <tr><td><strong>Test Files</strong></td><td>The paths to your compiled test assemblies. Several, separated by new lines. Relative to the workspace or full paths; spaces are allowed. Ant-style filters work: <code>foo/*</code>, <code>foo/**/bar.dll</code>. Passed as <code>/testcontainer</code>.</td><td>Empty</td><td><code>Tests/**/*.Tests.dll</code></td></tr>
+    <tr><td><strong>Fail if no tests</strong></td><td>Fail the build when no test files are found.</td><td>Off</td><td>On</td></tr>
+    <tr><td><strong>Test Categories</strong></td><td>Optional. Empty runs all tests. Use <code>&amp;</code> and <code>|</code> and <code>!</code>: <code>Priority1&amp;!SpeedTest</code> runs tests with Priority1 but not SpeedTest. Passed as <code>/category</code>.</td><td>Empty</td><td><code>Priority1</code></td></tr>
+    <tr><td><strong>Result File Name</strong></td><td>Name of the result file. It is deleted before each run and created relative to the workspace. Passed as <code>/resultsfile</code>.</td><td>Empty</td><td><code>mstest.trx</code></td></tr>
+    <tr><td><strong>Command Line Arguments</strong></td><td>Extra arguments, separated by spaces, as you would give MSTest on the command line.</td><td>Empty</td><td><code>/detail:errormessage</code></td></tr>
+    <tr><td><strong>Continue on failed tests</strong></td><td>Unticked: the build fails when a test fails. Ticked: the build continues.</td><td>Off</td><td>Off</td></tr>
+  </tbody>
+</table>
+
+
+<h2>A worked example</h2>
+<p>Run the priority-1 tests. Step name <code>MSTest</code>, <strong>Test Files</strong> <code>Tests/**/*.Tests.dll</code>, <strong>Test Categories</strong> <code>Priority1</code>, <strong>Result File Name</strong> <code>mstest.trx</code>.</p>
+
+<h2>What you see when it runs</h2>
+<p>The console shows the MSTest command line and its output, then the result file name. A failed test fails the build unless <strong>Continue on failed tests</strong> is ticked.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong>The version list is empty</strong></td><td>Add an installation under <strong>Settings › Tools</strong>.</td></tr>
+    <tr><td><strong>No tests ran</strong></td><td>Check the patterns in <strong>Test Files</strong>, and tick <strong>Fail if no tests</strong> to be told.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="nunit.html">NUnit</a></li>
+  <li><a href="vstest.html">VSTest</a></li>
+  <li><a href="../administration/tools.html">Tools</a></li>
+  <li><a href="runners.html">Runners</a></li>
+  <li><a href="common-step-fields.html">Fields every runner has</a></li>
+</ul>
+</main>
+</body>
+</html>

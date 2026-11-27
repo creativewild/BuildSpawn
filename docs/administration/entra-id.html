@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Entra ID sign-in · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="administration/entra-id">
+<main class="doc">
+<h1>Entra ID sign-in</h1>
+<p class="lead">Let people sign in to Buildspawn with their Microsoft work account, and give rights to people and groups from your Entra ID directory.</p>
+
+<p>Entra ID is Microsoft’s cloud directory (it used to be called Azure Active Directory or Azure AD). With the <strong>Entra ID</strong> security realm, Buildspawn sends people to the Microsoft sign-in page and gets back who they are and which groups they belong to. You never create users in Buildspawn.</p>
+
+<h2>When to use it</h2>
+<p>Use it when your studio already manages accounts in Microsoft 365 or Azure. People use one password, your IT team can switch an account off in one place, and you give permissions to the same groups you already have. To do all of it in one go, follow <a href="../how-to/admin-sign-in-entra-id.html">Sign in with Entra ID</a>.</p>
+
+<h2>How to set it up</h2>
+<p>There are three parts: register Buildspawn in Entra ID, fill in the realm form, and choose the Entra ID matrix for permissions.</p>
+
+<h3>Part 1: Register Buildspawn in the Entra admin centre</h3>
+<p>You need an Entra ID role that may register applications (for example <em>Application Administrator</em>). Ask your IT team if you do not have one. Before you start, open <strong>Settings › System</strong> and check that <strong>Buildspawn URL</strong> is the real address people use, for example <code>https://build.studio.example/</code>. See <a href="system-settings.html">System settings</a>.</p>
+<ol class="steps">
+  <li>Open the Entra admin centre (<code>entra.microsoft.com</code>) and sign in.</li>
+  <li>Go to <strong>Identity › Applications › App registrations</strong> and click <strong>New registration</strong>.</li>
+  <li>Type a <strong>Name</strong>, for example <code>Buildspawn</code>.</li>
+  <li>Under <strong>Supported account types</strong> choose <strong>Accounts in this organizational directory only</strong>.</li>
+  <li>Under <strong>Redirect URI</strong> choose the platform <strong>Web</strong> and type your Buildspawn address followed by <code>/securityRealm/finishLogin</code>, for example <code>https://build.studio.example/securityRealm/finishLogin</code>. It must match exactly, including <code>https</code> and the last part.</li>
+  <li>Click <strong>Register</strong>.</li>
+  <li>On the <strong>Overview</strong> page, copy two values: <strong>Application (client) ID</strong> and <strong>Directory (tenant) ID</strong>. You will paste them into Buildspawn.</li>
+  <li>Open <strong>Certificates &amp; secrets › Client secrets › New client secret</strong>. Type a description, choose how long it lasts, and click <strong>Add</strong>. Copy the secret <strong>Value</strong> now. Entra ID shows it only once.</li>
+  <li>Open <strong>API permissions › Add a permission › Microsoft Graph › Application permissions</strong>. Add <code>User.Read.All</code> and <code>Group.Read.All</code>. Also add <code>People.Read</code> if your tenant offers it for applications. Then click <strong>Grant admin consent</strong>. Buildspawn uses these to read a person’s groups, to search people and groups in the matrix, and to fetch profile photos.</li>
+</ol>
+<div class="callout note"><p>Skip step 9 only if you cannot get admin consent. Then tick <strong>Disable graph integration</strong> in the realm form. People can still sign in, but group search and photos do not work, and the matrix asks you to type names. See below.</p></div>
+<figure class="shot"><img src="../../assets/shots/administration/entra-realm.png" alt="The Security Realm section with Entra ID chosen: Client ID, Authentication Type, Tenant and the Verify configuration button"><figcaption>The Entra ID realm form. Do not save until the values are right.</figcaption></figure>
+
+<h3>Part 2: Fill in the Security Realm form</h3>
+<ol class="steps">
+  <li>Open <strong>Settings › Security</strong>.</li>
+  <li>In <strong>Security Realm</strong> choose <strong>Entra ID</strong>.</li>
+  <li>Paste the <strong>Client ID</strong>.</li>
+  <li>Under <strong>Authentication Type</strong> keep <strong>Client Secret</strong> and paste the secret into <strong>Secret</strong>.</li>
+  <li>Paste the <strong>Tenant</strong> (the directory ID).</li>
+  <li>In <strong>Test user principal name or object id</strong> type your own work account, for example <code>dana.k@studio.example</code>.</li>
+  <li>Click <strong>Verify configuration</strong>. Wait for a green message. See Problems and fixes below if you get an error.</li>
+  <li>Do <em>not</em> save yet. Go to Part 3 first, so that you are an administrator after the switch.</li>
+</ol>
+
+<h3>Part 3: Choose the Entra ID matrix and add yourself</h3>
+<ol class="steps">
+  <li>Still on <strong>Settings › Security</strong>, open <strong>Authorization</strong> and choose <strong>Entra ID Matrix-based security</strong>.</li>
+  <li>In <strong>Add from Entra ID</strong> start typing your name. Pick yourself in the list and click <strong>Add</strong>. A card for you appears.</li>
+  <li>Open your card and tick <strong>Administer</strong>. It ticks the other boxes as implied.</li>
+  <li>Add a card for the group of everybody who should see Buildspawn (for example <em>Studio staff</em>) and tick <strong>Read</strong> under <strong>Overall</strong>. Without it people sign in and see nothing.</li>
+  <li>Click <strong>Save</strong>. Open a private window and sign in with your work account.</li>
+</ol>
+<div class="callout warning"><p>If you save without an <strong>Administer</strong> card for a person who can really sign in with Entra ID, you are locked out. The recovery steps are on <a href="security-realms.html">Security realms</a>.</p></div>
+
+<h2>Every field of the realm form</h2>
+<table>
+  <tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr>
+  <tr><td><strong>Client ID</strong></td><td>The <em>Application (client) ID</em> of the app you registered. It tells Entra ID which application is asking.</td><td>Empty</td><td><code>8f1c2d3e-…</code> (a GUID)</td></tr>
+  <tr><td><strong>Authentication Type</strong></td><td>How Buildspawn proves to Entra ID that it is your registered app. Pick one of the three below.</td><td>Client Secret</td><td>Client Secret</td></tr>
+  <tr><td><strong>Secret</strong> (Client Secret)</td><td>The secret <em>Value</em> from <strong>Certificates &amp; secrets</strong>. It is stored encrypted and shown as dots. Note when it expires, because sign-in stops then.</td><td>Empty</td><td>(a secret, never written down in documents)</td></tr>
+  <tr><td><strong>Certificate</strong> (Client Certificate)</td><td>A private key and a certificate in PEM format, joined together, with the private key first. The key must not be encrypted, and the certificate must not have expired. Upload the public certificate to the app under <strong>Certificates &amp; secrets › Certificates</strong>.</td><td>Empty</td><td>A <code>-----BEGIN PRIVATE KEY-----</code> block followed by a <code>-----BEGIN CERTIFICATE-----</code> block</td></tr>
+  <tr><td><strong>Workload Identity (Federated Credentials)</strong></td><td>No secret or certificate. Buildspawn uses a federated token that the environment supplies in the <code>AZURE_FEDERATED_TOKEN_FILE</code> variable. Used when the server runs in Azure with a managed identity.</td><td>Off</td><td>—</td></tr>
+  <tr><td><strong>Federated Credentials</strong> (under Advanced, Workload Identity only)</td><td>Optionally pick stored credentials from the OpenID Connect provider instead of the token file.</td><td>None</td><td>—</td></tr>
+  <tr><td><strong>Tenant</strong></td><td>The <em>Directory (tenant) ID</em>. It names your organisation in Entra ID.</td><td>Empty</td><td><code>b2a4…</code> (a GUID) or <code>studio.onmicrosoft.com</code></td></tr>
+</table>
+<p>Click <strong>Advanced</strong> to see more fields:</p>
+<table>
+  <tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr>
+  <tr><td><strong>Azure Environment</strong></td><td>Which Microsoft cloud your tenant lives in: <strong>Azure</strong>, <strong>Azure China</strong>, <strong>Azure US Government L4</strong> or <strong>Azure US Government L5 (DOD)</strong>. It picks the sign-in and Graph addresses.</td><td>Azure</td><td>Azure</td></tr>
+  <tr><td><strong>Cache Duration</strong></td><td>How many seconds Buildspawn keeps a person’s name and groups after sign-in. It does not ask Entra ID again during that time. A group change shows up after the person signs in again or the time ends. One hour is recommended.</td><td>3600</td><td>3600</td></tr>
+  <tr><td><strong>Callback URL from request</strong></td><td>When ticked, the redirect address (<code>…/securityRealm/finishLogin</code>) is built from the address the browser used, not from <strong>Buildspawn URL</strong>. Tick it if people reach the server by more than one name.</td><td>Off</td><td>Off</td></tr>
+  <tr><td><strong>Prompt for user account on each login</strong></td><td>Always shows the account picker, even when only one account is signed in to the browser.</td><td>Off</td><td>On for shared computers</td></tr>
+  <tr><td><strong>Domain Hint</strong></td><td>The realm of the user in a federated directory. It skips the question <em>"which company are you with?"</em> on the Microsoft page.</td><td>Empty</td><td><code>studio.example</code></td></tr>
+  <tr><td><strong>Enable Single Logout</strong></td><td>Signing out of Buildspawn also signs the person out of all Entra ID sessions. This is stricter, but people using Teams or Outlook in the browser are signed out too.</td><td>Off</td><td>Off</td></tr>
+  <tr><td><strong>Disable graph integration</strong></td><td>Buildspawn does not call Microsoft Graph. No group search, no profile photos, and no permission errors in the log if you could not grant admin consent. Groups then come only from the group claim in the sign-in token, and the matrix asks you to type names.</td><td>Off</td><td>Off</td></tr>
+</table>
+<table>
+  <tr><th>Below the fields</th><th>What it does</th></tr>
+  <tr><td><strong>Test user principal name or object id</strong></td><td>The account used by <strong>Verify configuration</strong>. It is not saved.</td></tr>
+  <tr><td><strong>Verify configuration</strong></td><td>Tests the client ID, the secret or certificate, the cloud and the tenant, and reads the test user from the directory. Save the form first if you changed anything about the authorization.</td></tr>
+</table>
+
+<h2>The Entra ID Matrix-based security grid</h2>
+<p>Choose <strong>Entra ID Matrix-based security</strong> under <strong>Authorization</strong>. It works like <a href="authorization.html">Matrix-based security</a>, with one card for each user or group, and it knows your directory.</p>
+<ul>
+  <li><strong>Add from Entra ID</strong> holds a people picker. Type a name or an object ID, pick a person or a group, and click <strong>Add</strong>. People are stored by their object ID, groups by their object ID too, and the card shows the name with the ID in brackets, for example <code>Art Team (3c9e…)</code>.</li>
+  <li>If you ticked <strong>Disable graph integration</strong>, the picker is replaced by a text box (<em>Object ID, or group name (ID)</em>) and the buttons <strong>Add user</strong> and <strong>Add group</strong>. Buildspawn cannot check the name, so a name that does not exist gives permissions to nobody.</li>
+  <li>The people picker finds only people and groups that exist in your directory. Search by name or by ID.</li>
+  <li>Use the filter box (<em>Filter users and groups</em>) and the permission filter to find a card in a long list.</li>
+  <li>Two cards are always there: <strong>Anonymous</strong> (people not signed in) and <strong>Authenticated Users</strong> (everybody who signed in).</li>
+  <li>An entry that fits both a user name and a group name gets a yellow <em>ambiguous</em> label and a warning. Use the two small buttons on the card to turn it into a user or into a group.</li>
+</ul>
+<div class="callout tip"><p>Give permissions to groups, not to people. Groups are identified by their object ID, so renaming a group in Entra ID does not break the grant. Names of groups are not used to grant rights, because anybody could create a second group with the same name.</p></div>
+
+<h3>Matrix cards in projects</h3>
+<p>With this choice, each project also gets a grid in its settings that uses the same cards and the same picker. See <a href="authorization.html">Authorization</a> for how a project grid combines with the server grid.</p>
+
+<h2>Profile photos</h2>
+<p>When someone signs in, Buildspawn asks Entra ID for their profile photo (48 by 48 pixels) and keeps it in the user’s folder. It is then used as the person’s picture in lists and on builds. People without a photo get the usual initial. Photos need the Graph permissions from Part 1 and are not fetched when <strong>Disable graph integration</strong> is on.</p>
+
+<h2>A worked example</h2>
+<p>The studio <em>Nightlight Games</em> registers an app called <code>Buildspawn</code> with the redirect address <code>https://build.nightlight.example/securityRealm/finishLogin</code>. It uses the tenant ID from the Overview page and a client secret that lasts 24 months. In Entra ID the group <em>Game Dev</em> contains the developers. In Buildspawn, the matrix has three cards: <em>Dana K.</em> with <strong>Administer</strong>, <em>Game Dev</em> with <strong>Read</strong>, <strong>Build</strong> and <strong>Workspace</strong>, and <em>Authenticated Users</em> with only <strong>Read</strong>.</p>
+
+<h2>What you see when it runs</h2>
+<ul>
+  <li>A visitor who is not signed in is sent to the Microsoft page, signs in, and comes back to the page they asked for.</li>
+  <li>The user list shows people after their first sign-in, with their user principal name as ID.</li>
+  <li>The user’s <strong>Account</strong> page shows no password box, because the password is in Entra ID.</li>
+  <li>The log records <em>Fetch user details</em> when it loads groups from Entra ID.</li>
+</ul>
+
+<h2>Problems and fixes</h2>
+<table>
+  <tr><th>Problem</th><th>What to do</th></tr>
+  <tr><td>Microsoft says <em>AADSTS50011: the redirect URI does not match</em>.</td><td>The redirect URI in the app registration must be exactly <code>&lt;Buildspawn URL&gt;/securityRealm/finishLogin</code>. Check <code>https</code>, the port and the host name, or tick <strong>Callback URL from request</strong>.</td></tr>
+  <tr><td><strong>Verify configuration</strong> says the credentials are not valid.</td><td>Check the client ID, tenant and secret. The secret may have expired or you copied the secret <em>ID</em> instead of its <em>Value</em>.</td></tr>
+  <tr><td>Sign-in works, but nobody has any rights.</td><td>The user’s groups did not load. Grant admin consent for <code>Group.Read.All</code>, or add the person directly in the matrix.</td></tr>
+  <tr><td>The people picker shows no results.</td><td>The Graph permissions are missing, or admin consent was not given. Check <strong>API permissions</strong> in Entra ID. Or tick <strong>Disable graph integration</strong> and type names.</td></tr>
+  <tr><td>A user was removed from a group in Entra ID but still has the rights.</td><td>The groups are cached. Wait for <strong>Cache Duration</strong> to pass, or ask the person to sign in again.</td></tr>
+  <tr><td>People are signed out of Teams and Outlook when they sign out of Buildspawn.</td><td>Turn off <strong>Enable Single Logout</strong>.</td></tr>
+  <tr><td>Sign-in suddenly stops months later.</td><td>The client secret expired. Make a new secret in Entra ID and paste it in the realm form.</td></tr>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../how-to/admin-sign-in-entra-id.html">Sign in with Entra ID</a>: the whole job from start to finish</li>
+  <li><a href="security-realms.html">Security realms</a></li>
+  <li><a href="authorization.html">Authorization</a></li>
+  <li><a href="user-settings.html">User settings</a></li>
+  <li><a href="system-settings.html">System settings</a></li>
+</ul>
+</main>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Perforce root trigger · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="running-builds/trigger-p4-root">
+<main class="doc">
+<h1>Perforce root trigger</h1>
+<p class="lead">Starts a build when the Perforce server calls Buildspawn, for a build configuration that uses a shared Perforce root.</p>
+
+<h2>When to use it</h2>
+<p>Use it instead of the P4 trigger when the build configuration is on a <strong>Perforce root</strong> (a shared connection to a depot). The picker offers it only for those build configurations.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Triggers</strong>.</li>
+  <li>Click <strong>Add new trigger</strong> and click <strong>Add</strong> next to <strong>Perforce root: build when the Perforce server triggers it</strong>.</li>
+  <li>The trigger has no settings. Click <strong>Save</strong>.</li>
+  <li>Set up the same <code>change-commit</code> line on the Perforce server as for the <a href="trigger-p4.html">P4 trigger</a>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/running-builds/trigger-p4-root.png" alt="The Perforce root trigger form, which has no settings"><figcaption>The Perforce root trigger form.</figcaption></figure>
+
+<h2>Every field</h2>
+<p>There are no fields. The trigger works like the P4 trigger, with these differences:</p>
+<ul>
+  <li>It checks the build configuration's root, with the rights of the system, and starts a build when it finds changes.</li>
+  <li>While the trigger is active, the root polls at most once in a set time, even if something else asks. The log says <em>Polling skipped: a Perforce trigger is active on root …</em>.</li>
+  <li>The Perforce pages show the new change soon after.</li>
+</ul>
+<h2>A worked example</h2>
+<p>Skyforge's build configurations share the root <code>skyforge-main</code>. Add this trigger to the Windows Build. A submit starts one build.</p>
+<h2>What you see when it runs</h2>
+<p>The root's page says <em>Perforce trigger active: last call … ago</em>. The log of the trigger says <em>P4: Changes found</em> or <em>P4: No changes</em>.</p>
+<h2>Problems and fixes</h2>
+<table>
+<thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+<tbody>
+<tr><td>The trigger is not in the list</td><td>The build configuration is not on a Perforce root.</td></tr><tr><td>No build after a submit</td><td>The Perforce server's trigger line is missing, or the call is refused. See the P4 trigger page.</td></tr>
+</tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="trigger-p4.html">Perforce trigger (P4)</a></li>
+  <li><a href="../version-control/perforce.html">Perforce</a></li>
+  <li><a href="triggers.html">Triggers</a></li>
+</ul>
+</main>
+</body>
+</html>

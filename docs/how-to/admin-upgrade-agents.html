@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Upgrade agents · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/admin-upgrade-agents">
+<main class="doc">
+<h1>Upgrade agents</h1>
+<p class="lead">Move a build agent to the files of a new Buildspawn version, and keep its name, its secret, its pool and its work folders.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>You can open the agent machine, and on Windows you have an administrator prompt (on Linux and macOS, <code>sudo</code>).</li>
+  <li>You have the agent download of the new version: <strong>Agents › Install agents</strong> on the upgraded server (see <a href="../agents/install-agent.html">Install an agent</a>).</li>
+  <li>Pick a quiet time, or mark the agent offline first, so that no build is running (see below).</li>
+</ul>
+<div class="callout note"><p>An agent keeps its name and secret in <code>conf/buildspawn-agent.properties</code>. If you keep that file, the agent does <strong>not</strong> register again. It stays the same agent, in the same pool, with the same history. Agents that are older than the server still connect, but some features, such as trusted certificates from the server (1.9), the Certificates tab (1.9.2) and the terminal program's certs command, need new agent files.</p></div>
+
+<h2>Steps</h2>
+<ol class="steps">
+  <li>Open <strong>Agents</strong>, find the agent, open the row menu <strong>⋯</strong> and choose <strong>Mark offline</strong>. Running builds finish first. Wait until the status is <strong>Offline</strong>.</li>
+  <li>On the agent machine, close the tray app: right-click its icon, choose <strong>Exit</strong>, then click <strong>Stop agent</strong>. (A running tray app would block the new <code>Buildspawn Agent.exe</code> from being written.)</li>
+  <li>Stop the agent:
+<pre><code># Windows, administrator prompt, in the agent folder
+stop-agent.bat
+
+# Linux and macOS
+./stop-agent.sh</code></pre></li>
+  <li>Unzip the new download <strong>over</strong> the agent folder. When your tool asks about <code>conf\buildspawn-agent.properties</code>, <strong>keep your own file</strong>.
+<pre><code># Windows: unzip over C:\buildspawn-agent
+tar -xf buildspawn-agent-windows-x64.zip -C C:\
+
+# Linux
+sudo unzip -o buildspawn-agent-linux-x64.zip -d /opt</code></pre>
+  Do not delete the <code>work</code> folder. It holds the workspaces, so the first build after the upgrade does not sync everything again.</li>
+  <li>If you downloaded the zip made for <strong>one</strong> agent, it holds that agent's secret and may replace the settings file. Use the general download with the file you keep, or copy your old file back.</li>
+  <li>Install the service again, so that it points at the new files and picks up new Java options:
+<pre><code># Windows, administrator prompt
+install-service.bat
+
+# Linux and macOS
+sudo ./install-service.sh</code></pre>
+  Windows says <em>Service "Buildspawn Agent" installed again from … and started.</em> You do not need <code>--url</code>, because the settings file already holds it.</li>
+  <li>On Windows, open <code>bin\Buildspawn Agent.exe</code> again to get the tray app back. Tick <strong>Open this app when I sign in to Windows</strong> in its <strong>Settings</strong> tab if you want it to start by itself.</li>
+  <li>On the Agents page, open the row menu of the agent and choose <strong>Bring back online</strong>.</li>
+</ol>
+
+<h2>Check it worked</h2>
+<ol class="steps">
+  <li>The agent turns <strong>Idle</strong> on the Agents page, in its old pool, with its old name.</li>
+  <li>On the agent page its <strong>Parameters</strong> show the new <code>agent.version</code>.</li>
+  <li>In the tray app, the <strong>Certificates</strong> tab is there. In the terminal program, <code>bin/buildspawn-agent-tui --version</code> shows the new version.</li>
+  <li>Run a small build on it.</li>
+</ol>
+
+<h2>Upgrade many agents</h2>
+<ul>
+  <li>Do a few at a time, so the pool keeps capacity. Put one agent of each pool through the steps first, run a build on it, then do the rest.</li>
+  <li>Use the <a href="../agents/pool-scheduler.html">Pool Scheduler</a> to lend idle agents to a pool while some of its agents are offline for the upgrade.</li>
+</ul>
+
+<h2>Troubleshooting</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>The agent asks to register again and appears under <strong>Unauthorized</strong>.</td><td>The settings file was replaced and lost its secret. Copy the old <code>conf\buildspawn-agent.properties</code> back (it holds <code>secret=…</code>), or approve the new request. See <a href="../agents/agent-connection.html">Connect an agent</a>.</td></tr>
+    <tr><td><code>install-service.bat</code> says <em>could not remove the old service definition</em>.</td><td>Close the Services window (<code>services.msc</code>) and run it again.</td></tr>
+    <tr><td>The service does not start and <code>logs</code> is empty.</td><td>Check that <code>bin\buildspawn-agent-service.xml</code> is there. Run <code>install-service.bat</code> again.</td></tr>
+    <tr><td>The agent runs from a different folder after the unzip.</td><td>You unzipped to another place. Run <code>install-service</code> from the folder you want. It replaces the old service entry.</td></tr>
+    <tr><td>The tray app is the old one.</td><td>Exit it first. A running <code>Buildspawn Agent.exe</code> blocks the new file from being written.</td></tr>
+    <tr><td>Certificates that you added are gone.</td><td>They live in <code>work\trust</code>. If you deleted the work folder, add them again (see <a href="../administration/trusted-certificates.html">Trusted certificates</a>).</td></tr>
+  </tbody>
+</table>
+
+<h2>Next steps</h2>
+<ul>
+  <li><a href="../agents/windows-service.html">Agent service scripts</a></li>
+  <li><a href="../agents/windows-tray-app.html">Windows tray app</a></li>
+  <li><a href="back-up-and-upgrade.html">Back up and upgrade the server</a></li>
+  <li><a href="watch-agent-health.html">Spot unhealthy agents</a></li>
+</ul>
+</main>
+</body>
+</html>

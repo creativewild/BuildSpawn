@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unity build settings · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/feature-unity">
+<main class="doc">
+<h1>Unity build settings</h1>
+<p class="lead">Activates a Unity license around your Unity steps and sets the asset cache server.</p>
+<h2>When to use it</h2>
+<p>Use it when your agents have no signed-in, licensed Unity Editor. The full description of every field, with a worked example, is on <a href="../game-builds/unity-license.html">Unity build settings</a> in the Game builds section.</p>
+<figure class="shot">
+  <img src="../../assets/shots/projects/feat-unity.png" alt="The Unity build settings form">
+  <figcaption>The Unity build settings form.</figcaption>
+</figure>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration, click <strong>Settings</strong>, then <strong>Build Features</strong>. Click <strong>Add build feature</strong> and choose <strong>Unity build settings</strong>.</li>
+  <li>Choose the <strong>License</strong>: None, Plus or Pro, or Personal.</li>
+  <li>Choose the credentials, and the Unity version or folder.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>License</td><td>None, Unity Plus or Pro (serial number and account), or Unity Personal (a license file).</td><td>None</td><td>Unity Plus or Pro</td></tr>
+    <tr><td>License scope</td><td>Activate for each build step, or once for the whole build configuration.</td><td>Build step</td><td>Build configuration</td></tr>
+    <tr><td>Serial number</td><td>Secret text credential with the serial number.</td><td>None</td><td><code>unity-serial</code></td></tr>
+    <tr><td>Unity account</td><td>Username with password credential.</td><td>None</td><td><code>unity-build-account</code></td></tr>
+    <tr><td>License file</td><td>Secret file or Secret text credential with the .ulf file.</td><td>None</td><td><code>unity-personal-ulf</code></td></tr>
+    <tr><td>Detection mode</td><td>Auto picks an Editor the agent found. Manual uses the folder.</td><td>Auto</td><td>Auto</td></tr>
+    <tr><td>Unity version</td><td>Auto mode. Empty takes the latest Editor.</td><td>Empty</td><td><code>6000.0</code></td></tr>
+    <tr><td>Unity folder</td><td>Manual mode: the folder with the Editor.</td><td>Empty</td><td><code>C:\Program Files\Unity\Hub\Editor\6000.0.23f1</code></td></tr>
+    <tr><td>Cache server address</td><td>A Unity Accelerator or cache server as host:port.</td><td>Empty</td><td><code>unity-cache.studio.example:10080</code></td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p>One Unity Pro seat serves two Windows agents. <strong>License scope</strong> is set to the whole build configuration, so both Unity steps share one activation, and the seat is returned at the end. See the full example on the <a href="../game-builds/unity-license.html">Unity build settings page</a>.</p><h2>What you see when it runs</h2>
+<p>The log has a block <em>Activate Unity license</em> before your Unity step, and <em>Return Unity license</em> after it. Secrets show as <code>********</code>.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>The Unity Editor could not be started on this agent</td><td>Install Unity there, or choose <strong>Manual</strong> detection and name the folder.</td></tr>
+    <tr><td>Manual detection needs the folder</td><td>Fill <strong>Unity folder</strong>.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="bc-build-features.html">The Build Features tab</a></li>
+  <li><a href="../game-builds/unity-license.html">Unity build settings (full page)</a></li>
+  <li><a href="../game-builds/unity.html">Unity step</a></li>
+</ul>
+</main>
+</body>
+</html>

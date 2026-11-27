@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shared builds · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="running-builds/shared-builds">
+<main class="doc">
+<h1>Shared builds</h1>
+<p class="lead">Share a personal build with a link, so a colleague can look at its result and log without getting any other access.</p>
+
+<h2>When to use it</h2>
+<p>A personal build is private: only you and administrators see it. Share it when someone else should read its log, for example a programmer who helps you with a failing shelf, or a lead who wants to see a build before you submit.</p>
+
+<h2>Share a build</h2>
+<ol class="steps">
+  <li>Open the personal build. The <strong>Share</strong> button is in the header, next to the other build actions. Only the person who started the build, and administrators, see it.</li>
+  <li>Click <strong>Share</strong>. Buildspawn makes a link and copies it. A message says <em>Link copied</em>. If your browser refuses to copy, the link is shown in a box so you can copy it by hand.</li>
+  <li>Send the link to your colleague.</li>
+</ol>
+<p>The link ends in <code>?share=</code> and a long random code. Clicking <strong>Share</strong> again gives the same link.</p>
+
+<h2>What the other person sees</h2>
+<ul>
+  <li>They must be signed in and may read Buildspawn. The link then lets them view that one build, and only for their browser session.</li>
+  <li>They can read the build page, console, changes, parameters and artifacts.</li>
+  <li>They do not see <strong>Re-run</strong>, and they do not see your other personal builds.</li>
+</ul>
+
+<h2>Stop sharing</h2>
+<ol class="steps">
+  <li>Open the build and click <strong>Stop sharing</strong>. The button appears while the build is shared.</li>
+  <li>A message says <em>Sharing stopped. The link no longer works.</em> The link and every session that used it lose access at once.</li>
+</ol>
+
+<h2>Problems and fixes</h2>
+<table>
+  <tr><th>Problem</th><th>What to do</th></tr>
+  <tr><td>There is no Share button.</td><td>The build is not personal, or you did not start it. Only personal builds can be shared.</td></tr>
+  <tr><td>The colleague gets page not found.</td><td>They may not be signed in, or you stopped sharing. Share again and send the new link.</td></tr>
+  <tr><td>The browser could not copy the link.</td><td>Select the link in the box that opens and copy it yourself.</td></tr>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="personal-builds.html">Personal builds and shelves</a></li>
+  <li><a href="../build-results/build-page.html">The build page</a></li>
+</ul>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NuGet Installer · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/nuget-installer">
+<main class="doc">
+<h1>NuGet Installer</h1>
+<p class="lead">Restores the NuGet packages of a solution or project with <code>nuget restore</code>, from the sources you name.</p>
+
+<h2>When to use it</h2>
+<p>Use it before a MSBuild or .NET step, so the packages your solution needs are on the agent. It can also install the packages of one <code>packages.config</code> and update packages afterwards.</p>
+
+<h2>How to set it up</h2>
+
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>. Type <code>NuGet Installer</code> in <strong>Filter step types</strong> if you like, then click the <strong>NuGet Installer</strong> tile (group <strong>Packages</strong>).</li>
+  <li>Type a <strong>Step name</strong>, for example <code>Restore packages</code>.</li>
+  <li>Fill in the fields described below.</li>
+  <li>Optional: set <strong>Execute step</strong>, <strong>Conditions</strong> and <strong>Retry on failure</strong>. See <a href="step-list.html">The steps list and the step editor</a>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<figure class="shot small">
+  <img src="../../assets/shots/build-steps/nuget-installer.png" alt="The fields of the NuGet Installer step in the step editor">
+  <figcaption>The fields of the NuGet Installer step, as the step editor shows them.</figcaption>
+</figure>
+
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Solution</strong></td><td>A solution, project or <code>packages.config</code>, relative to the working directory. Runs <code>nuget restore</code> on it. Empty lets nuget look in the working directory.</td><td>Empty</td><td><code>Tools/BuildTools.sln</code></td></tr>
+    <tr><td><strong>Package sources</strong></td><td>One source per line, each passed as <code>-Source</code>. Empty uses the sources nuget is configured with.</td><td>Empty</td><td><code>https://nuget.studio.example/v3/index.json</code></td></tr>
+    <tr><td><strong>Mode</strong></td><td><strong>Restore</strong> runs <code>nuget restore</code> on a solution or project. <strong>Install</strong> runs <code>nuget install</code> on one <code>packages.config</code>.</td><td>Restore</td><td>Restore</td></tr>
+    <tr><td><strong>Disable looking up packages from the local machine cache</strong></td><td>Passed as <code>-NoCache</code>.</td><td>Off</td><td>Off</td></tr>
+    <tr><td><strong>Restore options</strong></td><td>One argument per line, passed to the restore or install after the sources. Do not put a secret here.</td><td>Empty</td><td><code>-Verbosity</code> then <code>quiet</code></td></tr>
+    <tr><td><strong>Update packages after restoring</strong></td><td>Runs <code>nuget update</code> on the same file after the restore succeeds, with the same sources.</td><td>Off</td><td>Off</td></tr>
+    <tr><td><strong>Update mode</strong></td><td><strong>Update via solution file</strong>: the file above is a solution or project. <strong>Update via packages.config file</strong>: it must be a <code>.config</code> file, or the step stops before it runs.</td><td>Update via solution file</td><td>Update via solution file</td></tr>
+    <tr><td><strong>Include pre-release packages</strong></td><td>Passed as <code>-Prerelease</code> to the update.</td><td>Off</td><td>Off</td></tr>
+    <tr><td><strong>Perform safe update</strong></td><td>Passed as <code>-Safe</code> to the update: only the smallest version change.</td><td>Off</td><td>On</td></tr>
+    <tr><td><strong>Update options</strong></td><td>One argument per line, passed to the update only.</td><td>Empty</td><td><code>-FileConflictAction</code> then <code>Ignore</code></td></tr>
+    <tr><td><strong>NuGet tool</strong></td><td>Path of <code>nuget.exe</code>. Empty takes <code>nuget</code> from the agent's <code>PATH</code>.</td><td>Empty</td><td><code>C:\tools\nuget.exe</code></td></tr>
+    <tr><td><strong>Arguments</strong></td><td>One argument per line, such as <code>-PackagesDirectory</code>. Pass a secret through the environment.</td><td>Empty</td><td><code>-PackagesDirectory</code> then <code>packages</code></td></tr>
+    <tr><td><strong>Working directory, Environment variables, Test reports, Run step within container</strong></td><td>The same in every runner. See <a href="common-step-fields.html">Fields every runner has</a>.</td><td></td><td></td></tr>
+  </tbody>
+</table>
+
+
+<h2>A worked example</h2>
+<p>Restore the tools solution before the build. Step name <code>Restore packages</code>, <strong>Solution</strong> <code>Tools/BuildTools.sln</code>, <strong>Package sources</strong> <code>https://nuget.studio.example/v3/index.json</code>.</p>
+
+<h2>What you see when it runs</h2>
+<p>The console shows <code>$ nuget restore Tools/BuildTools.sln -Source …</code> and the list of restored packages.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong><em>The nuget command was not found on this agent</em></strong></td><td>Install nuget, put it on the <code>PATH</code> or set <strong>NuGet tool</strong>.</td></tr>
+    <tr><td><strong><em>The NuGet Installer step updates packages but has no solution or packages.config</em></strong></td><td>Fill in <strong>Solution</strong>.</td></tr>
+    <tr><td><strong><em>… updates via a packages.config file, but its file is not a .config file</em></strong></td><td>Choose <strong>Update via solution file</strong>, or name a <code>.config</code> file.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="nuget-pack.html">NuGet Pack</a></li>
+  <li><a href="nuget-publish.html">NuGet Publish</a></li>
+  <li><a href="msbuild.html">MSBuild</a></li>
+  <li><a href="runners.html">Runners</a></li>
+  <li><a href="common-step-fields.html">Fields every runner has</a></li>
+</ul>
+</main>
+</body>
+</html>

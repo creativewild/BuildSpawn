@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Create a pool for console devkits · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/set-up-console-pool">
+<main class="doc">
+<h1>Create a pool for console devkits</h1>
+<p class="lead">Keep console builds on the machines that have the devkits, and keep other builds off them.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>You are an administrator.</li>
+  <li>The devkit machines are already agents (see <a href="add-windows-agent.html">Add a Windows build agent</a>).</li>
+  <li>You know which build configurations or project folders build for the console.</li>
+</ul>
+
+<h2>Steps</h2>
+<ol class="steps">
+  <li>Open <strong>Agents</strong>, click the <strong>Pools</strong> tab, then <strong>Create pool</strong>.</li>
+  <li>In <strong>Name</strong>, type a name that says what the pool builds, for example <code>HT2 Devkits</code>.</li>
+  <li>Under <strong>Icon</strong>, click <strong>Console</strong>, or the brand icon: <strong>PlayStation</strong>, <strong>Xbox</strong> or <strong>Nintendo Switch</strong>.</li>
+  <li>Under <strong>Icon colour</strong>, pick a colour, for example <strong>Green</strong>. The <strong>Sidebar preview</strong> shows how the pool will look.</li>
+  <li>Under <strong>Agents</strong>, tick the devkit machines. The <strong>Current pool</strong> column says <strong>Moves from …</strong> for each one: an agent belongs to one pool only.</li>
+  <li>Under <strong>Projects</strong>, type in <strong>Add project</strong> and pick each console build configuration or folder, for example <code>How-to » HT2 Devkit Build</code>. A folder adds every build configuration in it.</li>
+  <li>Click <strong>Create</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/how-to/set-up-console-pool-1.png" alt="The Create pool page: Name HT2 Devkits, the Console icon chosen, Icon colour Green, ht-win-agent-01 ticked with Moves from Default, and Add project showing How-to » HT2 Devkit Build"><figcaption>Name, icon and colour, agents and projects on one page.</figcaption></figure>
+
+<div class="callout tip"><p>A pool decides <em>where</em> a build may run. To also pick a particular machine, label the devkit agents (for example <code>ps5 devkit</code>) and set a label expression or an agent requirement on the build configuration. See <a href="../agents/agent-labels-requirements.html">Labels and agent requirements</a>. Set <strong>Number of executors</strong> to <code>1</code> on a devkit (see <a href="../agents/agent-executors.html">Builds at a time</a>).</p></div>
+
+<h2>Check it worked</h2>
+<ol class="steps">
+  <li>The pool appears in the side panel of the Agents pages with its icon and colour. Click the arrow before it to see its agents.</li>
+  <li>Run one of the pool's build configurations. Its build page says <strong>on</strong> and the name of a devkit agent, and the Agents page shows that agent <strong>Building</strong>.</li>
+  <li>To change the pool later, click its name. The <strong>Edit pool</strong> page has the same settings and <strong>Delete pool</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/how-to/set-up-console-pool-3.png" alt="The Agents page with every pool opened in the side panel: HT2 Devkits has a green console icon and holds ht-win-agent-01, which shows 1/2 busy; in the list, ht-win-agent-01 is Building How-to » HT2 Devkit Build #2"><figcaption>The pool in the side panel, and its agent running the console build.</figcaption></figure>
+<figure class="shot"><img src="../../assets/shots/how-to/set-up-console-pool-2.png" alt="The Edit pool page of HT2 Devkits: name, the Console icon, Icon colour Green and the sidebar preview"><figcaption>The pool page, where you change the pool later.</figcaption></figure>
+
+<h2>Troubleshooting</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>Console builds wait with <em>Not in a pool assigned to this project</em>.</td><td>The build configuration is not in the pool's <strong>Projects</strong>, or it is also in another pool. Add it, or its folder, on the pool page.</td></tr>
+    <tr><td>Other builds no longer run on the devkits.</td><td>That is the point of the pool: its agents run only the pool's projects. To share a machine at night, use a <a href="night-pool-schedule.html">scheduled move</a>.</td></tr>
+    <tr><td>The pool shows no agents ready.</td><td>The agents are offline or still in another pool. Open the pool and check <strong>Current pool</strong>, then the agents' status on the Agents page.</td></tr>
+  </tbody>
+</table>
+
+<h2>Next steps</h2>
+<ul>
+  <li><a href="../agents/pools.html">Pools</a>: how pools work, icons and the sidebar.</li>
+  <li><a href="night-pool-schedule.html">Move agents to another pool every evening</a>.</li>
+  <li><a href="borrow-agents-for-release.html">Give release builds priority on agents</a>.</li>
+  <li><a href="../agents/agent-settings.html">Agent settings</a>.</li>
+</ul>
+</main>
+</body>
+</html>

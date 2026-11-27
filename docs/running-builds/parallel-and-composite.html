@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parallel tests and composite builds · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="running-builds/parallel-and-composite">
+<main class="doc">
+<h1>Parallel tests and composite builds</h1>
+<p class="lead">Split a long test run over several agents so it finishes sooner, and see the results as one build.</p>
+
+<h2>Parallel tests</h2>
+<p><strong>Parallel tests</strong> is a build feature. When it is on, one build of the build configuration becomes a <strong>parent</strong> that starts 2 to 20 <strong>batch</strong> builds at the same time. Each batch runs its share of the test classes. The parent waits for them and merges the results.</p>
+
+<h3>Turn it on</h3>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Build Features</strong>.</li>
+  <li>Add the feature <strong>Parallel tests</strong>.</li>
+  <li>Set the <strong>Number of batches</strong>, from 2 to 20.</li>
+  <li>Save.</li>
+</ol>
+<p>Each batch needs a free agent, so choose a number your agents can serve.</p>
+
+<h3>How the tests are split</h3>
+<ul>
+  <li><strong>Maven</strong>, <strong>Gradle</strong> and <strong>NUnit</strong> steps get their share of the test classes on their own.</li>
+  <li>Buildspawn uses the time each class took in earlier runs to give every batch about the same amount of work. New classes are spread evenly.</li>
+  <li>Any other step can read its share from environment variables:</li>
+</ul>
+<table>
+  <thead><tr><th>Variable</th><th>What it holds</th></tr></thead>
+  <tbody>
+    <tr><td><code>BUILDSPAWN_PARALLEL_BATCH</code></td><td>The number of this batch, starting at 1.</td></tr>
+    <tr><td><code>BUILDSPAWN_PARALLEL_BATCHES</code></td><td>How many batches there are.</td></tr>
+    <tr><td><code>BUILDSPAWN_PARALLEL_INCLUDE_FILE</code></td><td>A file with the test classes of this batch, one per line.</td></tr>
+    <tr><td><code>BUILDSPAWN_PARALLEL_EXCLUDE_FILE</code></td><td>A file with all the other known classes, for tools that only take an exclude list.</td></tr>
+  </tbody>
+</table>
+<p>For example, a Unity or Unreal test script can pass the include file to its own test filter:</p>
+<pre><code>python Build/run_tests.py --classes-from "$BUILDSPAWN_PARALLEL_INCLUDE_FILE"</code></pre>
+
+<h3>The results</h3>
+<ul>
+  <li>The parent's build page has a <strong>Parallel tests</strong> block: one row per batch with a link, the agent, the duration and the result, and the merged test counts.</li>
+  <li>A batch build says <em>Batch 2 of 4, part of #12</em> with a link to the parent.</li>
+  <li>The parent ends with the worst batch result. Each batch keeps its own artifacts and test reports. Mail goes out once, from the parent.</li>
+  <li>Stopping the parent stops its batches.</li>
+</ul>
+<div class="callout tip"><p>Pin the revision in the build configuration, or use one Perforce changelist, so every batch builds the same code. Each batch prints its share size in its log, so you can check.</p></div>
+
+<h2>Composite builds</h2>
+<p>A <strong>composite build</strong> is a build that only starts and waits for other builds. It uses <strong>no agent</strong>: it runs on the server, starts at once and finishes when its parts finish. Because it holds no executor while it waits, it cannot take the agent its own parts need.</p>
+<p>You meet composite builds in two places:</p>
+<ul>
+  <li>the parent build of <strong>Parallel tests</strong>;</li>
+  <li>a <strong>distributed Unreal Engine BuildGraph</strong> build: a hidden setup build exports the graph, the groups run on agents of the matching type, and the parent collects their artifacts.</li>
+</ul>
+<p>A composite build shows <em>No agent (composite)</em> in the executor lists, and is not counted as a busy executor. Its build page and log say it runs without an agent. The hidden builds made for it are not listed as build configurations and are cleaned up with the build.</p>
+
+<h2>Parallel blocks and Matrix blocks</h2>
+<p>Parallel tests splits one test run. A <strong>Parallel block</strong> instead runs steps of one build side by side, on this machine or on other agents. The parts that run on other agents are <a href="side-builds.html">side builds</a>. A <strong>Matrix</strong> block runs the same steps for every combination of values, such as platform &times; config. See <a href="side-builds.html">Side builds</a> for how they look in the queue and on the build page.</p>
+
+<h2>Related</h2>
+<ul>
+  <li><a href="../build-steps/parallel-blocks.html">Parallel blocks</a>: run steps side by side inside one build.</li>
+  <li><a href="side-builds.html">Side builds</a>: the parts of a Parallel block.</li>
+  <li><a href="queue.html">The queue</a>: where batches wait for agents.</li>
+</ul>
+</main>
+</body>
+</html>

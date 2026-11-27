@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PowerShell · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/powershell">
+<main class="doc">
+<h1>PowerShell</h1>
+<p class="lead">Runs a PowerShell script you type, or a <code>.ps1</code> file, with Windows PowerShell or <code>pwsh</code> (PowerShell 7).</p>
+
+<h2>When to use it</h2>
+<p>Use it for build scripts you already wrote in PowerShell: packaging, signing, copying to a share, calling the console SDK tools. It works on Windows agents, and on Linux and macOS agents that have <code>pwsh</code>.</p>
+
+<h2>How to set it up</h2>
+
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>. Type <code>PowerShell</code> in <strong>Filter step types</strong> if you like, then click the <strong>PowerShell</strong> tile (group <strong>Command line and scripts</strong>).</li>
+  <li>Type a <strong>Step name</strong>, for example <code>Pack build</code>.</li>
+  <li>Choose <strong>Run</strong>: type the script, or give a script file. Set the other fields described below.</li>
+  <li>Optional: set <strong>Execute step</strong>, <strong>Conditions</strong> and <strong>Retry on failure</strong>. See <a href="step-list.html">The steps list and the step editor</a>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<figure class="shot small">
+  <img src="../../assets/shots/build-steps/powershell.png" alt="The fields of the PowerShell step in the step editor">
+  <figcaption>The fields of the PowerShell step, as the step editor shows them.</figcaption>
+</figure>
+
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Run</strong></td><td><strong>Script in this step</strong> or <strong>File</strong>.</td><td>Script in this step</td><td>File</td></tr>
+    <tr><td><strong>Script</strong></td><td>The script text in the code editor. <code>%name%</code> is replaced with that build parameter when the step runs.</td><td>Empty</td><td><code>Write-Host "Packing $env:CONFIG"</code></td></tr>
+    <tr><td><strong>Script file</strong></td><td>A <code>.ps1</code> file, relative to the working directory. The agent's execution policy applies to it.</td><td>Empty</td><td><code>Build/package.ps1</code></td></tr>
+    <tr><td><strong>Script execution mode</strong></td><td><strong>Execute .ps1 from external file</strong> runs <code>-File</code>. <strong>Put script into PowerShell stdin with -Command -</strong> writes the script, or the file, to PowerShell's standard input. Script arguments are hidden and not passed in that mode.</td><td>Execute .ps1 from external file</td><td>Put script into PowerShell stdin</td></tr>
+    <tr><td><strong>Arguments</strong></td><td>One argument per line, passed to the script. Each line stays one argument, whatever it holds. Other processes on the agent can see arguments, so pass a secret through the environment.</td><td>Empty</td><td><code>-Config</code> on one line, <code>Shipping</code> on the next</td></tr>
+    <tr><td><strong>PowerShell version</strong></td><td>The agent must report this version. <strong>5.1</strong> is Windows PowerShell, <strong>7</strong> is <code>pwsh</code>, unless Edition is set. <strong>Any</strong> adds no requirement. A step in a container needs none.</td><td>Any</td><td>7</td></tr>
+    <tr><td><strong>Platform</strong></td><td>Windows agents only. <strong>x86</strong> starts the 32-bit Windows PowerShell, <strong>x64</strong> the 64-bit one. <strong>Auto</strong> starts the edition chosen below. On a Unix agent x86 or x64 stops the step.</td><td>Auto</td><td>x64</td></tr>
+    <tr><td><strong>Edition</strong></td><td><strong>Default for the agent</strong> (Windows PowerShell on Windows, <code>pwsh</code> on Unix agents), <strong>PowerShell 7 (pwsh)</strong> or <strong>Windows PowerShell</strong>.</td><td>Default for the agent</td><td>PowerShell 7 (pwsh)</td></tr>
+    <tr><td><strong>Bypass the execution policy</strong></td><td>Off: the agent's policy is used as it is, and a policy that blocks scripts fails the step. On: runs with <code>-ExecutionPolicy Bypass</code> on Windows agents. No effect on Unix agents.</td><td>Off</td><td>On</td></tr>
+    <tr><td><strong>Add -NoProfile argument</strong></td><td>On: PowerShell does not load the profile of the account the agent runs as. Untick to load it.</td><td>On</td><td>On</td></tr>
+    <tr><td><strong>Additional command line parameters</strong></td><td>Split on spaces and line breaks into separate PowerShell parameters, put before the script. Double quotes group a parameter that holds spaces. Script arguments go after the script; these go to PowerShell.</td><td>Empty</td><td><code>-NonInteractive</code></td></tr>
+    <tr><td><strong>Format stderr output as</strong></td><td>Show stderr lines in orange or red in the log.</td><td>Plain</td><td>Error</td></tr>
+    <tr><td><strong>Fail the step when anything is written to stderr</strong></td><td>Off: the exit code alone decides.</td><td>Off</td><td>On</td></tr>
+    <tr><td><strong>Working directory, Environment variables, Test reports, Run step within container</strong></td><td>The same in every runner. See <a href="common-step-fields.html">Fields every runner has</a>.</td><td></td><td></td></tr>
+  </tbody>
+</table>
+
+
+<h2>A worked example</h2>
+<p>A Windows agent packs a Unity build into a zip and passes the configuration as a script argument. Step name <code>Pack build</code>, <strong>Run</strong> = <strong>File</strong>, <strong>Script file</strong> = <code>Build/pack.ps1</code>, <strong>Arguments</strong>:</p><pre><code>-Config
+%CONFIG%
+-Out
+Builds\Win64</code></pre><p>The script <code>Build/pack.ps1</code>:</p><pre><code>param([string]$Config, [string]$Out)
+Compress-Archive -Path "$Out\*" -DestinationPath "Skyforge-$Config.zip" -Force
+Write-Host "Packed Skyforge-$Config.zip"</code></pre>
+
+<h2>What you see when it runs</h2>
+<p>The console shows the PowerShell command line after a <code>$</code>, then the output. A non-zero exit code fails the step. With <strong>Format stderr output as</strong> set, error text shows in colour.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong><em>The PowerShell command was not found on this agent</em></strong></td><td>Install PowerShell there or put it on the <code>PATH</code>. The step waits for an agent that reports the chosen version.</td></tr>
+    <tr><td><strong>A policy that blocks scripts fails the step</strong></td><td>Tick <strong>Bypass the execution policy</strong>, or sign the script.</td></tr>
+    <tr><td><strong><em>The PowerShell script file … was not found in the working directory</em></strong></td><td>Check the path. It is relative to the <strong>Working directory</strong>.</td></tr>
+    <tr><td><strong><em>The PowerShell platform x86 or x64 applies to Windows agents only</em></strong></td><td>Set <strong>Platform</strong> to <strong>Auto</strong>.</td></tr>
+    <tr><td><strong><em>The PowerShell platform x86 or x64 means Windows PowerShell</em></strong></td><td>Set Edition to the default or Windows PowerShell, or Platform to Auto.</td></tr>
+    <tr><td><strong>Arguments are missing in the script</strong></td><td>In stdin mode the script arguments are not passed. Use the file mode.</td></tr>
+    <tr><td><strong><em>A step in a container cannot take its script on standard input</em></strong></td><td>Use the file execution mode.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="script-editor.html">The script editor</a></li>
+  <li><a href="../how-to/steps-powershell-with-parameters.html">Run a PowerShell script with parameters</a></li>
+  <li><a href="command-line.html">Command Line</a></li>
+  <li><a href="runners.html">Runners</a></li>
+  <li><a href="common-step-fields.html">Fields every runner has</a></li>
+</ul>
+</main>
+</body>
+</html>

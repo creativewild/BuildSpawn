@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/type-project">
+<main class="doc">
+<h1>Project</h1>
+<p class="lead">A project is a folder. It groups build configurations and other projects, and passes settings down to everything inside.</p>
+<h2>When to use it</h2>
+<p>Make one project per game or tool: <em>Game</em>, <em>Engine</em>, <em>Tools</em>. Inside you can make a project per kind of build, such as <em>Main</em>, <em>Drops</em> and <em>Release</em>. A project holds shared steps, parameters, credentials, Perforce roots, templates, documentation links and permissions. The page <a href="projects.html">Projects</a> has the full description.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the project the new one sits in, or the Projects page for a top-level project. Click <strong>New Item</strong>.</li>
+  <li>Type the name, for example <code>Engine</code>.</li>
+  <li>Under <strong>Type</strong> choose <strong>Project</strong>. Click <strong>Create</strong>.</li>
+  <li>On its <strong>Settings</strong>, add a description, an icon and a colour. Click <strong>Save</strong>.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Display Name</td><td>Shown in lists and the tree. Empty shows the name.</td><td>Empty</td><td><code>Skyforge Engine</code></td></tr>
+    <tr><td>Description</td><td>Free text.</td><td>Empty</td><td><code>Engine builds and tests.</code></td></tr>
+    <tr><td>Icon and Icon colour</td><td>See <a href="project-icons.html">Project icons</a>.</td><td>Project</td><td>Tools</td></tr>
+    <tr><td>Health metrics</td><td>How the health of the project is worked out from what is inside.</td><td>Worst child health</td><td>-</td></tr>
+    <tr><td>Properties</td><td>Settings the build configurations inside get: Pipeline libraries, credentials, Perforce roots. See <a href="folder-settings.html">Project settings</a>.</td><td>-</td><td>-</td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p>The studio makes <strong>Game</strong> with the subprojects <strong>Main</strong>, <strong>Drops</strong> and <strong>Release</strong>. See <a href="../how-to/projects-organise-game.html">Organise projects for a game</a>.</p><h2>What you see when it runs</h2>
+<p>The project appears in the tree. The dot after its name is the worst result inside it.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>A build configuration does not get a setting of the project</td><td>Check the order of inheritance, and the <strong>Disabled above</strong> note. See <a href="projects.html#passes-down">What a project passes down</a>.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="item-types.html">Item types</a></li>
+  <li><a href="projects.html">Projects</a></li>
+  <li><a href="folder-settings.html">Project settings</a></li>
+  <li><a href="project-tree-order.html">Tree order and separators</a></li>
+</ul>
+</main>
+</body>
+</html>

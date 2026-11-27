@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The build configuration block · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="visual-editor/configuration-block">
+<main class="doc">
+<h1>The build configuration block</h1>
+<p class="lead">The block that holds settings for the whole build. Every graph has exactly one, and the steps start from it.</p>
+
+<figure class="shot">
+  <img src="../../assets/shots/visual-editor/canvas.png" alt="The Build configuration block, marked job-wide, with sections Parameters (4 parameters), Triggers (None), Source (Perforce //depot/skyforge/...), Every step inherits (Runs on pool Windows) and Rules for the build (Build features 0 on, Failure conditions 0); a Parameters group below holds CONFIG, CLEAN, pool.priority and STEAM_UPLOAD_KEY">
+  <figcaption>The Build configuration block (top left) and the Parameters group wired into it.</figcaption>
+</figure>
+
+<h2>The build configuration block</h2>
+<p>The block is marked <strong>job-wide</strong>. Its sections sum up the settings that are not steps:</p>
+<table>
+  <thead><tr><th>Section</th><th>What it shows</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Parameters</strong></td><td>How many parameters the build has. The Parameters group is wired here.</td></tr>
+    <tr><td><strong>Triggers</strong></td><td>What starts a build, or <em>None</em>.</td></tr>
+    <tr><td><strong>Source</strong></td><td>The version control roots, such as a Perforce depot path or a Git repository. <strong>+ root</strong> adds one.</td></tr>
+    <tr><td><strong>Every step inherits</strong></td><td>Settings every step gets, such as <strong>Runs on</strong> <em>pool Windows</em>.</td></tr>
+    <tr><td><strong>Rules for the build</strong></td><td>How many build features are on, and how many failure conditions are set.</td></tr>
+  </tbody>
+</table>
+<p>The <strong>Run order</strong> dot on the right of the block starts the chain of steps. Open the block's properties (right-click, <strong>Open properties</strong>) to change any of these settings. They are the same settings as on the <a href="../projects/settings-homes.html">settings homes</a> (<a href="../projects/bc-triggers.html">Triggers</a>, <a href="../projects/bc-version-control.html">Version Control</a>, <a href="../projects/bc-build-features.html">Build Features</a>, <a href="../projects/bc-failure-conditions.html">Failure Conditions</a>).</p>
+
+<h2>Parameter groups</h2>
+<p>All parameters sit in one <strong>Parameters</strong> group, wired into the build configuration block. Each parameter is a small block with its name, its value, its type and whether it is asked at run time, for example <em>choice · asked at run</em>.</p>
+<ul>
+  <li>The chips at the top of the group filter by kind: <strong>All</strong>, <strong>Configuration</strong>, <strong>Environment</strong> and <strong>System</strong>, with a count each.</li>
+  <li><strong>+ Add parameter</strong> adds one. You can also drag a parameter type from the palette into the group.</li>
+  <li>A <code>system.</code> property shows a <strong>system</strong> tag. Password values always show as dots.</li>
+  <li>Each parameter has a coloured dot on the right. Wire it to a step to show that the step uses it. The parameter's properties list the steps that use it under <strong>Used by</strong>.</li>
+</ul>
+<div class="callout note"><p>People who may only view the settings never see secret values: they are masked in the visual editor too.</p></div>
+<p>See <a href="../parameters/parameters.html">Parameters</a> for what each kind does.</p>
+</main>
+</body>
+</html>

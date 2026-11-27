@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Perforce polling and triggers · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="version-control/perforce-polling">
+<main class="doc">
+<h1>Perforce polling and triggers</h1>
+<p class="lead">Start a build when someone submits to Perforce, either by asking the server on a timer or by letting a Perforce trigger call Buildspawn.</p>
+
+<h2>When to use it</h2>
+<p><strong>Polling</strong> means Buildspawn asks Perforce on a schedule whether there is a new changelist. A <strong>Perforce trigger</strong> is a script on the Perforce server that calls Buildspawn after each submit. Polling is simple. A trigger starts builds at once and puts less load on the server. You can use both: polling is the safety net.</p>
+
+<h2>How to set it up</h2>
+<h3>Poll on a schedule</h3>
+<ol class="steps">
+  <li>Open the build configuration, then <strong>Settings › Triggers</strong>.</li>
+  <li>Click <strong>Add new trigger</strong> and add <strong>Poll SCM</strong> (or, with Perforce Software, <strong>P4 triggered build.</strong>). Type a schedule such as <code>H/5 * * * *</code>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<p>See <a href="../running-builds/triggers.html">Triggers</a> for the schedule syntax.</p>
+<h3>Build when the Perforce server calls</h3>
+<ol class="steps">
+  <li>Add the trigger <strong>Perforce root: build when the Perforce server triggers it</strong> to the build configuration. It needs the build configuration to use a <a href="perforce-roots.html">Perforce root</a>.</li>
+  <li>On the Perforce server, an administrator adds a trigger line with <code>p4 triggers</code> that calls Buildspawn after each submit. Use a Buildspawn user that can only build these build configurations, and its API token.</li>
+  <li>The root shows <strong>Commit hook is active</strong> or <strong>Commit hook is inactive</strong>, so you can see whether the server has called.</li>
+</ol>
+<p>A Pipeline job reads the note <em>build when the Perforce server triggers it</em> and takes the same trigger.</p>
+
+<h2>Every setting</h2>
+<table>
+  <thead><tr><th>Where</th><th>Setting</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td>Perforce root, <strong>Advanced settings</strong></td><td><strong>Minimum polling interval</strong></td><td>At least this many seconds between two polls of a build configuration on the root. Kept across restarts. While a Perforce trigger is active, the interval doubles with each trigger call, from 15 minutes up to 4 hours, and goes back when a poll finds a change the trigger missed. Then the log says <em>Polling skipped: a Perforce trigger is active on root ...</em></td></tr>
+    <tr><td>Build configuration, Perforce root</td><td><strong>Checkout rules</strong></td><td>Excluded paths do not start polling.</td></tr>
+    <tr><td>Perforce Software</td><td><strong>Polling build filters</strong></td><td>See <a href="perforce-software.html">Perforce Software</a>.</td></tr>
+    <tr><td>Job property <strong>Refresh Perforce lists on a custom interval</strong></td><td>Interval in seconds</td><td>How often the Perforce lists of the build configuration (submitted changes, shelves, pending changes, labels, branch streams) are read again in the background. It runs while someone has viewed the build configuration in the last 30 minutes, or while it has a polling, commit or shelve trigger. Pages show the stored lists at once, with their age. The default is 120 seconds, at least 15.</td></tr>
+  </tbody>
+</table>
+
+<h2>A worked example</h2>
+<p>The <strong>Windows Build</strong> of Skyforge uses root <code>skyforge-main</code> with <strong>Minimum polling interval</strong> <code>60</code>. It has the trigger <strong>Perforce root: build when the Perforce server triggers it</strong> and a <strong>Poll SCM</strong> trigger <code>H/30 * * * *</code> as backup. A submit at 14:02 starts a build within seconds.</p>
+
+<h2>What you see when it runs</h2>
+<p>The build lists the changelists since the last build. For builds started by a trigger, the cause says <em>run by a Perforce trigger</em>. The build configuration page shows a polling log.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>You see</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>No build after a submit</td><td>The change may be outside the view or the checkout rules, or removed by a filter. Look at the polling log.</td></tr>
+    <tr><td>The commit hook stays inactive</td><td>The server has not called yet. Check the <code>p4 triggers</code> line, the user and the API token.</td></tr>
+    <tr><td>The build triggers itself</td><td>Its own submit starts it. Use the filter <strong>Exclude changes from user</strong> for the build user.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../running-builds/triggers.html">Triggers</a>, <a href="../how-to/build-every-submit.html">Build every Perforce submit</a>, <a href="perforce-shelves.html">Shelves</a></li>
+</ul>
+</main>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Send build artifacts to a Windows share · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="post-build/cifs">
+<main class="doc">
+<h1>Send build artifacts to a Windows share</h1>
+<p class="lead">Sends files from the build to a server over a Windows file share (SMB), when the build ends.</p>
+<h2>When to use it</h2>
+<p>Use it to put build output where other people or machines can get it. Use it to copy output to a file server that your artists use, for example <code>\\files\skyforge\drops</code>. An administrator sets up the servers once in the global settings. The same form is also offered as a build step of a promotion, for build configurations that use promotions.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration, click <strong>Settings</strong>, then <strong>Post-build Actions</strong>. Click <strong>Add post-build action</strong> and choose <strong>Send build artifacts to a Windows share</strong>.</li>
+  <li>Click <strong>Add</strong> under <strong>Publishers</strong> and choose the server in <strong>Name</strong>.</li>
+  <li>Add a transfer set: <strong>Source files</strong> and the other fields.</li>
+  <li>Open <strong>Advanced</strong> for retries, labels and what to do on an error.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Name</td><td>The server, chosen from the servers set up in the global settings.</td><td>None</td><td><code>build-share-01</code></td></tr>
+    <tr><td>Source files</td><td>Files to send, as a comma separated Ant pattern. The base folder is the workspace.</td><td>Empty</td><td><code>Output/**</code></td></tr>
+    <tr><td>Remove prefix</td><td>The first part of the path that is not created on the server.</td><td>Empty</td><td><code>Output</code></td></tr>
+    <tr><td>Remote directory</td><td>A folder below the one set in the global settings. It is created when missing.</td><td>Empty</td><td><code>skyforge/nightly</code></td></tr>
+    <tr><td>Exclude files</td><td>Files that match are not sent. Comma separated Ant patterns.</td><td>Empty</td><td><code>**/*.pdb</code></td></tr>
+    <tr><td>Pattern separator</td><td>The regular expression that separates patterns in the two fields above.</td><td><code>[, ]+</code></td><td><code>[,]+</code></td></tr>
+    <tr><td>No default excludes</td><td>Send files that Ant leaves out by default.</td><td>Off</td><td>Off</td></tr>
+    <tr><td>Make empty dirs</td><td>Also create folders that match, even when empty.</td><td>Off</td><td>Off</td></tr>
+    <tr><td>Flatten files</td><td>Send only files, no folders. File names must be unique, or the transfer stops.</td><td>Off</td><td>Off</td></tr>
+    <tr><td>Clean remote</td><td>Delete the files in the remote directory before sending.</td><td>Off</td><td>Off</td></tr>
+    <tr><td>Remote directory is a date format</td><td>The remote directory is a Java date pattern, filled with the build date.</td><td>Off</td><td>On with <code>yyyy-MM-dd</code></td></tr>
+    <tr><td>Retry: Retries</td><td>Advanced. How many times to try again after an error.</td><td>Off</td><td><code>3</code></td></tr>
+    <tr><td>Retry: Delay</td><td>Advanced. Milliseconds to wait between tries.</td><td>Off</td><td><code>10000</code></td></tr>
+    <tr><td>Verbose output in console</td><td>Advanced. A lot of detail in the build log, for finding problems.</td><td>Off</td><td>Off</td></tr>
+    <tr><td>Publish to other shares if an error occurs / Fail the build if an error occurs</td><td>Advanced (on the whole list). Keep going with the other servers after an error; mark the build failed instead of unstable.</td><td>Off / Off</td><td>-</td></tr>
+    <tr><td>Always transfer from master / Give the master a NODE_NAME</td><td>Advanced. Send the files through the server, which helps with strict firewalls.</td><td>Off</td><td>-</td></tr>
+    <tr><td>Use the workspace / Use promotion timestamp</td><td>Promotion only. Take files from the workspace instead of the artifacts of the promoted build; use the promotion time for the date format.</td><td>Off</td><td>-</td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p>After <strong>Windows Build</strong>, <code>Output/**</code> goes to the share <code>files-drops</code>, into <code>skyforge\1.4</code>. Artists open the share in Explorer.</p><h2>What you see when it runs</h2>
+<p>The log shows the share connection and each file copied. An error makes the build unstable, or failed if you chose that.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>Logon failure</td><td>Check the user name and password of the share in the global settings.</td></tr>
+    <tr><td>The network path was not found</td><td>The server name or share name is wrong, or the agent cannot reach it.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="overview.html">After the build: overview</a></li>
+  <li><a href="../projects/bc-post-build-actions.html">Post-build actions tab</a></li>
+</ul>
+</main>
+</body>
+</html>

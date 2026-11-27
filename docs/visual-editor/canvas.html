@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Canvas and palette · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="visual-editor/canvas">
+<main class="doc">
+<h1>Canvas and palette</h1>
+<p class="lead">Draw a build by dragging blocks onto a canvas and wiring them up. The visual editor shows the same settings as the form, as a graph.</p>
+
+<p>Open a build configuration, click <strong>Settings</strong>, then <strong>Visual editor</strong>. The editor and the form edit the same settings: a change in one shows in the other. People who may only view the settings see the graph read-only.</p>
+
+<figure class="shot">
+  <img src="../../assets/shots/visual-editor/canvas.png" alt="The visual editor of Windows Build: a toolbar with Save, Validate, undo, redo, Auto-layout and zoom; the palette on the left with Build configuration, Parameters, Build steps and Flow; on the canvas the Build configuration block wired to the steps Compile, Cook content and Package and to Archive the artifacts, with a Parameters group below">
+  <figcaption>The visual editor: palette on the left, canvas on the right.</figcaption>
+</figure>
+
+<p>The visual editor is marked <strong>Beta</strong> on the Settings row. It works on Build configurations and on declarative Pipelines. For a Pipeline the graph is made from the <code>pipeline { }</code> script and written back to it. See <a href="../projects/type-pipeline.html">Pipeline</a>.</p>
+<h2>Canvas</h2>
+<p>The canvas is a grid you can pan and zoom:</p>
+<ul>
+  <li>Drag an empty part of the canvas to move around. Use the mouse wheel, or <strong>−</strong> and <strong>+</strong> in the toolbar, to zoom.</li>
+  <li><strong>Fit</strong> (the square button beside the zoom) shows the whole graph. The minimap in the corner shows where you are.</li>
+  <li><strong>Auto-layout</strong> tidies the blocks into neat rows.</li>
+  <li><strong>Search nodes</strong> (press <kbd>Space</kbd>) finds a block by name.</li>
+  <li>Drag a block to move it. The layout is saved with the settings, but moving blocks never starts a build.</li>
+</ul>
+<p>The legend above the canvas names the wire colours: <strong>Run order</strong>, <strong>Text</strong>, <strong>Number</strong>, <strong>Boolean</strong> and <strong>File</strong>.</p>
+
+<h2>Palette</h2>
+<p>The palette on the left lists everything you can add, in groups:</p>
+<ul>
+  <li><strong>Build configuration</strong>: the one job-wide block. See <a href="configuration-block.html">The build configuration block</a>.</li>
+  <li><strong>Parameters</strong>: configuration parameters, environment variables, system properties, and parameters that ask for text, a choice, yes or no, a password or a file.</li>
+  <li><strong>Build steps</strong>: the common runners, such as Command Line, PowerShell, Unity, Unreal and MSBuild. <strong>More steps</strong> holds every other runner.</li>
+  <li><strong>Flow</strong>: Sequence, Branch on condition, Parallel and Fail if.</li>
+  <li>Also sources, dependencies and outputs such as artifacts and notifications.</li>
+</ul>
+<p>Drag an item onto the canvas to add it. Type in <strong>Search nodes</strong> to filter the palette.</p>
+
+<h2>Wiring</h2>
+<p>Blocks connect with wires. Drag from a block's output dot to another block's input dot.</p>
+<ul>
+  <li><strong>Run-order wires</strong> (grey) set the order the steps run in: from the build configuration block to the first step, then step to step.</li>
+  <li><strong>Data wires</strong> (coloured by type) carry values: a parameter into a step that uses it, or a step's output into a later step. Wires are type-checked when you save.</li>
+  <li>To run steps side by side, wire them through a <strong>Parallel</strong> block. See <a href="../build-steps/parallel-blocks.html">Parallel blocks</a>.</li>
+</ul>
+
+<p>Flow blocks shape the build. <strong>Sequence</strong> runs steps one after another. <strong>Branch on condition</strong> runs a branch only when a condition is true. <strong>Parallel</strong> runs sides at the same time; with a <strong>Matrix</strong> it shows as one card with its axes, and an include row can set where it runs. <strong>Fail if</strong> fails the build on a condition. See <a href="../build-steps/parallel-blocks.html">Parallel blocks</a> and <a href="../build-steps/matrix-mode.html">Matrix mode</a>.</p>
+<h2>Problems and Compile preview</h2>
+<p>Under the canvas two tabs help you check your work before you save:</p>
+<ul>
+  <li><strong>Problems</strong> lists what is wrong with the graph, for example a wire of the wrong type, a loop or a missing value. <strong>No problems found</strong> means it can be saved. A line at the right says when the last check ran and that there are no cycles.</li>
+  <li><strong>Compile preview</strong> shows what <strong>Save</strong> will write, in the words of the forms and in the order of the Build Steps list. Each item is marked <em>new</em>, <em>changed</em> or <em>unchanged</em> since the last save. It also shows the failure conditions, the declared outputs and who reads them, and anything else that changes.</li>
+</ul>
+<h2>Properties</h2>
+<p>To change a block's settings:</p>
+<ol class="steps">
+  <li>Right-click the block and choose <strong>Open properties</strong>, or select it and press <kbd>Enter</kbd>.</li>
+  <li>A large dialog opens with the block's own form: for a step, the same fields as on the Build Steps home, plus its execution settings, retry, outputs and <strong>Run on</strong>.</li>
+  <li>Click <strong>Save</strong> in the dialog. The change is kept in the editor until you save the page.</li>
+</ol>
+<p>The side panel button in the toolbar opens a read-only panel beside the graph that shows the selected block. You can resize it; it remembers its width.</p>
+
+<h2>Save</h2>
+<p>The <strong>Save</strong> button in the toolbar has a small arrow beside it for the other ways to save.</p>
+<ul>
+  <li><strong>Validate</strong> checks the graph without saving and lists any problems.</li>
+  <li><strong>Save</strong> writes the graph back to the build configuration. The status beside the zoom says <em>No unsaved changes</em> once it is saved.</li>
+  <li><strong>Undo</strong> and <strong>Redo</strong> go back and forward up to 100 changes.</li>
+  <li><strong>Open as form</strong> switches to the form view of the same settings.</li>
+</ul>
+<div class="callout note"><p>If someone else saved the same build configuration while you were editing, your save is refused and tells you who saved and when. Reload to get their changes, then make yours again.</p></div>
+<div class="callout tip"><p>Opening the editor and saving with no changes leaves the settings exactly as they were, so it is safe to explore.</p></div>
+</main>
+</body>
+</html>

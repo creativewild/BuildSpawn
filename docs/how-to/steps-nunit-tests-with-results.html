@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Run NUnit tests and see the results · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/steps-nunit-tests-with-results">
+<main class="doc">
+<h1>Run NUnit tests and see the results</h1>
+<p class="lead">Run your NUnit tests on every build and read the passed and failed tests on the build page.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>A Windows agent with the NUnit 3 console runner (<code>nunit3-console</code>) on its <code>PATH</code>.</li>
+  <li>A built test assembly, here <code>Tests/bin/Release/Game.Tests.dll</code>. Build it in an earlier step.</li>
+</ul>
+
+<h2>Steps</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Build Steps</strong>.</li>
+  <li>Add an <strong>NUnit</strong> step named <code>Unit tests</code>.</li>
+  <li>Put <code>Tests/bin/Release/Game.Tests.dll</code> in <strong>Test assemblies</strong>.</li>
+  <li>Put <code>Slow</code> in <strong>Exclude categories</strong> to skip slow tests.</li>
+  <li>Tick <strong>Run recently failed tests first</strong>, so a test that broke last time is run first.</li>
+  <li>Optional: set <strong>Code coverage</strong> to <strong>Coverlet</strong> or <strong>dotCover</strong> if the tool is on the agent.</li>
+  <li>Click <strong>Save</strong> and run the build.</li>
+</ol>
+
+<h2>Check it worked</h2>
+<p>Open the build. The <strong>Build steps</strong> card shows the step as succeeded, or unstable when a test failed. Open the <strong>Tests</strong> tab for each test. With coverage on, the totals show on the build page. See <a href="../build-results/changes-artifacts-tests.html">Changes, artifacts and tests</a>.</p>
+
+<h2>Troubleshooting</h2>
+<ul>
+  <li><strong>nunit3-console not found.</strong> Install it, or set <strong>Console runner</strong>.</li>
+  <li><strong>No tests run.</strong> Check the path in <strong>Test assemblies</strong>.</li>
+  <li><strong>The failed-first pass is skipped.</strong> The first build with the option on runs the suite once.</li>
+</ul>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../build-steps/nunit.html">NUnit</a></li>
+  <li><a href="../build-steps/dotcover.html">dotCover</a></li>
+  <li><a href="find-why-build-failed.html">Find why a build failed</a></li>
+</ul>
+</main>
+</body>
+</html>

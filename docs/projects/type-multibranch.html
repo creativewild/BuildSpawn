@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Multibranch Pipeline · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/type-multibranch">
+<main class="doc">
+<h1>Multibranch Pipeline</h1>
+<p class="lead">A Multibranch Pipeline makes one Pipeline build configuration for each branch of a repository that has a pipeline script file.</p>
+<h2>When to use it</h2>
+<p>Use it when every branch must be built by the same script, for example each feature branch of the launcher. New branches are found by a scan, and removed branches are cleaned up. It is under <strong>More types</strong> on the New Item page.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the project and click <strong>New Item</strong>. Type a name.</li>
+  <li>Under <strong>More types</strong> choose <strong>Multibranch Pipeline</strong>. Click <strong>Create</strong>.</li>
+  <li>Under <strong>Branch Sources</strong> click <strong>Add source</strong> and fill in the repository.</li>
+  <li>Under <strong>Build Configuration</strong>, <strong>Mode</strong> is the choice that reads the pipeline script file. Set the <strong>Script Path</strong>: replace the name the field starts with by the path of your file.</li>
+  <li>Set the scan trigger and the orphaned item strategy. Click <strong>Save</strong>. The first scan starts.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Branch Sources</td><td>The repositories to scan for branches.</td><td>None</td><td>A Git repository</td></tr>
+    <tr><td>Mode</td><td>How the build is defined: by the pipeline script file.</td><td>The script file mode</td><td>-</td></tr>
+    <tr><td>Script Path</td><td>The path of the script file in each branch. The field starts with a default file name: replace it with the path of your file.</td><td>A default file name</td><td><code>ci/build.pipeline</code></td></tr>
+    <tr><td>Property strategy</td><td>Properties given to every branch project.</td><td>All branches get the same properties</td><td>-</td></tr>
+    <tr><td>Build strategies</td><td>When no strategy is added, everything except tags is built when found or changed. Adding one turns the defaults off.</td><td>Empty</td><td>-</td></tr>
+    <tr><td>Scan triggers and orphaned items</td><td>Scan on a timer, and what to do with branches that no longer exist: discard them after some days.</td><td>-</td><td>-</td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p>The launcher repository has branches <code>main</code>, <code>release/1.4</code> and <code>feature/login</code>. The Multibranch Pipeline <strong>Launcher</strong> shows three Pipelines, one per branch.</p><h2>What you see when it runs</h2>
+<p>The page shows the branch projects with their results. The <strong>Scan</strong> log says which branches were found. Orphaned branches are removed by the strategy.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>No branches are found</td><td>The scan found no script file at the <strong>Script Path</strong>, or the credential cannot read the repository. Open the scan log.</td></tr>
+    <tr><td>Too many builds start on a scan</td><td>Set <strong>Build strategies</strong> or the branch name rule for automatic triggers.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="item-types.html">Item types</a></li>
+  <li><a href="type-pipeline.html">Pipeline</a></li>
+  <li><a href="folder-settings.html">Project settings</a></li>
+</ul>
+</main>
+</body>
+</html>

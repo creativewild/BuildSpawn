@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Users and groups · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="administration/users">
+<main class="doc">
+<h1>Users and groups</h1>
+<p class="lead">Create the people who can sign in, put them in groups, and give a whole group a role or permission at once.</p>
+
+<h2>When to use it</h2>
+<p>Use these pages when people sign in with <strong>Buildspawn’s own user database</strong> (see <a href="security-realms.html">Security realms</a>). With Entra ID or SAML, people and groups come from your company, so you do not create users here. The page <strong>Users</strong> then shows only people who signed in before, and the groups that Buildspawn keeps are not used for them.</p>
+<p>You need <strong>Administer</strong> to create, change or delete users and groups.</p>
+
+<h2>How to set it up</h2>
+<h3>Create a user</h3>
+<ol class="steps">
+  <li>Open <strong>Settings › Users</strong> and click <strong>Create User</strong>.</li>
+  <li>Fill in the form (see the table below).</li>
+  <li>Click <strong>Create User</strong>.</li>
+  <li>Back in the list, click <strong>Add to group</strong> on the new row and tick the groups. Every user is already in <strong>All users</strong>.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/administration/create-user-form.png" alt="The Create User form with Username, Password, Confirm password, Full name and Email">
+  <figcaption>The Create User form.</figcaption>
+</figure>
+<table>
+  <tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr>
+  <tr><td><strong>Username</strong></td><td>What the person types to sign in. It is the user ID. Use letters, digits, dashes and underscores. It cannot be changed later.</td><td>Empty</td><td><code>ht3-artist</code></td></tr>
+  <tr><td><strong>Password</strong></td><td>The first password. It must pass the password rule on <strong>Settings › Security</strong>.</td><td>Empty</td><td>(a long password)</td></tr>
+  <tr><td><strong>Confirm password</strong></td><td>The same password again.</td><td>Empty</td><td>—</td></tr>
+  <tr><td><strong>Full name</strong></td><td>The name other people see.</td><td>Empty</td><td>Alex Artist</td></tr>
+  <tr><td><strong>Email</strong></td><td>Where build e-mails for the person are sent.</td><td>Empty</td><td><code>alex@studio.example</code></td></tr>
+</table>
+<p>A new user can sign in at once, but sees nothing until you give them permissions or a role.</p>
+
+<h3>The Users list</h3>
+<p><strong>Settings › Users</strong> lists the people who can sign in, with columns <strong>User ID</strong>, <strong>Name</strong> and <strong>Groups</strong>. Your own row is marked <strong>You</strong>. The text above the list links to the longer list of every user Buildspawn has seen, including people who only made a commit.</p>
+<figure class="shot">
+  <img src="../../assets/shots/administration/users-list.png" alt="The Users list with User ID, Name and Groups columns and an Add to group button">
+  <figcaption>The Users list. The icons on the right open and delete a user.</figcaption>
+</figure>
+<table>
+  <tr><th>Button</th><th>What it does</th></tr>
+  <tr><td><strong>Configure</strong></td><td>Opens the settings of that user: name, e-mail, password and the other <a href="user-settings.html">user settings</a>.</td></tr>
+  <tr><td><strong>Delete</strong></td><td>Asks <em>Delete Buildspawn user ‘…’?</em> and removes the account. You cannot delete yourself.</td></tr>
+  <tr><td><strong>Add to group</strong></td><td>Opens the list of groups to tick. They are in <strong>All users</strong> already.</td></tr>
+</table>
+
+<h3>Change a password</h3>
+<ol class="steps">
+  <li>Open <strong>Settings › Users</strong> and click <strong>Configure</strong> on the user. People can also open their own page from the account menu and choose <strong>Security</strong>.</li>
+  <li>Type the new password in <strong>Password</strong> and again in <strong>Confirm Password</strong>. Leave both boxes as they are to keep the old password.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<h3>End all sessions of a user</h3>
+<p>On the <strong>Security</strong> page of a user, <strong>Session Termination</strong> has the button <strong>Terminate All Sessions</strong>. It signs the user out of every browser and device, and disconnects computers that use their sessions. They must sign in again. Use it when a laptop is lost. It does not remove <a href="../reference/api-tokens.html">API tokens</a>. See <a href="user-settings.html">User settings</a>.</p>
+
+<h2>Groups</h2>
+<p>A group collects users and other groups. You give a role or permission to the group, and everyone in it has it. When someone joins the team you add them to the group and they get the right access straight away. Groups work in the permission cards and on the <strong>Roles</strong> tab of every project. Groups are kept only by Buildspawn’s own user database.</p>
+<p>The group <strong>All users</strong> (ID <code>authenticated</code>) is built in. It means every signed-in user. You cannot rename, empty, delete or add it to another group. Where a card says <strong>Authenticated Users</strong>, it means this group.</p>
+
+<h3>Create a group</h3>
+<ol class="steps">
+  <li>Open <strong>Settings › Groups</strong> and click <strong>Create group</strong>.</li>
+  <li>Type a <strong>Name</strong>, for example <code>Artists</code>. The ID is made from it.</li>
+  <li>Optional: choose a <strong>Parent group</strong>.</li>
+  <li>Click <strong>Create group</strong>.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/administration/groups-list.png" alt="The Groups list with the built-in group All users and the group ht3-artists">
+  <figcaption>The Groups list.</figcaption>
+</figure>
+<table>
+  <tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr>
+  <tr><td><strong>Name</strong></td><td>Shown in lists and pickers. You can change it at any time.</td><td>Empty</td><td>Artists</td></tr>
+  <tr><td><strong>ID</strong></td><td>What roles and permissions point to. Letters, digits, dots, dashes and underscores. It cannot change later.</td><td>Made from the name</td><td><code>artists</code></td></tr>
+  <tr><td><strong>Description</strong></td><td>A line about the group.</td><td>Empty</td><td>The art team</td></tr>
+  <tr><td><strong>Parent group</strong></td><td>Optional. Members of this group then also belong to the parent.</td><td>No parent group</td><td>Studio staff</td></tr>
+</table>
+
+<h3>The Groups list</h3>
+<p>The columns are <strong>Name</strong>, <strong>ID</strong>, <strong>Description</strong>, <strong>Members</strong>, <strong>Subgroups</strong>, <strong>Roles</strong> and <strong>Actions</strong>. Use <em>Filter by name or ID</em> to find one.</p>
+
+<h3>The page of one group</h3>
+<p>Click a group to open its page. A list of sections on the side shows:</p>
+<table>
+  <tr><th>Section</th><th>What it does</th></tr>
+  <tr><td><strong>Members</strong></td><td>Users who belong directly. <strong>Add a user</strong> finds them by ID or name. Users who belong through a subgroup show <em>Also members through subgroups</em>.</td></tr>
+  <tr><td><strong>Subgroups</strong></td><td>Groups whose members are also members of this one. <strong>Add a subgroup</strong>.</td></tr>
+  <tr><td><strong>Member of</strong></td><td>The parent groups of this group. <strong>Add to a parent group</strong>.</td></tr>
+  <tr><td><strong>Roles</strong></td><td>Where this group holds a role. <strong>Open Roles tab</strong> goes to that project. It says <em>This group holds no role anywhere yet</em> when it has none.</td></tr>
+  <tr><td><strong>Permission grid</strong></td><td>Where the group has custom permissions in a grid.</td></tr>
+  <tr><td><strong>Settings</strong></td><td>Name and description, and <strong>Delete this group</strong>. Deleting removes its role assignments and permission entries. Users are not deleted.</td></tr>
+</table>
+
+<h3>From the terminal</h3>
+<table>
+  <tr><th>Command</th><th>What it does</th></tr>
+  <tr><td><code>create-group ID [-name …] [-description …] [-parent …]</code></td><td>Creates a group.</td></tr>
+  <tr><td><code>delete-group ID</code></td><td>Deletes a group, and its grants at Root, on projects and on build configurations.</td></tr>
+  <tr><td><code>add-group-member GROUP USER…</code></td><td>Adds users to a group.</td></tr>
+  <tr><td><code>remove-group-member GROUP USER…</code></td><td>Takes users out of a group.</td></tr>
+  <tr><td><code>list-groups [GROUP]</code></td><td>Lists the groups, or the members of one (those through subgroups are marked with <code>*</code>).</td></tr>
+</table>
+
+<h2>A worked example</h2>
+<p>The art team has three people. You create the group <code>ht3-artists</code> and the users <code>ht3-artist</code>, <code>ht3-rigger</code> and <code>ht3-vfx</code>, and add all three to the group. You give the group the <em>Developer</em> role on the project <em>HT3</em> (see <a href="roles.html">Roles</a>). When a fourth artist joins, you create the user and add it to the group. Nothing else changes.</p>
+
+<h2>What you see when it runs</h2>
+<ul>
+  <li>The user sees their own groups on their page, under <strong>Groups</strong>.</li>
+  <li>The Groups list shows the counts of members, subgroups and roles.</li>
+  <li>A deleted user can no longer sign in. Their past builds keep their name.</li>
+</ul>
+
+<h2>Problems and fixes</h2>
+<table>
+  <tr><th>Problem</th><th>What to do</th></tr>
+  <tr><td><em>The user name is not allowed.</em></td><td>Use letters, digits, dashes and underscores only. Write <code>alex-artist</code> instead of <code>alex.artist</code>.</td></tr>
+  <tr><td>The new password is refused.</td><td>It fails the rule on <strong>Settings › Security</strong>. The message lists what is missing.</td></tr>
+  <tr><td>The group page says <em>You need the Administer permission to do this.</em></td><td>Only administrators change groups.</td></tr>
+  <tr><td><em>Already a member</em></td><td>The user is already in that group, directly.</td></tr>
+  <tr><td>You cannot delete a user.</td><td>You cannot delete yourself. Ask another administrator.</td></tr>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="security-realms.html">Security realms</a></li>
+  <li><a href="authorization.html">Authorization</a></li>
+  <li><a href="roles.html">Roles</a></li>
+  <li><a href="user-settings.html">User settings</a></li>
+  <li><a href="users-and-permissions.html">Users and permissions</a></li>
+  <li><a href="../how-to/give-team-access.html">Give a team access to its projects</a></li>
+</ul>
+</main>
+</body>
+</html>

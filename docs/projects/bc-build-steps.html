@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Build Steps · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/bc-build-steps">
+<main class="doc">
+<h1>Build Steps</h1>
+<p class="lead">The list of steps a build runs, in order. This page explains how the tab works. Each kind of step has its own page in the Build steps section.</p>
+<h2>When to use it</h2>
+<p>Use it to add, order, switch off and override steps. Steps run from top to bottom. Steps that a project or a template passes down run first.</p>
+<figure class="shot">
+  <img src="../../assets/shots/projects/bc-build-steps.png" alt="The Build Steps tab of Windows Build with three steps">
+  <figcaption>The Build Steps tab.</figcaption>
+</figure>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings</strong>. Then click <strong>Build Steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>, pick a runner such as <strong>Command Line</strong> or <strong>Unreal Engine</strong>, and fill in its fields.</li>
+  <li>Drag the handle on the left of a row to change the order.</li>
+  <li>Use the <strong>Enabled</strong> switch to skip a step without losing its settings.</li>
+  <li>The changes on this tab are saved when you finish a step.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Name</td><td>What the step is called in the list and in the log.</td><td>Runner name</td><td><code>Cook content</code></td></tr>
+    <tr><td>Runner</td><td>The kind of step: Command Line, PowerShell, Unity, Unreal Engine, MSBuild and more. See <a href="../build-steps/runners.html">Runners</a>.</td><td>-</td><td>Unreal Engine</td></tr>
+    <tr><td>Summary</td><td>A short line of what the step runs.</td><td>-</td><td>-</td></tr>
+    <tr><td>When it runs</td><td>The execution rule of the step: only when earlier steps passed, always, and so on. See <a href="../build-steps/common-step-fields.html">Common step fields</a>.</td><td>Only if all previous steps succeeded</td><td>Always run</td></tr>
+    <tr><td>Enabled</td><td>Switch a step off to skip it. It stays saved.</td><td>On</td><td>On</td></tr>
+    <tr><td>Add Parallel block</td><td>Steps that run side by side. See <a href="../build-steps/parallel-blocks.html">Parallel blocks</a>.</td><td>-</td><td>-</td></tr>
+    <tr><td>Edit and the … menu</td><td>Open a step. The menu copies, moves or deletes it.</td><td>-</td><td>-</td></tr>
+    <tr><td>Override / Disable in this job / Reset</td><td>On an inherited step: change it here only, switch it off here only, or go back to what the project or template gives.</td><td>-</td><td>-</td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p><strong>Windows Build</strong> has three steps: <em>Sync and clean</em> (Perforce operations), <em>Cook content</em> (Unreal Engine) and <em>Package</em> (PowerShell). The project <strong>Game</strong> passes down a first step that prints the build number. It shows with a chip <em>Game</em>; the studio disables it on the Linux server build only.</p><h2>What you see when it runs</h2>
+<p>The build page lists each step with its result. The console log shows one block per step. A step that is switched off shows as skipped.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>I cannot edit a step</td><td>It is inherited. Use <strong>Override</strong>, or edit it on the project or template it comes from.</td></tr>
+    <tr><td>A step shows Disabled above</td><td>It was switched off on a project higher up. Change it there.</td></tr>
+    <tr><td>A Pipeline shows read-only steps</td><td>A Pipeline keeps its steps in the script. See <a href="type-pipeline.html">Pipeline</a>.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="settings-homes.html">Settings homes</a></li>
+  <li><a href="../build-steps/runners.html">Runners</a></li>
+  <li><a href="../build-steps/step-list.html">The step list</a></li>
+  <li><a href="../build-steps/parallel-blocks.html">Parallel blocks</a></li>
+  <li><a href="templates.html">Templates</a></li>
+</ul>
+</main>
+</body>
+</html>

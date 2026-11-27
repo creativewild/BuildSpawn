@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NUnit · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/nunit">
+<main class="doc">
+<h1>NUnit</h1>
+<p class="lead">Runs the NUnit 3 console runner on test assemblies and records the results.</p>
+
+<h2>When to use it</h2>
+<p>Use it to run the unit tests of your game code or tools written in C#. Results show on the build. It can run the tests that failed last time first, so you hear about them sooner, and measure code coverage.</p>
+
+<h2>How to set it up</h2>
+
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>. Type <code>NUnit</code> in <strong>Filter step types</strong> if you like, then click the <strong>NUnit</strong> tile (group <strong>Tests</strong>).</li>
+  <li>Type a <strong>Step name</strong>, for example <code>Unit tests</code>.</li>
+  <li>Fill in the fields described below.</li>
+  <li>Optional: set <strong>Execute step</strong>, <strong>Conditions</strong> and <strong>Retry on failure</strong>. See <a href="step-list.html">The steps list and the step editor</a>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<figure class="shot small">
+  <img src="../../assets/shots/build-steps/nunit.png" alt="The fields of the NUnit step in the step editor">
+  <figcaption>The fields of the NUnit step, as the step editor shows them.</figcaption>
+</figure>
+
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Test assemblies</strong></td><td>One test assembly or project per line, relative to the working directory.</td><td>Empty (required)</td><td><code>Tests/bin/Release/Game.Tests.dll</code></td></tr>
+    <tr><td><strong>Console runner</strong></td><td>Path of the NUnit 3 console runner. Empty takes <code>nunit3-console</code> from the agent's <code>PATH</code>.</td><td>Empty</td><td><code>C:\tools\nunit\nunit3-console.exe</code></td></tr>
+    <tr><td><strong>NUnit console version</strong></td><td>The agent must report this version: <code>3</code> matches any 3.x, <code>3.17</code> any 3.17.x. Empty adds none. With a console path there is no requirement.</td><td>Empty</td><td><code>3.17</code></td></tr>
+    <tr><td><strong>Do not run tests from</strong></td><td>Assemblies to leave out, one per line. <code>*</code> matches any characters. A match in <strong>Test assemblies</strong> is dropped before the run.</td><td>Empty</td><td><code>legacy/*.dll</code></td></tr>
+    <tr><td><strong>Path to application configuration file</strong></td><td>Passed as <code>--configfile=PATH</code>, relative to the working directory.</td><td>Empty</td><td><code>Tests/app.config</code></td></tr>
+    <tr><td><strong>Include categories</strong></td><td>One category per line. Only tests in one of them run. Both category lists become one <code>--where</code> filter, so do not add another <code>--where</code> to the arguments.</td><td>Empty</td><td><code>Fast</code></td></tr>
+    <tr><td><strong>Exclude categories</strong></td><td>One category per line. Tests in any of them do not run. A name with a quote or a backslash is refused.</td><td>Empty</td><td><code>Slow</code></td></tr>
+    <tr><td><strong>Run recently failed tests first</strong></td><td>Runs the tests that failed in the last build of this build configuration, with this option on, in a pass of their own, then the whole suite. Results on the build come from the whole suite, so no test counts twice. The first build with the option on runs the suite once.</td><td>Off</td><td>On</td></tr>
+    <tr><td><strong>Run new tests first</strong></td><td>Lists the tests with <code>nunit3-console --explore</code>, runs those that the last build with this option did not run in a pass of their own, then the whole suite. A step in a container runs once.</td><td>Off</td><td>Off</td></tr>
+    <tr><td><strong>Code coverage</strong></td><td><strong>None</strong>, <strong>Coverlet</strong> (runs <code>coverlet.console</code> around the runner and reads its Cobertura report) or <strong>dotCover</strong> (runs the dotCover command line tool and reads its XML report). Neither tool is installed by the step. The report is archived and the totals show on the build page.</td><td>None</td><td>Coverlet</td></tr>
+    <tr><td><strong>Include assemblies</strong></td><td>Assembly name patterns, one per line, such as <code>MyApp.*</code>. Empty lets the tool pick.</td><td>Empty</td><td><code>Game.*</code></td></tr>
+    <tr><td><strong>Exclude assemblies</strong></td><td>Patterns to leave out, such as <code>*.Tests</code>.</td><td>Empty</td><td><code>*.Tests</code></td></tr>
+    <tr><td><strong>Coverage tool path</strong></td><td>Path of coverlet or dotCover. Empty uses the one on the agent's <code>PATH</code>.</td><td>Empty</td><td><code>C:\tools\coverlet.exe</code></td></tr>
+    <tr><td><strong>Arguments</strong></td><td>One argument per line, such as <code>--where=cat==Fast</code>. The step asks for the NUnit 3 result file itself and records the results, so <strong>Test reports</strong> is for extra files only.</td><td>Empty</td><td><code>--timeout=60000</code></td></tr>
+    <tr><td><strong>Working directory, Environment variables, Test reports, Run step within container</strong></td><td>The same in every runner. See <a href="common-step-fields.html">Fields every runner has</a>.</td><td></td><td></td></tr>
+  </tbody>
+</table>
+
+
+<h2>A worked example</h2>
+<p>Run the fast unit tests of the game code and put the failed ones first. Step name <code>Unit tests</code>, <strong>Test assemblies</strong> <code>Tests/bin/Release/Game.Tests.dll</code>, <strong>Exclude categories</strong> <code>Slow</code>, tick <strong>Run recently failed tests first</strong>.</p>
+
+<h2>What you see when it runs</h2>
+<p>The console shows <code>$ nunit3-console …</code>. With failed-first on, a line says <em>Running the 2 test(s) that failed in the last build first.</em> and then the full run. The build gets a <strong>Tests</strong> tab with passed, failed and skipped tests. A failed test makes the step unstable.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong><em>The nunit3-console command was not found on this agent</em></strong></td><td>Install the NUnit 3 console runner or set <strong>Console runner</strong>.</td></tr>
+    <tr><td><strong><em>The NUnit step has no test assemblies</em></strong></td><td>Fill in <strong>Test assemblies</strong>.</td></tr>
+    <tr><td><strong><em>The NUnit category … holds a quote or a backslash</em></strong></td><td>Rename the category.</td></tr>
+    <tr><td><strong><em>No earlier build recorded failed tests for this step, so the tests run once</em></strong></td><td>Normal for the first build. The option works from the next build.</td></tr>
+    <tr><td><strong><em>No … coverage report was found</em></strong></td><td>The tests may have stopped before the report was written.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="vstest.html">VSTest</a></li>
+  <li><a href="mstest.html">MSTest</a></li>
+  <li><a href="dotnet.html">.NET</a></li>
+  <li><a href="dotcover.html">dotCover</a></li>
+  <li><a href="../how-to/steps-nunit-tests-with-results.html">Run NUnit tests and see the results</a></li>
+  <li><a href="runners.html">Runners</a></li>
+  <li><a href="common-step-fields.html">Fields every runner has</a></li>
+</ul>
+</main>
+</body>
+</html>

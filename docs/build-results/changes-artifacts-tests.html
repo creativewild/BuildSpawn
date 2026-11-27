@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Changes, artifacts and tests · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-results/changes-artifacts-tests">
+<main class="doc">
+<h1>Changes, artifacts and tests</h1>
+<p class="lead">Three tabs on the build page tell you what went into a build, what came out of it and whether its tests passed.</p>
+
+<h2>Changes</h2>
+<p>The <strong>Changes</strong> tab lists the code changes that are new in this build, compared with the build before it.</p>
+<ul>
+  <li>With Perforce, each entry is a changelist: its number, author, description and files.</li>
+  <li>With Git, each entry is a commit: its short hash, author, message and files.</li>
+  <li>With several version control roots, the changes are grouped by root.</li>
+</ul>
+<p>Each entry shows the description, the changelist number or commit hash, the author, when it was committed, and the <strong>Affected paths</strong> with the action on each file (<em>edit</em>, <em>add</em>, <em>delete</em>). The tab title shows how many changes there are. The <strong>detail</strong> link opens the details of the change.</p>
+<p>To see the changes of many builds in one list, open the <strong>Change Log</strong> tab of the build configuration.</p>
+<p>The info line in the header always shows the changelist or commit the build used, for example <em>Changelist 259</em> or <em>Commit 65a8b39</em>, even when there are no new changes.</p>
+<figure class="shot">
+  <img src="../../assets/shots/build-results/changes-tab.png" alt="The Changes tab of Windows Build number 1 with one changelist: its description, number 259, author, time, and the affected path with the action edit">
+  <figcaption>The Changes tab of the first build: one changelist, with its author and the files it touched. A build that used the same changelist as the one before it shows <em>No changes</em>.</figcaption>
+</figure>
+<div class="callout tip"><p>The Overview tab shows the newest changes in a small card. Click <strong>View all</strong> there to open this tab. For more on Perforce and Git roots, see <a href="../version-control/perforce.html">Perforce</a> and <a href="../version-control/git.html">Git</a>.</p></div>
+
+<h2>Artifacts</h2>
+<p><strong>Artifacts</strong> are files that a build keeps after it ends, such as game packages, symbols or reports. A build configuration chooses which files to keep in its build features (the "Archive the artifacts" post-build action, with a file pattern such as <code>Output/**</code>).</p>
+<p>When a build kept files, it has an <strong>Artifacts</strong> tab:</p>
+<figure class="shot">
+  <img src="../../assets/shots/build-results/artifacts-tab.png" alt="The Artifacts tab of Windows Build number 7: a Build Artifacts table with the Output folder, a link to download all files in a zip, and a Pattern box">
+  <figcaption>The files kept by a Windows build.</figcaption>
+</figure>
+<ol class="steps">
+  <li>Click a folder to open it, or a file to download it.</li>
+  <li>Click <strong>(all files in zip)</strong> to download everything at once.</li>
+  <li>Type a pattern in the <strong>Pattern</strong> box, for example <code>**/*.pdb</code>, and press the arrow to list only matching files.</li>
+</ol>
+<div class="callout note"><p>Artifacts are deleted with their build. Pin a build on its page to keep its artifacts for good.</p></div>
+
+<h2>Tests</h2>
+<p>When a build publishes a test report (for example JUnit XML files from NUnit, Unity or Unreal Engine test runs), it gets a <strong>Test Result</strong> tab.</p>
+<figure class="shot">
+  <img src="../../assets/shots/build-results/tests.png" alt="The Test Result tab of Unit Tests build number 3: 0 failures, 0 skipped, 12 tests, a full green bar, the message All tests are passing, and a table with the Engine package">
+  <figcaption>A test report with every test passing.</figcaption>
+</figure>
+<ul>
+  <li>The top card counts the failures, skipped tests and all tests. The numbers in brackets compare with the previous build, so <em>0 failures (-2)</em> means two tests that failed last time now pass.</li>
+  <li>The bar shows the share of failed, skipped and passed tests.</li>
+  <li><strong>History</strong> shows how the counts changed over the last builds.</li>
+  <li><strong>All Tests</strong> lists the packages. Click one to see its classes and tests, and click a failed test to read its error message and stack trace.</li>
+</ul>
+<p>The Overview tab of the build also shows a one-line test summary, and the build configuration page shows a chart of test results over time.</p>
+
+<h2>Tips</h2>
+<ul>
+  <li>A build can show several of these tabs at once. Look at Changes first when a test suddenly fails: the culprit is often in the list.</li>
+  <li>Keep artifacts small. Archive packages and symbols, not whole work folders.</li>
+</ul>
+</main>
+</body>
+</html>

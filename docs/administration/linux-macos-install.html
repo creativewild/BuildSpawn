@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Install on Linux and macOS · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="administration/linux-macos-install">
+<main class="doc">
+<h1>Install on Linux and macOS</h1>
+<p class="lead">Install the Buildspawn server on Linux with a package or a folder, or on a Mac with a folder, and run it as a service.</p>
+
+<p>Every download includes its own Java, so nothing else needs installing. For the short version, see <a href="../get-started/install.html">Install the server</a>. This page covers everything in the packages: the files they put on your computer, how to start and stop the server, ports, the home folder, and how to upgrade and remove it.</p>
+
+<h2>When to use which download</h2>
+<table>
+  <thead><tr><th>Download</th><th>Best for</th><th>Service</th></tr></thead>
+  <tbody>
+    <tr><td><code>.deb</code> package (Debian, Ubuntu)</td><td>A Linux server that runs all the time</td><td>Set up for you: runs as the system user <code>buildspawn</code>, starts at boot</td></tr>
+    <tr><td><code>.rpm</code> package (RHEL, Rocky, Fedora)</td><td>The same on an RPM-based Linux</td><td>The same</td></tr>
+    <tr><td><code>tar.gz</code> for Linux (x64 and aarch64)</td><td>Any glibc Linux, a try-out, or a server in a folder you choose</td><td>Optional: <code>install-service.sh</code></td></tr>
+    <tr><td><code>tar.gz</code> for macOS (Apple silicon and Intel)</td><td>A build Mac</td><td>Optional: a LaunchAgent, <code>install-service.sh</code></td></tr>
+  </tbody>
+</table>
+<p>The packages are for x86-64. You need a Linux with glibc (most distributions; not Alpine). Install <code>fontconfig</code> and a font so that charts can be drawn. The macOS download for your Mac's chip is named <code>-macos-aarch64</code> (Apple silicon) or <code>-macos-x64</code> (Intel).</p>
+
+<h2>Install a package (Linux)</h2>
+<ol class="steps">
+  <li>Download the package and its <code>.sha256</code> file. Check the download: <code>sha256sum -c buildspawn_&lt;version&gt;_amd64.deb.sha256</code>.</li>
+  <li>Install it.
+<pre><code># Debian, Ubuntu
+sudo apt install ./buildspawn_&lt;version&gt;_amd64.deb
+
+# RHEL, Rocky, Fedora
+sudo dnf install ./buildspawn-&lt;version&gt;.x86_64.rpm</code></pre></li>
+  <li>The package starts the service. Open <code>http://&lt;this machine&gt;:8080/</code>.</li>
+  <li>Get the initial admin password: <code>sudo buildspawn admin-password</code>. Type it on the setup page and follow the steps. See <a href="../get-started/first-start.html">Your first start</a>.</li>
+</ol>
+
+<h3>Where the package puts things</h3>
+<table>
+  <thead><tr><th>Path</th><th>What it is</th></tr></thead>
+  <tbody>
+    <tr><td><code>/opt/buildspawn</code></td><td>The program: <code>bin/buildspawn</code>, <code>app/buildspawn.war</code>, <code>runtime/</code> (Java).</td></tr>
+    <tr><td><code>/usr/bin/buildspawn</code></td><td>A link, so you can type <code>buildspawn</code>.</td></tr>
+    <tr><td><code>/etc/default/buildspawn</code> (.deb) or <code>/etc/sysconfig/buildspawn</code> (.rpm)</td><td>The settings file. See <a href="../reference/settings-files.html#conf">buildspawn.conf</a>.</td></tr>
+    <tr><td><code>/var/lib/buildspawn</code></td><td>The home: projects, build history, settings. Back this up.</td></tr>
+    <tr><td><code>/var/log/buildspawn</code></td><td><code>gc.log</code> and heap dumps. The server log is in the journal.</td></tr>
+  </tbody>
+</table>
+<p>Builds run as the system user <code>buildspawn</code>, so the tools and files that builds need must be readable by that user.</p>
+
+<h3>Everyday commands</h3>
+<pre><code>sudo systemctl status buildspawn     # or: buildspawn status
+sudo buildspawn restart              # or: sudo systemctl restart buildspawn
+buildspawn logs                      # the same as: journalctl -u buildspawn -f
+buildspawn check                     # checks the settings and Java
+sudo buildspawn set port=8090 --apply</code></pre>
+
+<h3>Upgrade and remove</h3>
+<p>Install the new package over the old one with the same command you used to install. The upgrade stops the service, replaces the program, keeps the settings file and the home, and starts the service again. See <a href="backups.html">Backups and upgrades</a>.</p>
+<table>
+  <thead><tr><th>Goal</th><th>Command</th></tr></thead>
+  <tbody>
+    <tr><td>Remove the program. Keeps the settings, the home, the logs and the <code>buildspawn</code> user.</td><td><code>sudo apt remove buildspawn</code> or <code>sudo dnf remove buildspawn</code></td></tr>
+    <tr><td>Also remove the settings file (Debian, Ubuntu).</td><td><code>sudo apt purge buildspawn</code></td></tr>
+    <tr><td>Delete the data as well. This cannot be undone.</td><td><code>sudo BUILDSPAWN_PURGE_DATA=yes apt purge buildspawn</code> (Debian, Ubuntu)</td></tr>
+  </tbody>
+</table>
+
+<h2>Install from a folder (tar.gz, Linux and macOS)</h2>
+<p>The tar.gz holds one folder that is portable. The settings (<code>buildspawn.conf</code>), the home (<code>data/</code>) and the logs (<code>logs/</code>) stay inside it, so you can move or copy the whole folder.</p>
+<ol class="steps">
+  <li>Download the tar.gz for your system and check its <code>.sha256</code> file.</li>
+  <li>Unpack it, for example into <code>/opt</code>:
+<pre><code>tar -xzf buildspawn-&lt;version&gt;-linux-x64.tar.gz -C /opt
+cd /opt/buildspawn-&lt;version&gt;-linux-x64</code></pre></li>
+  <li>On a Mac, clear the quarantine flag first (see below).</li>
+  <li>Run <code>bin/buildspawn</code>. On a first run it opens the <a href="server-terminal.html">launch flow</a>, then the live monitor. Press <kbd>b</kbd> to open the web page.</li>
+  <li>To run the server in the terminal without the interface: <code>bin/buildspawn run</code>. <kbd>Ctrl</kbd> + <kbd>C</kbd> stops it.</li>
+</ol>
+
+<h3>macOS: unsigned and not notarized</h3>
+<p>The Mac download is not signed with an Apple developer ID and is not notarized. When a browser downloads it, macOS marks it as quarantined, and Gatekeeper blocks <code>bin/buildspawn</code> and Java. Unpack it in Terminal and clear the flag from the folder:</p>
+<pre><code>shasum -a 256 -c buildspawn-&lt;version&gt;-macos-aarch64.tar.gz.sha256
+tar -xzf buildspawn-&lt;version&gt;-macos-aarch64.tar.gz
+xattr -dr com.apple.quarantine buildspawn-&lt;version&gt;-macos-aarch64</code></pre>
+<p>The bundled Java is signed by its publisher. The <code>bin/buildspawn</code> program is not.</p>
+
+<h3>Run it as a service</h3>
+<table>
+  <thead><tr><th></th><th>Linux (systemd)</th><th>macOS (LaunchAgent)</th></tr></thead>
+  <tbody>
+    <tr><td>Command</td><td><code>sudo ./install-service.sh</code></td><td><code>./install-service.sh</code> (no <code>sudo</code>)</td></tr>
+    <tr><td>Same as</td><td><code>sudo bin/buildspawn install-service</code>, or <kbd>i</kbd> in the Service view</td><td><code>bin/buildspawn install-service</code></td></tr>
+    <tr><td>What it does</td><td>Creates the system user <code>buildspawn</code> with no login and gives it <code>data/</code> and <code>logs/</code>. Writes <code>/etc/systemd/system/buildspawn.service</code>, which runs <code>bin/buildspawn run</code> with this folder's <code>buildspawn.conf</code>. Enables it at boot and starts it. systemd restarts it if Java stops with an error.</td><td>Writes <code>~/Library/LaunchAgents/io.github.creativewild.buildspawn.plist</code>, which runs <code>bin/buildspawn run</code> as you. Starts Buildspawn now and at every login. launchd restarts it if Java crashes. Output goes to <code>logs/buildspawn.log</code>.</td></tr>
+    <tr><td>Remove</td><td><code>sudo ./uninstall-service.sh</code></td><td><code>./uninstall-service.sh</code></td></tr>
+    <tr><td>Log</td><td><code>journalctl -u buildspawn -f</code> or the Logs view</td><td><code>logs/buildspawn.log</code></td></tr>
+  </tbody>
+</table>
+<p>Options for <code>install-service</code>: <code>--user NAME</code> (Linux: run as another user), <code>--no-start</code> and <code>--dry-run</code>. <code>uninstall-service</code> keeps your data, logs and settings. <code>--remove-user</code> (Linux) also deletes the <code>buildspawn</code> user, but not its files. Running <code>install-service</code> again upgrades the unit and restarts the service.</p>
+<div class="callout warning"><p>On Linux the <code>buildspawn</code> user must be able to read the folder. Put it in <code>/opt/buildspawn</code>, not in your own home directory. <code>install-service</code> checks this and tells you.</p></div>
+<div class="callout note"><p>On macOS Buildspawn runs as you, so builds can use your Xcode, keychain and tools. It runs while you are signed in. For a build Mac that must start after a restart with nobody at it, turn on automatic login in <strong>System Settings › Users &amp; Groups</strong>. The first start from launchd may ask to accept incoming network connections: allow it.</p></div>
+
+<h2>Ports, access and the firewall</h2>
+<ul>
+  <li>The web port is <code>BUILDSPAWN_PORT</code>, default <strong>8080</strong>. Agents and browsers use it. Change it with <code>buildspawn set port=8090 --apply</code>.</li>
+  <li><code>BUILDSPAWN_LISTEN</code> is <code>all</code> (every network interface) or <code>localhost</code> (this computer only). Choose <code>all</code> when agents and other people must reach the server.</li>
+  <li>Buildspawn does not change a Linux or macOS firewall. Open the port yourself, for example <code>sudo ufw allow 8080/tcp</code> or <code>sudo firewall-cmd --add-port=8080/tcp --permanent</code>.</li>
+</ul>
+
+<h2>Upgrade a folder install</h2>
+<ol class="steps">
+  <li>Stop Buildspawn: <code>bin/buildspawn stop</code>.</li>
+  <li>Unpack the new version into a new folder (on a Mac, clear its quarantine flag).</li>
+  <li>Copy <code>buildspawn.conf</code> and <code>data/</code> into the new folder (and <code>logs/</code> if you want to keep them).</li>
+  <li>With a service, run the new folder's <code>install-service.sh</code>. It points the service at the new folder.</li>
+  <li>Start it: <code>bin/buildspawn start</code>.</li>
+</ol>
+<div class="callout tip"><p>To copy only the settings next time, set <code>BUILDSPAWN_HOME</code> to a folder outside the program folder, such as <code>/srv/buildspawn</code>. With the Linux service, that folder must belong to the <code>buildspawn</code> user: <code>sudo chown -R buildspawn:buildspawn /srv/buildspawn</code>.</p></div>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>macOS says the program cannot be opened because the developer cannot be verified.</td><td>Clear the quarantine flag with <code>xattr -dr com.apple.quarantine</code> as shown above.</td></tr>
+    <tr><td>The service fails and the journal mentions permissions.</td><td>The <code>buildspawn</code> user cannot read the program folder or write the home. Move the program to <code>/opt/buildspawn</code> and run <code>chown</code> on the home.</td></tr>
+    <tr><td>Charts show errors or empty boxes.</td><td>Install <code>fontconfig</code> and a font package.</td></tr>
+    <tr><td>Two Buildspawns on one home.</td><td>Run either the service or a terminal run on one home, never both. Stop one first.</td></tr>
+    <tr><td>The page does not load from another computer.</td><td>Check <code>BUILDSPAWN_LISTEN=all</code> and open the port in the firewall.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="running-the-server.html">Running the server</a></li>
+  <li><a href="server-terminal.html">The server terminal program</a></li>
+  <li><a href="../reference/settings-files.html">Settings files</a></li>
+  <li><a href="backups.html">Backups and upgrades</a></li>
+  <li><a href="../agents/install-agent.html">Install an agent</a></li>
+</ul>
+</main>
+</body>
+</html>

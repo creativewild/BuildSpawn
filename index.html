@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Buildspawn · The build server for game studios</title>
+<meta name="description" content="Buildspawn is a self-hosted build server for game studios: Perforce and Git, Unity and Unreal Engine steps, Steam and Epic Games Store uploads, agent pools for every platform and a visual pipeline editor.">
+<meta name="color-scheme" content="dark light">
+<link rel="icon" href="assets/home/mark.svg">
+<script>
+  (function () { var t = null; try { t = localStorage.getItem('bs-theme'); } catch (e) {}
+    var m = location.search.match(/[?&]theme=(light|dark)/); if (m) t = m[1];
+    document.documentElement.setAttribute('data-theme', t === 'light' ? 'light' : 'dark'); })();
+</script>
+<link rel="stylesheet" href="assets/home/home.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="brand" href="index.html" title="Buildspawn home">
+      <img class="white" src="assets/logo.svg" alt="Buildspawn">
+      <img class="ink" src="assets/logo-ink.svg" alt="Buildspawn">
+    </a>
+    <nav aria-label="Main">
+      <a class="lnk" href="#flow">How it works</a>
+      <a class="lnk" href="#features">Features</a>
+      <a class="lnk" href="#studios">Game studios</a>
+      <a class="lnk opt" href="#agents">Agents</a>
+      <a class="lnk" href="docs/index.html">Guide</a>
+      <a class="lnk" href="#howto">How-to guides</a>
+      <span class="sep" aria-hidden="true"></span>
+      <button class="theme" type="button" id="theme" aria-label="Switch between light and dark theme"></button>
+      <a class="btn btn-primary btn-sm" href="#download">Download 1.9.3</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ Hero ============ -->
+<div class="hero">
+  <div class="wrap">
+    <span class="pill"><span class="dot" aria-hidden="true"></span>Version 1.9.3 · Windows, Linux and macOS</span>
+    <h1>Build, test and ship your game <span class="grad">on your own machines</span></h1>
+    <p class="pitch">Buildspawn is a self-hosted build server for game studios. Perforce and Git, Unity and Unreal Engine, agent pools for every platform, Steam and the Epic Games Store, all in one place.</p>
+    <div class="cta">
+      <a class="btn btn-primary" href="#download">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>
+        Download 1.9.3</a>
+      <a class="btn btn-ghost" href="docs/get-started/what-is-buildspawn.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/></svg>
+        Read the guide</a>
+    </div>
+    <p class="meta">
+      <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Runs on your own servers</span>
+      <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Java included in every download</span>
+      <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>58 step-by-step how-to guides</span>
+    </p>
+    <div class="hero-shot">
+      <span class="hud tl" aria-hidden="true"></span><span class="hud tr" aria-hidden="true"></span>
+      <div class="frame">
+        <div class="chrome"><i></i><i></i><i></i><b>Game / Windows Build · Visual editor</b></div>
+        <img src="assets/home/hero-visual-run.png" width="1920" height="1080" alt="The visual editor of Game / Windows Build, viewing build #7: the build configuration block wired to the Compile, Cook content and Package steps, each lit green with its time, and the four parameters below" data-zoom>
+      </div>
+      <p class="caption"><b>The visual editor, viewing build #7.</b> Each step shows its result and time on the graph. <a href="docs/visual-editor/run-view.html">Run view</a></p>
+    </div>
+  </div>
+</div>
+
+<div class="works" aria-label="Works with">
+  <div class="wrap">
+    <span class="lbl">Works with</span>
+    <span class="t">Perforce</span><span class="t">Git</span><span class="t">Unreal Engine</span><span class="t">Unity</span><span class="t">Steam</span><span class="t">Epic Games Store</span><span class="t">Docker</span><span class="t">MSBuild</span>
+  </div>
+</div>
+
+<!-- ============ Flow ============ -->
+<section id="flow">
+  <div class="wrap">
+    <div class="head">
+      <div class="kicker">How a build flows</div>
+      <h2>From a submit to a store branch</h2>
+      <p>Someone submits a change. Buildspawn builds it on the right machines, runs the tests and sends the game to the store. Click a stage to see its page.</p>
+    </div>
+
+    <div class="flow-steps" role="tablist" aria-label="Stages of a build">
+      <button class="fstep" role="tab" id="ft-1" aria-controls="fp-1" aria-selected="true" type="button">
+        <span class="n">01</span><h3>Submit</h3><p>A Perforce submit or a Git push starts the build.</p>
+      </button>
+      <button class="fstep" role="tab" id="ft-2" aria-controls="fp-2" aria-selected="false" tabindex="-1" type="button">
+        <span class="n">02</span><h3>Build on agents</h3><p>The build goes to a free agent in the right pool.</p>
+      </button>
+      <button class="fstep" role="tab" id="ft-3" aria-controls="fp-3" aria-selected="false" tabindex="-1" type="button">
+        <span class="n">03</span><h3>Test</h3><p>Test results and failures land on the build page.</p>
+      </button>
+      <button class="fstep" role="tab" id="ft-4" aria-controls="fp-4" aria-selected="false" tabindex="-1" type="button">
+        <span class="n">04</span><h3>Publish</h3><p>Upload to Steam or the Epic Games Store.</p>
+      </button>
+    </div>
+
+    <div class="panel" role="tabpanel" id="fp-1" aria-labelledby="ft-1">
+      <div class="frame"><div class="chrome"><i></i><i></i><i></i><b>Game / Windows Build · Submitted changes</b></div>
+        <img src="assets/home/flow-changes.png" width="1600" height="900" alt="Submitted Changes of Game / Windows Build: Perforce changelists 259 and 258 with their user, workspace, date and the first build that contained each one" data-zoom decoding="async"></div>
+      <div class="side">
+        <div class="tag">01 · Submit</div>
+        <h3>Every changelist, and the build that took it</h3>
+        <p>Buildspawn watches Perforce and Git. A submit can start a build at once, through a trigger on the Perforce server, or on a polling timer.</p>
+        <ul class="ticks"><li>Changelists with the first build that contained each one.</li><li>Perforce streams and shelves, and several roots in one build configuration.</li><li>Builds on a schedule or after another build, too.</li></ul>
+        <a class="more" href="docs/how-to/build-every-submit.html">Build every Perforce submit</a>
+      </div>
+    </div>
+    <div class="panel" role="tabpanel" id="fp-2" aria-labelledby="ft-2" hidden>
+      <div class="frame"><div class="chrome"><i></i><i></i><i></i><b>Agents</b></div>
+        <img src="assets/home/flow-agents.png" width="1600" height="900" alt="The Agents page: the agent pools in the side panel, and live CPU, memory, disk, network and GPU use for each agent" data-zoom decoding="async"></div>
+      <div class="side">
+        <div class="tag">02 · Build on agents</div>
+        <h3>The right machine for every build</h3>
+        <p>Agents sit in pools, such as Windows or Linux. A build only goes to an agent that has what it needs, and the queue says why a build waits.</p>
+        <ul class="ticks"><li>Live CPU, memory, disk, network and GPU for each agent.</li><li>Pools with their own icon and colour.</li><li>Steps can run side by side on several agents.</li></ul>
+        <a class="more" href="docs/agents/agents-page.html">The Agents page</a>
+      </div>
+    </div>
+    <div class="panel" role="tabpanel" id="fp-3" aria-labelledby="ft-3" hidden>
+      <div class="frame"><div class="chrome"><i></i><i></i><i></i><b>Engine / Unit Tests #2 · Test Result</b></div>
+        <img src="assets/home/flow-tests.png" width="1600" height="900" alt="Test results of Engine / Unit Tests build #2: 2 of 12 tests failed, listed first and marked as regressions" data-zoom decoding="async"></div>
+      <div class="side">
+        <div class="tag">03 · Test</div>
+        <h3>Know at once what broke</h3>
+        <p>Test reports from NUnit, VSTest, JUnit XML and more show on the build. Failed tests come first, and new failures are marked as regressions.</p>
+        <ul class="ticks"><li>Failure conditions on exit codes, log text, time and test counts.</li><li>Retry a flaky step on its own.</li><li>Resume a failed build from the step that failed.</li></ul>
+        <a class="more" href="docs/how-to/find-why-build-failed.html">Find out why a build failed</a>
+      </div>
+    </div>
+    <div class="panel" role="tabpanel" id="fp-4" aria-labelledby="ft-4" hidden>
+      <div class="frame"><div class="chrome"><i></i><i></i><i></i><b>Game / Steam Nightly · Console</b></div>
+        <img src="assets/home/flow-publish.png" width="1600" height="900" alt="The console of Game / Steam Nightly build #1: the Upload to the nightly branch step signs in with the password hidden, uploads the content, gets build ID 15870342 and sets it live on the nightly branch" data-zoom decoding="async"></div>
+      <div class="side">
+        <div class="tag">04 · Publish</div>
+        <h3>Straight to Steam and the Epic Games Store</h3>
+        <p>Store steps upload the build and put it on a branch. Store passwords stay in credentials and are hidden in the log.</p>
+        <ul class="ticks"><li>6 Steam steps: install SteamCMD, upload, check, DRM wrap, set live and workshop.</li><li>8 Epic Games Store steps, from upload to label and clean up.</li><li>Steam Guard is handled for you.</li></ul>
+        <a class="more" href="docs/how-to/game-unity-perforce-steam.html">Upload to a Steam branch</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Features ============ -->
+<section id="features" class="alt">
+  <div class="wrap">
+    <div class="head">
+      <div class="kicker">Features</div>
+      <h2>Everything a build team needs</h2>
+      <p>Read a log that makes sense, run steps side by side and pick up a failed build where it stopped. Every picture on this page is the real product. Click one to see it full size.</p>
+    </div>
+    <div class="bento">
+
+      <article class="tile w7">
+        <div class="pic"><img src="assets/home/tile-matrix.png" width="982" height="600" alt="Game / Platform Matrix Build #1: the Compile every platform step is a Parallel block in Matrix mode, with one result for each platform (Win64, Win32) and configuration (Development, Shipping), all passed" data-zoom decoding="async"></div>
+        <div class="body">
+          <div class="tag">Parallel steps</div>
+          <h3>Build every platform at once</h3>
+          <p>A Parallel block runs its sides at the same time, on one agent or on several. Matrix mode writes the steps once for each platform and configuration.</p>
+          <a class="more" href="docs/build-steps/parallel-blocks.html">Parallel blocks</a>
+        </div>
+      </article>
+
+      <article class="tile w5">
+        <div class="pic"><img src="assets/home/tile-console.png" width="991" height="860" alt="The console of How-to / HT3 Log blocks build #1: the Build game step open as a block, with the script&#39;s own Compile game, Cook content, Textures and Maps blocks inside, a time on every line and the warning counts" data-zoom decoding="async"></div>
+        <div class="body">
+          <div class="tag">Build console</div>
+          <h3>A build log you can read</h3>
+          <p>Each step is a block with its result, warnings and time. Scripts add their own blocks with <code>::group::</code>. Filter to errors only, or search the log.</p>
+          <a class="more" href="docs/build-results/build-console.html">The build console</a>
+        </div>
+      </article>
+
+      <article class="tile w6">
+        <div class="pic"><img src="assets/home/tile-shelf-build.png" width="642" height="708" alt="How-to / HT1 Shelf Check build #3: the Personal build card says only you can see it and that it doesn&#39;t change the build configuration&#39;s status. The summary says: Personal build of shelf 260 by t.osei" data-zoom decoding="async"></div>
+        <div class="body">
+          <div class="tag">Shelf checks</div>
+          <h3>Test a shelf before you submit</h3>
+          <p>Shelve your Perforce change and run a personal build of it. A personal build never turns the build red for your team.</p>
+          <a class="more" href="docs/how-to/check-shelf-before-submit.html">Test a shelved change</a>
+        </div>
+      </article>
+
+      <article class="tile w6">
+        <div class="pic"><img src="assets/home/tile-resume.png" width="642" height="708" alt="Game / Content Cook build #1: step 2, Cook content, failed. It has a Resume from step 2 button and the note Step 1 is not run again" data-zoom decoding="async"></div>
+        <div class="body">
+          <div class="tag">Resume</div>
+          <h3>Pick up a failed build where it stopped</h3>
+          <p>Cook content failed? Fix the cause, then resume from that step on the same agent and workspace. The steps that passed don't run again.</p>
+          <a class="more" href="docs/running-builds/resume.html">Resume a build</a>
+        </div>
+      </article>
+
+      <article class="tile w7">
+        <div class="pic"><img src="assets/home/tile-pools.png" width="982" height="602" alt="The Pool Scheduler overview: Running, 1 waiting build, the next scheduled move at 20:00 (win-build-02 to the Consoles pool), and the capacity of each pool with its ready, busy and offline agents and its weight" data-zoom decoding="async"></div>
+        <div class="body">
+          <div class="tag">Pool Scheduler</div>
+          <h3>Lend agents where they are needed</h3>
+          <p>The Pool Scheduler moves agents between pools: by hand on a board, at set times, or by itself when urgent builds wait.</p>
+          <a class="more" href="docs/agents/pool-scheduler.html">The Pool Scheduler</a>
+        </div>
+      </article>
+
+      <article class="tile w5">
+        <div class="pic"><img src="assets/home/tile-run.png" width="789" height="687" alt="The Run custom build dialog of Tools / Local Asset Check with the agent My machine, studio-workstation, online. It says Only you can see this option, and Personal build is ticked" data-zoom decoding="async"></div>
+        <div class="body">
+          <div class="tag">Run on my machine</div>
+          <h3>Build on your own computer</h3>
+          <p>Connect your PC as a personal agent, then pick My machine when you run a build. Only you see the option, and the build is personal.</p>
+          <a class="more" href="docs/agents/personal-agents.html">Personal agents</a>
+        </div>
+      </article>
+
+      <article class="tile w6">
+        <div class="pic"><img src="assets/home/tile-project.png" width="1264" height="943" alt="The Game project: the project tree with Windows Build, PS5 Build and Xbox Series Build and the other build configurations, and the project tabs Perforce roots, Roles, Build settings and Credentials" data-zoom decoding="async"></div>
+        <div class="body">
+          <div class="tag">Projects</div>
+          <h3>One project, every platform</h3>
+          <p>A project groups build configurations, such as the Windows, PS5 and Xbox builds. Settings you put on a project, such as parameters or Perforce roots, pass down to everything inside it.</p>
+          <a class="more" href="docs/projects/projects.html">Projects</a>
+        </div>
+      </article>
+
+      <article class="tile w3">
+        <div class="pic"><img src="assets/home/tile-entra.png" width="528" height="819" alt="The Security page with Entra ID picked as the security realm: Client ID, the authentication type (client secret, client certificate or workload identity), Tenant and Verify configuration, not saved yet" data-zoom decoding="async"></div>
+        <div class="body">
+          <div class="tag">Sign-in</div>
+          <h3>Sign in with Entra ID</h3>
+          <p>Pick Entra ID as the security realm. People then sign in with their Microsoft work account.</p>
+          <a class="more" href="docs/administration/entra-id.html">Entra ID sign-in</a>
+        </div>
+      </article>
+
+      <article class="tile w3">
+        <div class="pic"><img src="assets/home/tile-roles.png" width="492" height="763" alt="The built-in roles: Project viewer, Developer, Project administrator, Build settings administrator, Agent manager and System administrator, and what each one allows" data-zoom decoding="async"></div>
+        <div class="body">
+          <div class="tag">Roles</div>
+          <h3>Roles for every project</h3>
+          <p>Six built-in roles, from Project viewer to System administrator. Or make your own.</p>
+          <a class="more" href="docs/administration/roles.html">Roles</a>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ Game studios ============ -->
+<section id="studios" class="studio">
+  <div class="wrap">
+    <div class="head">
+      <div class="kicker">Made for game studios</div>
+      <h2>Built around how games are made</h2>
+      <p>Big depots, long cooks, many platforms and a store at the end. Pick a topic.</p>
+    </div>
+
+    <div class="engine">
+      <div class="etabs" role="tablist" aria-label="Game studio topics" aria-orientation="vertical">
+        <button class="etab" role="tab" id="et-1" aria-controls="ep-1" aria-selected="true" type="button">
+          <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/><path d="M3 17.5l9 5 9-5" opacity=".6"/></svg></span>
+          <span><b>Unreal Engine</b><span>BuildCookRun, BuildGraph, tests</span></span>
+        </button>
+        <button class="etab" role="tab" id="et-2" aria-controls="ep-2" aria-selected="false" tabindex="-1" type="button">
+          <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M12 22V12M21 7l-9 5-9-5"/></svg></span>
+          <span><b>Unity</b><span>Players, build profiles, tests</span></span>
+        </button>
+        <button class="etab" role="tab" id="et-3" aria-controls="ep-3" aria-selected="false" tabindex="-1" type="button">
+          <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="M6 9v3a6 6 0 0 0 6 6h3"/></svg></span>
+          <span><b>Perforce</b><span>Roots, streams, shelves, operations</span></span>
+        </button>
+        <button class="etab" role="tab" id="et-4" aria-controls="ep-4" aria-selected="false" tabindex="-1" type="button">
+          <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v3h16v-3"/></svg></span>
+          <span><b>Steam</b><span>6 steps, upload to set live</span></span>
+        </button>
+        <button class="etab" role="tab" id="et-5" aria-controls="ep-5" aria-selected="false" tabindex="-1" type="button">
+          <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h14v14l-7 4-7-4z"/><path d="M9 8h6M9 12h5"/></svg></span>
+          <span><b>Epic Games Store</b><span>8 steps, upload to clean up</span></span>
+        </button>
+        <button class="etab" role="tab" id="et-6" aria-controls="ep-6" aria-selected="false" tabindex="-1" type="button">
+          <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="6" rx="1.5"/><rect x="3" y="14" width="18" height="6" rx="1.5"/><path d="M7 7h.01M7 17h.01"/></svg></span>
+          <span><b>Agent pools</b><span>A pool per platform, icon and colour</span></span>
+        </button>
+      </div>
+
+      <div>
+        <div class="epanel" role="tabpanel" id="ep-1" aria-labelledby="et-1">
+          <div class="frame"><div class="chrome"><i></i><i></i><i></i><b>HT1 Unreal Windows Build · Edit build step</b></div>
+            <img src="assets/home/unreal-step.png" width="1600" height="900" alt="The Unreal Engine step of How-to / HT1 Unreal Windows Build: automatic engine detection for version 5.4, the BuildCookRun command, the project Skyforge.uproject, Standalone game and the Development target configuration" data-zoom decoding="async"></div>
+          <div class="txt">
+            <h3>One step for every Unreal job</h3>
+            <p>Make a packaged game with BuildCookRun, run a BuildGraph script on one agent or many, run automation tests or a commandlet. The step finds the engine on the agent.</p>
+            <ul class="ticks"><li>Launcher installs and source builds.</li><li>Errors and warnings picked out of the engine log.</li><li>Post a badge to Unreal Game Sync.</li></ul>
+            <div class="links"><a class="more" href="docs/game-builds/unreal.html">Unreal Engine step</a><a class="more" href="docs/how-to/build-unreal-from-perforce.html">Build Unreal from Perforce</a></div>
+          </div>
+        </div>
+        <div class="epanel" role="tabpanel" id="ep-2" aria-labelledby="et-2" hidden>
+          <div class="frame"><div class="chrome"><i></i><i></i><i></i><b>HT1 Unity Windows Build · Edit build step</b></div>
+            <img src="assets/home/unity-step.png" width="1600" height="900" alt="The Unity step of How-to / HT1 Unity Windows Build: the execute method BuildScript.BuildWindows, the build target StandaloneWindows64, the build profile and standalone player fields, and the editor options" data-zoom decoding="async"></div>
+          <div class="txt">
+            <h3>Unity in batch mode</h3>
+            <p>Build a player, use a build profile, run your own build method or run the project's tests. The step finds the Unity Editor on the agent.</p>
+            <ul class="ticks"><li>Players for Windows, Linux, Mac and Android.</li><li>Edit-mode and play-mode tests.</li><li>Unity licence kept as a credential.</li></ul>
+            <div class="links"><a class="more" href="docs/game-builds/unity.html">Unity step</a><a class="more" href="docs/how-to/build-unity-from-git.html">Build Unity from Git</a></div>
+          </div>
+        </div>
+        <div class="epanel" role="tabpanel" id="ep-3" aria-labelledby="et-3" hidden>
+          <div class="frame"><div class="chrome"><i></i><i></i><i></i><b>Promote to Drop · Edit build step</b></div>
+            <img src="assets/home/p4ops-step.png" width="1600" height="900" alt="The Perforce operations step of Game / Promote to Drop: the connection taken from the Perforce root Skyforge stream (server, user and workspace, with the password kept in the credential), and the operations Sync, Clean, Reconcile, Edit, Add, Delete and Revert" data-zoom decoding="async"></div>
+          <div class="txt">
+            <h3>Perforce first</h3>
+            <p>Define a Perforce root once and use it in many builds. The Perforce operations step syncs, submits, shelves, copies streams and labels, with no password in any script.</p>
+            <ul class="ticks"><li>Streams, shelves and view mappings as a table.</li><li>Shelf checks before submit.</li><li>Depot browser, changelists and labels.</li></ul>
+            <div class="links"><a class="more" href="docs/version-control/perforce.html">Perforce in Buildspawn</a><a class="more" href="docs/version-control/perforce-operations.html">Perforce operations</a></div>
+          </div>
+        </div>
+        <div class="epanel" role="tabpanel" id="ep-4" aria-labelledby="et-4" hidden>
+          <div class="frame"><div class="chrome"><i></i><i></i><i></i><b>Game / Steam Release · Build steps</b></div>
+            <img src="assets/home/steam-steps.png" width="1600" height="900" alt="The build steps of Game / Steam Release: Collect package, Install SteamCMD, Upload to Steam, Check the build, Wrap with DRM, Set the branch live and Update the workshop item" data-zoom decoding="async"></div>
+          <div class="txt">
+            <h3>Steam, step by step</h3>
+            <p>Steam Release installs SteamCMD, uploads the depots, checks the build, wraps it with DRM, sets a branch live and updates a workshop item.</p>
+            <ul class="ticks"><li>A Steam build account credential, with Steam Guard.</li><li>A preview of the build script the step writes.</li><li>Setting a branch live needs its own permission.</li></ul>
+            <div class="links"><a class="more" href="docs/game-builds/steam-overview.html">Steam overview</a><a class="more" href="docs/how-to/game-unity-perforce-steam.html">Unity from Perforce to Steam</a></div>
+          </div>
+        </div>
+        <div class="epanel" role="tabpanel" id="ep-5" aria-labelledby="et-5" hidden>
+          <div class="frame"><div class="chrome"><i></i><i></i><i></i><b>Game / Epic Publish · Build steps</b></div>
+            <img src="assets/home/epic-steps.png" width="1600" height="900" alt="The build steps of Game / Epic Publish: Collect package, Install BuildPatch Tool, Upload to Epic, Optimise the patch and Label the build" data-zoom decoding="async"></div>
+          <div class="txt">
+            <h3>The Epic Games Store, end to end</h3>
+            <p>Epic Publish installs the BuildPatch Tool, uploads the build, optimises the patch and labels it. More steps copy, download, inspect or delete binaries.</p>
+            <ul class="ticks"><li>An Epic Games Store credential.</li><li>Agents report where the BuildPatch Tool is.</li><li>Secrets hidden in the log.</li></ul>
+            <div class="links"><a class="more" href="docs/game-builds/epic-overview.html">Epic Games Store</a><a class="more" href="docs/how-to/game-publish-epic.html">Publish to the Epic Games Store</a></div>
+          </div>
+        </div>
+        <div class="epanel" role="tabpanel" id="ep-6" aria-labelledby="et-6" hidden>
+          <div class="frame"><div class="chrome"><i></i><i></i><i></i><b>Agents · Pools · Windows</b></div>
+            <img src="assets/home/windows-pool.png" width="1600" height="900" alt="The Windows pool page: the agents win-build-01 and win-build-02 in the pool, the Windows icon picked from the icon library, the colour Blue, and the summary 2 agents, 4 executors, 17 projects" data-zoom decoding="async"></div>
+          <div class="txt">
+            <h3>A pool for every platform</h3>
+            <p>Group your build machines in pools, such as Windows and Linux. Give each pool to the projects that need it, so their builds land on the right machines.</p>
+            <ul class="ticks"><li>An icon and a colour for each pool.</li><li>Pools show in the Agents side panel and the agent list.</li><li>Move agents between pools by hand or on a schedule.</li></ul>
+            <div class="links"><a class="more" href="docs/agents/pools.html">Pools</a><a class="more" href="docs/agents/pool-scheduler.html">The Pool Scheduler</a></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Agents ============ -->
+<section id="agents">
+  <div class="wrap split">
+    <div>
+      <div class="head" style="margin-bottom:0">
+        <div class="kicker">Agents</div>
+        <h2>Agents on every system</h2>
+        <p>Download an agent from the server and start it. Java is in the download, so a new build machine needs nothing else.</p>
+      </div>
+      <div class="oslist">
+        <div><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.5l7.5-1v7H3zM11.5 4.3L21 3v8.5h-9.5zM3 12.5h7.5v7L3 18.5zM11.5 12.5H21V21l-9.5-1.3z"/></svg>Windows</div>
+        <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c-2 0-3 1.8-3 4.5 0 1.6-.6 2.7-1.6 4.1C6 13.4 5 15.5 5 17.5c0 2 2.3 3.5 7 3.5s7-1.5 7-3.5c0-2-1-4.1-2.4-5.9-1-1.4-1.6-2.5-1.6-4.1C15 4.8 14 3 12 3z"/></svg>Linux</div>
+        <div><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.6c0-2.6 2.1-3.8 2.2-3.9-1.2-1.8-3.1-2-3.7-2-1.6-.2-3.1.9-3.9.9-.8 0-2-.9-3.4-.9-1.7 0-3.3 1-4.2 2.6-1.8 3.1-.5 7.8 1.3 10.3.9 1.2 1.9 2.6 3.2 2.6 1.3-.1 1.8-.8 3.3-.8 1.6 0 2 .8 3.4.8 1.4 0 2.3-1.3 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9 0 0-2.7-1-2.7-4.2zM13.9 5.1c.7-.9 1.2-2 1-3.2-1 0-2.3.7-3 1.6-.7.8-1.2 2-1.1 3.1 1.2.1 2.3-.6 3.1-1.5z"/></svg>macOS</div>
+      </div>
+      <ul class="ticks">
+        <li>A terminal screen on every system, also over SSH.</li>
+        <li>On Windows, a tray app next to the clock and a Windows service.</li>
+        <li>Agents connect out to the server. No port to open on the agent.</li>
+      </ul>
+      <a class="more" href="docs/agents/install-agent.html">Install an agent</a><a class="more" href="docs/agents/agent-terminal.html">Agent terminal program</a>
+    </div>
+    <div class="frame"><div class="chrome"><i></i><i></i><i></i><b>Agents · Install agents</b></div>
+      <img src="assets/home/install-agents.png" width="1920" height="1080" alt="The Agents page with the Install agents panel open: agent downloads for Windows, macOS (Apple silicon and Intel) and Linux (x64 and ARM64), and the install steps" data-zoom decoding="async"></div>
+  </div>
+</section>
+
+<!-- ============ How-to ============ -->
+<section id="howto" class="alt">
+  <div class="wrap">
+    <div class="head">
+      <div class="kicker">Guide and how-tos</div>
+      <h2>58 step-by-step how-to guides</h2>
+      <p>The guide covers every page and every field. The how-tos walk you through real jobs, with the Skyforge sample studio.</p>
+    </div>
+    <div class="guides">
+      <a class="guide" href="docs/how-to/build-unreal-from-perforce.html"><span class="tag">Game builds</span><b>Build an Unreal Engine game from Perforce</b><span>Root, step and first build.</span></a>
+      <a class="guide" href="docs/how-to/build-unity-from-git.html"><span class="tag">Game builds</span><b>Build a Unity project from Git</b><span>A Windows player on every push.</span></a>
+      <a class="guide" href="docs/how-to/game-unity-perforce-steam.html"><span class="tag">Stores</span><b>Build Unity from Perforce and upload to a Steam branch</b><span>From depot to branch.</span></a>
+      <a class="guide" href="docs/how-to/game-publish-epic.html"><span class="tag">Stores</span><b>Publish a build to the Epic Games Store</b><span>Upload, label and clean up.</span></a>
+      <a class="guide" href="docs/how-to/check-shelf-before-submit.html"><span class="tag">Perforce</span><b>Test a shelved change before you submit</b><span>A personal build of your shelf.</span></a>
+      <a class="guide" href="docs/how-to/watch-agent-health.html"><span class="tag">Agents</span><b>Spot unhealthy agents</b><span>CPU, memory, disk and GPU at a glance.</span></a>
+      <a class="guide" href="docs/how-to/run-steps-in-parallel.html"><span class="tag">Steps</span><b>Run steps in parallel on several agents</b><span>Cook platforms side by side.</span></a>
+      <a class="guide" href="docs/how-to/rerun-from-failed-step.html"><span class="tag">Running builds</span><b>Re-run a failed build from the failing step</b><span>Skip the steps that passed.</span></a>
+    </div>
+    <div class="guides-foot">
+      <a class="btn btn-ghost" href="docs/index.html">Open the guide</a>
+      <a class="btn btn-ghost" href="docs/get-started/install.html">Install the server</a>
+      <a class="btn btn-ghost" href="docs/reference/release-notes.html">Release notes</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Download ============ -->
+<section id="download">
+  <div class="wrap">
+    <div class="head center">
+      <div class="kicker">Download</div>
+      <h2>Buildspawn 1.9.3</h2>
+      <p>Pick the file for the computer that will run the server. Each one includes Java 21, so there is nothing else to install.</p>
+    </div>
+    <div class="downloads">
+      <div class="dl">
+        <div class="os"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.5l7.5-1v7H3zM11.5 4.3L21 3v8.5h-9.5zM3 12.5h7.5v7L3 18.5zM11.5 12.5H21V21l-9.5-1.3z"/></svg><h3>Windows</h3></div>
+        <p class="sub">64-bit Windows</p>
+        <a class="file" href="https://github.com/creativewild/buildspawn/releases/download/v1.9.3/buildspawn-2.589-buildspawn.21-setup.exe"><b>Setup program</b><code>buildspawn-2.589-buildspawn.21-setup.exe</code><span>513 MB · installs the server and the Windows app</span></a>
+        <a class="file" href="https://github.com/creativewild/buildspawn/releases/download/v1.9.3/buildspawn-2.589-buildspawn.21-windows-x64.zip"><b>Portable zip</b><code>buildspawn-2.589-buildspawn.21-windows-x64.zip</code><span>513 MB · unzip and run</span></a>
+        <a class="go more" href="docs/get-started/install.html#windows">How to install on Windows</a>
+      </div>
+      <div class="dl">
+        <div class="os"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c-2 0-3 1.8-3 4.5 0 1.6-.6 2.7-1.6 4.1C6 13.4 5 15.5 5 17.5c0 2 2.3 3.5 7 3.5s7-1.5 7-3.5c0-2-1-4.1-2.4-5.9-1-1.4-1.6-2.5-1.6-4.1C15 4.8 14 3 12 3z"/><circle cx="10.5" cy="8" r=".6" fill="currentColor"/><circle cx="13.5" cy="8" r=".6" fill="currentColor"/></svg><h3>Linux</h3></div>
+        <p class="sub">x64 and ARM64</p>
+        <a class="file" href="https://github.com/creativewild/buildspawn/releases/download/v1.9.3/buildspawn_2.589-buildspawn.21_amd64.deb"><b>Debian / Ubuntu</b><code>buildspawn_2.589-buildspawn.21_amd64.deb</code><span>516 MB</span></a>
+        <a class="file" href="https://github.com/creativewild/buildspawn/releases/download/v1.9.3/buildspawn-2.589-buildspawn.21.x86_64.rpm"><b>RHEL / Fedora</b><code>buildspawn-2.589-buildspawn.21.x86_64.rpm</code><span>516 MB</span></a>
+        <a class="file" href="https://github.com/creativewild/buildspawn/releases/download/v1.9.3/buildspawn-2.589-buildspawn.21-linux-x64.tar.gz"><b>tar.gz, x64</b><code>buildspawn-2.589-buildspawn.21-linux-x64.tar.gz</code><span>516 MB</span></a>
+        <a class="file" href="https://github.com/creativewild/buildspawn/releases/download/v1.9.3/buildspawn-2.589-buildspawn.21-linux-aarch64.tar.gz"><b>tar.gz, ARM64</b><code>buildspawn-2.589-buildspawn.21-linux-aarch64.tar.gz</code><span>515 MB</span></a>
+        <a class="go more" href="docs/get-started/install.html#linux">How to install on Linux</a>
+      </div>
+      <div class="dl">
+        <div class="os"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.6c0-2.6 2.1-3.8 2.2-3.9-1.2-1.8-3.1-2-3.7-2-1.6-.2-3.1.9-3.9.9-.8 0-2-.9-3.4-.9-1.7 0-3.3 1-4.2 2.6-1.8 3.1-.5 7.8 1.3 10.3.9 1.2 1.9 2.6 3.2 2.6 1.3-.1 1.8-.8 3.3-.8 1.6 0 2 .8 3.4.8 1.4 0 2.3-1.3 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9 0 0-2.7-1-2.7-4.2zM13.9 5.1c.7-.9 1.2-2 1-3.2-1 0-2.3.7-3 1.6-.7.8-1.2 2-1.1 3.1 1.2.1 2.3-.6 3.1-1.5z"/></svg><h3>macOS</h3></div>
+        <p class="sub">Apple silicon and Intel</p>
+        <a class="file" href="https://github.com/creativewild/buildspawn/releases/download/v1.9.3/buildspawn-2.589-buildspawn.21-macos-aarch64.tar.gz"><b>Apple silicon</b><code>buildspawn-2.589-buildspawn.21-macos-aarch64.tar.gz</code><span>511 MB</span></a>
+        <a class="file" href="https://github.com/creativewild/buildspawn/releases/download/v1.9.3/buildspawn-2.589-buildspawn.21-macos-x64.tar.gz"><b>Intel</b><code>buildspawn-2.589-buildspawn.21-macos-x64.tar.gz</code><span>506 MB</span></a>
+        <a class="go more" href="docs/get-started/install.html#macos">How to install on macOS</a>
+      </div>
+      <div class="dl">
+        <div class="os"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8l-9-5-9 5 9 5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg><h3>Web archive</h3></div>
+        <p class="sub">For your own Java 21 or a servlet container</p>
+        <a class="file" href="https://github.com/creativewild/buildspawn/releases/download/v1.9.3/buildspawn-2.589-buildspawn.21.war"><b>Any system</b><code>buildspawn-2.589-buildspawn.21.war</code><span>463 MB · run with <code>java -jar</code></span></a>
+        <a class="go more" href="docs/get-started/install.html#war">Run the web archive</a>
+      </div>
+    </div>
+    <p class="dl-note">Every file is on the <a href="https://github.com/creativewild/buildspawn/releases/tag/v1.9.3">1.9.3 release page</a>, with a <code>.sha256</code> checksum next to it. New to Buildspawn? Start with <a href="docs/get-started/install.html">Install the server</a>.</p>
+  </div>
+</section>
+
+<div class="closing">
+  <div class="wrap">
+    <img class="mark" src="assets/home/mark.svg" alt="" aria-hidden="true">
+    <h2>Ship your next build with Buildspawn</h2>
+    <p>Install the server, add an agent and run your first build in an afternoon.</p>
+    <div class="cta">
+      <a class="btn btn-primary" href="#download">Download 1.9.3</a>
+      <a class="btn btn-ghost" href="docs/get-started/what-is-buildspawn.html">Read the guide</a>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <a class="brand" href="index.html" title="Buildspawn home"><img class="white" src="assets/logo.svg" alt="Buildspawn"><img class="ink" src="assets/logo-ink.svg" alt="Buildspawn"></a>
+    <span>Buildspawn by Luis Gomes · <a href="https://github.com/creativewild">github.com/creativewild</a> · Version 1.9.3</span>
+    <nav aria-label="Footer">
+      <a href="docs/index.html">Guide</a>
+      <a href="docs/how-to/build-unreal-from-perforce.html">How-to guides</a>
+      <a href="docs/reference/release-notes.html">Release notes</a>
+      <a href="#download">Download</a>
+    </nav>
+  </div>
+</footer>
+
+<div class="zoom" id="zoom" role="dialog" aria-modal="true" aria-label="Enlarged picture"><button type="button">Close</button><img alt=""><p></p></div>
+
+<script src="assets/home/home.js"></script>
+</body>
+</html>

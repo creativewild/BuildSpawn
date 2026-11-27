@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tree order and separators · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/project-tree-order">
+<main class="doc">
+<h1>Tree order and separators</h1>
+<p class="lead">Put the projects and build configurations of the tree in the order your team wants, and group them with named separators.</p>
+<h2>How the tree is sorted</h2><ul>
+  <li>Every project has two groups: <strong>projects first</strong>, then <strong>build configurations</strong>. Nothing crosses the line between the groups.</li>
+  <li>The default order is <strong>alphabetical</strong>.</li>
+  <li>A project can switch to a <strong>custom order</strong>. Then each group keeps the order you set.</li>
+  <li>Everyone sees the same order. It also applies to the Projects page and the dashboard list.</li>
+</ul>
+<h2>Who can change it</h2><p>Only administrators (the Administer permission) can change the order and the separators. For the whole server, use the root project settings.</p><h2>Reorder with the dialog</h2><figure class="shot">
+  <img src="../../assets/shots/projects/tree-reorder.png" alt="The Reorder items in Game dialog with the projects group, the build configurations group, move buttons and Add separator">
+  <figcaption>The Reorder dialog, opened from Order of items.</figcaption>
+</figure>
+<ol class="steps">
+  <li>Open the project and click <strong>Settings</strong>. On <strong>General</strong>, in the card <strong>Order of items</strong>, click <strong>Reorder...</strong>. The card says how the items are sorted now. The dialog is titled <em>Reorder items in Game</em>.</li>
+  <li>Drag an item by its handle. Or use <strong>Move to top</strong>, <strong>Move up</strong>, <strong>Move down</strong> and <strong>Move to bottom</strong>. With the keyboard press <kbd>Space</kbd> to pick up, the arrow keys to move and <kbd>Space</kbd> to drop.</li>
+  <li>Click <strong>Save</strong>. The <strong>x</strong> button, <strong>Cancel</strong> and <kbd>Esc</kbd> leave without saving. The footer says <em>No changes</em> until you move something. Clicking outside the dialog does not close it.</li>
+</ol>
+<h2>Reorder with the tree</h2><ol class="steps">
+  <li>In the header of the project tree switch on <strong>Reorder mode</strong>. It shows only if you may reorder something.</li>
+  <li>Handles appear on the rows you may move. Drag a row by its handle, only among its own siblings.</li>
+  <li>Every drop saves that project and shows an <strong>Undo</strong> toast. Press <kbd>Esc</kbd> to cancel a drag.</li>
+</ol>
+<h2>Separators</h2><p>A separator is a named line in the tree, for example <em>Main</em>, <em>Drops</em> or <em>Release</em>. It groups the items under it. Add one with <strong>Add separator</strong> in the dialog, give it a name, and drag it to its place. You can rename and delete separators there. A separator belongs to one group: the projects or the build configurations.</p><h2>Back to alphabetical</h2><p>Use <strong>Sort alphabetically</strong> in the dialog (it asks first), or click <strong>Alphabetical</strong> in the card <strong>Order of items</strong>. The custom list is dropped. The card has two choices, <strong>Alphabetical</strong> and <strong>Custom</strong>.</p><h2>What happens when things change</h2><table>
+  <thead><tr><th>Change</th><th>What happens</th></tr></thead>
+  <tbody>
+    <tr><td>A new item in a custom order</td><td>It is added at the end of its group. In alphabetical mode nothing changes.</td></tr>
+    <tr><td>Rename</td><td>The item keeps its place.</td></tr>
+    <tr><td>Move to another project</td><td>It leaves the old order and goes to the end of the group in the new project.</td></tr>
+    <tr><td>Copy</td><td>The copy is a new item.</td></tr>
+    <tr><td>Delete</td><td>The entry is dropped.</td></tr>
+    <tr><td>Items you cannot see</td><td>They are not shown but keep their place. A save only orders the visible items among themselves.</td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2><p>The <strong>Game</strong> project lists <em>Windows Build</em>, <em>PS5 Build</em> and <em>Xbox Series Build</em>. The studio wants the dev kits together. It sets a custom order, adds the separator <em>Consoles</em> above PS5 and Xbox, and <em>Desktop</em> above Windows.</p><h2>Problems and fixes</h2><table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>I cannot change the order</td><td>Only administrators can. The dialog says so at the top.</td></tr>
+    <tr><td>The order changed back</td><td>The project is in alphabetical mode. Save a custom order again.</td></tr>
+    <tr><td>A separator is not shown on the dashboard</td><td>The dashboard list applies the order but not the separators. The tree and the Projects page show them.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="projects.html">Projects</a></li>
+  <li><a href="settings-homes.html">Settings homes</a></li>
+  <li><a href="../administration/users-and-permissions.html">Users, groups and permissions</a></li>
+</ul>
+</main>
+</body>
+</html>

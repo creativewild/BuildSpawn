@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>After the build · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="post-build/overview">
+<main class="doc">
+<h1>After the build</h1>
+<p class="lead">Post-build actions run when the build steps have finished. They keep the files, report the tests, tell people and start other work.</p>
+<h2>How they work</h2>
+<ul>
+  <li>They run in the order of the list, after the last build step.</li>
+  <li>A post-build action never changes how the steps ran. Some can change the result: a failed upload can make the build unstable or failed.</li>
+  <li>Open them in <strong>Settings › Post-build Actions</strong> of a build configuration. See <a href="../projects/bc-post-build-actions.html">the Post-build Actions tab</a>.</li>
+  <li>A <a href="../projects/templates.html">template</a> or a project can pass post-build actions down to many build configurations.</li>
+</ul>
+<h2>Pick the right one</h2>
+<table>
+  <thead><tr><th>I want to</th><th>Use</th></tr></thead>
+  <tbody>
+    <tr><td>Keep the files the build made so I can download them</td><td><a href="archive-artifacts.html">Archive the artifacts</a></td></tr>
+    <tr><td>Show test results and trends</td><td><a href="test-report.html">Publish JUnit test result report</a></td></tr>
+    <tr><td>See the test results of the builds that follow this one</td><td><a href="aggregate-tests.html">Aggregate downstream test results</a></td></tr>
+    <tr><td>Start another build when this one ends</td><td><a href="build-other.html">Build other build configurations</a></td></tr>
+    <tr><td>Find out where a file came from</td><td><a href="fingerprints.html">Record fingerprints of files to track usage</a></td></tr>
+    <tr><td>Email people when a build fails</td><td><a href="email.html">E-mail Notification</a></td></tr>
+    <tr><td>Push a tag or branch to Git</td><td><a href="git-publisher.html">Git Publisher</a></td></tr>
+    <tr><td>Label the Perforce revision that was built</td><td><a href="perforce-label.html">Label in Perforce (VCS labeling)</a> or <a href="perforce-label-build.html">Perforce: Label build</a></td></tr>
+    <tr><td>Submit or shelve changed files to Perforce</td><td><a href="perforce-publish.html">Perforce: Publish assets</a></td></tr>
+    <tr><td>Delete the Perforce workspace after the build</td><td><a href="perforce-cleanup.html">Perforce: Cleanup</a></td></tr>
+    <tr><td>Approve or reject a Swarm review</td><td><a href="perforce-approve-review.html">Perforce: ApproveImpl review</a></td></tr>
+    <tr><td>Show a badge in Unreal Game Sync</td><td><a href="ugs-badge.html">UGS metadata server badge</a></td></tr>
+    <tr><td>Copy files to a server over SSH, FTP or a Windows share</td><td><a href="ssh.html">SSH</a>, <a href="ftp.html">FTP</a>, <a href="cifs.html">Windows share</a></td></tr>
+    <tr><td>Deploy a web application to a server</td><td><a href="deploy-container.html">Deploy war/ear to a container</a></td></tr>
+  </tbody>
+</table>
+<div class="callout note"><p>Some post-build settings also show as <a href="../projects/bc-build-features.html">build features</a>, for example Notifications, XML report processing and VCS labeling. They are the same settings. A Pipeline does all this in its script.</p></div>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../projects/bc-post-build-actions.html">The Post-build Actions tab</a></li>
+  <li><a href="../projects/bc-build-features.html">The Build Features tab</a></li>
+</ul>
+</main>
+</body>
+</html>

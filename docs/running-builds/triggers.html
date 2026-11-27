@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Triggers · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="running-builds/triggers">
+<main class="doc">
+<h1>Triggers</h1>
+<p class="lead">Triggers start builds on their own: when code changes, on a schedule, or when another build finishes.</p>
+
+<p>Each build configuration has its triggers on <strong>Settings › Triggers</strong>. A build configuration can have several triggers. Each is a separate entry that you can edit, disable, enable or delete. A disabled trigger stays saved but never starts a build.</p>
+<figure class="shot">
+  <img src="../../assets/shots/running-builds/triggers-page.png" alt="The Triggers settings of a build configuration with the Add new trigger button and the Remote trigger switch">
+  <figcaption>The Triggers page. Click <strong>Add new trigger</strong> to add one.</figcaption>
+</figure>
+
+<h2>Add a trigger</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Triggers</strong>.</li>
+  <li>Click <strong>Add new trigger</strong>. The list shows only the kinds that work for this build configuration. A kind that is already on it says so, and you edit it instead of adding it twice.</li>
+  <li>Click <strong>Add</strong> next to the kind and fill in its settings.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<p>On the Triggers page each row has <strong>Edit</strong>, <strong>Disable</strong> or <strong>Enable</strong>, and <strong>Delete</strong>. Changing triggers needs the Configure permission. The summary on the right says in one sentence what starts a build, for example <em>Runs every day at 02:00 and after Game/Windows Build finishes</em>.</p>
+<div class="callout note"><p>When a build configuration or its project is <strong>paused</strong>, no trigger starts a build. People can still start builds by hand.</p></div>
+
+<h2>The trigger types</h2>
+<table>
+  <thead><tr><th>Trigger</th><th>Starts a build when</th></tr></thead>
+  <tbody>
+    <tr><td><a href="trigger-vcs.html">VCS Trigger</a></td><td>Someone commits or submits a change to a root.</td></tr>
+    <tr><td><a href="trigger-schedule.html">Schedule Trigger</a></td><td>The time matches a schedule.</td></tr>
+    <tr><td><a href="trigger-finish-build.html">Finish Build Trigger</a></td><td>A watched build configuration finishes a build.</td></tr>
+    <tr><td><a href="trigger-retry.html">Retry build trigger</a></td><td>A build of this configuration fails.</td></tr>
+    <tr><td><a href="trigger-p4.html">P4 triggered build.</a></td><td>The Perforce server calls Buildspawn after a submit.</td></tr>
+    <tr><td><a href="trigger-p4-root.html">Perforce root: build when the Perforce server triggers it</a></td><td>The same, for a build configuration on a Perforce root.</td></tr>
+    <tr><td><a href="trigger-p4-shelve.html">Perforce shelve trigger</a></td><td>A new shelf matches your keyword, pattern or users.</td></tr>
+    <tr><td><a href="trigger-remote.html">Remote trigger</a></td><td>A script sends a web request with a token.</td></tr>
+  </tbody>
+</table>
+<p>Core triggers show a <strong>Core</strong> chip and those that come from a plugin show <strong>Plugin</strong>. The VCS, Schedule and Finish Build triggers have a plain form. The others bring their own form, or say <em>This trigger has no settings</em> and show what to set up on the other side.</p>
+<div class="callout note"><p>A project that indexes branches has one more trigger, <strong>Periodically if not otherwise run</strong>, with an <strong>Interval</strong> (default <code>1d</code>; also <code>5m</code>, <code>2h</code>, <code>7d</code>). It runs an index if none ran within that time. It belongs to the project, not to a build configuration.</p></div>
+
+<h2>Parameters and triggers</h2>
+<p>A trigger starts a build with the default values of its parameters. The rules of each parameter still count: a value that breaks them is refused. To start with other values, use the <a href="trigger-remote.html">remote trigger</a> with <code>buildWithParameters</code>, the <a href="trigger-p4-shelve.html">shelve trigger's</a> <strong>Parameters</strong>, or <a href="../parameters/build-chains.html">reverse.dep</a> values.</p>
+
+<h2>Triggers from projects and templates</h2>
+<p>Triggers can come from a <a href="../projects/templates.html">template</a> or a project. Inherited triggers show where they come from, and you can override, disable or reset them on the build configuration, as with <a href="../parameters/parameters.html#inheritance">parameters</a>.</p>
+
+<h2>How-to pages</h2>
+<ul>
+  <li><a href="../how-to/params-nightly-0200.html">Run nightly at 02:00</a></li>
+  <li><a href="../how-to/params-run-on-perforce-submit.html">Run on every Perforce submit</a></li>
+  <li><a href="../how-to/params-run-b-after-a.html">Run B when A succeeds</a></li>
+</ul>
+</main>
+</body>
+</html>

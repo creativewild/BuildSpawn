@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SSH Upload · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/ssh-upload">
+<main class="doc">
+<h1>SSH Upload</h1>
+<p class="lead">Copies files from the workspace to a remote server over SFTP, with include patterns, and can run a command afterwards.</p>
+
+<h2>When to use it</h2>
+<p>Use it to put a Linux server build or a patch on a test server.</p>
+
+<h2>How to set it up</h2>
+
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>. Type <code>SSH Upload</code> in <strong>Filter step types</strong> if you like, then click the <strong>SSH Upload</strong> tile (group <strong>Upload and deploy</strong>).</li>
+  <li>Type a <strong>Step name</strong>, for example <code>Upload server</code>.</li>
+  <li>Fill in the fields described below.</li>
+  <li>Optional: set <strong>Execute step</strong>, <strong>Conditions</strong> and <strong>Retry on failure</strong>. See <a href="step-list.html">The steps list and the step editor</a>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<figure class="shot small">
+  <img src="../../assets/shots/build-steps/ssh-upload.png" alt="The fields of the SSH Upload step in the step editor">
+  <figcaption>The fields of the SSH Upload step, as the step editor shows them.</figcaption>
+</figure>
+
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Name (SSH Server)</strong></td><td>The server to use, chosen from the servers defined once under <strong>Settings › System</strong>. A server marked <em>[No Exec]</em> cannot run commands.</td><td>First server</td><td><code>build-linux</code></td></tr>
+    <tr><td><strong>Verbose output in console</strong></td><td>More detail in the log.</td><td>Off</td><td>On</td></tr>
+    <tr><td><strong>Credentials</strong></td><td>Optional credentials to use instead of the server's own.</td><td>Server's own</td><td></td></tr>
+    <tr><td><strong>Retry (Retries, Delay)</strong></td><td>Try again when a transfer fails: how many times and the delay in milliseconds.</td><td>Off</td><td>3 retries, 10000 ms</td></tr>
+    <tr><td><strong>Label</strong></td><td>Only publish to this server when the label matches. For parameterised publishing.</td><td>None</td><td></td></tr>
+    <tr><td><strong>Publish to other SSH servers if an error occurs</strong></td><td>Keep going with the other servers when one fails.</td><td>Off</td><td>On</td></tr>
+    <tr><td><strong>Fail the build if an error occurs</strong></td><td>Fail the step when a transfer or command fails.</td><td>On</td><td>On</td></tr>
+    <tr><td><strong>Always SSH from master</strong></td><td>Make the transfer from the server instead of from the agent.</td><td>Off</td><td>Off</td></tr>
+    <tr><td><strong>Source files</strong></td><td>Files to upload: a comma-separated list of Ant includes, such as <code>**/*.jar</code>. The base folder is the workspace.</td><td>Empty</td><td><code>Builds/LinuxServer/**</code></td></tr>
+    <tr><td><strong>Remove prefix</strong></td><td>The first part of the file path that is not created on the server. All source paths must start with it.</td><td>Empty</td><td><code>Builds/LinuxServer</code></td></tr>
+    <tr><td><strong>Remote directory</strong></td><td>Optional destination folder, below the one in the server settings. It is created if missing.</td><td>Empty</td><td><code>/srv/skyforge/server</code></td></tr>
+    <tr><td><strong>Exec command</strong></td><td>A command to run on the server after the files are copied. A transfer set needs a source pattern, an exec command, or both.</td><td>Empty</td><td><code>./deploy.sh</code></td></tr>
+    <tr><td><strong>Exclude files (More options)</strong></td><td>Comma-separated Ant excludes.</td><td>Empty</td><td><code>**/*.log,**/*.tmp</code></td></tr>
+    <tr><td><strong>Pattern separator (More options)</strong></td><td>Regular expression that splits the include and exclude patterns. Default <code>[, ]+</code>. Use a single comma to keep spaces in names.</td><td><code>[, ]+</code></td><td><code>,</code></td></tr>
+    <tr><td><strong>No default excludes (More options)</strong></td><td>Do not use Ant's default excludes.</td><td>Off</td><td>Off</td></tr>
+    <tr><td><strong>Make empty dirs (More options)</strong></td><td>Create directories that match the pattern even when empty.</td><td>Off</td><td>Off</td></tr>
+    <tr><td><strong>Flatten files (More options)</strong></td><td>Create only files, no folders. File names must be unique or the step fails.</td><td>Off</td><td>Off</td></tr>
+    <tr><td><strong>Remote directory is a date format (More options)</strong></td><td>Treat the remote directory as a date pattern.</td><td>Off</td><td>Off</td></tr>
+    <tr><td><strong>Exec timeout (ms), Exec in pty (More options)</strong></td><td>As in <a href="ssh-exec.html">SSH Exec</a>.</td><td></td><td></td></tr>
+    <tr><td><strong>Add Transfer Set</strong></td><td>Add more sets. They run in order, so put an exec before a copy by using two sets.</td><td>One set</td><td></td></tr>
+  </tbody>
+</table>
+
+
+<h2>A worked example</h2>
+<p>Copy the Linux server build to the test box and unpack it. Step name <code>Upload server</code>, <strong>Name</strong> <code>build-linux</code>, <strong>Source files</strong> <code>Builds/LinuxServer/**</code>, <strong>Remove prefix</strong> <code>Builds/LinuxServer</code>, <strong>Remote directory</strong> <code>/srv/skyforge/server</code>, <strong>Exec command</strong> <code>./post-deploy.sh</code>.</p>
+
+<h2>What you see when it runs</h2>
+<p>The console says it is connecting, then <em>Transferred N file(s)</em>, the output of the command, and that it is disconnecting.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong><em>Failed to remove prefix from file named …</em></strong></td><td>All source paths must start with <strong>Remove prefix</strong>.</td></tr>
+    <tr><td><strong><em>Duplicate filename detected in flatten mode</em></strong></td><td>Two files have the same name. Turn off <strong>Flatten files</strong>.</td></tr>
+    <tr><td><strong><em>Could not create or change to directory</em></strong></td><td>Check the remote directory and the account's rights.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="ssh-exec.html">SSH Exec</a></li>
+  <li><a href="ftp-upload.html">FTP Upload</a></li>
+  <li><a href="smb-upload.html">SMB Upload</a></li>
+  <li><a href="runners.html">Runners</a></li>
+  <li><a href="common-step-fields.html">Fields every runner has</a></li>
+</ul>
+</main>
+</body>
+</html>

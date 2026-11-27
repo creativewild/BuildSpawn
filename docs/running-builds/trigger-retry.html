@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Retry build trigger · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="running-builds/trigger-retry">
+<main class="doc">
+<h1>Retry build trigger</h1>
+<p class="lead">Starts a failed build again after a delay.</p>
+
+<h2>When to use it</h2>
+<p>Use it for builds that sometimes fail for reasons outside your code, such as a busy network share or a license server that is slow.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Triggers</strong>.</li>
+  <li>Click <strong>Add new trigger</strong> and click <strong>Add</strong> next to <strong>Retry build trigger</strong>.</li>
+  <li>Set <strong>Retry delay</strong> and <strong>Maximum retries</strong>.</li>
+  <li>Tick or untick <strong>Retry with the same parameters</strong>.</li>
+  <li>Choose <strong>Retry from</strong>: <strong>The beginning</strong> or <strong>The failed step</strong>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/running-builds/trigger-retry.png" alt="The Retry build trigger form with Retry delay, Maximum retries, Retry with the same parameters and Retry from"><figcaption>The Retry build trigger form.</figcaption></figure>
+
+<h2>Every field</h2>
+<table>
+<thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>Retry delay</td><td>Seconds to wait after a failed build before the retry starts. 0 or more.</td><td>10</td><td><code>60</code></td></tr><tr><td>Maximum retries</td><td>How many times a failed build is retried. A retry that fails again counts against the same limit. 1 or more.</td><td>3</td><td><code>2</code></td></tr><tr><td>Retry with the same parameters</td><td>The retry gets the parameter values of the failed build. Otherwise it uses the defaults.</td><td>On</td><td>On</td></tr><tr><td>Retry from: The beginning</td><td>A new build that syncs the sources again and runs every step.</td><td>The beginning</td><td>-</td></tr><tr><td>Retry from: The failed step</td><td>A resumed build: same sources, parameters, agent and workspace. Steps before the failed one show as done in the failed build. If it cannot be resumed (the agent is offline, the workspace is gone or another build used it), the retry starts from the beginning and its cause says why.</td><td>-</td><td>The failed step</td></tr>
+</tbody>
+</table>
+
+<h2>A worked example</h2>
+<p>The Windows Build sometimes fails while it copies files from the share. Set delay 60, maximum retries 2 and <strong>The failed step</strong>. The cook step is not run again if it was done.</p>
+<h2>What you see when it runs</h2>
+<p>The row reads <em>Up to 2 times · 60 s apart · from the failed step</em>. The console of the failed build says <em>Retry 1 of 2 scheduled in 60 seconds: it resumes this build at the failed step</em>. The retry's cause says <em>Retry 1 of 2 after failure of #12</em>. When the limit is reached the log says <em>Not retrying: the build was already retried 2 times</em>.</p>
+<h2>Problems and fixes</h2>
+<table>
+<thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+<tbody>
+<tr><td>No retry happens</td><td>Only a result of Failure is retried (not Unstable or Aborted). A personal build and a side build of a Parallel block are not retried by themselves. The build configuration must be able to build (not disabled).</td></tr><tr><td>The retry starts from the beginning</td><td>The console says why: agent offline, workspace gone or used by another build.</td></tr>
+</tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="triggers.html">Triggers</a></li>
+  <li><a href="../build-steps/resume-and-retry.html">Resume and retry</a></li>
+</ul>
+</main>
+</body>
+</html>

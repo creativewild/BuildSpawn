@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VSTest · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/vstest">
+<main class="doc">
+<h1>VSTest</h1>
+<p class="lead">Runs unit tests with <code>vstest.console.exe</code> and can report the results. Installations are defined once, under Tools.</p>
+
+<h2>When to use it</h2>
+<p>Use it for MSTest, NUnit or xUnit tests that you run through Visual Studio's test platform, on a Windows agent.</p>
+
+<h2>How to set it up</h2>
+
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>. Type <code>VSTest</code> in <strong>Filter step types</strong> if you like, then click the <strong>VSTest</strong> tile (group <strong>Tests</strong>).</li>
+  <li>Type a <strong>Step name</strong>, for example <code>VSTest</code>.</li>
+  <li>Fill in the fields described below.</li>
+  <li>Optional: set <strong>Execute step</strong>, <strong>Conditions</strong> and <strong>Retry on failure</strong>. See <a href="step-list.html">The steps list and the step editor</a>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<figure class="shot small">
+  <img src="../../assets/shots/build-steps/vstest.png" alt="The fields of the VSTest step in the step editor">
+  <figcaption>The fields of the VSTest step, as the step editor shows them.</figcaption>
+</figure>
+
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>VsTest Version</strong></td><td>The VSTest installation, from <strong>Settings › Tools</strong>.</td><td>Default installation</td><td>VSTest 17</td></tr>
+    <tr><td><strong>Test Files</strong></td><td>The compiled test assemblies. Separate several with a new line or a space.</td><td>Empty</td><td><code>Tests\bin\Release\Game.Tests.dll</code></td></tr>
+    <tr><td><strong>Settings File</strong></td><td>Run tests with additional settings such as data collectors. Passed as <code>/Settings:</code>.</td><td>Empty</td><td><code>Local.runsettings</code></td></tr>
+    <tr><td><strong>Test Name</strong></td><td>Run tests whose names match. Separate several with commas. Passed as <code>/Tests:</code>. Cannot be used with Test Case Filter.</td><td>Empty</td><td><code>TestMethod1,TestMethod2</code></td></tr>
+    <tr><td><strong>Test Case Filter</strong></td><td>Run tests that match an expression of the form <code>property=value</code>, joined with <code>||</code>. Passed as <code>/TestCaseFilter:</code>.</td><td>Empty</td><td><code>TestCategory=Nightly</code></td></tr>
+    <tr><td><strong>Enable Code Coverage</strong></td><td>Enables the code coverage data collector. Default settings are used unless a settings file says otherwise.</td><td>Off</td><td>On</td></tr>
+    <tr><td><strong>InIsolation</strong></td><td>Runs the tests in an isolated process. The runner is less likely to stop on an error in the tests, but tests may run slower.</td><td>Off</td><td>On</td></tr>
+    <tr><td><strong>Use Vsix Extensions</strong></td><td>Use or skip the installed VSIX extensions in the test run.</td><td>Off</td><td>Off</td></tr>
+    <tr><td><strong>Use VS 2017 or Greater</strong></td><td>Adjusts the arguments for Visual Studio 2017 and newer.</td><td>Off</td><td>On</td></tr>
+    <tr><td><strong>Platform</strong></td><td>Target platform: x86, x64 or ARM.</td><td>Empty</td><td>x64</td></tr>
+    <tr><td><strong>.NET Framework Version</strong></td><td>Target framework: Framework35, Framework40 or Framework45.</td><td>Empty</td><td>Framework45</td></tr>
+    <tr><td><strong>Specify a logger for test results</strong></td><td>For example <code>trx</code> for a Visual Studio Test Results File.</td><td>Empty</td><td><code>trx</code></td></tr>
+    <tr><td><strong>Command Line Arguments</strong></td><td>Extra arguments for <code>vstest.console.exe</code>.</td><td>Empty</td><td><code>/Parallel</code></td></tr>
+    <tr><td><strong>Fail build on test failure</strong></td><td>Fail the build when a test fails.</td><td>On</td><td>On</td></tr>
+  </tbody>
+</table>
+
+
+<h2>A worked example</h2>
+<p>Run the game's unit tests with a runsettings file. Step name <code>VSTest</code>, <strong>Test Files</strong> <code>Tests\bin\Release\Game.Tests.dll</code>, <strong>Settings File</strong> <code>CI.runsettings</code>, <strong>Specify a logger</strong> <code>trx</code>.</p>
+
+<h2>What you see when it runs</h2>
+<p>The console shows the <code>vstest.console.exe</code> command and its output, ending with the totals of passed and failed tests. A failed test fails the build when <strong>Fail build on test failure</strong> is on.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong>The version list is empty</strong></td><td>Add an installation under <strong>Settings › Tools</strong> with the folder of <code>vstest.console.exe</code>.</td></tr>
+    <tr><td><strong><em>Test Name</em> and <em>Test Case Filter</em> both set</strong></td><td>Use only one of them.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="nunit.html">NUnit</a></li>
+  <li><a href="mstest.html">MSTest</a></li>
+  <li><a href="../administration/tools.html">Tools</a></li>
+  <li><a href="runners.html">Runners</a></li>
+  <li><a href="common-step-fields.html">Fields every runner has</a></li>
+</ul>
+</main>
+</body>
+</html>

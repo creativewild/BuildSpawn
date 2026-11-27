@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Epic: copy binary · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="game-builds/epic-copy">
+<main class="doc">
+<h1>Epic: copy binary</h1>
+<p class="lead">Copy a binary from one artifact to another on Epic, without uploading it again.</p>
+
+<h2>When to use it</h2>
+<p>Use it when you test a build on a staging artifact first and then want the same build on the live artifact. Copying is fast because nothing is uploaded again.</p>
+<div class="callout note"><p>Every Epic step runs the Epic <strong>BuildPatch Tool</strong> on the agent. The agent needs the tool: see <a href="install-buildpatch-tool.html">Install BuildPatch Tool</a>. A step that needs a newer tool than the agent has stops with a message that names the version the agent has.</p></div>
+
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration, then <strong>Settings › Build steps › Add build step</strong>.</li>
+  <li>Type <code>Epic</code> in <strong>Filter step types</strong> and click <strong>Epic: copy binary</strong>.</li>
+  <li>Pick the credential. Type the <strong>Artifact ID</strong> of the source in <strong>Artifact ID</strong>.</li>
+  <li>Type the <strong>Build version</strong> and the <strong>Destination artifact ID</strong>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/game-builds/epic-copy.png" alt="The Epic: copy binary step form with its Connection and copy settings"><figcaption>The Epic: copy binary step.</figcaption></figure>
+
+<h2>Every field</h2>
+<h3>Connection</h3>
+<table>
+<thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>Epic Games Store credential</td><td>The credential that holds your BuildPatch Tool keys. The list shows the credentials you may use. The secret is never typed in the step, never written to a file and never shown in the log.</td><td>None. The step fails if you pick nothing.</td><td><code>Epic Store (Skyforge)</code></td></tr>
+<tr><td>Artifact ID</td><td>The Epic artifact to work on. Leave it empty to use the <strong>Default artifact ID</strong> of the credential.</td><td>Empty (the credential default)</td><td><code>0f2b8a6c9d1e4c37a5e8b1d6c2f94a70</code></td></tr>
+<tr><td>BuildPatch Tool program</td><td>The full path of the BuildPatch Tool program on the agent. Leave it empty to use the tool the agent reported.</td><td>Empty (the tool the agent reported)</td><td><code>D:/Tools/BuildPatchTool/BuildPatchTool.exe</code></td></tr>
+</tbody>
+</table>
+<p>For this step the artifact ID above is the <strong>source</strong>.</p>
+<h3>Epic: copy binary</h3>
+<table>
+<thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>Build version</td><td>The version of the binary to copy.</td><td>Empty</td><td><code>1.4.57-Windows</code></td></tr>
+<tr><td>Destination artifact ID</td><td>The artifact the binary is copied to. It must not be the same as the source.</td><td>Empty (required)</td><td><code>7e3c1b9a5d2f48c6b0a4e8d1f5c2a936</code></td></tr>
+</tbody>
+</table>
+<h3>Options</h3>
+<table>
+<thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>Stop after (minutes)</td><td>The step is stopped after this time.</td><td>30</td><td><code>30</code></td></tr>
+<tr><td>Tries on network errors</td><td>How many times the step runs BuildPatch Tool when it fails because of a network problem. A wrong key or a missing permission is never tried again.</td><td>1</td><td><code>3</code></td></tr>
+<tr><td>Wait between tries (seconds)</td><td>The pause between two tries.</td><td>30</td><td><code>60</code></td></tr>
+<tr><td>Save the tool&rsquo;s logs with the build</td><td>Whether the logs BuildPatch Tool wrote on the agent are kept as build artifacts in <code>epic-logs</code>. Choices: <strong>Only when the step fails</strong>, <strong>Always</strong>, <strong>Never</strong>.</td><td>Only when the step fails</td><td><strong>Always</strong></td></tr>
+<tr><td>Fail the build on warnings</td><td>Fails the step when BuildPatch Tool gave warnings, for example when metadata could not be written. Without it, warnings only show in the log.</td><td>Off</td><td>On</td></tr>
+</tbody>
+</table>
+<h3>Hands on to later steps</h3>
+<table>
+<thead><tr><th>Name</th><th>What it holds</th></tr></thead>
+<tbody>
+<tr><td><code>EPIC_COPIED_VERSION</code></td><td>The version that was copied.</td></tr>
+<tr><td><code>EPIC_DEST_ARTIFACT_ID</code></td><td>The artifact it went to.</td></tr>
+</tbody>
+</table>
+
+<h2>A worked example</h2>
+<p>QA tested <code>1.4.57-Windows</code> on the staging artifact <code>Skyforge Windows Staging</code>. A build named <strong>Epic Promote</strong> copies it to the live artifact: credential <code>Epic Store (Skyforge)</code>, <strong>Artifact ID</strong> the staging ID, <strong>Build version</strong> <code>1.4.57-Windows</code>, <strong>Destination artifact ID</strong> the live ID. A <a href="epic-label.html">label step</a> then puts it live.</p>
+
+<h2>What you see when it runs</h2>
+<pre class="terminal" data-title="build log">Epic: credential Epic Store (Skyforge), product 8c1d5f, artifact 0f2b8a..., Publishing: Labels set by builds
+Epic: copy version 1.4.57-Windows from artifact 0f2b8a... to artifact 7e3c1b...
+Epic: Step output EPIC_COPIED_VERSION = 1.4.57-Windows
+Epic: Step output EPIC_DEST_ARTIFACT_ID = 7e3c1b...</pre>
+
+<h2>Problems and fixes</h2>
+<table>
+<thead><tr><th>Message</th><th>What to do</th></tr></thead>
+<tbody>
+<tr><td>The destination artifact ID is required</td><td>Fill in <strong>Destination artifact ID</strong>.</td></tr>
+<tr><td>The source and the destination are the same artifact</td><td>The destination must differ from the source. Check both IDs.</td></tr>
+<tr><td>Epic says the Client ID has no permission for the artifact</td><td>The credential must be allowed on both artifacts. Ask the person who runs the Developer Portal.</td></tr>
+</tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="epic-overview.html">Epic Games Store</a></li>
+  <li><a href="epic-label.html">Epic: label binary</a></li>
+  <li><a href="epic-inspect.html">Epic: inspect binaries</a></li>
+</ul>
+
+</main>
+</body>
+</html>

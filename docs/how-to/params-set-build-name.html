@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Set the build name from a script · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/params-set-build-name">
+<main class="doc">
+<h1>Set the build name from a script</h1>
+<p class="lead">Name each build after the version and the changelist.</p>
+
+<h2>When to use this</h2>
+<p>Use it so the build page and History show a name that means something, such as <code>1.4.212-CL48213</code>.</p>
+<h2>Steps</h2>
+<ol class="steps">
+  <li>Open the step that knows the version (<strong>Settings › Build steps</strong>).</li>
+  <li>Add a line that prints a <code>buildNumber</code> message (below).</li>
+  <li>Save and run.</li>
+</ol>
+<h2>A worked example</h2>
+<pre><code>Write-Host "##buildspawn[buildNumber '1.4.%build.counter%-CL%build.vcs.number%']"</code></pre><p>A name can use <code>%build.counter%</code>, a parameter, <code>%build.vcs.number%</code>, <code>{build.number}</code> for the name so far, and <code>%%</code> for a percent sign. It can be 200 characters at most.</p>
+<h2>What you see when it runs</h2>
+<p>The build page and the History tab show <em>1.4.212-CL48213</em>. The number and address of the build stay the same.</p>
+<h2>Problems and fixes</h2>
+<table>
+<thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+<tbody>
+<tr><td>The name did not change</td><td>An unknown parameter or a password in the name is refused. The log says why.</td></tr>
+</tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../reference/service-messages.html">Service messages</a></li>
+</ul>
+</main>
+</body>
+</html>

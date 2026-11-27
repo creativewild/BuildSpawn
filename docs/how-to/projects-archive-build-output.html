@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Archive build output · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/projects-archive-build-output">
+<main class="doc">
+<h1>Archive build output</h1>
+<p class="lead">Keep the files of a build so people can download them later, and reuse them in other builds.</p>
+<p>The <strong>Windows Build</strong> writes the game to <code>Output/Win64</code>. The studio wants the zip files kept with the build and the symbols left out.</p>
+<h2>Before you start</h2>
+<ul>
+  <li>A build step that writes the files into the workspace.</li>
+  <li>The <strong>Configure</strong> permission.</li>
+</ul>
+<h2>Steps</h2>
+<h3>Add the post-build action</h3>
+<ol class="steps">
+  <li>Open the build configuration, click <strong>Settings</strong>, then <strong>Post-build Actions</strong>.</li>
+  <li>Click <strong>Add post-build action</strong> and choose <strong>Archive the artifacts</strong>.</li>
+  <li>In <strong>Files to archive</strong> type <code>Output/Win64/**/*.zip</code>.</li>
+  <li>Open <strong>More options</strong>. In <strong>Excludes</strong> type <code>**/*.pdb</code>.</li>
+  <li>Tick <strong>Archive artifacts only if build is successful</strong>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<h3>Use the files in another build</h3>
+<ol class="steps">
+  <li>Open the other build configuration, <strong>Settings › More › Dependencies</strong>.</li>
+  <li>Add an <strong>artifact dependency</strong> on <strong>Windows Build</strong> with the rule <code>Output/Win64/*.zip =&gt; packages</code>. See <a href="../projects/bc-dependencies.html">Dependencies</a>.</li>
+</ol>
+<h2>Check it worked</h2>
+<ol class="steps">
+  <li>Run the build. The build page has an <strong>Artifacts</strong> list with the zip files.</li>
+  <li>The log says <em>Archived N artifacts</em>.</li>
+  <li>Download one file and open it.</li>
+</ol>
+<h2>Troubleshooting</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>No files found to archive</td><td>The pattern does not match. It is relative to the workspace. Check the step that makes the files.</td></tr>
+    <tr><td>The disk fills up</td><td>Keep the artifacts of fewer builds. See <a href="projects-keep-last-30-builds.html">Keep the last 30 builds</a>.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../post-build/archive-artifacts.html">Archive the artifacts</a></li>
+  <li><a href="../projects/bc-dependencies.html">Dependencies</a></li>
+  <li><a href="../build-results/changes-artifacts-tests.html">Artifacts on the build page</a></li>
+</ul>
+</main>
+</body>
+</html>

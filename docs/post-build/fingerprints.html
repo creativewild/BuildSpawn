@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Record fingerprints of files to track usage · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="post-build/fingerprints">
+<main class="doc">
+<h1>Record fingerprints of files to track usage</h1>
+<p class="lead">Records a fingerprint (a checksum) of files, so you can find which build made a file and which builds used it.</p>
+<h2>When to use it</h2>
+<p>Use it when several build configurations pass files to each other, for example the engine DLLs that the game build uses. With fingerprints you can answer: "this <code>Engine.dll</code> is on my disk. Which build made it?" and "which game builds used engine build 87?".</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration, click <strong>Settings</strong>, then <strong>Post-build Actions</strong>. Click <strong>Add post-build action</strong> and choose <strong>Record fingerprints of files to track usage</strong>.</li>
+  <li>In <strong>Files to fingerprint</strong> type the files, for example <code>Binaries/Win64/*.dll</code>.</li>
+  <li>Click <strong>Save</strong>.</li>
+  <li>Do the same on the build configuration that uses the files, so the use is recorded there too.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Files to fingerprint</td><td>Files to record, as Ant patterns, relative to the workspace.</td><td>Empty</td><td><code>Binaries/Win64/*.dll</code></td></tr>
+    <tr><td>Excludes</td><td>Files that match are not recorded. Comma separated.</td><td>Empty</td><td><code>**/*.pdb</code></td></tr>
+    <tr><td>Use default excludes</td><td>Leave out the files version control tools make.</td><td>On</td><td>On</td></tr>
+    <tr><td>Treat include and exclude patterns as case sensitive</td><td>Off matches any case.</td><td>On</td><td>On</td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p><strong>Engine Build</strong> fingerprints <code>Binaries/Win64/*.dll</code>. <strong>Windows Build</strong> copies the DLLs as an artifact dependency. A fingerprint check shows that Windows Build #142 used Engine Build #87.</p><h2>What you see when it runs</h2>
+<p>The build page has a <strong>See fingerprints</strong> section with the recorded files. Each file shows where else it was used.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>No fingerprints are shown</td><td>The files did not match. Check the pattern.</td></tr>
+    <tr><td>A file has no "used in" entry</td><td>The other build configuration does not fingerprint it. Archive with <strong>Fingerprint all archived artifacts</strong> there.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="overview.html">After the build: overview</a></li>
+  <li><a href="../projects/bc-post-build-actions.html">Post-build actions tab</a></li>
+  <li><a href="archive-artifacts.html">Archive the artifacts</a></li>
+</ul>
+</main>
+</body>
+</html>

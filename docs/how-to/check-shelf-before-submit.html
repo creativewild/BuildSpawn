@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Test a shelved change before you submit · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/check-shelf-before-submit">
+<main class="doc">
+<h1>Test a shelved change before you submit</h1>
+<p class="lead">Run a personal build of a shelved changelist, so you know your change builds before it reaches the depot.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>A build configuration with a Perforce connection whose view holds the files you changed. See <a href="build-every-submit.html">Build every Perforce submit</a> for how to set one up.</li>
+  <li>A change you have not submitted yet, in a pending changelist in your own workspace.</li>
+  <li>The permission to run builds of that build configuration.</li>
+</ul>
+<p>A <em>shelf</em> (shelved changelist) stores your files on the Perforce server without submitting them. A <em>personal build</em> syncs the latest code, puts your shelved files on top and runs the steps. It does not change the status of the build configuration.</p>
+
+<h2>Steps</h2>
+<h3>Shelve your change</h3>
+<ol class="steps">
+  <li>In P4V, right-click your pending changelist and choose <strong>Shelve</strong>. Or, on the command line:
+<pre><code>p4 shelve -c 261</code></pre>
+  Use your own changelist number instead of <code>261</code>.</li>
+  <li>Note the changelist number. You pick it in Buildspawn in a moment.</li>
+</ol>
+
+<h3>Run a personal build</h3>
+<ol class="steps">
+  <li>Open the build configuration, for example <strong>HT1 Shelf Check</strong> in the <strong>How-to</strong> project.</li>
+  <li>Click the <strong>Shelves</strong> tab. Your shelf is listed with its description, user, workspace and files. If you don't see it, click <strong>Refresh</strong> at the bottom.
+<figure class="shot">
+  <img src="../../assets/shots/how-to/check-shelf-before-submit-2.png" alt="The Shelves tab of HT1 Shelf Check: the Shelve trigger card with keyword #buildspawn, and shelf 261 Forest_Main: brighter morning light #buildspawn by t.osei in workspace ws-t.osei, 1 file, no personal build yet">
+  <figcaption>The Shelves tab lists the shelves in the build configuration\'s view. The <strong>Personal build</strong> column fills in after the build.</figcaption>
+</figure></li>
+  <li>Click the button beside <strong>Run</strong> (<strong>Run custom build</strong>).</li>
+  <li>Open the <strong>Shelved changes</strong> tab.</li>
+  <li>Tick your shelf in the list, or type its number in <strong>Shelved changelist IDs</strong>. To build several shelves together, separate the numbers with commas.
+<figure class="shot small">
+  <img src="../../assets/shots/how-to/check-shelf-before-submit-3.png" alt="The Run custom build dialog on the Shelved changes tab: Shelved changelist IDs holds 261, and shelf 261 Forest_Main: brighter morning light #buildspawn by t.osei is ticked, with Cancel and Run Build buttons">
+  <figcaption>Pick the shelf on the <strong>Shelved changes</strong> tab.</figcaption>
+</figure></li>
+  <li>Click <strong>Run Build</strong>.</li>
+</ol>
+
+<h2>Check it worked</h2>
+<ol class="steps">
+  <li>Open the new build. It has a <strong>Personal</strong> chip beside its result.</li>
+  <li>In <strong>Summary</strong>, the <strong>Personal build</strong> row names your shelf and its owner, and <strong>Parameters</strong> shows <code>p4.status = shelved</code> and <code>p4.review</code> with your changelist number.</li>
+  <li><strong>Changes</strong> lists your shelved changelist.</li>
+  <li>If the build passed, submit your change. If it failed, fix it, shelve again and run another personal build.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/how-to/check-shelf-before-submit-4.png" alt="Build #3 of HT1 Shelf Check with Success and Personal chips; the Summary shows Parameters p4.status = shelved, p4.review = 260 and Personal build of shelf 260 by t.osei; Changes lists change 260">
+  <figcaption>A personal build of a shelf. In the log you can see the step reading the shelved version of the file.</figcaption>
+</figure>
+
+<h2>Run it on your own computer</h2>
+<p>If an administrator has turned on personal machines, you can run the same personal build on your own computer. Add your computer once under <strong>My machines</strong> in your account menu. Then, on the <strong>Shelved changes</strong> tab, pick your shelf and click <strong>Run on my machine</strong>, or choose <strong>My machine</strong> in the Agent list. Only you can build there, and the shelved files are reverted after the build. See <a href="../running-builds/personal-builds.html">Personal builds and shelves</a>.</p>
+<h2>Show the result to a colleague</h2>
+<p>A personal build is private. Open the build and click <strong>Share</strong> to copy a link that lets someone else read it. Click <strong>Stop sharing</strong> to turn the link off. See <a href="../running-builds/shared-builds.html">Shared builds</a>.</p>
+
+<h2>Build every new shelf on its own</h2>
+<p>If your team wants every shelf checked, add a shelve trigger. People then only add a keyword to the changelist description.</p>
+<ol class="steps">
+  <li>Open the build configuration's <strong>Settings</strong>, then <strong>Triggers</strong>.</li>
+  <li>Click <strong>Add new trigger</strong> and click <strong>Add</strong> on <strong>Perforce shelve trigger</strong>.</li>
+  <li>Keep the <strong>Schedule</strong>, for example <code>H/2 * * * *</code>. It says how often to look for new shelves.</li>
+  <li>Keep the <strong>Keyword</strong> <code>#buildspawn</code>, or type your own. Only shelves whose description holds it are built.</li>
+  <li>If you like, limit it further with a <strong>Description pattern</strong> (a regular expression) or a list of <strong>Users</strong>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/how-to/check-shelf-before-submit-5.png" alt="The Perforce shelve trigger form: Schedule H/2 * * * *, Keyword #buildspawn, empty Description pattern and Users, Build customization, with Cancel and Save">
+  <figcaption>The shelve trigger. Each new revision of a matching shelf starts one personal build.</figcaption>
+</figure>
+<div class="callout note"><p>Shelves that already exist when you add the trigger are not built straight away. They are built when someone shelves them again. The same happens when you change the filters.</p></div>
+
+<h2>Troubleshooting</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>My shelf is not in the list.</td><td>The list only shows shelves with files inside the build configuration's view. Check the view on <strong>Settings › Version Control</strong>. The list is also kept for a while: click <strong>Refresh</strong>.</td></tr>
+    <tr><td>The build fails before the steps and names some files.</td><td>Your shelf conflicts with newer submits. Sync your workspace, resolve the files, shelve again and run a new personal build.</td></tr>
+    <tr><td>The shelve trigger did not start a build.</td><td>Check that the description holds the <strong>Keyword</strong> and that your user is in <strong>Users</strong>, if that is filled in. A shelf that existed before the trigger needs a new revision: shelve it again.</td></tr>
+    <tr><td>The build configuration turned red after a personal build.</td><td>It doesn't: personal builds never change its status. Look for a regular build that failed at the same time in <strong>History</strong>.</td></tr>
+  </tbody>
+</table>
+
+<h2>Next steps</h2>
+<div class="cards">
+  <a class="card" href="build-every-submit.html"><h3>Build every Perforce submit</h3><p>Start a build for each new submit.</p></a>
+  <a class="card" href="../version-control/perforce.html"><h3>Perforce</h3><p>Shelves, review status and the workbench pages.</p></a>
+  <a class="card" href="../running-builds/run-dialog.html"><h3>The Run dialog</h3><p>Every tab of Run custom build.</p></a>
+  <a class="card" href="../running-builds/triggers.html"><h3>Triggers</h3><p>All trigger kinds and how they are set.</p></a>
+</div>
+</main>
+</body>
+</html>

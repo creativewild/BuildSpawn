@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Windows app · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="administration/windows-launcher">
+<main class="doc">
+<h1>The Windows app</h1>
+<p class="lead">Buildspawn.exe is the window you use to start, stop and set up the Buildspawn server on a Windows computer.</p>
+
+<p>Every Windows download of the server includes the app. It has five tabs: <strong>Run here</strong>, <strong>Settings</strong>, <strong>Windows service</strong>, <strong>Certificates</strong> and <strong>About</strong>. Open it from the Start menu (<strong>Buildspawn</strong>) or run <code>Buildspawn.exe</code> from the program folder. A short walk-through is in <a href="../get-started/windows-app.html">Get started: the Windows app</a>. This page lists every control.</p>
+<p>The app is for the <em>server</em>. The small program for a build agent is described in <a href="../agents/windows-tray-app.html">The agent tray app</a>.</p>
+
+<div class="callout note"><p>Buildspawn runs either inside the app or as the Windows service, on one data folder, never both at once. The app checks this and tells you which one is running.</p></div>
+
+<h2>When to use it</h2>
+<p>Use the app to try Buildspawn out, to change its settings with a form instead of a text file, to install the Windows service, and to add your company's root certificates. On a server that nobody signs in to, install the service once and then you rarely open the app.</p>
+
+
+<h2>Run here</h2>
+<p>This tab starts Buildspawn inside the app, for this signed-in user. It stops when you stop it or close the app (see the tray icon below).</p>
+<table>
+  <thead><tr><th>Control</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td>Status and a coloured label</td><td>Shows <em>Stopped</em>, <em>Starting here</em>, <em>Running here</em> (with the address, the process number and how long it has run), <em>Stopping</em> or <em>Failed to start</em>. It also shows <em>Service running</em> or <em>Service stopping</em> when the Windows service owns the data folder.</td></tr>
+    <tr><td>Settings</td><td>The settings file this copy uses.</td></tr>
+    <tr><td><strong>Start</strong></td><td>Starts Buildspawn here. If you have unsaved changes on the Settings tab it asks whether to save them first. It refuses, and says why, when the settings have a problem or when the service already runs on the same data folder.</td></tr>
+    <tr><td><strong>Stop</strong></td><td>Stops the server and waits until it has really ended.</td></tr>
+    <tr><td><strong>Open in browser</strong></td><td>Opens the web interface at the address and port from the settings.</td></tr>
+    <tr><td><strong>Open logs folder</strong></td><td>Opens the folder with <code>buildspawn.log</code>.</td></tr>
+    <tr><td>The live log</td><td>The server's output as it starts and runs. The status turns to <em>Running</em> when the server says it is fully up.</td></tr>
+    <tr><td><strong>First start: initial admin password</strong> and <strong>Copy</strong></td><td>On the first start the server makes a one-time password for the user <code>admin</code>. It is shown here until you finish the setup page in the browser. <strong>Copy</strong> puts it on the clipboard.</td></tr>
+  </tbody>
+</table>
+
+<h3>The tray icon</h3>
+<p>When you close the window while Buildspawn runs here, a question appears: <em>Buildspawn is still running here. Stop it, or keep it running with an icon in the notification area?</em> The buttons are <strong>Keep running in the tray</strong>, <strong>Stop and close</strong> and <strong>Cancel</strong>.</p>
+<p>The tray icon (the notification area at the bottom right) has a menu:</p>
+<table>
+  <thead><tr><th>Menu item</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Open Buildspawn</strong></td><td>Shows the app window again.</td></tr>
+    <tr><td><strong>Open in browser</strong></td><td>Opens the web interface.</td></tr>
+    <tr><td><strong>Stop</strong></td><td>Stops the server.</td></tr>
+    <tr><td><strong>Exit</strong></td><td>Closes the app.</td></tr>
+  </tbody>
+</table>
+<p>Hover over the icon to see the state. If the server stops by itself, a balloon tells you why.</p>
+
+<h2>Settings</h2>
+<p>The form writes <code>buildspawn.cfg</code>. The Windows service and the <a href="server-terminal.html">terminal program</a> read the same file. See <a href="../reference/settings-files.html">Settings files</a> for every key and the placeholders.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Port</strong></td><td>The web port. Next to it the app says whether the port is already used, for example <em>In use by Buildspawn running here</em> or <em>In use by the Buildspawn service</em>.</td><td><code>8080</code></td></tr>
+    <tr><td><strong>Listen on</strong></td><td><strong>This computer only</strong> or <strong>Network (all interfaces)</strong>. Choose the network when agents and other people must reach the server.</td><td>Network</td></tr>
+    <tr><td><strong>Memory</strong></td><td>A slider from 2 GB up to 32 GB (never more than the computer has, minus 1 GB). The label beside it shows <em>of N GB in this machine</em>. This is the Java heap.</td><td>A quarter of the computer's memory, between 2 and 16 GB</td></tr>
+    <tr><td><strong>Data folder</strong> (with <strong>Browse…</strong>)</td><td>Hint: <em>Jobs, build history and settings</em>. The home of the server.</td><td><code>C:\ProgramData\Buildspawn\data</code> (installed) or <code>data</code> in the program folder (portable)</td></tr>
+    <tr><td><strong>Logs folder</strong> (with <strong>Browse…</strong>)</td><td>Hint: <em>buildspawn.log, gc.log and heap dumps</em>.</td><td><code>C:\ProgramData\Buildspawn\logs</code> or <code>logs</code> in the program folder</td></tr>
+  </tbody>
+</table>
+<h3>Advanced</h3>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Java options</strong></td><td>A multi-line box with the Java options. <code>{data}</code>, <code>{logs}</code> and <code>{install}</code> (the program folder) stand for those folders. Folders named here are created before Java starts.</td></tr>
+    <tr><td><strong>Extra arguments</strong></td><td>Extra Buildspawn arguments, for example <code>--sessionTimeout=480</code>.</td></tr>
+    <tr><td><strong>Reset to recommended</strong></td><td>Puts the recommended Java options back. See <a href="../reference/settings-files.html#java-options">The recommended Java options</a>.</td></tr>
+  </tbody>
+</table>
+<h3>The buttons</h3>
+<table>
+  <thead><tr><th>Button</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Save</strong></td><td>Writes the file. For an installed copy the file is in <code>C:\ProgramData</code>, so Windows asks for administrator rights. Afterwards the app says what to do next, for example <em>Saved. To use the new settings, stop and start Buildspawn here and restart the service.</em></td></tr>
+    <tr><td><strong>Revert</strong></td><td>Throws away your unsaved changes and loads the file again.</td></tr>
+    <tr><td><strong>Check with Java</strong></td><td>Runs Java with your options, without starting the server. It says <em>Java accepts the options</em> or shows what Java complained about. Use it before you rely on new options.</td></tr>
+  </tbody>
+</table>
+<p>The app checks the form as you type. It reports a port outside 1 to 65535, a memory size that is not like <code>4g</code>, less than 512 MB, or as much as the whole computer, and folders that are not full paths or cannot be created.</p>
+
+<h2>Windows service</h2>
+<p>The service starts with Windows, runs without anybody signed in, and restarts Buildspawn if it stops. This tab shows its state and controls it.</p>
+<table>
+  <thead><tr><th>Item</th><th>What it shows or does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Service</strong></td><td><em>Not installed</em>, <em>Running</em> (starts with Windows, restarts on failure), <em>Stopped</em> and so on.</td></tr>
+    <tr><td><strong>Program</strong></td><td>The program the service runs. A note appears when it is another copy of Buildspawn than this one. Remove it, then install again, to use this copy.</td></tr>
+    <tr><td><strong>Account</strong></td><td><code>NT AUTHORITY\LocalService</code> by default.</td></tr>
+    <tr><td><strong>Data</strong></td><td>The data folder the service uses.</td></tr>
+    <tr><td><strong>Install</strong>, <strong>Remove</strong></td><td>Install or remove the service. Remove asks first and keeps your settings and data.</td></tr>
+    <tr><td><strong>Start</strong>, <strong>Stop</strong>, <strong>Restart</strong></td><td>Control the service. Start is disabled while Buildspawn runs here on the same data folder.</td></tr>
+    <tr><td><strong>Open in browser</strong></td><td>Opens the service's web address while it runs.</td></tr>
+  </tbody>
+</table>
+<p>Buttons with a shield icon ask Windows for administrator rights. If you cancel the prompt, the app says <em>Cancelled: Windows did not get administrator rights.</em> A blue note tells you when the settings changed after the service started, and that a restart is needed.</p>
+
+<h3>The LocalService account</h3>
+<p>The service runs as <code>LocalService</code>. This account can change only the data and logs folders. Installing the service also gives it read access to <code>C:\ProgramData\Buildspawn</code> and Modify access to folders named in the Java options. Builds that need more, such as tools or files elsewhere or network shares, need another account. Set it in the Windows <strong>Services</strong> program, on the <strong>Log On</strong> tab of <strong>Buildspawn</strong>, and give that account Modify on the data and logs folders.</p>
+<p>The service is set to restart Buildspawn after 10, 30 and 60 seconds if it fails. Read more in <a href="../agents/windows-service.html">Windows services for agents</a> for the agent side.</p>
+
+<h3>If Buildspawn stops soon after it starts</h3>
+<p>The reason is written to the Windows <strong>Application</strong> event log (source <em>Buildspawn</em>) and to <code>logs\buildspawn.log</code>. Every run adds a line there when it starts (naming whether it is the app or the service, the user and the settings file) and when it stops (with the exit code).</p>
+
+<h2>Certificates</h2>
+<p>This tab keeps the list of extra root certificates for company servers, for example a proxy or internal Git or Perforce servers signed by your own certificate authority. It works on the <code>trust</code> folder inside the data folder. The full explanation, and the web page for the same list, are in <a href="trusted-certificates.html">Trusted certificates</a>.</p>
+<table>
+  <thead><tr><th>Control</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Also trust Windows' certificate store</strong></td><td>For companies whose IT team pushes the root certificate with group policy. No import needed.</td></tr>
+    <tr><td><strong>Certificates you added</strong></td><td>The list. Under it the app says <em>plus N built into Java</em>. Right-click a row for <strong>View…</strong>, <strong>Copy fingerprint</strong> and <strong>Remove</strong>.</td></tr>
+    <tr><td><strong>Add…</strong></td><td>Opens <strong>Add certificates</strong>: paste one or more Base64 certificates (<code>-----BEGIN CERTIFICATE-----</code>), or click <strong>Choose file…</strong>. Accepted files: <code>.pem .crt .cer .der .p7b .p7c</code>, Base64 or binary. A chain file adds each certificate. Click <strong>Add certificates</strong> to finish.</td></tr>
+    <tr><td><strong>View…</strong></td><td>Shows the certificate: name, issuer, valid dates and the SHA-256 fingerprint, with <strong>Copy fingerprint</strong> and <strong>Close</strong>.</td></tr>
+    <tr><td><strong>Remove</strong></td><td>Removes the selected certificate after you confirm.</td></tr>
+    <tr><td>Blue band <em>Changes take effect when the server starts again.</em></td><td>With <strong>Restart now</strong> (or <strong>Restart the service</strong> when the service runs).</td></tr>
+    <tr><td>The line at the bottom</td><td>Shows the trust folder, says it is kept when Buildspawn is upgraded, and whether changing it needs administrator rights.</td></tr>
+  </tbody>
+</table>
+<div class="callout warning"><p>Never paste a private key. The app refuses it and does not keep it. Buildspawn needs only the public certificate.</p></div>
+
+<h2>About</h2>
+<p>Shows the Buildspawn version and a short licence note: Buildspawn is MIT licensed, and the bundled Java runtime is named with its version. The links <strong>Program folder</strong>, <strong>Settings file</strong> and <strong>Java notices</strong> open those places in Explorer.</p>
+
+<h2>Setup: the installer</h2>
+<p>The installer is <code>buildspawn-&lt;version&gt;-setup.exe</code>. It needs administrator rights and installs the program to <code>C:\Program Files\Buildspawn</code>. It adds Start menu shortcuts, an <strong>Apps &amp; features</strong> entry, the <code>bin</code> folder on the PATH (so <code>buildspawn</code> works in every new terminal) and, if you choose it, the service.</p>
+<h3>The wizard</h3>
+<ol class="steps">
+  <li>Start <code>setup.exe</code>. The steps on the left are <strong>Welcome</strong>, <strong>Licence</strong>, <strong>Install folder</strong>, <strong>Data folder</strong>, <strong>Port and memory</strong>, <strong>Options</strong>, <strong>Install</strong> and <strong>Finish</strong>.</li>
+  <li>Tick <strong>I accept the licence</strong>.</li>
+  <li>Pick the program folder. If Buildspawn is already installed, the wizard says it replaces the program files.</li>
+  <li>Pick the data folder (default <code>C:\ProgramData\Buildspawn</code>). When settings already exist, the wizard shows them and keeps them. If a service from an unzipped package is found, you can <strong>Use the existing service's data and settings</strong>. Its service is replaced and its folder stays.</li>
+  <li>Set the <strong>Port</strong> (the wizard checks it is free), the <strong>Memory</strong> and <strong>Listen on</strong> (<strong>This computer only</strong> or <strong>Network</strong>).</li>
+  <li>On <strong>Options</strong> tick <strong>Install as a Windows service and start it</strong>, <strong>Start menu shortcuts</strong> and a desktop shortcut as you like.</li>
+  <li>Click <strong>Install</strong>. On <strong>Finish</strong> choose <strong>Open Buildspawn in the browser</strong> and <strong>Open the Buildspawn app</strong>.</li>
+</ol>
+<p>Running a newer setup upgrades the server: it stops the service, replaces the program files, keeps settings and data, and starts the service again. See <a href="backups.html">Backups and upgrades</a>.</p>
+<h3>Silent install and the switches</h3>
+<pre><code>buildspawn-&lt;version&gt;-setup.exe /S /PORT=8080 /MEMORY=8g /LISTEN=all /SERVICE=1</code></pre>
+<table>
+  <thead><tr><th>Switch</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>/S</code></td><td>Install or upgrade without questions.</td></tr>
+    <tr><td><code>/D=&lt;folder&gt;</code></td><td>The program folder. Default <code>C:\Program Files\Buildspawn</code>, or the installed one.</td></tr>
+    <tr><td><code>/DATA=&lt;folder&gt;</code></td><td>The folder that holds <code>data\</code> and <code>logs\</code>. Default <code>C:\ProgramData\Buildspawn</code>. Without it, a service from an unzipped package hands over its data and settings.</td></tr>
+    <tr><td><code>/PORT=&lt;port&gt;</code></td><td>The web port. Default 8080, or the current setting.</td></tr>
+    <tr><td><code>/MEMORY=&lt;size&gt;</code></td><td>The Java heap, for example <code>8g</code>.</td></tr>
+    <tr><td><code>/LISTEN=all|localhost</code></td><td>Which network interfaces to listen on.</td></tr>
+    <tr><td><code>/SERVICE=0|1</code></td><td>Install and start the Windows service. Default 1.</td></tr>
+    <tr><td><code>/STARTMENU=0|1</code>, <code>/DESKTOP=0|1</code></td><td>Shortcuts. Default 1 and 0.</td></tr>
+    <tr><td><code>/uninstall [/S] [/DELETEDATA]</code></td><td>Removes Buildspawn. Data is kept unless you add <code>/DELETEDATA</code>.</td></tr>
+    <tr><td><code>/list</code></td><td>Lists the package inside the setup.</td></tr>
+    <tr><td><code>/extract=&lt;folder&gt;</code></td><td>Unpacks the package without installing.</td></tr>
+    <tr><td><code>/?</code></td><td>Shows all the switches.</td></tr>
+  </tbody>
+</table>
+<p>A silent run writes its log to <code>%TEMP%\buildspawn-setup.log</code>. To remove Buildspawn use <strong>Apps &amp; features</strong> or <strong>Uninstall Buildspawn</strong> in the Start menu. It asks before deleting data, and the default keeps it.</p>
+
+<h2>The portable zip</h2>
+<p>The zip needs no installation. Unpack it anywhere and open <code>Buildspawn.exe</code>. A file named <code>portable</code> in the folder makes the app keep its settings (<code>buildspawn.cfg</code>), data (<code>data\</code>) and logs (<code>logs\</code>) in the same folder, so you can move or copy the whole folder. The zip also has <code>bin\buildspawn.exe</code>, the terminal program, but it does not put <code>bin</code> on the PATH. Add it yourself if you want to type <code>buildspawn</code>.</p>
+
+<h2>The service commands</h2>
+<p>For scripts and remote work, <code>buildspawn-service.exe</code> in the program folder does what the <strong>Windows service</strong> tab does. Open a command prompt as administrator and go to the program folder:</p>
+<table>
+  <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>buildspawn-service install</code></td><td>Installs the service and the Application event log source. Gives LocalService the access it needs.</td></tr>
+    <tr><td><code>buildspawn-service uninstall</code></td><td>Removes the service. (<code>remove</code> works too.) Settings and data stay.</td></tr>
+    <tr><td><code>buildspawn-service start</code> / <code>stop</code> / <code>restart</code></td><td>Control the service. Stop waits until Java has really ended, and after 120 seconds it ends it by force and logs that.</td></tr>
+    <tr><td><code>buildspawn-service status</code></td><td>Shows the service state.</td></tr>
+    <tr><td><code>buildspawn-service check</code></td><td>Needs no administrator rights. Checks the settings, runs Java with the options, and prints the settings file, data, logs and the full Java command, ending with <em>OK</em> or <em>Not OK</em>.</td></tr>
+    <tr><td><code>buildspawn-service run</code></td><td>Needs no administrator rights. Runs Buildspawn in the command prompt until you press <kbd>Enter</kbd>. Handy for trying settings.</td></tr>
+  </tbody>
+</table>
+<div class="callout note"><p>The old <code>buildspawn.exe</code> console launcher is gone. <code>Buildspawn.exe</code> is the app now. For a console run, use <code>buildspawn-service run</code>. The terminal program is <code>bin\buildspawn.exe</code>, in a folder, so the two never overwrite each other.</p></div>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>Start says the service runs Buildspawn on this data folder.</td><td>Stop the service on the <strong>Windows service</strong> tab first, or just open it in the browser.</td></tr>
+    <tr><td><em>Service is still stopping...</em> and Start is grey.</td><td>Wait. Java is still shutting down. The button turns on by itself.</td></tr>
+    <tr><td>The state is <em>Failed to start</em>.</td><td>Read the live log and <code>logs\buildspawn.log</code>. Use <strong>Check with Java</strong> on the Settings tab. A Java option that names a folder that cannot be created is a common cause.</td></tr>
+    <tr><td>The port is in use.</td><td>The note beside the port says by whom. Choose another port, or stop the other program.</td></tr>
+    <tr><td>Save needs a UAC prompt every time.</td><td>This is normal for an installed copy, because its settings are in <code>C:\ProgramData</code>. The portable copy saves without a prompt.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="running-the-server.html">Running the server</a>: which package to pick and the first start.</li>
+  <li><a href="../reference/settings-files.html">Settings files</a></li>
+  <li><a href="server-terminal.html">The server terminal program</a></li>
+  <li><a href="trusted-certificates.html">Trusted certificates</a></li>
+  <li><a href="backups.html">Backups and upgrades</a></li>
+  <li><a href="../agents/windows-service.html">Windows service for an agent</a> and <a href="../agents/install-agent.html">Install an agent</a></li>
+</ul>
+</main>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Retention and discard old builds · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/bc-retention">
+<main class="doc">
+<h1>Retention and discard old builds</h1>
+<p class="lead">Rules that delete old builds and their files after each build, so the disk does not fill up.</p>
+<h2>When to use it</h2>
+<p>Use it when builds and artifacts take much space. A build of a game can have gigabytes of artifacts. Keep the last 30 builds, and keep the artifacts of fewer. The rules run after every build, not at once when you save. The card is on <strong>General</strong> under <strong>Clean-up rules</strong>.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings</strong>. Then click <strong>General</strong>.</li>
+  <li>Go to <strong>Clean-up rules</strong> and turn on <strong>Discard old builds</strong>.</li>
+  <li>Choose the <strong>Strategy</strong>: <strong>Keep by age and number</strong>.</li>
+  <li>Set <strong>Days to keep builds</strong> or <strong>Builds to keep</strong>, or both.</li>
+  <li>Set <strong>Days to keep artifacts</strong> or <strong>Builds to keep artifacts of</strong> to remove artifacts sooner than the builds.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<h2>Every field</h2>
+<p>Keep rules are whole numbers from 1. An empty field means no limit. The card shows a line <strong>In words</strong> that says what the rules do.</p><table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Discard old builds</td><td>Master switch. When off, nothing is deleted and no limit is set.</td><td>Off</td><td>On</td></tr>
+    <tr><td>Strategy</td><td>The clean-up strategy. <strong>Keep by age and number</strong> is built in. Other strategies show their own settings here.</td><td>Keep by age and number</td><td>Keep by age and number</td></tr>
+    <tr><td>Days to keep builds</td><td>Builds (with their logs) older than this are deleted.</td><td>Empty (no limit)</td><td><code>14</code></td></tr>
+    <tr><td>Builds to keep</td><td>Only this many of the newest builds are kept.</td><td>Empty (no limit)</td><td><code>30</code></td></tr>
+    <tr><td>Days to keep artifacts</td><td>Artifacts older than this are deleted. The builds stay.</td><td>Empty</td><td><code>7</code></td></tr>
+    <tr><td>Builds to keep artifacts of</td><td>Only the newest builds keep artifacts.</td><td>Empty</td><td><code>5</code></td></tr>
+    <tr><td>Remove the last build too when it is old enough</td><td>Also apply the rules to the newest build.</td><td>Off</td><td>Off</td></tr>
+  </tbody>
+</table>
+<div class="callout note"><p>Builds that you pin with <strong>Keep this build forever</strong>, and the last stable and last successful build, are never deleted by these rules. If both a number and an age are set, a build is deleted when either limit is passed.</p></div><h2>A worked example</h2>
+<p>The studio keeps the last <code>30</code> builds of <strong>Windows Build</strong> and the artifacts of the last <code>5</code>. The game package of 2 GB is then kept for 5 builds only. The log and the change list stay for 30. See <a href="../how-to/projects-keep-last-30-builds.html">Keep the last 30 builds</a>.</p><h2>What you see when it runs</h2>
+<p>After each build, builds and artifacts outside the rules disappear from the History list. The summary says <em>Nothing is deleted</em> when no limit is set. An administrator can also set a server-wide rule in the global settings.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>Old builds are still there</td><td>The rules run after a build finishes. Run a build, or wait for the next one.</td></tr>
+    <tr><td>I need one old build</td><td>Open it and use <strong>Keep this build forever</strong>.</td></tr>
+    <tr><td>A number is refused</td><td>Keep rules are whole numbers from 1, or empty for no limit.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="settings-homes.html">Settings homes</a></li>
+  <li><a href="bc-general.html">General</a></li>
+  <li><a href="../how-to/projects-keep-last-30-builds.html">Keep the last 30 builds</a></li>
+  <li><a href="../post-build/archive-artifacts.html">Archive the artifacts</a></li>
+</ul>
+</main>
+</body>
+</html>

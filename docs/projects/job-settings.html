@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Job settings · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/job-settings">
+<main class="doc">
+<h1>Job settings</h1>
+<p class="lead">Every setting that is stored with a build configuration, what it holds and where to find it.</p>
+<h2>What a job setting is</h2><p>A job setting is a property stored with one build configuration. Most have a place on the tabs of the build configuration. This page lists every one, what it holds and where to find it. The server calls them job properties; in the user interface a job is a build configuration.</p><h2>Platform icon</h2>
+<p>Choose the platform icon of a build configuration. On <a href="bc-general.html">General</a>.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Icon</td><td>The platform. See <a href="project-icons.html">Project icons</a>.</td><td>Generic</td><td>Windows</td></tr>
+    <tr><td>Icon colour</td><td>The colour of the icon.</td><td>Theme colour</td><td>-</td></tr>
+  </tbody>
+</table>
+<h2>Build priority</h2>
+<p>The order of builds that wait for an agent. On <a href="bc-general.html">General</a> under Build options.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Build priority</td><td>A whole number from -100 to 100. Higher goes first. Same priority: first come, first served.</td><td>0</td><td><code>10</code></td></tr>
+  </tbody>
+</table>
+<h2>Dependencies</h2>
+<p>Snapshot and artifact dependencies. On the <a href="bc-dependencies.html">Dependencies</a> tab. The full form shows a summary with a link to it.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Snapshot and artifact dependencies</td><td>See <a href="bc-dependencies.html">Dependencies</a>.</td><td>None</td><td>-</td></tr>
+  </tbody>
+</table>
+<h2>Discard old builds</h2>
+<p>Delete old builds and artifacts. On <a href="bc-general.html">General</a> under Clean-up rules.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Strategy and keep rules</td><td>See <a href="bc-retention.html">Retention and discard old builds</a>.</td><td>Off</td><td>-</td></tr>
+  </tbody>
+</table>
+<h2>Do not allow concurrent builds</h2>
+<p>A Pipeline runs one build at a time. On <a href="bc-general.html">General</a>, <strong>Run one build at a time</strong> and <strong>Abort the running build when a newer one starts</strong>.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Abort previous builds</td><td>A new build immediately aborts the running one, instead of waiting in the queue. Useful for expensive tests of an outdated commit.</td><td>Off</td><td>On</td></tr>
+  </tbody>
+</table>
+<h2>Do not allow the pipeline to resume if the controller restarts</h2>
+<p>A running Pipeline ends when the server restarts. On <a href="bc-workspace-options.html">Workspace options</a>, <strong>Resume after a controller restart</strong>.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>(no fields)</td><td>Turning it on has no extra fields.</td><td>Off</td><td>-</td></tr>
+  </tbody>
+</table>
+<h2>Documentation</h2>
+<p>Links on the Documentation tab. As the build feature <a href="feature-documentation.html">Documentation</a>.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Title, Summary, links</td><td>See <a href="documentation-links.html">Documentation links</a>.</td><td>Empty</td><td>-</td></tr>
+  </tbody>
+</table>
+<h2>Parallel tests</h2>
+<p>Split tests into batches. As the build feature <a href="feature-parallel-tests.html">Parallel tests</a>.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Number of batches</td><td>2 to 20.</td><td>4</td><td><code>4</code></td></tr>
+  </tbody>
+</table>
+<h2>Perforce data refresh</h2>
+<p>How often the Perforce lists of the build configuration are read again. On <a href="bc-other-settings.html">Other settings</a>.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Refresh Perforce lists on a custom interval</td><td>Turn on to set your own interval.</td><td>Off</td><td>On</td></tr>
+    <tr><td>Interval</td><td>Seconds. How often the lists (submitted changes, shelves, pending changes, labels, branch streams) are read in the background while someone has viewed the build configuration in the last 30 minutes, or while it has a polling, commit or shelve trigger. The interval is shorter for ten minutes after a change and grows while nothing changes, up to 15 minutes.</td><td>120</td><td><code>300</code></td></tr>
+  </tbody>
+</table>
+<h2>Pipeline speed/durability override</h2>
+<p>How often a running Pipeline saves its state. On <a href="bc-workspace-options.html">Workspace options</a>, <strong>Speed and durability</strong>.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Custom Pipeline Speed/Durability Level</td><td>Server default, Performance-optimized, Less durable (a bit faster) or Maximum survivability.</td><td>Server default</td><td>Maximum survivability</td></tr>
+  </tbody>
+</table>
+<h2>Preserve stashes from completed builds</h2>
+<p>Keep stashes so a later stage can restart from a finished build. On <a href="bc-workspace-options.html">Workspace options</a>.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Number of completed builds</td><td>How many builds keep their stashes.</td><td>1</td><td><code>3</code></td></tr>
+  </tbody>
+</table>
+<h2>Publish build status to Helix Swarm</h2>
+<p>Reports the build to a Swarm review. As the Helix Swarm choice of <a href="feature-commit-status.html">Commit status publisher</a>.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Swarm server</td><td>The server to report to.</td><td>None</td><td><code>swarm.studio.example</code></td></tr>
+    <tr><td>Code review comments</td><td>Also post a comment on the review.</td><td>Off</td><td>On</td></tr>
+  </tbody>
+</table>
+<h2>This project is parameterised</h2>
+<p>The parameters of the build configuration. On the <a href="bc-parameters.html">Parameters</a> tab.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Parameters</td><td>See <a href="bc-parameters.html">Parameters</a>.</td><td>None</td><td>-</td></tr>
+  </tbody>
+</table>
+<h2>Throttle builds</h2>
+<p>Limit how often builds start. On <a href="bc-general.html">General</a> under Build options.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Allow N builds per time period</td><td>Number of builds from 1 to 1000 and a period.</td><td>Off</td><td>1 per hour</td></tr>
+    <tr><td>Builds started by a person ignore the limit</td><td>People can still run it.</td><td>Off</td><td>On</td></tr>
+  </tbody>
+</table>
+<h2>Build triggers (Pipeline)</h2>
+<p>The triggers of a Pipeline. On the <strong>Build Triggers</strong> tab of a Pipeline.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Triggers</td><td>See <a href="bc-triggers.html">Triggers</a>.</td><td>None</td><td>-</td></tr>
+  </tbody>
+</table>
+<h2>Perforce root: build when the Perforce server triggers it</h2>
+<p>Marks that a Pipeline is started by a Perforce server trigger. On the Triggers tab.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>(note only)</td><td>Set by the Perforce root trigger. See <a href="../running-builds/trigger-p4-root.html">Perforce root trigger</a>.</td><td>-</td><td>-</td></tr>
+  </tbody>
+</table>
+<h2>Project-based security (AuthorizationMatrixProperty, and the Entra ID matrix)</h2>
+<p>Who may do what on this build configuration, besides the global rules. See <a href="../administration/users-and-permissions.html">Users, groups and permissions</a>.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Users and groups</td><td>One card per user or group, with what it grants as a summary and every permission grouped inside the card. The Entra ID matrix has an <strong>Add from Entra ID</strong> row for the people picker.</td><td>None</td><td><code>sam.lee</code>: Build</td></tr>
+  </tbody>
+</table>
+<h2>Override multibranch or organization branch indexing triggers</h2>
+<p>Branch projects only. On a branch project of a <a href="type-multibranch.html">Multibranch Pipeline</a>.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Override disabled triggers</td><td>If indexing triggers are disabled on the Multibranch or organization level, turn them on for this job only. Unchecked: disable them for this job only.</td><td>Off</td><td>-</td></tr>
+  </tbody>
+</table>
+<h2>Settings you do not edit</h2><table>
+  <thead><tr><th>Setting</th><th>What it is</th></tr></thead>
+  <tbody>
+    <tr><td>Based on branch</td><td>Set by a Multibranch Pipeline on each branch project. You do not edit it.</td></tr>
+    <tr><td>Generated build configuration</td><td>Marks a build configuration that a plugin made for one run of another one, as part of a composite build. It is hidden from lists, the tree, search and the dashboard, keeps the access rules of its owner, and is deleted with it or after a retention time.</td></tr>
+    <tr><td>BuildGraph agent group</td><td>Marks a build configuration that a distributed BuildGraph build made for one agent group: which build it belongs to and which agent types may run it. Never made from a form.</td></tr>
+  </tbody>
+</table>
+<h2>Problems and fixes</h2><table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>I cannot find a setting</td><td>Open <a href="bc-other-settings.html">Other settings</a>. Settings of add-ons that have no page of their own are listed there.</td></tr>
+    <tr><td>The setting is read-only</td><td>You need the Configure permission on the build configuration.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="settings-homes.html">Settings homes</a></li>
+  <li><a href="folder-settings.html">Project settings</a></li>
+  <li><a href="bc-other-settings.html">Other settings</a></li>
+</ul>
+</main>
+</body>
+</html>

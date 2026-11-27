@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Management pages · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="administration/management-pages">
+<main class="doc">
+<h1>Management pages</h1>
+<p class="lead">One section for each of the smaller pages under Manage: reload, system information, logs, load statistics, the command line client, the script console, nodes, old data, shutdown, the root project, credentials, Perforce roots, the BuildPatch Tool and the plugin pages.</p>
+
+<p><strong>When to use it:</strong> when you look after the server and need to find out what a Settings page does, what it shows, and what its buttons change. The big pages have their own guide pages, listed in the <a href="settings-overview.html">Settings overview</a>.</p>
+
+<h2>How to open any of them</h2>
+<ol class="steps">
+  <li>Click <strong>Manage</strong> in the left rail. The Settings page lists every page as a card, or as a row in the list.</li>
+  <li>Click the page you want, or use the search box at the top of Settings.</li>
+  <li>Use the breadcrumb at the top to go back to <strong>Manage</strong>.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/administration/system-settings.png" alt="The Settings list on the left of a Settings page">
+  <figcaption>Every Settings page shows the list of pages on its left.</figcaption>
+</figure>
+
+<table>
+  <thead><tr><th>Page</th><th>Address</th></tr></thead>
+  <tbody>
+    <tr><td><a href="#reload">Reload Configuration from Disk</a></td><td><code>/reload</code></td></tr>
+    <tr><td><a href="#system-information">System Information</a></td><td><code>/systemInfo</code></td></tr>
+    <tr><td><a href="#logs">Logs</a></td><td><code>/log</code></td></tr>
+    <tr><td><a href="#load-statistics">Load Statistics</a></td><td><code>/load-statistics</code></td></tr>
+    <tr><td><a href="#cli">Buildspawn CLI</a></td><td><code>/cli</code></td></tr>
+    <tr><td><a href="#script-console">Script Console</a></td><td><code>/script</code></td></tr>
+    <tr><td><a href="#nodes">Nodes</a></td><td><code>/computer</code></td></tr>
+    <tr><td><a href="#about">About Buildspawn</a></td><td><code>/about</code></td></tr>
+    <tr><td><a href="#old-data">Manage Old Data</a></td><td><code>/administrativeMonitor/OldData/manage</code></td></tr>
+    <tr><td><a href="#shutdown">Prepare for Shutdown</a></td><td><code>/prepareShutdown</code></td></tr>
+    <tr><td><a href="#root-project">Root project</a></td><td><code>/rootProject</code></td></tr>
+    <tr><td><a href="#credentials">Credentials</a></td><td><code>/credentials</code></td></tr>
+    <tr><td><a href="#credential-providers">Credential Providers</a></td><td><code>/configureCredentials</code></td></tr>
+    <tr><td><a href="#perforce-roots">Perforce roots</a></td><td><code>/perforce-roots</code></td></tr>
+    <tr><td><a href="#buildpatch-tool">BuildPatch Tool</a></td><td><code>/buildpatchtool</code></td></tr>
+    <tr><td><a href="#plugins-installed">Plugins pages</a></td><td><code>/pluginManager/...</code></td></tr>
+  </tbody>
+</table>
+
+<h2 id="reload">Reload Configuration from Disk</h2>
+<p>Throws away everything the server holds in memory and loads all settings, build configurations and build records again from the data folder. It does not restart the server.</p>
+<h3>When to use it</h3>
+<p>Only after you changed files in the data folder by hand, for example a <code>config.xml</code> of a build configuration. Normal changes through the web pages never need it.</p>
+<h3>How to use it</h3>
+<ol class="steps">
+  <li>Open <strong>Manage › Reload Configuration from Disk</strong>.</li>
+  <li>A page asks you to confirm. Click <strong>Retry using POST</strong> (the button is the confirmation).</li>
+  <li>Wait. The server shows <em>Starting Buildspawn</em> and your browser reloads when it is ready.</li>
+</ol>
+<div class="callout warning"><p>Anything not saved to disk is lost. Running builds keep running, but the page is not available for a short time. Do it when no one is editing settings.</p></div>
+<h3>Problems and fixes</h3>
+<ul>
+  <li><em>Settings you changed on disk do not show:</em> check the file is valid. A broken file is skipped and an entry appears under <a href="#old-data">Manage Old Data</a>.</li>
+</ul>
+
+<h2 id="system-information">System Information</h2>
+<p>Runtime details of the server, to help you find problems. The header shows the Buildspawn version, the Java version and the operating system.</p>
+<table>
+  <thead><tr><th>Part</th><th>What it shows</th></tr></thead>
+  <tbody>
+    <tr><td><strong>System Properties</strong></td><td>The Java system properties, as <strong>Name</strong> and <strong>Value</strong>. Values that look like secrets are masked. Click <strong>Show values</strong> to see the masked ones. Examples: the data folder, the Java home, the file encoding.</td></tr>
+    <tr><td><strong>Environment Variables</strong></td><td>The environment of the server process, with secrets masked in the same way.</td></tr>
+    <tr><td><strong>Plugins</strong></td><td>Every plugin with <strong>Name</strong>, <strong>Version</strong> and <strong>Enabled</strong>.</td></tr>
+    <tr><td><strong>Memory Usage</strong></td><td>A chart of the Java heap: <strong>Used</strong> and <strong>Total</strong>. Choose a <strong>Timespan</strong> of <strong>Short</strong>, <strong>Medium</strong> or <strong>Long</strong>.</td></tr>
+    <tr><td><strong>Thread Dumps</strong></td><td>A link to the thread dumps of the server and of each agent. An offline agent shows <em>Offline · not available</em>.</td></tr>
+  </tbody>
+</table>
+<figure class="shot"><img src="../../assets/shots/administration/system-info.png" alt="System Information with the header, the system properties table and a switch to show masked values"><figcaption>Settings › System Information.</figcaption></figure>
+<div class="callout tip"><p>When you ask for help, copy the version line and the plugin list from this page.</p></div>
+
+<h2 id="logs">Logs</h2>
+<p>Log recorders collect log messages from the server code, at the levels you pick. Use them to find out why something in the server fails, for example a version control poll or an agent connection.</p>
+<h3>How to read the log</h3>
+<ol class="steps">
+  <li>Open <strong>Manage › Logs</strong>.</li>
+  <li>Under <strong>Log Recorders</strong>, the first row is <strong>All Buildspawn Logs</strong>: every logger at level info and above. Click <strong>View log</strong> or <strong>Open full log</strong>. The newest line is first. Columns are <strong>Time</strong>, <strong>Level</strong>, <strong>Logger</strong> and <strong>Message</strong>.</li>
+</ol>
+<h3>How to add a recorder</h3>
+<ol class="steps">
+  <li>Click <strong>Add recorder</strong>.</li>
+  <li>Type a name, for example <code>Perforce polling</code>, and confirm.</li>
+  <li>On the recorder's page, add one or more loggers and pick a level for each (for example the logger of the Perforce plugin at <em>FINE</em>).</li>
+  <li>Click <strong>Save</strong>. Then reproduce the problem and open <strong>View log</strong>.</li>
+</ol>
+<p>Each recorder row has <strong>Configure</strong>, <strong>View log</strong> and, in <strong>More actions</strong>, <strong>Delete</strong>. <strong>Log levels</strong> shows the levels set now.</p>
+<div class="callout note"><p>Messages are kept in memory. A restart clears them. Very low levels (FINE, FINER, FINEST) make the server slower, so switch them off when you are done.</p></div>
+<h3>Problems and fixes</h3>
+<ul>
+  <li><em>No logs available:</em> nothing has been written at that level yet. Do the action again.</li>
+</ul>
+
+<h2 id="load-statistics">Load Statistics</h2>
+<p>Charts of how busy the whole server is. They tell you whether builds wait for free executors and whether you need more agents.</p>
+<table>
+  <thead><tr><th>Metric</th><th>Meaning</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Available executors</strong></td><td>Executors that are online and idle, ready to start a build now. If this stays at 0 while the queue grows, builds are waiting for capacity.</td></tr>
+    <tr><td><strong>Online executors</strong></td><td>The sum of executors on all connected nodes. It drops when agents go offline.</td></tr>
+    <tr><td><strong>Busy executors</strong></td><td>Online executors that run a build. Busy divided by online is your use of capacity.</td></tr>
+    <tr><td><strong>Queue length</strong></td><td>Builds waiting for an executor. It does not count builds in their quiet period or builds that wait for an earlier build of the same configuration.</td></tr>
+  </tbody>
+</table>
+<p>Choose a <strong>Timespan</strong>: <strong>Short</strong> (a point every 10 seconds), <strong>Medium</strong> (every minute) or <strong>Long</strong> (every hour). The lines are moving averages. <strong>Show data table</strong> shows the numbers. The heading <strong>Overall load</strong> is the whole server. A node or a label has the same chart on its own page.</p>
+<figure class="shot">
+  <img src="../../assets/shots/administration/load-statistics.png" alt="Load Statistics with the Short, Medium and Long buttons, a chart of available, online and busy executors and queue length, and an explanation of each metric">
+  <figcaption>Load Statistics.</figcaption>
+</figure>
+
+<h2 id="cli">Buildspawn CLI</h2>
+<p>The command line client lets you control the server from a shell or a script, for example to start a build from a console or to list build configurations.</p>
+<ol class="steps">
+  <li>Open <strong>Manage › Buildspawn CLI</strong>.</li>
+  <li>Download the client file with the link at the top of the page. It needs Java.</li>
+  <li>Use <strong>Filter commands</strong> to find a command, and click it to see its usage and an example call.</li>
+  <li>Run the example in a shell. Use an API token, not your password. See <a href="../reference/api-tokens.html">API tokens</a>.</li>
+</ol>
+<p>The table lists <strong>Available commands</strong> with <strong>Name</strong> and <strong>Description</strong>. For day to day work on a console, the <a href="server-terminal.html">terminal program</a> may be easier.</p>
+
+<h2 id="script-console">Script Console</h2>
+<p>Runs a Groovy script inside the server for troubleshooting and for jobs that no page offers.</p>
+<ol class="steps">
+  <li>Open <strong>Manage › Script Console</strong>.</li>
+  <li>Type a script. Use <code>println</code> to see output. The server's main packages are already imported, and every class of every plugin is visible.</li>
+  <li>Click <strong>Run</strong>, or press <kbd>Ctrl</kbd> + <kbd>Enter</kbd>.</li>
+</ol>
+<p>The page starts with a sample script that counts the installed plugins.</p>
+<div class="callout warning"><p>A script runs in the server process with no sandbox. It can read every secret, change any setting and run programs as the server's user. Only run a script you understand, and give the Administer permission to very few people.</p></div>
+<h3>Problems and fixes</h3>
+<ul>
+  <li><em>No output:</em> you used <code>System.out</code>, which goes to the server's own output. Use <code>println</code>.</li>
+  <li><em>The page says you are not allowed:</em> you need the Administer permission.</li>
+</ul>
+
+<h2 id="nodes">Nodes</h2>
+<p>The list of the machines that run builds: the built-in node and every agent. You can add, change, connect and monitor them here. The page is described in full in <a href="../agents/agents-page.html">Agents page</a>. Settings of a single agent are in <a href="../agents/agent-settings.html">Agent settings</a>.</p>
+
+<h2 id="about">About Buildspawn</h2>
+<p>Shows the version, a short description, the licence and the list of third-party libraries and plugin licences that Buildspawn uses. Use it when you need the licence notice of a library for your own records. It has no settings.</p>
+
+<h2 id="old-data">Manage Old Data</h2>
+<p>When you remove or upgrade plugins, or upgrade Buildspawn, old data may stay on disk. Buildspawn converts it when it loads it, but does not save the file again, so you can still go back to an older version. Data that cannot be read at all, such as fields of a plugin that you removed, is skipped so that the server starts and works normally.</p>
+<ol class="steps">
+  <li>Open <strong>Manage › Manage Old Data</strong>. The heading shows how many entries there are, for example <em>Old and unreadable data (0)</em>. With none, the page says <em>No old data</em>.</li>
+  <li>For each entry, read the file name and the Buildspawn version where the format changed. Unreadable fields show on the right.</li>
+  <li>Click <strong>Discard</strong> to save the affected files again without the unreadable fields. Nothing else in the build configuration or node settings changes, and the errors stop showing in the log.</li>
+  <li>To convert old data to the current format, pick the version you may need to go back to, and click <strong>Upgrade</strong>.</li>
+</ol>
+<div class="callout warning"><p>After you convert or discard, an older Buildspawn or plugin version may not be able to read the saved file. Make a <a href="backups.html">backup</a> first.</p></div>
+<p>It is fine to leave unreadable data alone. The warning for this page is one of the <a href="system-settings.html#admin-monitors">administrative monitors</a>.</p>
+
+<h2 id="shutdown">Prepare for Shutdown</h2>
+<p>Stops the server from starting new builds, so you can restart or switch it off safely once the running builds are done.</p>
+<ol class="steps">
+  <li>Open <strong>Manage › Prepare for Shutdown</strong>.</li>
+  <li>Optionally type a <strong>Reason</strong>. Everybody sees it in a banner at the top of every page while the server prepares: <em>Buildspawn is going to shut down. No new builds can be started.</em> The page shows a preview.</li>
+  <li>Click <strong>Shutdown</strong>. Running builds finish. Queued builds wait.</li>
+  <li>Restart or stop the server when no build runs. To change the reason, use <strong>Update shutdown preparation</strong>.</li>
+  <li>To go back to normal, click <strong>Cancel shutdown</strong> (the link is then called <strong>Cancel Shutdown</strong> in the list).</li>
+</ol>
+<p>Triggers keep adding builds to the queue while you prepare, so the queue is long after you cancel.</p>
+<div class="callout tip"><p>Do this before a <a href="backups.html">backup or upgrade</a>, so no build is writing files at that moment.</p></div>
+
+<h2 id="root-project">Root project</h2>
+<p>The root project sits above every project. What you set there is passed down to all projects and build configurations: build steps, parameters, templates, connections, Perforce roots and credentials. The page description reads <em>Connections, parameters and templates that every project inherits.</em></p>
+<ol class="steps">
+  <li>Open <strong>Manage › Root project</strong>. You land on the root project with its sub-tabs.</li>
+  <li>Use the tabs and the menu on the left of <strong>Build settings</strong>. See <a href="global-connections.html">Global connections and Vault</a> and <a href="../projects/templates.html">Templates</a>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<h2 id="credentials">Credentials</h2>
+<p>Credentials are the sign-in details builds use: user names and passwords, SSH keys, tokens, certificates and secret files. Secrets are stored encrypted and never shown again.</p>
+<ol class="steps">
+  <li>Open <strong>Manage › Credentials</strong>. The page lists the credential stores. The system store holds credentials for the server itself. A store has one or more domains. A domain limits where a credential may be used, for example only for one host name.</li>
+  <li>Open a store and a domain, for example <strong>Global credentials (unrestricted)</strong>.</li>
+  <li>Click <strong>Add Credentials</strong>, pick the <strong>Kind</strong> and fill in the fields. Give it an ID that you can recognise, such as <code>p4-studio</code>.</li>
+  <li>Click <strong>Create</strong>.</li>
+</ol>
+<p>How builds use credentials is in <a href="../parameters/credentials.html">Credentials</a>. Credentials can also be set on a single project, and then only that project and the ones below it can use them.</p>
+
+<h2 id="credential-providers">Credential Providers</h2>
+<p>Decides which sources of credentials are on, and which kinds of credential people may create.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Providers</strong></td><td>Pick <strong>All</strong>, or choose to include or exclude certain providers (for example the system provider, the folder provider or the user provider).</td><td>All</td></tr>
+    <tr><td><strong>Types</strong></td><td>Pick <strong>All</strong>, or include or exclude certain kinds, for example allow only <em>Secret text</em> and <em>SSH username with private key</em>.</td><td>All</td></tr>
+    <tr><td><strong>Restrictions</strong> › <strong>Add</strong></td><td>Rules that apply to certain providers and types together: <strong>Includes</strong> or <strong>Excludes</strong>.</td><td>None</td></tr>
+  </tbody>
+</table>
+<p>Example: a studio that wants no user passwords on the server excludes the <em>Username with password</em> type, so everybody has to use tokens and keys.</p>
+
+<h2 id="perforce-roots">Perforce roots</h2>
+<p>A Perforce root is a saved connection to a Perforce server with its workspace mapping. Build configurations pick a root instead of repeating the settings.</p>
+<ol class="steps">
+  <li>Open <strong>Manage › Perforce roots</strong>.</li>
+  <li>Click <strong>Create root</strong>, name it, pick the credential and set the mapping or stream.</li>
+  <li>Click <strong>Save</strong>. The table shows <strong>Used in</strong>, the number of build configurations that use each root, with <strong>Edit</strong>, <strong>Duplicate</strong> and <strong>Delete</strong>.</li>
+</ol>
+<p>Full details are in <a href="../version-control/perforce-roots.html">Perforce roots</a> and <a href="global-connections.html#perforce-roots">Global connections</a>. Rules for steps that run Perforce commands are on the System page, under <a href="system-settings.html#perforce-operations">Perforce operations</a>.</p>
+
+<h2 id="buildpatch-tool">BuildPatch Tool</h2>
+<p>Epic gives out the BuildPatch Tool ZIP only after sign-in to its developer portal, so an agent cannot download it alone. Upload it here once, and the <strong>Install BuildPatch Tool</strong> step sends it to the agents.</p>
+<h3>Upload a package</h3>
+<ol class="steps">
+  <li>Open <strong>Manage › BuildPatch Tool</strong>. The <strong>Packages</strong> card lists what is uploaded: <strong>Package</strong>, <strong>System</strong>, <strong>Version</strong>, <strong>SHA-256</strong> and <strong>Size</strong>. With none it says <em>No package yet.</em></li>
+  <li>Choose the ZIP from the developer portal.</li>
+  <li>Pick the <strong>System</strong>, and type the <strong>Version</strong>, for example <code>1.8.8</code>. You must say it, because the tool has no switch that prints its version.</li>
+  <li>Click <strong>Upload</strong>.</li>
+</ol>
+<h3>See the agents</h3>
+<p>The <strong>Agents</strong> card lists each agent (the built-in node shows as <em>(built-in)</em>) with <strong>System</strong>, <strong>Version</strong> and a <strong>State</strong>. When an agent has no tool, or an older one, an <strong>Install</strong> or <strong>Update</strong> button sends the package over the agent's own connection.</p>
+<p>The steps that use it are in <a href="../game-builds/install-buildpatch-tool.html">Install BuildPatch Tool</a> and <a href="../game-builds/epic-overview.html">Epic Games Store overview</a>.</p>
+<h3>Problems and fixes</h3>
+<ul>
+  <li><em>No Install button for an agent:</em> no package for the agent's system is uploaded. Upload the right one.</li>
+  <li><em>State stays red:</em> the agent is offline. Connect it first.</li>
+</ul>
+
+<h2>Plugins pages</h2>
+<p>The four plugin pages sit under <strong>Manage › Plugins</strong>. An overview and the advice on updates is in <a href="plugins.html">Plugins and updates</a>. Here is each page.</p>
+
+<h3 id="plugins-installed">Installed plugins</h3>
+<p>Lists every plugin: name and version, a short description, health, an <strong>Enabled</strong> switch and an uninstall button. The heading shows the count, for example <em>107 plugins installed</em>. Type in the search box to filter. After a change, a bar says <em>Changes will take effect when you restart Buildspawn</em>. A plugin that other plugins need has a locked switch. See <a href="plugins.html#installed">Installed plugins</a>.</p>
+
+<h3 id="plugins-available">Available plugins</h3>
+<p>Plugins from the update site that are not installed yet. <strong>Last checked</strong> shows when the list was refreshed, and <strong>Check now</strong> refreshes it. Tick plugins in the table (<strong>Name</strong>, <strong>Released</strong>, <strong>Health</strong>). The bar shows <em>No plugins selected</em> until you do. Then click <strong>Install</strong>, or <strong>Install after restart</strong>. See <a href="plugins.html#from-the-update-site">Add a plugin from the update site</a>.</p>
+
+<h3 id="plugins-downloads">Download progress</h3>
+<p>Shows each plugin that is being downloaded and installed, with its state. When all rows are done you can start using the plugins right away, or restart if a plugin asks for it. Use <strong>Go back to the top page</strong> when finished. The page opens by itself after you click <strong>Install</strong> on Available plugins.</p>
+
+<h3 id="plugins-advanced">Advanced settings</h3>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>File</strong> (Deploy Plugin)</td><td>A plugin file from your computer.</td><td>None</td><td><code>my-tool.hpi</code></td></tr>
+    <tr><td><strong>URL</strong> (Deploy Plugin)</td><td>Or an address to fetch the plugin from.</td><td>Empty</td><td><code>https://files.skyforge.example/my-tool.hpi</code></td></tr>
+    <tr><td><strong>Replace the installed plugin</strong></td><td>Plugins come with Buildspawn and are not updated from here. A file for a plugin that is already installed is refused unless you tick this box.</td><td>Off</td><td>Off</td></tr>
+    <tr><td><strong>Deploy</strong></td><td>Installs the plugin. Restart Buildspawn afterwards.</td><td></td><td></td></tr>
+    <tr><td><strong>Update Site</strong> › <strong>URL</strong></td><td>Where the list of available plugins comes from. <strong>Reset to default</strong> brings back the standard address. Click <strong>Submit</strong> to save it.</td><td>The standard update site</td><td><code>https://updates.skyforge.example/update-center.json</code></td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="settings-overview.html">Settings overview</a></li>
+  <li><a href="system-settings.html">System settings</a></li>
+  <li><a href="plugins.html">Plugins and updates</a></li>
+  <li><a href="backups.html">Backups and upgrades</a></li>
+  <li><a href="global-connections.html">Global connections and Vault</a></li>
+</ul>
+</main>
+</body>
+</html>

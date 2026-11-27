@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Duplicates finder · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/duplicates-finder">
+<main class="doc">
+<h1>Duplicates finder</h1>
+<p class="lead">Runs the PMD copy-paste detector (<code>pmd cpd</code>) or reads its report, and lists the duplicate blocks on the build.</p>
+
+<h2>When to use it</h2>
+<p>Use it to find copy-pasted code in your game scripts before it spreads. It needs PMD 7 on the agent if the step runs the tool itself.</p>
+
+<h2>How to set it up</h2>
+
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>. Type <code>Duplicates finder</code> in <strong>Filter step types</strong> if you like, then click the <strong>Duplicates finder</strong> tile (group <strong>Code quality and coverage</strong>).</li>
+  <li>Type a <strong>Step name</strong>, for example <code>Find duplicates</code>.</li>
+  <li>Fill in the fields described below.</li>
+  <li>Optional: set <strong>Execute step</strong>, <strong>Conditions</strong> and <strong>Retry on failure</strong>. See <a href="step-list.html">The steps list and the step editor</a>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<figure class="shot small">
+  <img src="../../assets/shots/build-steps/duplicates-finder.png" alt="The fields of the Duplicates finder step in the step editor">
+  <figcaption>The fields of the Duplicates finder step, as the step editor shows them.</figcaption>
+</figure>
+
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Language</strong></td><td>The PMD language name, for example <code>java</code>, <code>cs</code>, <code>javascript</code>, <code>python</code>, <code>kotlin</code>.</td><td>java</td><td>cs</td></tr>
+    <tr><td><strong>Minimum tokens</strong></td><td>Blocks shorter than this many tokens are not reported.</td><td>100</td><td>150</td></tr>
+    <tr><td><strong>Paths</strong></td><td>Folders or files to search, one per line, relative to the working directory. Runs <code>pmd cpd</code>, which must be on the agent. Leave empty to only read a report an earlier step wrote.</td><td>Empty</td><td><code>Assets/Scripts</code></td></tr>
+    <tr><td><strong>Report file</strong></td><td>Used when <strong>Paths</strong> is empty: an Ant pattern of PMD CPD XML files inside the workspace. A path that leaves the workspace is refused.</td><td>Empty</td><td><code>reports/cpd.xml</code></td></tr>
+    <tr><td><strong>Limit</strong></td><td>Optional. The step is worse when it finds more duplicate blocks than this number. Empty means no limit.</td><td>Empty</td><td><code>20</code></td></tr>
+    <tr><td><strong>When over the limit</strong></td><td><strong>The build turns unstable</strong> or <strong>The step fails</strong>.</td><td>The build turns unstable</td><td>The build turns unstable</td></tr>
+    <tr><td><strong>Working directory, Environment variables, Test reports, Run step within container</strong></td><td>The same in every runner. See <a href="common-step-fields.html">Fields every runner has</a>.</td><td></td><td></td></tr>
+  </tbody>
+</table>
+
+
+<h2>A worked example</h2>
+<p>Search the Unity scripts for duplicates. Step name <code>Find duplicates</code>, <strong>Language</strong> <code>cs</code>, <strong>Minimum tokens</strong> <code>150</code>, <strong>Paths</strong> <code>Assets/Scripts</code>, <strong>Limit</strong> <code>20</code>.</p>
+
+<h2>What you see when it runs</h2>
+<p>The console shows the <code>pmd cpd</code> command and <em>Found 7 duplicate blocks.</em> The build page lists the blocks, with lines and tokens: <em>7 duplicate blocks, 212 duplicated lines, largest block 340 tokens.</em></p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong><em>The pmd command was not found on this agent</em></strong></td><td>Install PMD 7 or put <code>pmd</code> on the <code>PATH</code>.</td></tr>
+    <tr><td><strong><em>The Duplicates finder step has no paths to search</em></strong></td><td>Fill in <strong>Paths</strong> (or a <strong>Report file</strong> to read).</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="resharper-duplicates.html">Duplicates (ReSharper)</a></li>
+  <li><a href="code-inspections.html">Code Inspections</a></li>
+  <li><a href="runners.html">Runners</a></li>
+  <li><a href="common-step-fields.html">Fields every runner has</a></li>
+</ul>
+</main>
+</body>
+</html>

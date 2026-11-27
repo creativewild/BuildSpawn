@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Python · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/python">
+<main class="doc">
+<h1>Python</h1>
+<p class="lead">Runs a Python script you type, a <code>.py</code> file or a module (<code>python -m</code>), with the interpreter on the agent.</p>
+
+<h2>When to use it</h2>
+<p>Use it for build helpers and tests written in Python, such as asset checks or a <code>pytest</code> run. It can start a virtual environment for you.</p>
+
+<h2>How to set it up</h2>
+
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>. Type <code>Python</code> in <strong>Filter step types</strong> if you like, then click the <strong>Python</strong> tile (group <strong>Command line and scripts</strong>).</li>
+  <li>Type a <strong>Step name</strong>, for example <code>Check assets</code>.</li>
+  <li>Fill in the fields described below.</li>
+  <li>Optional: set <strong>Execute step</strong>, <strong>Conditions</strong> and <strong>Retry on failure</strong>. See <a href="step-list.html">The steps list and the step editor</a>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<figure class="shot small">
+  <img src="../../assets/shots/build-steps/python.png" alt="The fields of the Python step in the step editor">
+  <figcaption>The fields of the Python step, as the step editor shows them.</figcaption>
+</figure>
+
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Run</strong></td><td><strong>Script in this step</strong>, <strong>File</strong> or <strong>Module</strong>.</td><td>Script in this step</td><td>Module</td></tr>
+    <tr><td><strong>Script</strong></td><td>Python in a code editor. <code>%name%</code> is replaced with that build parameter.</td><td>Empty</td><td><code>print("ok")</code></td></tr>
+    <tr><td><strong>Script file</strong></td><td>Relative to the working directory.</td><td>Empty</td><td><code>tools/check_assets.py</code></td></tr>
+    <tr><td><strong>Module name</strong></td><td>Run as <code>python -m</code> with this dotted name. The arguments follow the module name.</td><td>Empty</td><td><code>pytest</code></td></tr>
+    <tr><td><strong>Arguments</strong></td><td>One argument per line. Each line stays one argument. Pass a secret through the environment.</td><td>Empty</td><td><code>--junitxml=reports/py.xml</code></td></tr>
+    <tr><td><strong>Interpreter</strong></td><td>Path of the interpreter. Empty takes <code>python3</code> on Unix agents and <code>python</code> on Windows agents from the <code>PATH</code>.</td><td>Empty</td><td><code>C:\Python312\python.exe</code></td></tr>
+    <tr><td><strong>Python version</strong></td><td>The agent must report this version: <code>3</code> matches any 3.x, <code>3.12</code> matches any 3.12.x. Empty adds no requirement. Not used with an interpreter path, pipenv or poetry.</td><td>Empty</td><td><code>3.12</code></td></tr>
+    <tr><td><strong>Environment tool</strong></td><td><strong>None</strong> runs the interpreter as it is. <strong>venv</strong> makes the folder <code>.buildspawn-venv</code> in the working directory if missing and runs in it. <strong>pipenv</strong> and <strong>poetry</strong> run the command through <code>pipenv run</code> or <code>poetry run</code>. None of them installs packages. In a container it must stay None.</td><td>None</td><td>venv</td></tr>
+    <tr><td><strong>Working directory, Environment variables, Test reports, Run step within container</strong></td><td>The same in every runner. See <a href="common-step-fields.html">Fields every runner has</a>.</td><td></td><td></td></tr>
+  </tbody>
+</table>
+
+
+<h2>A worked example</h2>
+<p>Run the asset checker as a module and record its test report. Step name <code>Check assets</code>, <strong>Run</strong> = <strong>Module</strong>, <strong>Module name</strong> <code>pytest</code>, <strong>Arguments</strong> <code>tools/tests</code> and <code>--junitxml=reports/assets.xml</code> on separate lines, <strong>Test reports</strong> <code>reports/assets.xml</code>.</p>
+
+<h2>What you see when it runs</h2>
+<p>The console shows <code>$ python -m pytest tools/tests --junitxml=reports/assets.xml</code> and the pytest output. The build gets the test results, and a failed test makes the step unstable.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong><em>The Python step has no script / file / module</em></strong></td><td>Fill in the field for the mode you chose.</td></tr>
+    <tr><td><strong><em>The Python module must be a dotted name</em></strong></td><td>Use a name like <code>pytest</code> or <code>http.server</code>.</td></tr>
+    <tr><td><strong><em>An environment tool cannot be used in a container</em></strong></td><td>Set <strong>Environment tool</strong> to <strong>None</strong>.</td></tr>
+    <tr><td><strong>The step waits for an agent</strong></td><td>No agent reports the <strong>Python version</strong> you asked for. Lower the version or install Python on an agent.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="script-editor.html">The script editor</a></li>
+  <li><a href="../how-to/steps-python-tests-with-results.html">Run Python tests and see the results</a></li>
+  <li><a href="command-line.html">Command Line</a></li>
+  <li><a href="runners.html">Runners</a></li>
+  <li><a href="common-step-fields.html">Fields every runner has</a></li>
+</ul>
+</main>
+</body>
+</html>

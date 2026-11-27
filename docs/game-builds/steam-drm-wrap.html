@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Steam: DRM wrap · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="game-builds/steam-drm-wrap">
+<main class="doc">
+<h1>Steam: DRM wrap</h1>
+<p class="lead">Wrap a game program with the Steam DRM wrapper, as a step of its own.</p>
+
+<h2>When to use it</h2>
+<p>Use it to wrap a program and look at the result before you upload, or when the wrapped file goes somewhere other than a Steam upload. To wrap and upload in one sign-in, use the <strong>Wrap these files with the Steam DRM wrapper first</strong> option inside <a href="steam-upload.html">Steam upload</a> instead.</p>
+
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Build steps › Add build step › Steam: DRM wrap</strong>.</li>
+  <li>Choose the <strong>Steam build account</strong>.</li>
+  <li>Type the <strong>App ID</strong> and the <strong>Program to wrap</strong>.</li>
+  <li>Choose a <strong>Level</strong>. Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/game-builds/steam-drm-wrap.png" alt="The Steam: DRM wrap step form with Program to wrap and Level"><figcaption>The Steam: DRM wrap step.</figcaption></figure>
+
+<h2>Every field</h2>
+<table>
+  <tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr>
+  <tr><td><strong>Steam build account</strong></td><td>The credential to sign in with. The password and Steam Guard data stay in the credential.</td><td>None</td><td><code>steam-build</code></td></tr>
+  <tr><td><strong>SteamCMD program</strong></td><td>Path of SteamCMD.</td><td>Found on the agent</td><td><code>D:\tools\steamcmd\steamcmd.exe</code></td></tr>
+  <tr><td><strong>App ID</strong></td><td>Your app number.</td><td>None</td><td><code>1000480</code></td></tr>
+  <tr><td><strong>Program to wrap</strong></td><td>Path in the workspace of the program to wrap. It must exist.</td><td>None</td><td><code>Builds\Win64\Skyforge.exe</code></td></tr>
+  <tr><td><strong>Where the wrapped file goes</strong></td><td>Path for the wrapped file. Empty replaces the program.</td><td>Replaces the program</td><td><code>Builds\Win64\Skyforge_wrapped.exe</code></td></tr>
+  <tr><td><strong>Level</strong></td><td>How strict the wrapper is. <strong>Normal</strong>, <strong>Compatible</strong>, <strong>Skip debugger check</strong>, or <strong>Compatible, skip debugger check</strong>.</td><td>Normal</td><td>Compatible</td></tr>
+  <tr><td><strong>Stop after (minutes)</strong></td><td>Stops the step after this time.</td><td><code>120</code></td><td><code>30</code></td></tr>
+</table>
+<div class="callout warning"><p>Valve's notes, shown on the form: every build for release must be wrapped. Wrap before other DRM, in compatibility mode. Valve does not support .NET games. Antivirus tools can flag a wrapped file.</p></div>
+
+<h2>A worked example</h2>
+<p>After the Unreal Engine step packages Skyforge, wrap <code>Builds\Win64\Skyforge.exe</code> for app <code>1000480</code> with level <strong>Compatible</strong>, and leave <strong>Where the wrapped file goes</strong> empty. The Steam upload that follows then sends the wrapped program.</p>
+
+<h2>What you see when it runs</h2>
+<ul>
+  <li>The sign-in lines of Steam steps, then <em>wrapped Builds\Win64\Skyforge.exe</em>.</li>
+  <li>The wrapped file is at the place you chose.</li>
+</ul>
+
+<h2>Problems and fixes</h2>
+<table>
+  <tr><th>Message</th><th>What to do</th></tr>
+  <tr><td>The program to wrap is missing</td><td>Fill in <strong>Program to wrap</strong>.</td></tr>
+  <tr><td>The program … is not in the workspace</td><td>The path is wrong or an earlier step did not build it. Check the path, which is relative to the workspace.</td></tr>
+  <tr><td>Steam asked for a Steam Guard code</td><td>Sign in again on the <a href="steam-account.html">credential</a>.</td></tr>
+  <tr><td>SteamCMD was not found on the agent</td><td>Add <a href="install-steamcmd.html">Install SteamCMD</a> first.</td></tr>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="steam-upload.html">Steam upload</a></li>
+  <li><a href="steam-overview.html">Steam upload: overview</a></li>
+</ul>
+</main>
+</body>
+</html>

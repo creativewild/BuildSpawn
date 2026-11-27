@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Set parameters from a build · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="parameters/set-from-build">
+<main class="doc">
+<h1>Set parameters from a build</h1>
+<p class="lead">A step can change a parameter while the build runs. It prints one special line, and the steps after it get the new value.</p>
+
+<p>This is useful when one step works something out that later steps need: the version number from a file, the name of a package, the folder an engine was unpacked to. You don't need files or scripts to pass it along. You print a <strong>service message</strong>: a line that starts with <code>##buildspawn</code>. Buildspawn reads it from the step's output.</p>
+
+<h2>The ##buildspawn message</h2>
+<p>The message looks like this:</p>
+<pre><code>##buildspawn[setParameter name='NAME' value='VALUE']</code></pre>
+<p>The name decides what the value becomes:</p>
+<table>
+  <thead><tr><th>Name</th><th>What the later steps get</th></tr></thead>
+  <tbody>
+    <tr><td><code>version</code></td><td>A build parameter. Later steps read it as <code>%version%</code> in their fields and scripts. It is not put in the environment.</td></tr>
+    <tr><td><code>env.GAME_VERSION</code></td><td>An environment variable <code>GAME_VERSION</code> in the process of every later step.</td></tr>
+    <tr><td><code>system.version</code></td><td>A property for build tools, as with <a href="parameters.html#kinds">system. parameters</a>.</td></tr>
+  </tbody>
+</table>
+<p>If the build already has a parameter with that name, the new value replaces it for the steps after this one. The build log says so, for example <em>setParameter version replaces the build parameter version for the steps after this one.</em></p>
+
+<h3>Rules</h3>
+<ul>
+  <li>The name starts with a letter or <code>_</code>, and holds letters, digits, <code>.</code>, <code>_</code> and <code>-</code>, up to 100 characters.</li>
+  <li>The value can be up to 8,192 characters. A build keeps at most 200 values set this way.</li>
+  <li>Only the output of a <strong>running step's own script</strong> counts. A message that comes from elsewhere in the log, or after the step has ended, is refused with a line in the log.</li>
+  <li>If the same name is set twice, the later value wins.</li>
+  <li>The value reaches the steps <strong>after</strong> the one that printed it, not the rest of the same step.</li>
+</ul>
+
+<h3>Special characters</h3>
+<p>Values are in single quotes. To put a quote or a line break in a value, escape it with <code>|</code>:</p>
+<table>
+  <thead><tr><th>You want</th><th>Write</th></tr></thead>
+  <tbody>
+    <tr><td><code>'</code></td><td><code>|'</code></td></tr>
+    <tr><td><code>|</code></td><td><code>||</code></td></tr>
+    <tr><td>A new line</td><td><code>|n</code></td></tr>
+    <tr><td>A carriage return</td><td><code>|r</code></td></tr>
+  </tbody>
+</table>
+
+<h3>Names a step may not set</h3>
+<p>Some environment variables change which programs run or how they start. To keep builds safe, a step cannot set these as <code>env.</code> names:</p>
+<ul>
+  <li>search paths and loaders: <code>PATH</code>, <code>PATHEXT</code>, <code>LD_PRELOAD</code>, <code>LD_LIBRARY_PATH</code>, <code>LD_AUDIT</code>, and every <code>DYLD_*</code> name;</li>
+  <li>shell start-up: <code>BASH_ENV</code>, <code>ENV</code>, <code>PROMPT_COMMAND</code>, <code>COMSPEC</code>, <code>PSMODULEPATH</code>;</li>
+  <li>tool options: <code>JAVA_TOOL_OPTIONS</code>, <code>_JAVA_OPTIONS</code>, <code>JDK_JAVA_OPTIONS</code>, <code>NODE_OPTIONS</code>, <code>NODE_PATH</code>, <code>PYTHONPATH</code>, <code>PYTHONSTARTUP</code>, <code>PYTHONHOME</code>, <code>PERL5OPT</code>, <code>PERL5LIB</code>, <code>RUBYOPT</code>, <code>RUBYLIB</code>;</li>
+  <li>.NET profilers and start-up hooks: <code>DOTNET_STARTUP_HOOKS</code> and the <code>COR_*</code> and <code>CORECLR_*</code> profiler names;</li>
+  <li>every <code>GIT_*</code> name.</li>
+</ul>
+<p>Upper and lower case count the same. A refused name gets a line in the build log that says why. Plain names and <code>system.</code> names never touch the environment, so they are never refused.</p>
+<p>An administrator can lift the block: <strong>Settings › System</strong>, section <strong>Build steps</strong>, tick <strong>Let build steps set any environment variable</strong>.</p>
+<div class="callout warning"><p>Only lift the block if you trust everyone who can change the scripts your builds run. A step that sets <code>PATH</code> decides which programs all later steps run.</p></div>
+
+<h2>Examples</h2>
+<h3>Pass a version to later steps</h3>
+<p>A first step reads the version from the project and prints it. A batch step:</p>
+<pre><code>for /f %%v in (Build\version.txt) do echo ##buildspawn[setParameter name='version' value='%%v']</code></pre>
+<p>A PowerShell step does the same:</p>
+<pre><code>$v = (Get-Content Build\version.txt).Trim()
+Write-Host "##buildspawn[setParameter name='version' value='$v']"</code></pre>
+<p>A later step uses it in its command:</p>
+<pre><code>powershell -File Build\ci.ps1 -Stage package -Version %version%</code></pre>
+
+<h3>Set an environment variable</h3>
+<pre><code>echo "##buildspawn[setParameter name='env.ENGINE_DIR' value='$(pwd)/Engine']"</code></pre>
+<p>Every later step now has <code>ENGINE_DIR</code> in its environment.</p>
+
+<h3>A value with a quote in it</h3>
+<pre><code>echo "##buildspawn[setParameter name='title' value='Skyforge: the dragon|'s path']"</code></pre>
+
+<p>For how to read the values, see <a href="param-references.html">Parameter references</a>. For the other messages, see <a href="../reference/service-messages.html">Service messages</a>.</p>
+<h2>Step outputs</h2>
+<p>A step can also <strong>declare</strong> its outputs: a name and a type (Text, Number, True/false or File). The step must then set each output with a <code>setParameter</code> message. A step that ends without setting a declared output fails with <em>did not set output &lt;name&gt;</em>. In the <a href="../visual-editor/canvas.html">visual editor</a>, outputs become typed wires to the steps that read them.</p>
+<p>Values set by steps also carry over when you <a href="../build-steps/resume-and-retry.html">resume a build</a> from a later step, and from the steps of <a href="../build-steps/parallel-blocks.html">parallel blocks</a> that run on separate machines.</p>
+
+<h2>Other service messages</h2>
+<p>A build can report a number for the <strong>Statistics</strong> tab of its build configuration:</p>
+<pre><code>##buildspawn[buildStatisticValue key='shaderCount' value='12840']</code></pre>
+<p>The key holds letters, digits, <code>.</code>, <code>-</code> and <code>_</code>; the value must be a number. The full list of messages, including the <code>::group::</code> lines for the build console, is in <a href="../reference/service-messages.html">Service messages</a>.</p>
+</main>
+</body>
+</html>

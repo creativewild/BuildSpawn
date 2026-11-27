@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Settings overview · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="administration/settings-overview">
+<main class="doc">
+<h1>Settings overview</h1>
+<p class="lead">The Manage page lists every settings page of the server. This page tells you what each one is and where it is described in this guide.</p>
+
+<p><strong>When to use it:</strong> when you know what you want to change but not which page to open, or when you want to see everything an administrator can set.</p>
+
+<h2>How to open the Settings pages</h2>
+<ol class="steps">
+  <li>Click <strong>Manage</strong> in the left rail.</li>
+  <li>Find the page in the list. You only see the pages your permissions allow.</li>
+  <li>Click it. Use the breadcrumb to come back to <strong>Manage</strong>.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/administration/system-settings.png" alt="The Settings list on the left, grouped into System configuration, Plugins, Security, Status information and Troubleshooting">
+  <figcaption>The list of Settings pages on the left of every Settings page.</figcaption>
+</figure>
+<div class="callout note"><p>The pages that appear depend on the plugins that are installed and on your permissions. A person who only has the System read permission sees many pages read-only.</p></div>
+
+<h2>Every Settings page</h2>
+<table>
+  <thead><tr><th>Page</th><th>Address</th><th>What it is</th><th>Where it is described</th></tr></thead>
+  <tbody>
+    <tr><td><strong>System</strong></td><td><code>/configure</code></td><td>Server-wide settings: server address, quiet period, naming rule, defaults, and the settings of the bundled plugins.</td><td><a href="system-settings.html">System settings</a></td></tr>
+    <tr><td><strong>Security</strong></td><td><code>/configureSecurity</code></td><td>Who may sign in and what they may do, and the protection settings.</td><td><a href="security-settings.html">Security settings</a>, <a href="security-realms.html">Security realms</a>, <a href="authorization.html">Authorization</a></td></tr>
+    <tr><td><strong>Credentials</strong></td><td><code>/credentials</code></td><td>The stores of sign-in details that builds use.</td><td><a href="management-pages.html#credentials">Management pages › Credentials</a></td></tr>
+    <tr><td><strong>Credential Providers</strong></td><td><code>/configureCredentials</code></td><td>Which credential sources and kinds are allowed.</td><td><a href="management-pages.html#credential-providers">Management pages › Credential Providers</a></td></tr>
+    <tr><td><strong>Trusted certificates</strong></td><td><code>/trustedCertificates</code></td><td>Certificates the server and agents trust.</td><td><a href="trusted-certificates.html">Trusted certificates</a></td></tr>
+    <tr><td><strong>Users</strong></td><td><code>/securityRealm/</code></td><td>Create, change and remove user accounts of the built-in user database.</td><td><a href="users.html">Users</a></td></tr>
+    <tr><td><strong>Groups</strong></td><td><code>/groups</code></td><td>Groups of users, for giving permissions to many people at once.</td><td><a href="users.html">Users</a></td></tr>
+    <tr><td><strong>Roles</strong></td><td><code>/roles</code></td><td>Roles that bundle permissions, assigned per project.</td><td><a href="roles.html">Roles</a></td></tr>
+    <tr><td><strong>Tools</strong></td><td><code>/configureTools</code></td><td>Where the build tools are, and how agents get them.</td><td><a href="tools.html">Tools</a></td></tr>
+    <tr><td><strong>Plugins</strong></td><td><code>/pluginManager</code></td><td>The group of plugin pages below.</td><td><a href="plugins.html">Plugins and updates</a></td></tr>
+    <tr><td>&nbsp;&nbsp;Available plugins</td><td><code>/pluginManager/available</code></td><td>Plugins from the update site that are not installed yet.</td><td><a href="management-pages.html#plugins-available">Management pages › Available plugins</a></td></tr>
+    <tr><td>&nbsp;&nbsp;Installed plugins</td><td><code>/pluginManager/installed</code></td><td>Every plugin, with switches to turn them on or off.</td><td><a href="management-pages.html#plugins-installed">Management pages › Installed plugins</a></td></tr>
+    <tr><td>&nbsp;&nbsp;Download progress</td><td><code>/pluginManager/downloads/</code></td><td>Progress of plugin downloads.</td><td><a href="management-pages.html#plugins-downloads">Management pages › Download progress</a></td></tr>
+    <tr><td>&nbsp;&nbsp;Advanced settings</td><td><code>/pluginManager/advanced</code></td><td>Install a plugin from a file and choose the update site.</td><td><a href="management-pages.html#plugins-advanced">Management pages › Advanced settings</a></td></tr>
+    <tr><td><strong>Nodes</strong></td><td><code>/computer</code></td><td>The machines that run builds.</td><td><a href="management-pages.html#nodes">Management pages › Nodes</a>, <a href="../agents/agents-page.html">Agents page</a>, <a href="../agents/agent-settings.html">Agent settings</a></td></tr>
+    <tr><td><strong>Clouds</strong></td><td><code>/cloud</code></td><td>Cloud services that add agents when needed.</td><td><a href="../agents/clouds.html">Clouds</a></td></tr>
+    <tr><td><strong>Agent registration</strong></td><td><code>/agentRegistration</code></td><td>How new agents sign up with the server.</td><td><a href="../agents/agent-settings.html">Agent settings</a></td></tr>
+    <tr><td><strong>Agent Telemetry</strong></td><td><code>/agentTelemetrySettings</code></td><td>CPU, memory and disk figures that agents report.</td><td><a href="../agents/telemetry.html">Agent telemetry</a></td></tr>
+    <tr><td><strong>Root project</strong></td><td><code>/rootProject</code></td><td>Connections, parameters and templates that every project inherits.</td><td><a href="management-pages.html#root-project">Management pages › Root project</a>, <a href="global-connections.html">Global connections and Vault</a></td></tr>
+    <tr><td><strong>Perforce roots</strong></td><td><code>/perforce-roots</code></td><td>Saved Perforce server connections that build configurations reuse.</td><td><a href="management-pages.html#perforce-roots">Management pages › Perforce roots</a>, <a href="../version-control/perforce-roots.html">Perforce roots</a></td></tr>
+    <tr><td><strong>BuildPatch Tool</strong></td><td><code>/buildpatchtool</code></td><td>Upload the Epic BuildPatch Tool once and send it to agents.</td><td><a href="management-pages.html#buildpatch-tool">Management pages › BuildPatch Tool</a></td></tr>
+    <tr><td><strong>Appearance</strong></td><td><code>/appearance</code></td><td>Theme, icon colours and other looks for the whole server.</td><td><a href="appearance.html">Appearance</a></td></tr>
+    <tr><td><strong>In-process Script Approval</strong></td><td><code>/scriptApproval</code></td><td>Approve Pipeline and Groovy scripts that need more rights than the sandbox allows.</td><td><a href="security-settings.html">Security settings</a></td></tr>
+    <tr><td><strong>SAML single sign-on</strong></td><td><code>/MoPluginConfigView</code></td><td>Settings for sign-in with a SAML identity provider.</td><td><a href="security-realms.html">Security realms</a></td></tr>
+    <tr><td><strong>Reload Configuration from Disk</strong></td><td><code>/reload</code></td><td>Load everything again from the data folder.</td><td><a href="management-pages.html#reload">Management pages › Reload Configuration from Disk</a></td></tr>
+    <tr><td><strong>System Information</strong></td><td><code>/systemInfo</code></td><td>Versions, properties, plugins, memory and thread dumps of the server.</td><td><a href="management-pages.html#system-information">Management pages › System Information</a></td></tr>
+    <tr><td><strong>Logs</strong></td><td><code>/log</code></td><td>The server log and log recorders.</td><td><a href="management-pages.html#logs">Management pages › Logs</a></td></tr>
+    <tr><td><strong>Load Statistics</strong></td><td><code>/load-statistics</code></td><td>Charts of executors and queue length.</td><td><a href="management-pages.html#load-statistics">Management pages › Load Statistics</a></td></tr>
+    <tr><td><strong>Buildspawn CLI</strong></td><td><code>/cli</code></td><td>The command line client and its commands.</td><td><a href="management-pages.html#cli">Management pages › Buildspawn CLI</a></td></tr>
+    <tr><td><strong>Script Console</strong></td><td><code>/script</code></td><td>Run a Groovy script on the server.</td><td><a href="management-pages.html#script-console">Management pages › Script Console</a></td></tr>
+    <tr><td><strong>About Buildspawn</strong></td><td><code>/about</code></td><td>Version, licence and third-party notices.</td><td><a href="management-pages.html#about">Management pages › About Buildspawn</a></td></tr>
+    <tr><td><strong>Manage Old Data</strong></td><td><code>/administrativeMonitor/OldData/manage</code></td><td>Find and clean data that an older version or a removed plugin left behind.</td><td><a href="management-pages.html#old-data">Management pages › Manage Old Data</a></td></tr>
+    <tr><td><strong>Prepare for Shutdown</strong></td><td><code>/prepareShutdown</code></td><td>Stop new builds so the server can be shut down safely.</td><td><a href="management-pages.html#shutdown">Management pages › Prepare for Shutdown</a></td></tr>
+  </tbody>
+</table>
+<p>The inventory also holds one hidden entry (a restart helper of the single sign-on plugin). It has no page of its own.</p>
+
+<h2>Settings that live on other pages</h2>
+<p>Many fields are on the System, Security or Appearance pages rather than on a page of their own.</p>
+<div class="cards three">
+  <a class="card" href="system-settings.html"><h3>System settings</h3><p>Every field of the System page, section by section.</p></a>
+  <a class="card" href="management-pages.html"><h3>Management pages</h3><p>Reload, logs, statistics, console, old data, shutdown, plugins and more.</p></a>
+  <a class="card" href="tools.html"><h3>Tools</h3><p>The ten tool types, installers and tool locations.</p></a>
+  <a class="card" href="security-settings.html"><h3>Security settings</h3><p>Protection against forged requests, content security, API tokens.</p></a>
+  <a class="card" href="appearance.html"><h3>Appearance</h3><p>Themes, icon colours and the pipeline view.</p></a>
+  <a class="card" href="backups.html"><h3>Backups and upgrades</h3><p>Save and restore the data folder, and upgrade the server.</p></a>
+</div>
+
+<h2>Tips</h2>
+<ul>
+  <li>Give the Manage permission to very few people. It lets a person change the settings of the whole server.</li>
+  <li>The Script Console and Reload Configuration pages are the most powerful. Use them with care.</li>
+  <li>After you change a setting, check the page again. A field that shows a red message was not saved.</li>
+</ul>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="users-and-permissions.html">Users and permissions</a></li>
+  <li><a href="dashboard.html">Dashboard</a></li>
+  <li><a href="plugins.html">Plugins and updates</a></li>
+</ul>
+</main>
+</body>
+</html>

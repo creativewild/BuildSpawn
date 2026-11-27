@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Step statuses and BUILD_STEP_STATUS · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/step-statuses">
+<main class="doc">
+<h1>Step statuses and BUILD_STEP_STATUS</h1>
+<p class="lead">Every step ends with a status. Later steps can read it, so a clean-up step can act differently after a failure.</p>
+<h2>When to use it</h2>
+<p>Use the status to print a clear summary at the end of a build, or to do something only after a certain step passed or failed.</p>
+<h2>The statuses</h2>
+<table>
+  <thead><tr><th>Status</th><th>Meaning</th></tr></thead>
+  <tbody>
+    <tr><td><strong>SUCCESS</strong></td><td>The step ran and finished well.</td></tr>
+    <tr><td><strong>FAILURE</strong></td><td>The step ran and failed, or could not start.</td></tr>
+    <tr><td><strong>UNSTABLE</strong></td><td>The step ran to its end but made the build unstable, for example because tests failed.</td></tr>
+    <tr><td><strong>SKIPPED</strong></td><td>The step did not run because of its <strong>Execute step</strong> setting or a condition.</td></tr>
+    <tr><td><strong>DISABLED</strong></td><td>The step is switched off.</td></tr>
+    <tr><td><strong>ABORTED</strong></td><td>The build was stopped while the step ran.</td></tr>
+  </tbody>
+</table>
+<h2>How to read a status in a script</h2>
+<p>A finished step sets an environment variable named <code>BUILD_STEP_STATUS_</code> plus its <strong>Step ID</strong> in capitals. For the ID <code>unit_tests</code> it is <code>BUILD_STEP_STATUS_UNIT_TESTS</code>. The steps after it can read it.</p><ol class="steps">
+  <li>Open the first step and find its <strong>Step ID</strong>. The list shows it under the step name.</li>
+  <li>In a later Command Line step on Windows, read the variable:<pre><code>if "%BUILD_STEP_STATUS_UNIT_TESTS%"=="FAILURE" echo Tests failed, collecting logs</code></pre></li>
+  <li>In PowerShell:<pre><code>if ($env:BUILD_STEP_STATUS_UNIT_TESTS -eq "FAILURE") { Write-Host "Tests failed" }</code></pre></li>
+  <li>Set the later step to <strong>Execute step › Even if some of the previous steps failed</strong>. Otherwise it is skipped before it can read anything.</li>
+</ol>
+<h2>A worked example</h2>
+<p>The build configuration <strong>Engine / Unit Tests</strong> has a step with the ID <code>nunit</code>. A last step runs <em>Even if some of the previous steps failed</em> and prints:</p><pre><code>echo NUnit step: %BUILD_STEP_STATUS_NUNIT%</code></pre>
+<h2>What you see when it runs</h2>
+<p>The console prints <code>NUnit step: FAILURE</code> (or <code>SUCCESS</code>, <code>UNSTABLE</code> and so on). The <strong>Build steps</strong> card on the build page shows the same result in words: succeeded, failed, unstable, skipped, disabled or stopped.</p>
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong>The variable is empty</strong></td><td>The step you read has not finished yet, or its ID is spelled differently. IDs are lowercase in the editor and capitals in the variable name.</td></tr>
+    <tr><td><strong>The reading step never runs</strong></td><td>It was skipped because an earlier step failed. Set it to run even if previous steps failed.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="step-list.html">The steps list and the step editor</a></li>
+  <li><a href="resume-and-retry.html">Resume and retry</a></li>
+  <li><a href="../build-results/build-page.html">The build page</a></li>
+</ul>
+</main>
+</body>
+</html>

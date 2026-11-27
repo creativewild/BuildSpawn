@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Git Publisher · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="post-build/git-publisher">
+<main class="doc">
+<h1>Git Publisher</h1>
+<p class="lead">Pushes tags, branches or notes to your Git remote when the build ends.</p>
+<h2>When to use it</h2>
+<p>Use it to tag a release in Git after a good build, or to push a generated file to a branch. It works with the Git root of the build configuration.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration, click <strong>Settings</strong>, then <strong>Post-build Actions</strong>. Click <strong>Add post-build action</strong> and choose <strong>Git Publisher</strong>.</li>
+  <li>Tick <strong>Push Only If Build Succeeds</strong> unless you want to push after a failed build too.</li>
+  <li>Under <strong>Tags</strong>, <strong>Branches</strong> or <strong>Notes</strong> click <strong>Add</strong> and fill in what to push.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Push Only If Build Succeeds</td><td>Push to the remotes only when the build succeeded.</td><td>Off</td><td>On</td></tr>
+    <tr><td>Merge Results</td><td>If a merge was set up before the build, push the merge result back to the origin.</td><td>Off</td><td>Off</td></tr>
+    <tr><td>Force Push</td><td>Add the force option to <code>git push</code>.</td><td>Off</td><td>Off</td></tr>
+    <tr><td>Tag to push</td><td>The tag name. Build variables may be used.</td><td>Empty</td><td><code>skyforge-${BUILD_NUMBER}</code></td></tr>
+    <tr><td>Tag message</td><td>The message of the tag.</td><td>Empty</td><td><code>Build ${BUILD_NUMBER}</code></td></tr>
+    <tr><td>Create new tag</td><td>Create the tag now. The push fails if the tag already exists.</td><td>Off</td><td>On</td></tr>
+    <tr><td>Update new tag</td><td>Move the tag if it already exists.</td><td>Off</td><td>Off</td></tr>
+    <tr><td>Target remote name</td><td>The remote to push to. It must be one of the repositories in the Git root.</td><td>Empty</td><td><code>origin</code></td></tr>
+    <tr><td>Branch to push</td><td>The remote branch to push the current commit to.</td><td>Empty</td><td><code>release/1.4</code></td></tr>
+    <tr><td>Rebase before push</td><td>Rebase your changes before the push.</td><td>Off</td><td>Off</td></tr>
+    <tr><td>Note to push</td><td>The text of a Git note.</td><td>Empty</td><td><code>Built by Buildspawn</code></td></tr>
+    <tr><td>Note's namespace</td><td>The notes namespace.</td><td><code>master</code></td><td><code>master</code></td></tr>
+    <tr><td>Abort if note exists</td><td>Do not replace a note that already exists.</td><td>Off</td><td>Off</td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p>After <strong>Windows Build</strong> passes, the studio tags the Git commit of the launcher: <strong>Tag to push</strong> <code>launcher-${BUILD_NUMBER}</code>, <strong>Create new tag</strong> on, <strong>Target remote name</strong> <code>origin</code>.</p><h2>What you see when it runs</h2>
+<p>The log shows the <code>git tag</code> and <code>git push</code> commands and their result.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>Push rejected</td><td>The tag exists, or the branch moved. Use <strong>Update new tag</strong>, or <strong>Force Push</strong> if you really mean it.</td></tr>
+    <tr><td>Authentication failed</td><td>The credential of the Git root must be allowed to push.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="overview.html">After the build: overview</a></li>
+  <li><a href="../projects/bc-post-build-actions.html">Post-build actions tab</a></li>
+  <li><a href="../version-control/git.html">Git</a></li>
+</ul>
+</main>
+</body>
+</html>

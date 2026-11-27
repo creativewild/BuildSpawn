@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>API tokens · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="reference/api-tokens">
+<main class="doc">
+<h1>API tokens</h1>
+<p class="lead">An API token lets a script, a tool or the terminal program sign in as you, without your password.</p>
+
+<p>An <strong>API token</strong> is a long random code that stands in for your password. Use one whenever something other than your browser talks to Buildspawn:</p>
+<ul>
+  <li>the <a href="../get-started/terminal-program.html">terminal program</a>, to stop builds, cancel queue items or take agents offline;</li>
+  <li>scripts that read the server's data, for example the status of the last build;</li>
+  <li>scripts or other tools that start builds.</li>
+</ul>
+<p>A token has the same permissions as the user who made it. You can have several tokens, one for each script, and revoke one without touching the others.</p>
+
+<h2 id="create">Create a token</h2>
+<ol class="steps">
+  <li>Click your initial at the right of the top bar and choose <strong>Security</strong>.</li>
+  <li>Under <strong>API Token</strong>, find <strong>Add new token</strong>.</li>
+  <li>Type a <strong>Name</strong> that says where the token is used, for example <code>build-scripts</code> or <code>terminal on studio-pc</code>.</li>
+  <li>Choose an <strong>Expiration</strong>: 7, 30, 60 or 90 days, <strong>Custom</strong> to pick a date, or <strong>No Expiration</strong>.</li>
+  <li>Click <strong>Generate</strong>.</li>
+  <li>Click the copy button beside the token and store it somewhere safe, such as a password manager. Then click <strong>Done</strong>.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/reference/api-token-new.png" alt="The Security page with a dialog for the new token docs-d-build-scripts: a note to copy the token now, the token with a copy button, the expiry date and a Done button">
+  <figcaption>The new token is shown only once. Copy it before you click Done.</figcaption>
+</figure>
+<div class="callout warning"><p>Buildspawn shows the token only once and can't show it again later. If you lose it, revoke it and make a new one.</p></div>
+<div class="callout note"><p>The copy button works only over HTTPS, or when you open Buildspawn on the same computer. On a plain HTTP address, select the token and copy it by hand.</p></div>
+
+<h2 id="use">Use a token</h2>
+<p>Sign in with your user name and the token in place of the password. Most tools call this <em>basic authentication</em>.</p>
+
+<h3 id="use-terminal">In the terminal program</h3>
+<ol class="steps">
+  <li>Save a text file with one line: your user name, a colon and the token.
+    <pre><code>sam.lee:11f3c9a0e5b27d48c6a1f09e3b7d5c2a84</code></pre>
+  </li>
+  <li>Make the file private, so only you can read it. On Linux and macOS: <code>chmod 600 ~/.buildspawn-token</code>.</li>
+  <li>Start the program with the file:
+    <pre><code>buildspawn --token-file ~/.buildspawn-token</code></pre>
+    Or set <code>BUILDSPAWN_TOKEN_FILE</code> to the file's path once, in your shell profile.</li>
+</ol>
+
+<h3 id="use-scripts">In scripts</h3>
+<p>Add <code>api/json</code> to the address of most pages to get their data as JSON. Pass the user name and token with the request:</p>
+<pre><code># The result of the last build of a build configuration
+curl -u sam.lee:TOKEN "http://buildserver:8080/job/Game/job/Windows%20Build/lastBuild/api/json?tree=number,result"
+
+# Start a build
+curl -X POST -u sam.lee:TOKEN "http://buildserver:8080/job/Game/job/Windows%20Build/build"
+
+# Start a build with parameters
+curl -X POST -u sam.lee:TOKEN "http://buildserver:8080/job/Game/job/Windows%20Build/buildWithParameters" \
+     --data-urlencode "platform=Win64"</code></pre>
+<pre><code># PowerShell
+$pair = "sam.lee:$env:BUILDSPAWN_API_TOKEN"
+$auth = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($pair))
+Invoke-RestMethod -Headers @{ Authorization = "Basic $auth" } `
+  -Uri "http://buildserver:8080/job/Game/job/Windows%20Build/lastBuild/api/json"</code></pre>
+<p>Requests made with a token don't need any other security header, so a POST works as shown.</p>
+<div class="callout tip"><p>Keep tokens out of scripts that are checked in to version control. Store the token as a secret parameter or in Vault, and read it from an environment variable. See <a href="../parameters/secrets.html">Secrets and Vault</a>.</p></div>
+
+<h2 id="manage">See and rename tokens</h2>
+<p>The <strong>Current token(s)</strong> table on the Security page lists your tokens. For each one it shows the name, the expiry date, when it was created and when it was last used.</p>
+<figure class="shot">
+  <img src="../../assets/shots/reference/api-token-list.png" alt="The API Token section of the Security page with one token, docs-d-build-scripts, created 39 seconds ago and never used, with rename and revoke buttons">
+  <figcaption>Your tokens, with when each one was last used.</figcaption>
+</figure>
+<p>Click the pencil to rename a token.</p>
+<div class="callout tip"><p>A token that says <strong>Never used</strong> for a long time is probably not needed. Revoke it.</p></div>
+
+<h2 id="revoke">Revoke a token</h2>
+<ol class="steps">
+  <li>Open <strong>Security</strong> from your account menu.</li>
+  <li>In the <strong>Current token(s)</strong> table, click the red bin icon beside the token.</li>
+  <li>Confirm with <strong>Revoke</strong>.</li>
+</ol>
+<p>The token stops working at once. Anything that still uses it can no longer connect, so give those scripts a new token first.</p>
+<p>When a token expires, it stops working in the same way. Make a new one and put it in place of the old one.</p>
+
+<h2 id="tips">Tips</h2>
+<ul>
+  <li>Use one token per script or machine. Then you can revoke one without breaking the rest.</li>
+  <li>For scripts that run on their own, consider a separate user with only the permissions the script needs. See <a href="../administration/users-and-permissions.html">Users and permissions</a>.</li>
+  <li>The administrator controls tokens on <strong>Settings › Security › API Token</strong>: whether old-style tokens are made for new users or on request, and whether the date of last use is kept. See <a href="../administration/security-settings.html">Security settings</a>.</li>
+  <li>The Security page of a user is described on <a href="../administration/user-settings.html">User settings</a>. People who sign in with Entra ID or SAML make tokens in the same place, and the token belongs to their user.</li>
+  <li><strong>Terminate All Sessions</strong>, at the bottom of the Security page, signs you out on every browser and device. It does not revoke tokens.</li>
+</ul>
+</main>
+</body>
+</html>

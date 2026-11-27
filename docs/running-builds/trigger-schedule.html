@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Schedule trigger · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="running-builds/trigger-schedule">
+<main class="doc">
+<h1>Schedule trigger</h1>
+<p class="lead">Starts a build at set times, such as a nightly build of every platform.</p>
+<div class="callout note"><p>In the trigger picker this is called <strong>Build periodically</strong>.</p></div>
+
+<h2>When to use it</h2>
+<p>Use it for work that does not depend on a change: a nightly full build, a weekly cook, a morning smoke test.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Triggers</strong>.</li>
+  <li>Click <strong>Add new trigger</strong> and click <strong>Add</strong> next to <strong>Schedule Trigger</strong>.</li>
+  <li>Choose a <strong>Frequency</strong>: <strong>Every hour</strong>, <strong>Every day</strong>, <strong>Every week</strong> or <strong>Custom</strong>.</li>
+  <li>Fill in the <strong>Hour</strong>, <strong>Minute</strong> and (weekly) the <strong>Day</strong>.</li>
+  <li>Check the <strong>Cron line</strong>. It is the line that is saved, and it is checked as you type.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/running-builds/trigger-schedule-form.png" alt="The Schedule Trigger form with Every day, hour 2, minute H and the cron line H 2 * * *"><figcaption>The Schedule Trigger form. The cron line at the bottom is what is saved.</figcaption></figure>
+<h2>Every field</h2>
+<table>
+<thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>Frequency</td><td>Every hour, Every day, Every week, or Custom. A choice other than Custom writes the cron line for you.</td><td>Every day</td><td>Every week</td></tr><tr><td>Day</td><td>Weekly only. Sunday to Saturday.</td><td>Monday</td><td>Monday</td></tr><tr><td>Hour</td><td>A whole number 0 to 23, or <code>H</code>. Empty means <code>H</code>.</td><td><code>H</code> (2 for a new daily schedule)</td><td><code>2</code></td></tr><tr><td>Minute</td><td>A whole number 0 to 59, or <code>H</code>. Empty means <code>H</code>.</td><td><code>H</code></td><td><code>0</code></td></tr><tr><td>Cron line</td><td>The schedule. Edit it directly when Custom is chosen.</td><td><code>H 2 * * *</code> for a new trigger</td><td><code>0 2 * * 1-5</code></td></tr>
+</tbody>
+</table>
+<h2 id="cron">Cron syntax</h2>
+<p>A cron line has five fields, separated by spaces: <strong>minute</strong> (0-59), <strong>hour</strong> (0-23), <strong>day of month</strong> (1-31), <strong>month</strong> (1-12) and <strong>day of week</strong> (0-7; 0 and 7 are Sunday).</p>
+<table>
+<thead><tr><th>Part</th><th>Means</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td><code>*</code></td><td>Every value.</td><td><code>* * * * *</code> every minute</td></tr><tr><td><code>a,b</code></td><td>A list.</td><td><code>H H 1,15 * *</code></td></tr><tr><td><code>a-b</code></td><td>A range.</td><td><code>0 9 * * 1-5</code> weekdays at 09:00</td></tr><tr><td><code>*/n</code> or <code>a-b/n</code></td><td>Every n steps.</td><td><code>*/10 * * * *</code></td></tr><tr><td><code>H</code></td><td>A fixed value picked from a hash of the build configuration name, so not every build starts at the same second. It can have a range: <code>H(0-7)</code>.</td><td><code>H H(0-7) * * *</code> some time between midnight and 07:59</td></tr><tr><td><code>@hourly</code>, <code>@daily</code>, <code>@midnight</code>, <code>@weekly</code>, <code>@monthly</code>, <code>@yearly</code></td><td>Short names that use <code>H</code>. <code>@midnight</code> means some time from 00:00 to 02:59.</td><td><code>@daily</code></td></tr><tr><td><code>TZ=Zone</code></td><td>First line only. Uses another time zone instead of the server's. The IDs are the Java time zone IDs.</td><td><code>TZ=Europe/London</code></td></tr>
+</tbody>
+</table>
+<p>Empty lines and lines that start with <code>#</code> are comments. You can write several lines.</p>
+<pre><code># Every weekday at 02:00
+0 2 * * 1-5
+
+# Every 4 hours
+H */4 * * *
+
+# London time, once in the morning
+TZ=Europe/London
+H 8 * * *</code></pre><div class="callout note"><p><code>*/3</code> and <code>H/3</code> in the day of month field do not repeat evenly near the end of a month, because months have different lengths. Use days of the week instead.</p></div>
+<h2>A worked example</h2>
+<p>The Skyforge nightly builds every platform at 02:00 on weekdays. Choose <strong>Custom</strong> and type <code>0 2 * * 1-5</code>. See <a href="../how-to/params-nightly-0200.html">Run nightly at 02:00</a>.</p>
+<h2>What you see when it runs</h2>
+<p>The row on the Triggers page reads <em>Daily at 02:00</em>, <em>Every Monday at 03:30</em> or <em>On a cron schedule</em>. The build's cause says it was started by the timer. <code>%build.triggeredBy.username%</code> is empty.</p>
+<h2>Problems and fixes</h2>
+<table>
+<thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+<tbody>
+<tr><td>A minute or hour is refused</td><td>A minute is a whole number from 0 to 59, or H. An hour is 0 to 23, or H.</td></tr><tr><td>Pick a day of the week</td><td>Choose a day for a weekly schedule.</td></tr><tr><td>A schedule is needed</td><td>The cron line is empty.</td></tr><tr><td>The build starts at the wrong time</td><td>The server's time zone is used. Add <code>TZ=...</code> as the first line.</td></tr><tr><td>The build starts at a minute I did not choose</td><td><code>H</code> picks a minute for you. Type a number to fix it.</td></tr>
+</tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="triggers.html">Triggers</a></li>
+  <li><a href="../how-to/params-nightly-0200.html">Run nightly at 02:00</a></li>
+  <li><a href="trigger-vcs.html">VCS trigger</a></li>
+</ul>
+</main>
+</body>
+</html>

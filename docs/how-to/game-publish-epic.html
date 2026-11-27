@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Publish a build to the Epic Games Store · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/game-publish-epic">
+<main class="doc">
+<h1>Publish a build to the Epic Games Store</h1>
+<p class="lead">Package your game, upload it to Epic as a new binary, make the update smaller and put it live, all in one build.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>An <strong>Epic Games Store credential</strong> with your client ID, client secret, organization ID, product ID and default artifact ID. See <a href="../game-builds/epic-credentials.html">Epic Games Store credential</a>.</li>
+  <li>The <strong>BuildPatch Tool</strong> uploaded under <strong>Manage › Tools › BuildPatch Tool</strong>, so an agent can get it.</li>
+  <li>A <strong>Windows agent</strong> that builds your game. The build must leave a packaged game folder, for example <code>build/WindowsPackaged</code>. See <a href="build-unreal-from-perforce.html">Build an Unreal Engine game from Perforce</a>.</li>
+  <li>The permission <strong>Epic Games Store / Set Live</strong> for whoever starts the build.</li>
+</ul>
+
+<h2>Steps</h2>
+<h3>Add the Epic steps after the packaging step</h3>
+<ol class="steps">
+  <li>Open the build configuration that packages the game, then <strong>Settings › Build steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>, type <code>BuildPatch</code> and choose <strong>Install BuildPatch Tool</strong>. Keep <strong>From Buildspawn</strong>. Move this step above the others if you like: it only needs to run before the first Epic step.</li>
+  <li>Click <strong>Add build step</strong> again and choose <strong>Epic Games Store upload</strong>.</li>
+  <li>Pick your credential, for example <code>Epic Store (Skyforge)</code>.</li>
+  <li>Set <strong>Build root</strong> to <code>build/WindowsPackaged</code>.</li>
+  <li>Set <strong>Build version</strong> to <code>1.4.${BUILD_NUMBER}-Windows</code>. It must be new every time, so keep the build number in it.</li>
+  <li>Set <strong>Launch program</strong> to <code>Skyforge.exe</code>.</li>
+  <li>Choose <strong>Everything except these</strong> and list <code>W"*.pdb"</code> to leave out debug files.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/game-builds/epic-upload.png" alt="The Epic Games Store upload step with Build root, Build version and Launch program filled in"><figcaption>The upload step, filled in.</figcaption></figure>
+
+<h3>Make the update small and put it live</h3>
+<ol class="steps" start="9">
+  <li>Add <strong>Epic: optimise patch</strong>. Set <strong>From version</strong> to the version that is live now, for example <code>1.3.2-Windows</code>. Leave <strong>To version</strong> alone: it is the version just uploaded.</li>
+  <li>Add <strong>Epic: label binary</strong>. Keep <strong>Action</strong> on <strong>Label</strong>, <strong>Label</strong> on <strong>Live</strong> and tick <strong>Windows</strong>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<div class="callout tip"><p>Do not put the label step in the same build when you want a person to approve the release. Run upload and optimise on every build, and keep the label step in a separate build configuration that someone starts when the release is approved. Type the version in its <strong>Build version</strong> field.</p></div>
+<figure class="shot"><img src="../../assets/shots/how-to/game-publish-epic-steps.png" alt="The Build Steps list: Collect package, Install BuildPatch Tool, Upload to Epic, Optimise the patch and Label the build"><figcaption>The steps of the build configuration.</figcaption></figure>
+
+<h3>Run it</h3>
+<ol class="steps" start="12">
+  <li>Click <strong>Run</strong>.</li>
+</ol>
+
+<h2>Check it worked</h2>
+<ul>
+  <li>The log shows <em>Epic: access check: ... version ... is new</em>, then the upload, then <em>Epic: Step output EPIC_BUILD_VERSION = ...</em>.</li>
+  <li>The label step prints <em>Epic: label Live for Windows, version ...</em> and <em>EPIC_LABELLED = true</em>.</li>
+  <li>The metadata file <code>epic/metadata-...json</code> is under <strong>Artifacts</strong>.</li>
+  <li>In the Epic Developer Portal the binary is active and live for Windows.</li>
+</ul>
+
+<h2>Troubleshooting</h2>
+<table>
+<thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+<tbody>
+<tr><td>Version ... already exists</td><td>The version must be new for the artifact. Keep <code>${BUILD_NUMBER}</code> in <strong>Build version</strong>.</td></tr>
+<tr><td>BuildPatch Tool was not found on the agent</td><td>The Install step is missing or ran on another agent. Add it to this build, or set the <a href="../game-builds/epic-credentials.html#tool-folder">BuildPatch Tool folder</a>.</td></tr>
+<tr><td>Epic refused the label</td><td>Your organization may use self-service publishing. Set <strong>Publishing</strong> to <strong>Self-service</strong> on the credential and assign the platform in the Developer Portal.</td></tr>
+<tr><td>The launch program is not in the build root</td><td>Check the folder the packaging step made, and the spelling of the program.</td></tr>
+</tbody>
+</table>
+
+<h2>Next steps</h2>
+<div class="cards">
+  <a class="card" href="../game-builds/epic-upload.html"><h3>Epic Games Store upload</h3><p>Every setting of the upload step.</p></a>
+  <a class="card" href="../game-builds/epic-label.html"><h3>Epic: label binary</h3><p>Live, Archive and platforms.</p></a>
+  <a class="card" href="../game-builds/epic-overview.html"><h3>Epic Games Store</h3><p>All the Epic steps.</p></a>
+  <a class="card" href="../game-builds/steam-overview.html"><h3>Steam</h3><p>Ship the same build on Steam.</p></a>
+</div>
+
+</main>
+</body>
+</html>

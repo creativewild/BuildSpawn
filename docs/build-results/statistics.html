@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Statistics tab · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-results/statistics">
+<main class="doc">
+<h1>The Statistics tab</h1>
+<p class="lead">Charts of how a build configuration does over time: how often it passes, how long it takes, how long builds wait, how many tests pass and how big the artifacts are. You can add charts for numbers your own builds report.</p>
+
+<figure class="shot">
+  <img src="../../assets/shots/build-results/statistics.png" alt="The Statistics tab of Windows Build: the range buttons Week, Month, Quarter, Year and All, the Agent list, and the charts Success rate, Build duration, Time spent in queue, Test count and Artifacts size, then the Custom charts section">
+  <figcaption>The Statistics tab with the five default charts.</figcaption>
+</figure>
+
+<h2>When to use it</h2>
+<p>Use it to spot a build that slowly gets longer, a flaky build whose success rate drops, a queue that grows, or a package that doubles in size. You see it at once, without reading single builds.</p>
+
+<h2>Open it</h2>
+<ol class="steps">
+  <li>Open the build configuration, for example <em>Game / Windows Build</em>.</li>
+  <li>Click the <strong>Statistics</strong> tab. It is one of the five fixed first tabs.</li>
+</ol>
+
+<h2>The controls</h2>
+<table>
+  <tr><th>Control</th><th>What it does</th><th>Default</th></tr>
+  <tr><td><strong>Week</strong>, <strong>Month</strong>, <strong>Quarter</strong>, <strong>Year</strong>, <strong>All</strong></td><td>The time range: the last 7 days, 30 days, 90 days, 365 days, or all builds. Under the title, a line says how many builds are in the range.</td><td>Month</td></tr>
+  <tr><td><strong>Agent</strong></td><td>Show only the builds that ran on one agent. <em>All agents</em> shows every build. Use it to compare machines.</td><td>All agents</td></tr>
+</table>
+
+<h2>The five default charts</h2>
+<table>
+  <tr><th>Chart</th><th>What it shows</th></tr>
+  <tr><td><strong>Success rate</strong></td><td>The share of finished builds that did not fail, in percent. One point for each day (for each week in the Year and All ranges). Aborted builds and builds that did not run do not count. A red point means a failure on that day.</td></tr>
+  <tr><td><strong>Build duration</strong></td><td>How long each build took.</td></tr>
+  <tr><td><strong>Time spent in queue</strong></td><td>How long each build waited for an agent before it started.</td></tr>
+  <tr><td><strong>Test count</strong></td><td>Three lines: <em>Passed tests</em>, <em>Failed tests</em> and <em>Ignored tests</em>. It says <em>No data in this range</em> when no build published a test report.</td></tr>
+  <tr><td><strong>Artifacts size</strong></td><td>The total size of the files each build kept. It is recorded only when the build keeps them in the standard storage on the server. Builds that keep artifacts in remote storage have no point.</td></tr>
+</table>
+<h3>Read a chart</h3>
+<ul>
+  <li>The horizontal axis is time. For a short range it shows times as well as days, and never repeats a label. The vertical axis picks units that fit, such as <em>s</em>, <em>ms</em>, <em>B</em> or <em>%</em>.</li>
+  <li>Each point is one build. A failed build has a larger red point.</li>
+  <li>Move the mouse over a point (or press <kbd>&larr;</kbd> and <kbd>&rarr;</kbd>, <kbd>Home</kbd> and <kbd>End</kbd> while the chart has focus) to see a tip: the build number, the date and each value.</li>
+  <li>Click a point, or press <kbd>Enter</kbd> on it, to open that build.</li>
+  <li>The charts redraw when the page gets narrower, for example when you fold or resize the sidebar.</li>
+</ul>
+
+<h2>Custom charts</h2>
+<p>Below the default charts, <strong>Custom charts</strong> plots any number you choose. Anyone who can configure the build configuration can add and remove charts.</p>
+<h3>Report a number from a build</h3>
+<p>A build step prints a line like this. The number is then kept for that build:</p>
+<pre><code>##buildspawn[buildStatisticValue key='coverage' value='81.5']</code></pre>
+<pre><code># PowerShell: report the size of the Windows package in megabytes
+$mb = [math]::Round((Get-Item Build\Game-Win64.zip).Length / 1MB, 1)
+Write-Host "##buildspawn[buildStatisticValue key='package.win64.mb' value='$mb']"</code></pre>
+<ul>
+  <li><code>key</code> is a name of letters, digits, <code>.</code>, <code>-</code> and <code>_</code>, up to 100 characters.</li>
+  <li><code>value</code> must be a number, for example <code>12</code>, <code>-3.5</code> or <code>1.2e6</code>.</li>
+  <li>If a build prints the same key twice, the last value counts. A build keeps up to 200 keys. A line with a bad key or value is ignored.</li>
+  <li>You cannot overwrite the numbers Buildspawn measures itself, such as the build duration.</li>
+</ul>
+<p>See <a href="../reference/service-messages.html">Service messages</a> for every message a script can print.</p>
+<h3>Add a chart</h3>
+<ol class="steps">
+  <li>On the Statistics tab, under <strong>Custom charts</strong>, click <strong>Add new chart</strong>.</li>
+  <li>Type a <strong>Title</strong>, or leave it empty to name the chart after its statistics (up to 100 characters).</li>
+  <li>Under <strong>Statistics to plot</strong>, choose one or more, up to 10. The list holds the built-in numbers and every key your builds reported. It says <em>No custom statistics yet. Report one from a build log.</em> when there are none.</li>
+  <li>Click <strong>Add</strong>. A message says <em>Chart added</em>.</li>
+  <li>To change the order, use <strong>Move up</strong> and <strong>Move down</strong> on the chart. To delete it, use <strong>Remove chart</strong>. A build configuration can have up to 30 custom charts.</li>
+</ol>
+
+<h2>What you see when it runs</h2>
+<p>Charts fill in as builds finish. A new build configuration says <em>No builds in this range</em> and shows the line to print. Values come from the end of each build, so a running build shows no point yet.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <tr><th>Problem</th><th>What to do</th></tr>
+  <tr><td><em>No builds in this range</em></td><td>Choose a longer range, or <em>All agents</em>.</td></tr>
+  <tr><td>My custom number is not in the list.</td><td>The build must print the line while a step runs, and must finish. Check the log for the exact line, with single quotes.</td></tr>
+  <tr><td>A chart shows no points.</td><td>The builds in the range did not report that number.</td></tr>
+  <tr><td><em>Could not load the statistics</em> or <em>Could not save the charts</em></td><td>Reload the page. To save charts you need the permission to configure the build configuration.</td></tr>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="history.html">History</a></li>
+  <li><a href="build-page.html">The build page</a></li>
+  <li><a href="../reference/service-messages.html">Service messages</a></li>
+</ul>
+
+</main>
+</body>
+</html>

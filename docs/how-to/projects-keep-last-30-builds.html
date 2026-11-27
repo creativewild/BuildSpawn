@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Keep the last 30 builds · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/projects-keep-last-30-builds">
+<main class="doc">
+<h1>Keep the last 30 builds</h1>
+<p class="lead">Stop the disk filling up: keep 30 builds of a build configuration, and the artifacts of fewer.</p>
+<p>The <strong>Windows Build</strong> makes a 2 GB package per build. The studio wants the log and the change list of the last 30 builds, but the package of only the last 5.</p>
+<h2>Before you start</h2>
+<ul>
+  <li>The <strong>Configure</strong> permission on the build configuration.</li>
+</ul>
+<h2>Steps</h2>
+<h3>Set the rules</h3>
+<ol class="steps">
+  <li>Open the build configuration, click <strong>Settings</strong>, then <strong>General</strong>.</li>
+  <li>Go to <strong>Clean-up rules</strong> and turn on <strong>Discard old builds</strong>.</li>
+  <li>Leave <strong>Strategy</strong> on <strong>Keep by age and number</strong>.</li>
+  <li>Type <code>30</code> in <strong>Builds to keep</strong>. Leave <strong>Days to keep builds</strong> empty.</li>
+  <li>Type <code>5</code> in <strong>Builds to keep artifacts of</strong>.</li>
+  <li>Read the line <strong>In words</strong>. Click <strong>Save</strong>.</li>
+</ol>
+<h3>Keep one build forever</h3>
+<ol class="steps">
+  <li>Open a release build.</li>
+  <li>Click <strong>Keep this build forever</strong>. The rules never delete it.</li>
+</ol>
+<h2>Check it worked</h2>
+<ol class="steps">
+  <li>Run a build. After it ends, builds older than the 30th disappear from <strong>History</strong>.</li>
+  <li>Build 6 and older have no files under <strong>Artifacts</strong>, but their logs are there.</li>
+  <li>The pinned build is still there.</li>
+</ol>
+<h2>Troubleshooting</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>Nothing is deleted</td><td>The rules run after each build. Run one more.</td></tr>
+    <tr><td>I need a build that was deleted</td><td>It cannot be restored. Pin builds you may need before the rules reach them.</td></tr>
+    <tr><td>I want the same rule for every build configuration in a project</td><td>Set it on the project: <strong>Build settings</strong> passes steps and parameters. For a server-wide rule ask an administrator.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../projects/bc-retention.html">Retention and discard old builds</a></li>
+  <li><a href="../projects/bc-general.html">General</a></li>
+  <li><a href="projects-archive-build-output.html">Archive build output</a></li>
+</ul>
+</main>
+</body>
+</html>

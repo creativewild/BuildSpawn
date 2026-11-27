@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Templates · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/templates">
+<main class="doc">
+<h1>Templates</h1>
+<p class="lead">Share steps and settings between many build configurations. Change the template once and every build configuration based on it follows.</p>
+
+<p>A <strong>template</strong> holds build steps, parameters, post-build actions and version control roots, just like a build configuration, but it never runs by itself. A build configuration <strong>attaches</strong> one or more templates and inherits what they hold. It can still add its own steps and override what it inherits.</p>
+<p>Use a template when several build configurations do almost the same thing. For example, <em>Windows Build</em>, <em>PS5 Build</em> and <em>Xbox Series Build</em> can share one <em>Platform build</em> template with the compile, cook and package steps, and each passes its own <code>PLATFORM</code> parameter.</p>
+
+<div class="callout note"><p>Templates or projects? A <a href="projects.html">project</a> passes its settings to <em>everything</em> inside it. A template reaches only the build configurations that attach it, wherever they sit below its project.</p></div>
+
+<h2>Create a template</h2>
+<p>See also <a href="type-template.html">Build configuration template</a> as an item type.</p>
+<ol class="steps">
+  <li>Open the project that should own the template. Build configurations in this project and its subprojects can use it.</li>
+  <li>Click <strong>New Item</strong>.</li>
+  <li>Type a name, for example <code>Platform build</code>.</li>
+  <li>Choose <strong>Build configuration template</strong> and click <strong>OK</strong>.</li>
+  <li>Add the build steps, parameters and version control roots the build configurations should share, the same way as on a build configuration. Click <strong>Save</strong>.</li>
+</ol>
+<p>The project's <strong>Settings › Templates</strong> lists its templates, with a count. A template's page has a <strong>Used by</strong> section that lists the build configurations attached to it, so you can see who a change reaches.</p>
+<div class="callout warning"><p>A template that is in use cannot be moved. Detach it from every build configuration first. Delete does the detaching for you (see below).</p></div>
+
+<h2>Attach a configuration to a template</h2>
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings</strong>.</li>
+  <li>Open <strong>More › Templates</strong>.</li>
+  <li>Pick the template to attach. Only templates of this project and the projects above it are offered.</li>
+  <li>To attach more than one, add them in turn and use the up and down buttons to set their order.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/projects/bc-templates.png" alt="The Templates settings home of Windows Build: an explanation of the order rules, the text This job is based on no template, and a note on how Detach works">
+  <figcaption>The Templates home of a build configuration that is not based on a template yet.</figcaption>
+</figure>
+
+<h3>The order rules</h3>
+<ul>
+  <li><strong>Steps</strong> from the templates run first, template by template in the listed order, then the build configuration's own steps.</li>
+  <li><strong>Parameters:</strong> when two templates define the same parameter, the template higher in the list wins. The page shows which one lost.</li>
+  <li><strong>Version control roots</strong> come in the same order, before the build configuration's own roots.</li>
+  <li>The whole chain is: Root project, then each project, then the templates, then the build configuration itself. The nearer one wins.</li>
+</ul>
+<div class="callout note"><p>Templates carry steps, parameters, post-build actions and roots. Triggers and build features are not part of a template: set them on each build configuration. A Pipeline build configuration takes only parameters from a template.</p></div>
+
+<h2>A worked example: Stream copy</h2>
+<p>A Perforce studio copies the Main stream to the Drop streams every night, and the Drop streams to Live. Twenty build configurations do the same job with different streams. The studio makes one template <strong>Stream copy</strong>:</p>
+<ul>
+  <li>One Perforce root, with polling off.</li>
+  <li>The parameter <code>env.StreamMapping</code>, read-only, empty. Each build configuration overrides it.</li>
+  <li>The parameter <code>env.CopySourceCL</code>, asked when the build runs, with the description <em>Source CL to use on the copy. Leave empty to use latest.</em></li>
+  <li>One PowerShell step <em>Copy to Stream</em> that runs the copy script.</li>
+</ul>
+<p>Each build configuration, for example <strong>Copy Main to Drop9</strong>, is made with <strong>Start from</strong> <em>Template</em> › <strong>Stream copy</strong>. It overrides <code>env.StreamMapping</code> with <code>main-&gt;drop9</code> and has its own Schedule trigger at 02:00. When the script changes, the studio changes the template once. See <a href="../how-to/game-copy-stream.html">Copy a stream (Main to Drop)</a> and <a href="../how-to/projects-from-template.html">Create a build configuration from a template</a>.</p>
+<h2>Override inherited settings</h2>
+<p>On the <strong>Build Steps</strong> and <strong>Parameters</strong> homes, an item from a template has a chip with the template's name. For each one you can:</p>
+<ul>
+  <li><strong>Override</strong>: change it for this build configuration only, for example a different command or default value.</li>
+  <li><strong>Disable in this job</strong>: skip it here only.</li>
+  <li><strong>Reset</strong>: go back to what the template gives.</li>
+</ul>
+<p>You can also switch off a template's version control root for one build configuration.</p>
+
+<h3>Detach a template</h3>
+<p><strong>Detach</strong> asks first. It copies the template's own steps, parameters, post-build actions and version control roots into the build configuration, then removes the link. The build configuration builds the same as before, but no longer follows the template. Whatever the projects above give stays inherited.</p>
+<div class="callout tip"><p>Before you change a template, look at its <strong>Used by</strong> list. Every build configuration listed there changes with it, including the order of their steps.</p></div>
+</main>
+</body>
+</html>

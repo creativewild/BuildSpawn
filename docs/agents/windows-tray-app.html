@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Windows tray app · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="agents/windows-tray-app">
+<main class="doc">
+<h1>Windows tray app</h1>
+<p class="lead">The tray app is a small Windows program that sits next to the clock and shows what the agent on this machine is doing. You can pause the agent, read its logs, clean work folders and change its settings from it.</p>
+
+<h2>When to use it</h2>
+<p>Use the tray app on any Windows machine that runs a Buildspawn agent, whether it is a build machine, a devkit host or your own computer (see <a href="personal-agents.html">Personal agents</a>). It works with the agent running as a <a href="windows-service.html">Windows service</a> and with an agent that the app starts itself. It talks to the agent through a local connection on the same machine, so it works even when the server cannot be reached. It then shows the last data it knows.</p>
+
+<h2>How to set it up</h2>
+<p>Every Windows agent download already holds the app. You do not install it separately.</p>
+<ol class="steps">
+  <li>Unzip the agent download, for example into <code>C:\buildspawn-agent\</code>.</li>
+  <li>Open the <code>bin</code> folder and double-click <code>Buildspawn Agent.exe</code>. The icon appears in the notification area (click the small arrow next to the clock if it is hidden).</li>
+  <li>If the agent is not running yet, right-click the icon and choose <strong>Start the agent</strong>. The app starts the agent in the background and hides its window.</li>
+  <li>To start the app every time you sign in to Windows, open the <strong>Settings</strong> tab and tick <strong>Open this app when I sign in to Windows</strong>, then click <strong>Save</strong>.</li>
+</ol>
+<div class="callout note"><p>The app finds the agent folder by itself: the folder above the <code>bin</code> folder it runs from. To point it at another agent folder, start it with <code>--home "D:\other-agent"</code>.</p></div>
+<div class="callout note"><p>A second start of the app does not open a second copy. It brings the first window to the front.</p></div>
+
+<h2>The tray icon</h2>
+<p>The icon changes colour with the state of the agent. Hover over it to see a short line of text.</p>
+<table>
+  <thead><tr><th>Icon</th><th>Meaning</th><th>Tooltip text</th></tr></thead>
+  <tbody>
+    <tr><td>Green</td><td>Connected and idle.</td><td>Agent name · Idle · Connected</td></tr>
+    <tr><td>Blue, pulsing</td><td>A build is running.</td><td>Build name · time so far</td></tr>
+    <tr><td>Amber</td><td>Paused. The running build finishes, then no new builds start.</td><td>Paused · finishes the current build</td></tr>
+    <tr><td>Red</td><td>Offline, connecting, or the agent is not running.</td><td>Offline · reconnecting in 12 s</td></tr>
+  </tbody>
+</table>
+<p>The app also shows short pop-up messages: <em>Agent disconnected</em>, <em>Agent reconnected</em>, and one for each build that finishes (passed, failed or stopped).</p>
+
+
+<h2>The tray menu</h2>
+<p>Right-click the icon. A left click opens the window.</p>
+<table>
+  <thead><tr><th>Item</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Start the agent</strong></td><td>Starts the agent. Shown only when it is not running.</td></tr>
+    <tr><td><strong>Open as administrator</strong></td><td>Shown when the agent runs as another account (for example the service account). Opens the app again with administrator rights so it can control that agent.</td></tr>
+    <tr><td><strong>Open</strong> (bold)</td><td>Opens the window.</td></tr>
+    <tr><td><strong>Pause</strong> / <strong>Resume</strong></td><td>Pause: the build that runs now finishes, and no new build starts here. Resume: take builds again. The server applies it within a few seconds, and it is remembered while the agent is offline.</td></tr>
+    <tr><td><strong>Open in browser</strong></td><td>Opens this agent's page on the server.</td></tr>
+    <tr><td><strong>Show connection log</strong></td><td>Opens the window on the <strong>Connection log</strong> tab.</td></tr>
+    <tr><td><strong>Restart agent</strong></td><td>Stops and starts the agent. A running build is stopped.</td></tr>
+    <tr><td><strong>Exit</strong></td><td>Closes the app. It asks whether the agent keeps running. <strong>Keep running</strong> leaves the agent alone. <strong>Stop agent</strong> stops it (a service is stopped after Windows asks for permission). <strong>Cancel</strong> keeps the app open.</td></tr>
+  </tbody>
+</table>
+<p>The window closes to the tray when you click the close button or press <kbd>Esc</kbd>. Only <strong>Exit</strong> ends the app.</p>
+
+<h2>Every tab</h2>
+<p>The window has eight tabs. The title bar shows the agent's name.</p>
+
+<h3>Status</h3>
+<p>The first look at the machine.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it shows</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Owner</strong></td><td>Only on a personal machine: the user it belongs to.</td></tr>
+    <tr><td><strong>Connection</strong></td><td>Connected, Connecting, or Offline with a countdown to the next try. If the agent runs as another account: <em>This agent runs as another account. Open as administrator to control it.</em> If it is stopped: <em>The agent isn't running</em>.</td></tr>
+    <tr><td><strong>Server</strong></td><td>The server address the agent uses.</td></tr>
+    <tr><td><strong>Last contact</strong></td><td>How long ago the server was last heard from.</td></tr>
+    <tr><td><strong>Reconnects today</strong></td><td>How many times the connection came back since midnight.</td></tr>
+    <tr><td><strong>Current build</strong></td><td>The running build, a progress bar against its usual time, the current step and the time so far. <em>(+2 more)</em> when several builds run.</td></tr>
+    <tr><td><strong>CPU</strong>, <strong>RAM</strong>, <strong>Disk</strong></td><td>Bars with the percent used on this machine. Disk is the drive of the work folder.</td></tr>
+    <tr><td>Button at the bottom</td><td><strong>Pause</strong>, <strong>Resume</strong>, <strong>Start the agent</strong> or <strong>Open as administrator</strong>, depending on the state.</td></tr>
+  </tbody>
+</table>
+
+<h3>Builds</h3>
+<ul>
+  <li><strong>Current</strong>: the build running now with its time. <strong>Stop build</strong> asks <em>Stop …?</em> and stops it.</li>
+  <li><strong>Waiting (n)</strong>: builds in the queue for this agent, with a <strong>Why</strong> column. Hidden on a personal machine.</li>
+  <li><strong>Recent (n)</strong>: columns <strong>Build</strong>, <strong>Result</strong> and <strong>Finished</strong>. Press <kbd>Enter</kbd> or double-click a build to open its log in the browser. On a personal machine only the owner's builds are listed, and <strong>Share</strong> copies a link that lets other people read the selected build.</li>
+</ul>
+
+<h3>Connection log</h3>
+<p>A line on top counts the drops today and the longest time offline, for example <em>3 drops today · longest time offline 4 min</em>. The list has <strong>Time</strong>, <strong>Event</strong> (Connected, Disconnected, Reconnecting) and <strong>Reason</strong> in plain words, such as <em>Network lost (the PC went to sleep?)</em>, <em>Ping not answered for 60 s</em> or <em>Secret rejected by the server</em>. The last 1000 events are kept, even across restarts.</p>
+
+<h3>Agent log</h3>
+<p>The agent's own log, newest line first. Buttons <strong>All</strong>, <strong>Warnings</strong> and <strong>Errors</strong> filter it. <strong>Open log folder</strong> opens the folder in Windows Explorer.</p>
+
+<h3>Work folders</h3>
+<p>One row for each build configuration's folder in the work folder, with its <strong>Size</strong> and a <strong>State</strong> (<em>In use</em> while a build uses it). <strong>Clean</strong> deletes the selected folder after you confirm. <strong>Clean all</strong> deletes every folder, and the next builds start from scratch. A folder in use cannot be cleaned. The line at the bottom shows the <strong>Total</strong> size.</p>
+
+<h3>Service</h3>
+<table>
+  <thead><tr><th>Field</th><th>What it shows</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Service</strong></td><td><code>buildspawn-agent</code></td></tr>
+    <tr><td><strong>Installed</strong></td><td>Yes or No.</td></tr>
+    <tr><td><strong>State</strong></td><td>Running, Stopped or Not installed.</td></tr>
+    <tr><td><strong>Start type</strong></td><td>Automatic (start at boot), Manual or Disabled.</td></tr>
+    <tr><td><strong>Run as account</strong></td><td>For example Local System.</td></tr>
+    <tr><td><strong>Runs as</strong></td><td>Shown instead when there is no service: <em>This app in your Windows session (starts when you sign in)</em>.</td></tr>
+  </tbody>
+</table>
+<p>Buttons: <strong>Start</strong>, <strong>Stop</strong>, <strong>Restart</strong>, <strong>Install</strong> (or <strong>Run as a Windows service instead</strong> on a personal machine), <strong>Remove</strong>, and <strong>Run in my Windows session instead</strong> (removes the service and lets the app run the agent). Each one asks you to confirm, then Windows asks for administrator permission. Install and Remove run <code>install-service.bat</code> and <code>uninstall-service.bat</code> from the agent folder (see <a href="windows-service.html">Windows service</a>).</p>
+
+<h3>Certificates</h3>
+<p>The certificates this agent trusts, in two lists. See <a href="../administration/trusted-certificates.html">Trusted certificates</a> for the server side.</p>
+<ul>
+  <li><strong>Also trust Windows' certificate store</strong>: tick it to also trust everything Windows trusts. This helps behind a company proxy.</li>
+  <li><strong>From the server (n)</strong>: certificates the server sent when the agent connected. They cannot be removed here. A note says when they were last received.</li>
+  <li><strong>Added on this machine (n)</strong>: certificates you added. <strong>Add…</strong> takes a <code>.pem</code>, <code>.crt</code>, <code>.cer</code>, <code>.der</code>, <code>.p7b</code> or <code>.p7c</code> file and shows each certificate first. <strong>Remove</strong> asks, then removes the selected one. <strong>View…</strong> shows the details and the SHA-256 fingerprint.</li>
+  <li>A band says <em>The agent restarts to use them after the current build.</em> with <strong>Restart agent now</strong>.</li>
+</ul>
+<p>The agent keeps these in <code>work\trust</code>, so they survive an upgrade of the agent files.</p>
+
+<h3>Settings</h3>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Key in the settings file</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Server address</strong></td><td>The server the agent connects to.</td><td><code>serverUrl</code></td></tr>
+    <tr><td><strong>Name</strong></td><td>The agent's name.</td><td><code>name</code></td></tr>
+    <tr><td><strong>Work folder</strong></td><td>Where builds run. Default <code>work</code>.</td><td><code>workDir</code></td></tr>
+    <tr><td><strong>Java memory and options</strong></td><td>Extra Java options, for example <code>-Xmx4g</code>.</td><td><code>javaOptions</code></td></tr>
+    <tr><td><strong>Proxy</strong></td><td><code>host:port</code> or <code>http://user:pass@host:port</code>.</td><td><code>proxy</code></td></tr>
+    <tr><td><strong>Use WebSocket</strong></td><td>Ticked (default): connect over WebSocket. Unticked: use the plain TCP connection.</td><td><code>webSocket</code></td></tr>
+    <tr><td><strong>Builds at a time</strong></td><td>Read only. Set on the agent's page on the server (see <a href="agent-executors.html">Builds at a time</a>).</td><td>none</td></tr>
+    <tr><td><strong>Start with Windows</strong></td><td><strong>Open this app when I sign in to Windows</strong>.</td><td>none (a Windows sign-in entry)</td></tr>
+  </tbody>
+</table>
+<p>Click <strong>Save</strong>. The note under the form says <em>Saved in conf\buildspawn-agent.properties. The secret is not shown here.</em> If the file belongs to the service account, Windows asks for administrator permission first. After saving, the app asks <strong>Restart now</strong> or <strong>Later</strong>. A changed <strong>Java memory and options</strong> also needs <code>install-service.bat</code> to be run again when the agent runs as a service. See <a href="agent-connection.html">Connect an agent</a> for what each key means.</p>
+
+<h2>A worked example</h2>
+<p>A level designer's PC at the studio runs a personal agent named <code>dana-pc</code>. Dana is about to play-test and needs the CPU.</p>
+<ol class="steps">
+  <li>Dana right-clicks the tray icon and chooses <strong>Pause</strong>. The icon turns amber.</li>
+  <li>The build that was running finishes. No new build starts on <code>dana-pc</code>.</li>
+  <li>After the session Dana right-clicks the icon and chooses <strong>Resume</strong>. The icon turns green.</li>
+</ol>
+
+<h2>What you see when it runs</h2>
+<ul>
+  <li>A pop-up <em>Agent disconnected</em> when the connection drops, and <em>Agent reconnected</em> when it returns.</li>
+  <li>The window refreshes by itself every 2 seconds.</li>
+  <li>The server's Agents page shows the pause too: the agent's row says it is paused.</li>
+</ul>
+
+<h2>Log files</h2>
+<table>
+  <thead><tr><th>File</th><th>What is in it</th></tr></thead>
+  <tbody>
+    <tr><td><code>logs\run-agent.log</code></td><td>Everything the agent prints when the app starts it. If the agent stops right at the start, read this file first.</td></tr>
+    <tr><td><code>logs\tray.log</code></td><td>Unexpected errors of the tray app itself. If that folder cannot be written, the file <code>buildspawn-agent-tray.log</code> goes in the Windows temp folder.</td></tr>
+  </tbody>
+</table>
+<p>When the agent runs as a service, its output goes to the service logs in the same <code>logs</code> folder (see <a href="windows-service.html">Windows service</a>).</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>The status says <em>This agent runs as another account</em>.</td><td>The service runs as the system account. Choose <strong>Open as administrator</strong> from the tray menu.</td></tr>
+    <tr><td><strong>Start the agent</strong> does nothing.</td><td>Read <code>logs\run-agent.log</code>. A missing <code>serverUrl</code>, or Java that is too old, is written there.</td></tr>
+    <tr><td>The icon is red but the server is fine.</td><td>Open <strong>Connection log</strong> and read the reason. <em>Secret rejected by the server</em> means the agent's secret is out of date.</td></tr>
+    <tr><td>The <strong>Certificates</strong> tab is missing.</td><td>The agent files are older than 1.9.2. Upgrade them (see <a href="../how-to/admin-upgrade-agents.html">Upgrade agents</a>).</td></tr>
+    <tr><td>The app does not start on an old download.</td><td>Download the agent again. The app in 1.9.2 and later starts on every Windows machine where earlier copies failed.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="agent-terminal.html">Agent terminal program</a>: the same information in a console window, for every system.</li>
+  <li><a href="windows-service.html">Windows service</a></li>
+  <li><a href="personal-agents.html">Personal agents</a></li>
+  <li><a href="agent-connection.html">Connect an agent</a></li>
+  <li><a href="../how-to/admin-upgrade-agents.html">Upgrade agents</a></li>
+</ul>
+</main>
+</body>
+</html>

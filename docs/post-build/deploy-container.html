@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deploy war/ear to a container · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="post-build/deploy-container">
+<main class="doc">
+<h1>Deploy war/ear to a container</h1>
+<p class="lead">Deploys a web application (a WAR or EAR file) to an application server when the build ends.</p>
+<h2>When to use it</h2>
+<p>Use it for web services that you host in a Java application server, such as a launcher back end or an internal tool. Most game builds do not need it.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration, click <strong>Settings</strong>, then <strong>Post-build Actions</strong>. Click <strong>Add post-build action</strong> and choose <strong>Deploy war/ear to a container</strong>.</li>
+  <li>In <strong>WAR/EAR files</strong> type the file or pattern.</li>
+  <li>Fill in the <strong>Context path</strong>.</li>
+  <li>Under <strong>Containers</strong> click <strong>Add Container</strong>, choose the server type, and fill in its address and credentials.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>WAR/EAR files</td><td>The files to deploy, relative to the workspace. Ant patterns such as <code>**/*.war</code> work.</td><td>Empty</td><td><code>target/*.war</code></td></tr>
+    <tr><td>Context path</td><td>The path the container publishes the application under. A setting inside the file can override it.</td><td>Empty</td><td><code>/launcher</code></td></tr>
+    <tr><td>Containers</td><td>The servers to deploy to. Each one has its own address and credentials.</td><td>None</td><td>Tomcat at <code>http://tools.studio.example:8080</code></td></tr>
+    <tr><td>Deploy on failure</td><td>Deploy even if the build failed.</td><td>Off</td><td>Off</td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p>The back end of the launcher builds <code>launcher.war</code>. The post-build action deploys it to the test Tomcat server at <code>/launcher</code> after each good build.</p><h2>What you see when it runs</h2>
+<p>The log shows the upload and the answer of the server.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>Deploy fails with 401</td><td>The credentials of the container are wrong.</td></tr>
+    <tr><td>Nothing is deployed</td><td>The file pattern did not match. Check that the build produced the file.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="overview.html">After the build: overview</a></li>
+  <li><a href="../projects/bc-post-build-actions.html">Post-build actions tab</a></li>
+</ul>
+</main>
+</body>
+</html>

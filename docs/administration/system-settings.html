@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>System settings · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="administration/system-settings">
+<main class="doc">
+<h1>System settings</h1>
+<p class="lead">The System page holds the server-wide settings: the server address, how builds are queued, limits and defaults, and the settings of the bundled plugins.</p>
+
+<p><strong>When to use it:</strong> when you set up a new server, when builds queue too fast or too slowly, when the server sits behind a proxy, or when you want a default (such as a build timeout or a build discarder) to apply to every build configuration.</p>
+
+<h2>How to open it</h2>
+<ol class="steps">
+  <li>Click <strong>Manage</strong> in the left rail, then <strong>System</strong>. The address is <code>/configure</code>. You need the <strong>Manage</strong> permission to change the settings. People with the <strong>System read</strong> permission see the page read-only.</li>
+  <li>Use the <strong>On this page</strong> index on the left to jump to a section.</li>
+  <li>Change what you need. The <strong>Save</strong> and <strong>Apply</strong> buttons stay at the bottom of the window. <strong>Apply</strong> saves and stays on the page. <strong>Save</strong> saves and leaves it.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/administration/system-settings.png" alt="The System page with the Settings list on the left, the On this page index, and the General card with Home directory, System Message, retention interval, quiet period and retry count">
+  <figcaption>The System page. The Save and Apply buttons stay at the bottom of the window.</figcaption>
+</figure>
+
+<div class="callout note"><p>Each field has a small <strong>?</strong> button. Click it to read the help for that field. Some sections only appear when they have something to set. For example, the Fingerprint storage list only shows when more than one storage type is installed.</p></div>
+
+<h2 id="general">General</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Home directory</strong></td><td>Shows the folder where Buildspawn keeps all its data: configuration, build results and plugins. You cannot change it here. Use the copy button to copy the path. See <a href="backups.html">Backups and upgrades</a>.</td><td>Set when the server starts</td><td><code>D:\Buildspawn\data</code></td></tr>
+    <tr><td><strong>System Message</strong></td><td>A message shown at the top of the main page for every user. Write plain text, or HTML if your markup setting allows it. <strong>Preview</strong> shows how it looks.</td><td>Empty</td><td><code>Perforce is down for maintenance until 18:00.</code></td></tr>
+    <tr><td><strong>Computer Retention Check Interval</strong></td><td>How often Buildspawn checks whether an agent should be disconnected by its availability rule. Whole number, 1 to 60. Details are in <a href="../agents/agent-settings.html">Agent settings</a>.</td><td>60</td><td><code>30</code></td></tr>
+    <tr><td><strong>Quiet period</strong></td><td>Seconds that a newly triggered build waits in the queue before it starts. When several commits arrive close together, they go into one build instead of many. A new trigger while a build waits does not restart the wait. A build configuration can set its own quiet period.</td><td>5</td><td><code>60</code> for a game repository with many small submits</td></tr>
+    <tr><td><strong>SCM checkout retry count</strong></td><td>How many times Buildspawn tries a version control checkout again when it fails, for example because the Perforce server is busy.</td><td>0 (no retry)</td><td><code>2</code></td></tr>
+    <tr><td><strong>Default view</strong></td><td>The view that opens first on the Projects page (see <a href="../projects/views.html">Views</a>). A list of all your views. It only shows when you have more than one view.</td><td>The first view, <em>all</em></td><td><code>Release jobs</code></td></tr>
+  </tbody>
+</table>
+
+<h3>Restrict build configuration naming</h3>
+<p>Tick <strong>Restrict build configuration naming</strong> to force a rule on the names of new build configurations.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Strategy</strong> (Naming Strategy)</td><td>Pick <strong>Default</strong> (any name is allowed) or <strong>Pattern</strong> (the name must match a regular expression).</td><td>Default</td><td>Pattern</td></tr>
+    <tr><td><strong>Name Pattern</strong></td><td>A regular expression that every name must match.</td><td><code>.*</code></td><td><code>(Win64|PS5|Switch)-[A-Za-z0-9-]+</code></td></tr>
+    <tr><td><strong>Description</strong></td><td>The message people see when a name does not match. Explain the rule in plain words.</td><td>Empty</td><td><code>Start with the platform: Win64-, PS5- or Switch-.</code></td></tr>
+    <tr><td><strong>force existing</strong></td><td>Also applies the rule to build configurations that already exist. They must match the next time someone saves them.</td><td>Off</td><td>Off</td></tr>
+  </tbody>
+</table>
+
+<h3>Views tab bar</h3>
+<p>See <a href="../projects/views.html">Views</a> for views and tabs. Two settings choose which tab bar shows your views, and which shows <strong>My Views</strong>. A plugin can offer its own tab bar. When only the built-in bar is installed, there is nothing to choose and the setting does not appear.</p>
+
+<h2 id="location">Buildspawn Location</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Buildspawn URL</strong></td><td>The address people use to open the server. Buildspawn puts it in links in e-mails and notifications, and agents use it for some links. Buildspawn cannot find out this address reliably by itself, so set it.</td><td>Empty (a warning is shown)</td><td><code>https://build.skyforge.example/</code></td></tr>
+    <tr><td><strong>System Admin e-mail address</strong></td><td>The From address of e-mails the server sends. You can add a display name.</td><td>Empty</td><td><code>Buildspawn Server &lt;builds@skyforge.example&gt;</code></td></tr>
+  </tbody>
+</table>
+<div class="callout warning"><p>If a reverse proxy serves Buildspawn under a path, the URL must include that path. The page shows a message when the URL and the real path do not match.</p></div>
+
+<h2 id="resource-domain">Serve resource files from another domain</h2>
+<p>The <strong>Resource Root URL</strong> field sends files that users upload, such as build artifacts shown in the browser, from a second address. It is a security setting. It is described in <a href="security-settings.html">Security settings</a>.</p>
+
+<h2 id="global-properties">Global properties</h2>
+<p>These are properties of the built-in node, the server's own build slot. Other nodes have the same properties in their own settings; see <a href="../agents/agent-settings.html">Agent settings</a>.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>BuildPatch Tool folder</strong> › <strong>Folder</strong></td><td>The folder where the Epic BuildPatch Tool is installed. The Epic steps use it. See <a href="../game-builds/install-buildpatch-tool.html">Install BuildPatch Tool</a>.</td><td>Empty</td><td><code>C:\Epic\BuildPatchTool</code></td></tr>
+    <tr><td><strong>Free Disk Space Threshold</strong></td><td>If free space on the data drive falls below this, the node goes offline for a while. <code>0</code> turns the check off. Use units such as <code>500MiB</code> or <code>1.5GiB</code>.</td><td>1GiB</td><td><code>20GiB</code></td></tr>
+    <tr><td><strong>Free Disk Space Warning Threshold</strong></td><td>Below this, a warning shows on the node page but the node stays online.</td><td>2GiB</td><td><code>40GiB</code></td></tr>
+    <tr><td><strong>Free Temp Space Threshold</strong></td><td>Same as above for the temp folder.</td><td>1GiB</td><td><code>5GiB</code></td></tr>
+    <tr><td><strong>Free Temp Space Warning Threshold</strong></td><td>Warning level for the temp folder.</td><td>2GiB</td><td><code>10GiB</code></td></tr>
+    <tr><td><strong>Collect telemetry from this agent</strong></td><td>Turns on the resource telemetry for this node. See <a href="../agents/telemetry.html">Agent telemetry</a>.</td><td>On</td><td>On</td></tr>
+    <tr><td><strong>Enable node-based security</strong></td><td>Lets you give people permissions on this node only (Agent, Build, Configure, Connect, Delete, Disconnect). Choose <strong>Inherit globally defined permissions</strong> or <strong>Do not inherit permission grants from other ACLs</strong>, then add users and groups to the matrix. With an Entra ID realm the same section is called <strong>Entra ID Authorization Matrix</strong> and has <strong>Add from Entra ID</strong>. See <a href="authorization.html">Authorization</a>.</td><td>Off</td><td>Off</td></tr>
+    <tr><td><strong>Environment variables</strong> › <strong>List of variables</strong></td><td>Name and value pairs added to the environment of every build on this node. Click <strong>Add</strong> for a row.</td><td>None</td><td><code>UE_ENGINE_ROOT</code> = <code>D:\UE_5.4</code></td></tr>
+    <tr><td><strong>Tool Locations</strong> › <strong>List of tool locations</strong></td><td>Tells this node where a tool is installed, when that differs from the server-wide setting. Pick the tool by name, type its <strong>Home</strong> folder. See <a href="tools.html#tool-locations">Tool Locations</a>.</td><td>None</td><td>(Git) Default → <code>C:\Program Files\Git\bin\git.exe</code></td></tr>
+    <tr><td><strong>Publish Over CIFS</strong> › <strong>WINS server</strong></td><td>The name of a WINS server, for Windows share names. Leave empty if you do not use one.</td><td>Empty</td><td><code>10.0.0.5</code></td></tr>
+  </tbody>
+</table>
+
+<h2 id="visual-editor">Visual editor</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Show the Visual link on build pages and History</strong></td><td>Adds a <strong>Visual</strong> link to build pages and to the History list that opens the build in the visual editor's run view. The build picker in the editor's toolbar is always there. See <a href="../visual-editor/run-view.html">Run view</a>.</td><td>On</td><td>On</td></tr>
+  </tbody>
+</table>
+
+<h2 id="pipeline-durability">Pipeline Speed / Durability</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Default Speed / Durability Level</strong></td><td>How carefully Pipeline builds save their progress. <em>Maximum survivability/durability</em> is slowest and safest: a running build can carry on after a server crash. <em>Performance-optimized</em> is much faster but a running build is lost if the server stops without a clean shutdown. <em>Less durability, a bit faster</em> is a middle choice for special cases. A Pipeline can choose its own level.</td><td>Pipeline default (maximum survivability)</td><td>Performance-optimized on a server with many short builds</td></tr>
+  </tbody>
+</table>
+
+<h2 id="usage-statistics">Usage Statistics</h2>
+<p>This section only says that sending usage statistics is switched off for this server. Buildspawn does not send usage statistics, crash reports or telemetry to anyone. There is nothing to set.</p>
+
+<h2 id="health-metrics">Project Health Metrics</h2>
+<p>The health icon of a project (a folder of build configurations) is worked out from health metrics. <strong>List of default health metrics for Projects</strong> holds the metrics every project starts with. Click <strong>Add</strong> to add one, and drag to change the order.</p>
+<table>
+  <thead><tr><th>Metric</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Child item with the given name</strong></td><td>The project is as healthy as the build configuration you name. Use it for the build that matters most, for example <code>Win64-Release</code>.</td></tr>
+    <tr><td><strong>Child item with worst health</strong></td><td>The project is as healthy as its worst build configuration.</td></tr>
+    <tr><td><strong>Health of the primary branch of a repository</strong></td><td>For multi-branch projects: the health of the main branch. Set the branch name in the metric's fields.</td></tr>
+  </tbody>
+</table>
+<p>A new server starts with all three metrics in the list. Delete the ones you do not want.</p>
+
+<h2 id="proxy">HTTP Proxy Configuration</h2>
+<p>Use it when the server reaches the internet only through a proxy, for example to check the update site.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Server</strong></td><td>The proxy's host name. Leave empty to connect directly.</td><td>Empty</td><td><code>proxy.skyforge.example</code></td></tr>
+    <tr><td><strong>Port</strong></td><td>The proxy's port, 0 to 65535.</td><td>Empty</td><td><code>3128</code></td></tr>
+    <tr><td><strong>User name</strong></td><td>The sign-in name for the proxy. For a Microsoft NTLM proxy, write <code>DOMAIN\user</code>.</td><td>Empty</td><td><code>SKYFORGE\buildbot</code></td></tr>
+    <tr><td><strong>Password</strong></td><td>The proxy password. It is stored encrypted.</td><td>Empty</td><td>(hidden)</td></tr>
+    <tr><td><strong>No Proxy Host</strong></td><td>Host names that skip the proxy, one per line. <code>*</code> is a wild card.</td><td>Empty</td><td><code>*.skyforge.example</code></td></tr>
+    <tr><td><strong>Test URL</strong> (under <strong>More options</strong>)</td><td>An address to test with. Click <strong>Validate Proxy</strong> to try the settings without saving.</td><td>Empty</td><td><code>https://updates.example.com</code></td></tr>
+  </tbody>
+</table>
+
+<h2 id="global-timeout">Global Build Time Out</h2>
+<p>Stops builds that run too long, for every build configuration. Tick <strong>Enable Global Time Out</strong> to show the settings.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Time-out strategy</strong></td><td>How Buildspawn decides a build has run too long (see the list below).</td><td>Absolute</td><td>No Activity</td></tr>
+    <tr><td><strong>Time-out actions</strong> › <strong>Add action</strong></td><td>What happens at the time-out, in order: <strong>Abort the build</strong>, <strong>Fail the build</strong>, <strong>Writing the build description</strong> (writes a text on the build), or <strong>Perform BuildStep</strong> (runs a build step; shown only when <strong>Enable BuildStep Action</strong> is ticked in the Build timeout step section). With no action, the build is aborted.</td><td>Abort the build</td><td>Writing the build description: <code>Timed out</code>, then Abort the build</td></tr>
+    <tr><td><strong>Are individual jobs allowed to overwrite this global timeout?</strong></td><td>When ticked, a build configuration with its own time-out replaces the global one.</td><td>Off</td><td>On</td></tr>
+  </tbody>
+</table>
+<table>
+  <thead><tr><th>Strategy</th><th>Fields</th><th>Meaning</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Absolute</strong></td><td><strong>Timeout minutes</strong> (default 3, at least 3)</td><td>A fixed time limit.</td></tr>
+    <tr><td><strong>Deadline</strong></td><td><strong>Deadline time</strong> (24 hour, <code>HH:MM:SS</code>, default <code>0:00:00</code>), <strong>Deadline tolerance in minutes</strong> (default 1)</td><td>The build must end by a clock time. A build that starts after the time plus the tolerance gets the next day's deadline.</td></tr>
+    <tr><td><strong>Elastic</strong></td><td><strong>Timeout as a percentage of recent non-failing builds</strong>, <strong>Number of Builds</strong> (default 3), <strong>Timeout minutes</strong> (used when there is no history)</td><td>The limit is a percentage of the average time of the last builds that did not fail.</td></tr>
+    <tr><td><strong>Likely stuck</strong></td><td>None</td><td>Stops a build that takes many times longer than earlier ones.</td></tr>
+    <tr><td><strong>No Activity</strong></td><td><strong>Timeout seconds</strong> (default 180)</td><td>Stops a build when nothing has been written to the log for that long. Buffered output can look like no activity.</td></tr>
+  </tbody>
+</table>
+<h3>Build timeout step</h3>
+<p><strong>Enable BuildStep Action</strong> adds <strong>Perform BuildStep</strong> to the list of time-out actions. It is provided as is and does not work with every step. Leave it off unless you need it.</p>
+
+<h2 id="timestamper">Timestamper</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>System clock time format</strong></td><td>How the clock time of a log line is written, as a Java date pattern. Text in single quotes is kept as it is.</td><td><code>'&lt;b&gt;'HH:mm:ss'&lt;/b&gt; '</code></td><td><code>yyyy-MM-dd HH:mm:ss.SSS' | '</code></td></tr>
+    <tr><td><strong>Elapsed time format</strong></td><td>How the time since the build started is written, as a duration pattern.</td><td><code>'&lt;b&gt;'HH:mm:ss.S'&lt;/b&gt; '</code></td><td><code>mm:ss.S' | '</code></td></tr>
+    <tr><td><strong>Enabled for all Pipeline builds</strong></td><td>Adds timestamps to every Pipeline build, so a Pipeline does not need the <code>timestamps</code> step.</td><td>Off</td><td>On</td></tr>
+  </tbody>
+</table>
+
+<h2 id="perforce-operations">Perforce operations</h2>
+<p>Rules for every Perforce operations step. See <a href="../version-control/perforce-operations.html">Perforce operations</a>.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Allow destructive custom commands</strong></td><td>Off: steps refuse <code>obliterate</code>, <code>protect</code>, <code>triggers</code>, <code>typemap</code>, <code>admin</code>, <code>configure</code>, <code>unload</code>, <code>archive</code>, deleting users, groups and depots, and <code>-f</code> on deleting a spec. Turn it on only for a trusted server.</td><td>Off</td><td>Off</td></tr>
+    <tr><td><strong>Allow Administrator connection</strong></td><td>Off: steps use the project's Perforce root only. On: a step can pick an Administrator connection defined at its Perforce root or above, when the person who sets up the step has the Perforce permission to use it. Such a step runs without a workspace.</td><td>Off</td><td>Off</td></tr>
+  </tbody>
+</table>
+<p>Commands that show or change a login (<code>passwd</code>, tickets, <code>trust</code>, <code>set</code>, <code>login -p</code>) are always refused. A password or ticket in the output is replaced by <code>********</code> in the log.</p>
+
+<h2 id="agent-environment">Agent environment variables</h2>
+<p><strong>Variables to show</strong> lists environment variables, one name per line. Each one shows as <code>env.NAME</code> in the parameters of every agent, and a build configuration's requirements can use it. Nothing shows unless you list it. Names that look like secrets (password, secret, token, key, credential) are refused. Details are in <a href="../agents/agent-labels-requirements.html">Agent labels and requirements</a>.</p>
+
+<h2 id="build-console">Build console</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Record the time of each log line</strong></td><td>New builds keep a small record of when each log line was written. The Console Output uses it for times and block durations. Builds made while this is off show no times.</td><td>On</td><td>On</td></tr>
+  </tbody>
+</table>
+<p>See <a href="../build-results/build-console.html">Build console</a>. The <strong>Console URL Provider</strong> list is part of the same family: it chooses which tool opens console links, with the first provider that can show a link winning. It only appears when more than one provider is installed. Users can override it in <a href="user-settings.html">their own settings</a>.</p>
+
+<h2 id="fingerprints">Fingerprints</h2>
+<p>A fingerprint is a short code that identifies a file, so Buildspawn can show which builds used or made it.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Disable Fingerprint Cleanup</strong></td><td>Stops the daily removal of fingerprints that no build refers to any more.</td><td>Off</td><td>Off</td></tr>
+    <tr><td><strong>Fingerprint Storage Engine</strong></td><td>Where fingerprints are kept. Only shown when more than one engine is installed.</td><td>File system</td><td></td></tr>
+  </tbody>
+</table>
+
+<h2 id="admin-monitors">Administrative monitors</h2>
+<p>Administrative monitors are warnings that show to administrators about the state of the server. Every monitor has a tick box. Untick a monitor to hide its warning for good. Keep them all on unless you are sure you do not need one.</p>
+<table>
+  <thead><tr><th>Monitor</th><th>Warns about</th></tr></thead>
+  <tbody>
+    <tr><td>Ambiguous Permission Assignments (also the AzureAD one)</td><td>Permissions given to a name that could be a user or a group.</td></tr>
+    <tr><td>Buildspawn Initialization Monitor</td><td>A start-up that did not finish.</td></tr>
+    <tr><td>Buildspawn Update Notification</td><td>A newer Buildspawn release.</td></tr>
+    <tr><td>Built-In Node Name and Label Migration</td><td>An old built-in node name or label that can be migrated.</td></tr>
+    <tr><td>Built-in Node With / Without Agents Executors Configured Monitor</td><td>The built-in node has executors although agents exist, or no agents exist yet.</td></tr>
+    <tr><td>CSRF Protection Monitor</td><td>Request forgery protection is off.</td></tr>
+    <tr><td>Check URI Encoding</td><td>Addresses are mangled by a proxy or container.</td></tr>
+    <tr><td>Cron Triggers Monitor</td><td>Triggers do not fire on time.</td></tr>
+    <tr><td>Cyclic Dependencies Detector</td><td>Plugins that depend on each other in a circle.</td></tr>
+    <tr><td>Deprecated Plugin Monitor</td><td>Installed plugins that are marked deprecated.</td></tr>
+    <tr><td>Disabled Security</td><td>No security realm or authorization is set up.</td></tr>
+    <tr><td>Disk Usage Monitor</td><td>Free space in the data folder is below the threshold.</td></tr>
+    <tr><td>Duplicate Buildspawn checker</td><td>Two server processes use the same data folder.</td></tr>
+    <tr><td>Enforce TCP Agent Port</td><td>The agent port differs from the enforced value and will be reset on restart.</td></tr>
+    <tr><td>Folder Property Migration</td><td>Old project properties that can be migrated.</td></tr>
+    <tr><td>Invalid Plugin Configuration</td><td>A plugin that needs an update.</td></tr>
+    <tr><td>JVM Crash Reports</td><td>Crash dumps from an unclean stop.</td></tr>
+    <tr><td>Legacy API Token monitors (three)</td><td>Old-style API tokens: allowed without security, created by default, or in use.</td></tr>
+    <tr><td>Manage Old Data</td><td>Configuration files with data that cannot be read. See <a href="management-pages.html#old-data">Manage Old Data</a>.</td></tr>
+    <tr><td>Missing Descriptor ID</td><td>A problem in some old plugins.</td></tr>
+    <tr><td>Node Marked Offline Due to Health Check</td><td>A resource monitor took a node offline.</td></tr>
+    <tr><td>Operating system end of life monitor</td><td>The server's operating system is close to the end of support.</td></tr>
+    <tr><td>Plugins Failed To Load</td><td>Plugins that did not load. Saving settings now could lose their data, so act on this one.</td></tr>
+    <tr><td>Recommend Content Security Policy</td><td>No content security policy is set.</td></tr>
+    <tr><td>Recommended Java Version</td><td>An old Java version.</td></tr>
+    <tr><td>Resource Domain Recommendation</td><td>A custom content security header without a resource root URL.</td></tr>
+    <tr><td>Reverse Proxy Setup</td><td>A wrong proxy setup.</td></tr>
+    <tr><td>Root URL not configured Monitor</td><td>The Buildspawn URL is empty.</td></tr>
+    <tr><td>Too Many Build Configurations Not Organized in Views</td><td>A long list that would be easier to use with views.</td></tr>
+    <tr><td>Too Many SCM Polling Threads</td><td>More polling than the polling threads can handle.</td></tr>
+    <tr><td>Trusted certificates expiring</td><td>Certificates in the trust store close to their end date. See <a href="trusted-certificates.html">Trusted certificates</a>.</td></tr>
+    <tr><td>Update Site Warnings</td><td>Known security problems in installed components. Hide single messages in <a href="security-settings.html">Security settings</a> instead of turning this one off.</td></tr>
+    <tr><td>Warn when session ID is excluded from Default Crumb Issuer</td><td>Weaker request forgery protection.</td></tr>
+    <tr><td>SAML security monitor</td><td>Problems with single sign-on settings.</td></tr>
+  </tbody>
+</table>
+<p>The list depends on the installed plugins.</p>
+
+<h2 id="build-discarders">Global Build Discarders</h2>
+<p>A build discarder deletes old builds. A build configuration's own discarder runs only after a build finishes. A global discarder also runs on a timer, so changes to the rules apply even when no new builds run. Click <strong>Add</strong> to add one.</p>
+<table>
+  <thead><tr><th>Discarder</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Build Configuration Build Discarder</strong></td><td>Runs every build configuration's own discarder on a timer. It does nothing for a build configuration that has no discarder. Only one of these can be added.</td></tr>
+    <tr><td><strong>Specific Build Discarder</strong></td><td>Pick a discarder type (such as <em>Discard old builds</em> with days and number to keep). It runs after every build and on a timer, for every build configuration.</td></tr>
+  </tbody>
+</table>
+<div class="callout tip"><p>A game studio that keeps large builds can add a specific discarder that keeps the last 20 builds everywhere, so disk space stays under control.</p></div>
+
+<h2 id="build-steps">Build steps</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Let build steps set any environment variable</strong></td><td>A build step can set an environment variable for the steps after it with an <code>env.NAME</code> service message. By default Buildspawn refuses names that change which programs run or how they start, such as search paths, loaders, shell start-up files and interpreter options. Tick this to allow every name. Names without <code>env.</code> are build parameters and never reach the environment. See <a href="../reference/service-messages.html">Service messages</a>.</td><td>Off</td><td>Off. Tick it only if a step must set a name such as <code>JAVA_TOOL_OPTIONS</code>.</td></tr>
+  </tbody>
+</table>
+<p>The section is titled <strong>Build steps</strong>. Example: a PowerShell step prints <code>##buildspawn[setParameter name='env.UE_BUILD_ID' value='7']</code>. The later steps see <code>UE_BUILD_ID</code> in their environment, with this box off. A step that sets <code>env.PATH</code> is refused with a line in the log, unless the box is on. Always refused with the box off: <code>PATH</code>, <code>PATHEXT</code>, <code>LD_PRELOAD</code>, <code>LD_LIBRARY_PATH</code>, <code>BASH_ENV</code>, <code>COMSPEC</code>, <code>JAVA_TOOL_OPTIONS</code>, <code>NODE_OPTIONS</code>, <code>PYTHONPATH</code>, <code>DOTNET_STARTUP_HOOKS</code> and every name that starts with <code>DYLD_</code> or <code>GIT_</code>, among others. Names are compared without regard to upper or lower case.</p>
+
+<h2 id="notification-url">Default notification URL</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Notification URL</strong></td><td>Which address style links from notifications (e-mail, chat, commit status) use when people click them. Users can override it in their own settings.</td><td><strong>Default</strong>: Buildspawn picks the address style for you. It uses the Pipeline Graph style when that is installed, and the classic style otherwise</td><td><strong>Pipeline Graph</strong>, so a link in a chat message opens the pipeline graph of the run</td></tr>
+  </tbody>
+</table>
+<p>The section is titled <strong>Default notification URL</strong>. The list holds <strong>Default</strong> and one entry for every address style that is installed. A person can pick their own in their user settings, and that choice wins over this one.</p>
+
+<h2 id="env-var-filters">Filter build step environment variables</h2>
+<p>A section for rules that look at, and may change or refuse, the environment variables a build step gets. The rules come from plugins. Buildspawn does not ship a rule of its own, so on a standard server this section is hidden. It shows only when an installed plugin adds at least one rule.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Filter build step environment variables</strong></td><td>The title of the section.</td><td>Hidden</td><td></td></tr>
+    <tr><td><strong>Show global filter rules</strong></td><td>An <strong>Advanced</strong> block. Click it to open the rules.</td><td>Closed</td><td></td></tr>
+    <tr><td><strong>Global filter rules</strong></td><td>The list of rules that are active for every build step on the server. Each rule has its own settings.</td><td>Empty</td><td>Depends on the plugin that provides the rule</td></tr>
+    <tr><td><strong>Add filter rule</strong></td><td>The button that adds a rule. It offers every rule type that a plugin provides.</td><td></td><td></td></tr>
+  </tbody>
+</table>
+<p>To refuse a variable that a build step sets with a service message, use <strong>Let build steps set any environment variable</strong> above instead.</p>
+
+<h2 id="pipeline-libraries">Global Trusted and Untrusted Pipeline Libraries</h2>
+<p>A shared library is a repository of Pipeline code that many Pipelines can use. <strong>Global Trusted Pipeline Libraries</strong> run without the sandbox and may use <code>@Grab</code>. <strong>Global Untrusted Pipeline Libraries</strong> run in the sandbox and cannot use <code>@Grab</code>. Click <strong>Add</strong> for each library. The fields are the same in both sections.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Name</strong></td><td>The name a Pipeline uses in <code>@Library</code>. Buildspawn also sets <code>library.NAME.version</code> to the loaded version.</td><td>Empty</td><td><code>skyforge-build</code></td></tr>
+    <tr><td><strong>Default version</strong></td><td>The version to load when the script does not pick one: a branch, tag or commit.</td><td>Empty</td><td><code>main</code></td></tr>
+    <tr><td><strong>Load implicitly</strong></td><td>Every Pipeline gets the library without <code>@Library</code>.</td><td>Off</td><td>Off</td></tr>
+    <tr><td><strong>Allow default version to be overridden</strong></td><td>A script may pick another version with <code>@name@version</code>.</td><td>On</td><td>On</td></tr>
+    <tr><td><strong>Include @Library changes in job recent changes</strong></td><td>Changes in the library show as changes of the build and trigger builds. A Pipeline file can override it for one use.</td><td>On</td><td>On</td></tr>
+    <tr><td><strong>Cache fetched versions on controller for quick retrieval</strong></td><td>Keeps fetched versions on the server. Sub-fields: <strong>Refresh time in minutes</strong> (0 or less: never refresh), <strong>Versions to exclude</strong> and <strong>Versions to include</strong> (space separated, matched as text parts; exclude wins), <strong>Force clear cache</strong> (delete at once without waiting for running builds), and the <strong>Clear cache</strong> button.</td><td>Off</td><td>Refresh <code>60</code>, include <code>release/</code></td></tr>
+    <tr><td><strong>Retrieval method</strong></td><td>How the code is fetched: <strong>Modern SCM</strong> (pick Git or Perforce and fill in the repository) or <strong>Legacy SCM</strong>.</td><td>None</td><td>Modern SCM › Git</td></tr>
+  </tbody>
+</table>
+
+<h2 id="git">Git</h2>
+<p>Settings of the Git support. See <a href="../version-control/git.html">Git</a>.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Global Config user.name Value</strong></td><td>Sets <code>GIT_COMMITTER_NAME</code> and <code>GIT_AUTHOR_NAME</code> for builds. A build configuration can override it.</td><td>Empty</td><td><code>Buildspawn</code></td></tr>
+    <tr><td><strong>Global Config user.email Value</strong></td><td>Sets <code>GIT_COMMITTER_EMAIL</code> and <code>GIT_AUTHOR_EMAIL</code>.</td><td>Empty</td><td><code>builds@skyforge.example</code></td></tr>
+    <tr><td><strong>Create new accounts based on author/committer's email</strong></td><td>Creates a user account for each author found in a change log. The e-mail address becomes the account ID.</td><td>Off</td><td>Off</td></tr>
+    <tr><td><strong>Use existing account with same email if found</strong></td><td>Looks for a user with the same e-mail address before it creates one.</td><td>Off</td><td>On</td></tr>
+    <tr><td><strong>Show the entire commit summary in changes</strong></td><td>Shows the whole commit message on the changes page instead of cutting it.</td><td>On</td><td>On</td></tr>
+    <tr><td><strong>Hide credential usage in build output</strong></td><td>Does not write the credential ID used to clone into the console log.</td><td>Off</td><td>On</td></tr>
+    <tr><td><strong>Disable performance enhancements</strong></td><td>Turns off the choice of the faster Git client by repository size. Command line Git is then always used when it is installed.</td><td>Off</td><td>Off</td></tr>
+    <tr><td><strong>Preserve second fetch during checkout</strong></td><td>Brings back the second fetch that older versions did on the first checkout. Only for a known fault.</td><td>Off</td><td>Off</td></tr>
+    <tr><td><strong>Add git tag action to build configurations</strong></td><td>Adds the <em>Git Tag</em> action to new builds, which can tag the commit in the agent's workspace. The tag is not pushed anywhere and is lost when the workspace is deleted.</td><td>Off</td><td>Off</td></tr>
+  </tbody>
+</table>
+<p>Git host key checking, Git hooks and the Git API token settings are on the Security page. See <a href="security-settings.html">Security settings</a>.</p>
+
+<h2 id="perforce-p4">Perforce (P4)</h2>
+<p>These sections belong to the Perforce version control support. See <a href="../version-control/perforce.html">Perforce</a>.</p>
+<table>
+  <thead><tr><th>Section</th><th>Field</th><th>What it does</th><th>Default</th></tr></thead>
+  <tbody>
+    <tr><td rowspan="5"><strong>P4: Save Configuration</strong></td><td><strong>Enable Configuration Versioning</strong> › <strong>Enabled</strong></td><td>Saves the settings of build configurations into a Perforce depot, so changes have a history.</td><td>Off</td></tr>
+    <tr><td><strong>P4 Credentials</strong></td><td>The credential used for the depot. Pick one or click <strong>Add</strong>.</td><td>None</td></tr>
+    <tr><td><strong>Workspace name</strong></td><td>The workspace that holds the saved files.</td><td>Empty</td></tr>
+    <tr><td><strong>Depot location</strong></td><td>The depot path where they are saved, for example <code>//depot/buildspawn-config</code>.</td><td>Empty</td></tr>
+    <tr><td><strong>Submit changes automatically</strong> › <strong>Enabled</strong></td><td>Submits each change without asking.</td><td>On</td></tr>
+    <tr><td rowspan="2"><strong>P4: OnDelete Workspace Options</strong></td><td><strong>Delete P4 client</strong></td><td>When a build configuration is deleted, also delete its Perforce workspace spec.</td><td>On</td></tr>
+    <tr><td><strong>Delete Workspace files</strong></td><td>Also delete the files in the workspace folder.</td><td>On</td></tr>
+    <tr><td><strong>P4: Secure P4_TICKET</strong></td><td><strong>Hide TICKET</strong></td><td>Keeps the Perforce ticket out of the build environment that people can see.</td><td>Off</td></tr>
+    <tr><td rowspan="3"><strong>P4: Query limits</strong></td><td><strong>Maximum number of files shown in a changelist</strong></td><td>Longer lists are cut.</td><td>50</td></tr>
+    <tr><td><strong>Maximum number of changes shown in a build</strong></td><td>Longer lists of changes are cut.</td><td>20</td></tr>
+    <tr><td><strong>Head change query limit</strong></td><td>How many changes are looked at when finding the latest one.</td><td>1000</td></tr>
+    <tr><td rowspan="2"><strong>P4: Reporting</strong></td><td><strong>Report Changes since last successful build</strong></td><td>A build lists all changes since the last successful build, not only since the last build.</td><td>Off</td></tr>
+    <tr><td><strong>Hide Server Messages for all P4 commands</strong></td><td>Leaves the server's messages out of the console log.</td><td>Off</td></tr>
+    <tr><td><strong>P4: Polling</strong></td><td><strong>Use recursion to find a previous build during polling</strong></td><td>Checks more than the previous build to find a base for polling.</td><td>Off</td></tr>
+  </tbody>
+</table>
+<p>Perforce roots and Swarm servers have their own pages, <a href="management-pages.html#perforce-roots">Perforce roots</a> and <a href="../version-control/perforce-connections.html">Perforce connections</a>. They add no fields to this page.</p>
+
+<h2 id="shell">Shell</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Shell executable</strong></td><td>The program used by shell script steps. Normally leave it empty and let Buildspawn find the right one. Set a full path only when <code>sh</code> is outside the search path. See <a href="../build-steps/shell-script.html">Shell script</a>.</td><td>Empty</td><td><code>C:\Program Files\Git\bin\sh.exe</code></td></tr>
+  </tbody>
+</table>
+
+<h2 id="email">E-mail Notification</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>SMTP server</strong></td><td>The mail server that sends build e-mails.</td><td>Empty (uses the local machine)</td><td><code>smtp.skyforge.example</code></td></tr>
+    <tr><td><strong>Default user e-mail suffix</strong></td><td>Added to a user name to make an address when the user has none.</td><td>Empty</td><td><code>@skyforge.example</code></td></tr>
+    <tr><td><strong>Use SMTP Authentication</strong> › <strong>User Name</strong>, <strong>Password</strong></td><td>Sign in to the mail server (under <strong>More options</strong>).</td><td>Off</td><td>User <code>buildbot</code></td></tr>
+    <tr><td><strong>Use SSL</strong>, <strong>Use TLS</strong></td><td>Encrypt the connection.</td><td>Off</td><td>TLS on</td></tr>
+    <tr><td><strong>SMTP Port</strong></td><td>The mail server port.</td><td>25 (465 with SSL)</td><td><code>587</code></td></tr>
+    <tr><td><strong>Reply-To Address</strong></td><td>Where replies go.</td><td>Empty</td><td><code>build-team@skyforge.example</code></td></tr>
+    <tr><td><strong>Charset</strong></td><td>The character set of the e-mails.</td><td>UTF-8</td><td><code>UTF-8</code></td></tr>
+    <tr><td><strong>Test configuration by sending test e-mail</strong></td><td>Type a <strong>Test e-mail recipient</strong> and click <strong>Test configuration</strong>.</td><td>Off</td><td><code>you@skyforge.example</code></td></tr>
+  </tbody>
+</table>
+
+<h2 id="publish-over">Publish over CIFS, FTP and SSH</h2>
+<p>These sections hold the servers that the publish steps send files to. Each section has an <strong>Add</strong> button for a new server, a <strong>Test Configuration</strong> button for each server, and a <strong>Publisher defaults</strong> block under <strong>More options</strong> (<strong>Configure defaults</strong> or <strong>Use plugin defaults</strong>).</p>
+
+<h3>Publish over CIFS</h3>
+<p>A CIFS share is a Windows file share. Each entry under <strong>CIFS Shares</strong> has:</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Name</strong></td><td>The name steps use to pick this share.</td></tr>
+    <tr><td><strong>Hostname</strong>, <strong>Username</strong>, <strong>Password</strong></td><td>Where the share is and how to sign in.</td></tr>
+    <tr><td><strong>Share</strong></td><td>The share name on the host.</td></tr>
+    <tr><td><strong>Port</strong>, <strong>Timeout (ms)</strong>, <strong>Buffer size (Bytes)</strong></td><td>Connection details, under <strong>More options</strong>.</td></tr>
+    <tr><td><strong>SMB Version</strong></td><td>SMB v1/CIFS, SMB v2 or SMB v3.</td></tr>
+  </tbody>
+</table>
+
+<h3>Publish over FTP</h3>
+<p>Each entry under <strong>FTP Servers</strong> has:</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Name</strong>, <strong>Hostname</strong>, <strong>Username</strong>, <strong>Password</strong>, <strong>Remote Directory</strong></td><td>The server, the sign-in, and the folder that files go to.</td></tr>
+    <tr><td><strong>Secure connection</strong>, <strong>Data channel protection</strong>, <strong>Authentication method</strong></td><td>The encryption choices for FTPS.</td></tr>
+    <tr><td><strong>Port</strong>, <strong>Timeout (ms)</strong></td><td>Connection details, under <strong>More options</strong>.</td></tr>
+    <tr><td><strong>FTP mode</strong></td><td>Passive or active.</td></tr>
+    <tr><td><strong>Don't make nested dirs</strong></td><td>Does not create sub-folders on the server.</td></tr>
+    <tr><td><strong>Control encoding</strong></td><td>The text encoding of FTP commands.</td></tr>
+    <tr><td><strong>Disables Remote Verification</strong>, <strong>Trusted Certificate</strong></td><td>Skip the check of the server certificate, or name the certificate you trust.</td></tr>
+  </tbody>
+</table>
+
+<h3>SSH servers</h3>
+<p>The servers that the SSH Exec and SSH Upload steps connect to. Host keys are always checked. The common settings at the top of the section are used by every server that does not pick its own:</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Buildspawn SSH Key</strong> › <strong>Passphrase</strong>, <strong>Path to key</strong>, <strong>Key</strong></td><td>A shared key. The passphrase and the key are stored encrypted and shown as concealed.</td></tr>
+    <tr><td><strong>Disable exec</strong></td><td>Stops the SSH Exec step from running commands.</td></tr>
+  </tbody>
+</table>
+<p>Each entry under <strong>SSH Servers</strong> has:</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Name</strong>, <strong>Hostname</strong>, <strong>Username</strong>, <strong>Remote Directory</strong></td><td>The server and the folder that files go to.</td></tr>
+    <tr><td><strong>Transport protocol</strong></td><td>SFTP (default) or SCP.</td></tr>
+    <tr><td><strong>Known host keys</strong></td><td>The host keys you trust for this server.</td></tr>
+    <tr><td><strong>Avoid sending files that have not changed</strong></td><td>Skips files that are already the same on the server.</td></tr>
+    <tr><td><strong>Choose how to authenticate</strong> › <strong>Authentication method</strong>, <strong>Uploaded key (credentials)</strong>, <strong>Passphrase / Password</strong>, <strong>Path to key</strong>, <strong>Key</strong></td><td>A key or password for this server only, under <strong>More options</strong>. The path to a key is a path on the agent.</td></tr>
+    <tr><td><strong>Jump host</strong></td><td>Connect through another SSH host.</td></tr>
+    <tr><td><strong>Port</strong>, <strong>Timeout (ms)</strong>, <strong>SFTP Pipeline Depth</strong>, <strong>Disable exec</strong></td><td>Connection details.</td></tr>
+    <tr><td><strong>Proxy type</strong>, <strong>Proxy host</strong>, <strong>Proxy port</strong>, <strong>Proxy user</strong>, <strong>Proxy password</strong></td><td>Reach the server through an HTTP, SOCKS4 or SOCKS5 proxy.</td></tr>
+  </tbody>
+</table>
+<div class="callout tip"><p>Click <strong>Test Configuration</strong> on a server before you use it in a step. It tries to connect with the values on screen.</p></div>
+
+<h2 id="scm-polling">SCM Polling</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Max # of concurrent polling</strong></td><td>How many version control polls run at the same time. Raise it when polls wait in a line; lower it when your version control server is slow. Leave it empty for the built-in value.</td><td>Empty</td><td><code>8</code></td></tr>
+  </tbody>
+</table>
+<p>The current polling activity is shown on its own page, linked from the build configuration's polling log.</p>
+
+<h2 id="elsewhere">Where every other global setting lives</h2>
+<p>Some settings of the server do not appear on the System page. The table says where each one is, and which rows show nothing to the user.</p>
+<table>
+  <thead><tr><th>Setting</th><th>Where to find it</th></tr></thead>
+  <tbody>
+    <tr><td>Themes, Icon colour favourites, Pipeline Stages and Pipeline Graph, Prism syntax highlighting theme</td><td><a href="appearance.html">Appearance</a></td></tr>
+    <tr><td>Crumb issuer (request forgery protection), Content Security Policy, API token settings (core and Git), queue item authenticator, script approval, project roles note, Resource Root URL, build environment filters, Git host key verification</td><td><a href="security-settings.html">Security settings</a>, <a href="roles.html">Roles</a></td></tr>
+    <tr><td>Git hooks, Update site warnings, Prism permitted source directories and source code protection</td><td>The Security page. See <a href="security-settings.html">Security settings</a>.</td></tr>
+    <tr><td>Credential providers and types, restrictions</td><td><a href="management-pages.html#credential-providers">Credential Providers</a></td></tr>
+    <tr><td>Maven default settings and global settings provider</td><td><a href="tools.html#maven">Tools › Maven</a></td></tr>
+    <tr><td>Agent pools, Pool scheduler, Agent registration, Personal machines, Agent environment variables, Computer retention interval, Global node properties</td><td><a href="../agents/pools.html">Pools</a>, <a href="../agents/pool-scheduler.html">Pool scheduler</a>, <a href="../agents/agent-settings.html">Agent settings</a>, <a href="../agents/personal-agents.html">Personal agents</a></td></tr>
+    <tr><td>Perforce roots, Swarm servers</td><td>Own pages. See <a href="management-pages.html#perforce-roots">Perforce roots</a>. They have no fields on the System page.</td></tr>
+    <tr><td>Global plugin configuration, Artifact manager, JUnit test result storage, Fingerprint storage, Views tab bars, Console URL provider</td><td>Nothing to set with the plugins that ship with Buildspawn. They only show a field when a second option is installed.</td></tr>
+  </tbody>
+</table>
+
+<h2>What you see when it works</h2>
+<ul>
+  <li>After <strong>Save</strong> you return to the Manage page. After <strong>Apply</strong> a short <em>Saved</em> message shows and you stay on the page.</li>
+  <li>A build in its quiet period waits in the queue and starts when the time is over.</li>
+  <li>A name that breaks the naming rule shows your <strong>Description</strong> as the error when you create the build configuration.</li>
+</ul>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>A message says the reverse proxy set up is broken.</td><td>Set <strong>Buildspawn URL</strong> to the address people really use, including any path.</td></tr>
+    <tr><td>Fields cannot be edited.</td><td>You only have the System read permission. Ask for the Manage permission.</td></tr>
+    <tr><td>Save refuses a value.</td><td>The field shows a red message. Typical causes: the retention interval is outside 1 to 60, the name pattern is not a valid regular expression, or the proxy port is above 65535.</td></tr>
+    <tr><td>A warning keeps coming back after you hide it.</td><td>Hide it with its tick box under <strong>Administrative monitors</strong>, then Save.</td></tr>
+    <tr><td>The global time-out does not stop one build configuration.</td><td>That build configuration has its own time-out and <strong>Are individual jobs allowed to overwrite this global timeout?</strong> is on.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="settings-overview.html">Settings overview</a></li>
+  <li><a href="management-pages.html">Management pages</a></li>
+  <li><a href="tools.html">Tools</a></li>
+  <li><a href="security-settings.html">Security settings</a></li>
+  <li><a href="appearance.html">Appearance</a></li>
+  <li><a href="../agents/agent-settings.html">Agent settings</a></li>
+</ul>
+</main>
+</body>
+</html>

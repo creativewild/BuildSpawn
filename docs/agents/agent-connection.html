@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Connect an agent · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="agents/agent-connection">
+<main class="doc">
+<h1>Connect an agent</h1>
+<p class="lead">An agent connects to the server from its own machine. This page explains how that connection works, the settings file that controls it, and the options for WebSocket, TCP, proxies and Java.</p>
+
+<h2>When to use it</h2>
+<p>Read this page when an agent will not connect, when it must pass a company proxy or firewall, when you need to give the agent more memory, or when you want to know what is in <code>conf/buildspawn-agent.properties</code>.</p>
+
+<h2>How the connection works</h2>
+<ul>
+  <li><strong>The agent calls the server.</strong> This is the <em>inbound agent</em> (<strong>Launch agent by connecting it to the controller</strong>). The server never needs to reach the agent, so the agent can sit behind a router or a company firewall. It only needs to reach the server's address.</li>
+  <li>The agent starts with the server address and one of two ways to prove who it is: a <strong>secret</strong> (an agent made with <strong>New Node</strong>), or a <strong>registration request</strong> that an administrator approves (see <a href="install-agent.html">Install an agent</a>). After approval, the secret is written into the settings file for you.</li>
+  <li>The connection is a <strong>WebSocket</strong> by default. A WebSocket is a normal web connection on the same address and port as the Buildspawn pages. No extra port is needed.</li>
+  <li>If the connection drops, the agent tries again by itself. The <a href="windows-tray-app.html">tray app</a> and the <a href="agent-terminal.html">terminal program</a> show the reason in their <strong>Connection log</strong>.</li>
+</ul>
+
+<h2>WebSocket or TCP</h2>
+<table>
+  <thead><tr><th></th><th>WebSocket</th><th>TCP</th></tr></thead>
+  <tbody>
+    <tr><td>How</td><td>Uses the server's web address and port.</td><td>A separate port on the server for agents (<strong>Settings › Security</strong>, <em>TCP port for inbound agents</em>).</td></tr>
+    <tr><td>Default</td><td>Yes.</td><td>No. Used only when you turn WebSocket off.</td></tr>
+    <tr><td>Firewalls and proxies</td><td>Works wherever the web pages work, if the proxy allows WebSocket.</td><td>Needs the extra port to be open.</td></tr>
+    <tr><td>Turn it off with</td><td>—</td><td><code>webSocket=false</code> in the settings file, or leave out <code>-webSocket</code> on the command line.</td></tr>
+  </tbody>
+</table>
+<p>When the server has the TCP port turned off, an agent that asks for TCP <strong>switches to WebSocket by itself</strong>. To forbid that switch, set <code>webSocketFallback=false</code> in the settings file, or add <code>-noWebSocketFallback</code> to a command-line agent. Then an agent that cannot use TCP simply fails, and says why.</p>
+<p>The agent page on the server, <strong>Connect the agent</strong>, shows a notice when the TCP port is off (<em>The TCP port is disabled so TCP agents may not be connected. You may still use WebSocket agents.</em>) and the command with <code>-webSocket</code> in it. See <a href="../administration/security-settings.html">Security settings</a>.</p>
+
+<h2>The settings file</h2>
+<p>Every agent folder holds <code>conf/buildspawn-agent.properties</code>. It is a plain text file with one <code>key=value</code> per line. Lines that start with <code>#</code> are comments. Keep it private: it holds the agent's secret. The install scripts lock it to the service account.</p>
+<table>
+  <thead><tr><th>Key</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><code>serverUrl</code></td><td>Address of the server. Required. It must start with <code>http://</code> or <code>https://</code>. A closing <code>/</code> is added if missing.</td><td>empty (the zip for one agent fills it in)</td><td><code>https://buildspawn.studio.example/</code></td></tr>
+    <tr><td><code>name</code></td><td>The agent's name.</td><td>The machine's host name</td><td><code>win-build-04</code></td></tr>
+    <tr><td><code>registrationToken</code></td><td>Token that the server may require for self-registration. See below.</td><td>empty</td><td><code>k3J9x…</code></td></tr>
+    <tr><td><code>workDir</code></td><td>The agent's work folder. A relative path starts at the agent folder.</td><td><code>work</code></td><td><code>D:\agent-work</code></td></tr>
+    <tr><td><code>secret</code></td><td>The agent's secret. Written for you after approval, or by the zip made for one agent. Do not share it.</td><td>empty</td><td>(never type it into a ticket)</td></tr>
+    <tr><td><code>javaOptions</code></td><td>Extra options for Java, such as memory. Read at every start of <code>run-agent</code>. A service uses them after its next start; on Windows (and in the Linux and macOS service definitions) run <code>install-service</code> again after you change it.</td><td>empty</td><td><code>-Xmx4g</code></td></tr>
+    <tr><td><code>proxy</code></td><td>Connect through a web proxy: <code>host:port</code> or <code>http://user:pass@host:port</code>. The port defaults to 8080.</td><td>none</td><td><code>proxy.studio.example:3128</code></td></tr>
+    <tr><td><code>webSocket</code></td><td><code>true</code> or <code>false</code>. <code>false</code> uses the plain TCP connection.</td><td><code>true</code></td><td><code>false</code></td></tr>
+    <tr><td><code>webSocketFallback</code></td><td><code>false</code> stops the automatic switch to WebSocket when the TCP port is off (the same as <code>-noWebSocketFallback</code>).</td><td>on</td><td><code>false</code></td></tr>
+  </tbody>
+</table>
+<p>The agent also writes two keys of its own while it waits for approval, <code>registrationKey</code> and <code>registrationId</code>. Leave them alone.</p>
+<p>The tray app and the terminal program edit <code>serverUrl</code>, <code>name</code>, <code>workDir</code>, <code>javaOptions</code>, <code>proxy</code> and <code>webSocket</code> for you. A change applies after the agent restarts.</p>
+
+<h3>Start-up options</h3>
+<p><code>run-agent</code> and the service pass these to the agent. They override the file.</p>
+<table>
+  <thead><tr><th>Option</th><th>Same as key</th></tr></thead>
+  <tbody>
+    <tr><td><code>--url URL</code></td><td><code>serverUrl</code></td></tr>
+    <tr><td><code>--name NAME</code></td><td><code>name</code></td></tr>
+    <tr><td><code>--token TOKEN</code></td><td><code>registrationToken</code></td></tr>
+    <tr><td><code>--work-dir DIR</code></td><td><code>workDir</code></td></tr>
+    <tr><td><code>--config FILE</code></td><td>Use another settings file.</td></tr>
+  </tbody>
+</table>
+
+<h2 id="registration-token">Registration token</h2>
+<p>An agent that you did not create with <strong>New Node</strong> asks to join and waits under the <strong>Unauthorized</strong> tab until an administrator approves it. To control who may even ask, an administrator can require a token on the <strong>Agent registration</strong> page: turn on <strong>Require a registration token</strong>. The token has <strong>Show</strong>, <strong>Hide</strong>, <strong>Copy</strong> and <strong>Regenerate</strong>.</p>
+<ol class="steps">
+  <li>Open <strong>Settings › Agent registration</strong> (or <strong>Install agents › Agent registration</strong> on the Agents page).</li>
+  <li>Under <strong>Registration token</strong>, tick <strong>Require a registration token</strong>, click <strong>Copy</strong>.</li>
+  <li>On the agent machine, put <code>registrationToken=THE-TOKEN</code> in the settings file, or run <code>install-service --token THE-TOKEN</code>, or <code>run-agent --token THE-TOKEN</code>.</li>
+</ol>
+<p>Without the right token the server refuses the request (<em>The registration token is missing or wrong.</em>) and lists nothing. <strong>Regenerate</strong> makes a new token. Agents that use the old token are refused from then on. Agents that are already approved, and agents waiting under <strong>Unauthorized</strong>, are not removed. The token guards who may ask, not what an approved agent may do.</p>
+
+<h2>Command-line agent</h2>
+<p>Instead of the zip you can run the bare <code>agent.jar</code>, for containers or other custom setups. It needs Java 17 or later. On the agent's page, <strong>Or connect with a command</strong> shows the command with your server's address, the agent's name and its secret (hidden until you click <strong>Show secret</strong>; <strong>Copy</strong> copies the full command):</p>
+<pre><code>curl -sO https://buildspawn.studio.example/jnlpJars/agent.jar
+java -jar agent.jar -url https://buildspawn.studio.example/ -secret SECRET -name "win-build-04" -webSocket -workDir "D:/agent-work"</code></pre>
+<p>On PowerShell use <code>curl.exe</code>, not <code>curl</code>. Remove <code>-webSocket</code> to use TCP. Useful options:</p>
+<table>
+  <thead><tr><th>Option</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>-url URL</code>, <code>-name NAME</code>, <code>-secret SECRET</code></td><td>Server, agent name and secret.</td></tr>
+    <tr><td><code>-webSocket</code></td><td>Connect over WebSocket.</td></tr>
+    <tr><td><code>-noWebSocketFallback</code></td><td>Do not switch to WebSocket by itself when the server's TCP port is off.</td></tr>
+    <tr><td><code>-webSocketHeader NAME=VALUE</code></td><td>Add a header to the WebSocket request, for a reverse proxy that needs one. Repeat it for several headers.</td></tr>
+    <tr><td><code>-proxyCredentials USER:PASS</code></td><td>Sign in to a web proxy.</td></tr>
+    <tr><td><code>-tunnel HOST:PORT</code></td><td>Reach the TCP port through a tunnel.</td></tr>
+    <tr><td><code>-workDir DIR</code></td><td>The work folder.</td></tr>
+    <tr><td><code>-cert FILE</code></td><td>Trust the server's certificate from a file. See <a href="../administration/trusted-certificates.html">Trusted certificates</a>.</td></tr>
+  </tbody>
+</table>
+<p>Run <code>java -jar agent.jar -help</code> for the full list.</p>
+
+<h2>A worked example</h2>
+<p>The studio's build machines sit behind a proxy and the Java heap must be bigger.</p>
+<ol class="steps">
+  <li>Open <code>C:\buildspawn-agent\conf\buildspawn-agent.properties</code> in a text editor.</li>
+  <li>Add <code>proxy=proxy.studio.example:3128</code> and <code>javaOptions=-Xmx6g</code>.</li>
+  <li>From an administrator prompt in that folder, run <code>install-service.bat</code>. It writes the new Java options into the service definition and starts the service again.</li>
+  <li>Watch the <strong>Connection log</strong> in the tray app. It shows <em>Connected</em>.</li>
+</ol>
+
+<h2>What you see when it runs</h2>
+<ul>
+  <li>The first lines in the log: <em>Starting Buildspawn agent 'win-build-04' for https://…/</em>.</li>
+  <li>A self-registering agent prints <em>Registered agent 'win-build-04'</em> and waits. After approval: <em>Agent authorized as 'win-build-04'. Configuration saved.</em></li>
+  <li>On the Agents page the agent turns <strong>Idle</strong>. Its connection log says <em>protocol WebSocket</em>.</li>
+</ul>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><em>serverUrl is not set</em></td><td>Fill in <code>serverUrl</code> or pass <code>--url</code>.</td></tr>
+    <tr><td><em>Cannot reach … retrying</em></td><td>The machine cannot open the server's address. Test it in a browser. Check the firewall and the <code>proxy</code> key.</td></tr>
+    <tr><td><em>Registration refused: agent name 'x' is already in use</em></td><td>Choose another name with <code>--name</code>.</td></tr>
+    <tr><td><em>Agent rejected by the administrator</em></td><td>An administrator pressed <strong>Reject</strong>. Ask why, then start again with another name. Rejected agents are listed for 30 days.</td></tr>
+    <tr><td><em>The registration token is missing or wrong.</em></td><td>Copy the current token from the Agent registration page.</td></tr>
+    <tr><td><em>Secret rejected by the server</em></td><td>The agent was removed, or its secret was replaced. Download a new zip for it.</td></tr>
+    <tr><td>Works with TCP, not through a proxy.</td><td>Use WebSocket, and make sure the proxy lets WebSocket through. Add <code>-webSocketHeader</code> if the proxy needs a header.</td></tr>
+    <tr><td>Certificate errors on an <code>https</code> server with a company certificate.</td><td>Add the company certificate (see <a href="../administration/trusted-certificates.html">Trusted certificates</a>).</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="install-agent.html">Install an agent</a></li>
+  <li><a href="windows-service.html">Agent service scripts</a></li>
+  <li><a href="agent-settings.html">Agent settings</a></li>
+  <li><a href="../administration/trusted-certificates.html">Trusted certificates</a></li>
+</ul>
+</main>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Move a build configuration · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/projects-move-build-configuration">
+<main class="doc">
+<h1>Move a build configuration</h1>
+<p class="lead">Move a build configuration to another project and know what will change before it does.</p>
+<p>The studio moves <strong>Windows Build</strong> from <strong>Skyforge</strong> to <strong>Skyforge/Main</strong>. It keeps its builds, settings and ID.</p>
+<h2>Before you start</h2>
+<ul>
+  <li>The <strong>Configure</strong> permission on the build configuration and the <strong>Create</strong> permission on the destination.</li>
+  <li>No build of it is running.</li>
+</ul>
+<h2>Steps</h2>
+<h3>Move it</h3>
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Move</strong>.</li>
+  <li>Under <strong>Move to</strong> choose <strong>Skyforge » Main</strong>.</li>
+  <li>Click <strong>Move</strong>.</li>
+  <li>If the page lists problems, read them. Each one is a setting that will change because the new project passes down other things. Click <strong>Move anyway</strong> only if that is fine.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/projects/move-page.png" alt="The Move page">
+  <figcaption>The Move page.</figcaption>
+</figure>
+<h3>Fix what changed</h3>
+<ol class="steps">
+  <li>Open <strong>Settings › Parameters</strong> and check the <strong>Defined in</strong> column.</li>
+  <li>Add the parameters it lost to the new project, or to the build configuration.</li>
+  <li>Open <strong>More › Dependencies</strong> and check that the dependencies still point to the right build configurations.</li>
+</ol>
+<h2>Check it worked</h2>
+<ol class="steps">
+  <li>The build configuration shows in the new project in the tree. Its ID is unchanged.</li>
+  <li>The old address no longer works. The address <code>/buildConfiguration/&lt;id&gt;</code> still does.</li>
+  <li>Run it once.</li>
+</ol>
+<h2>Troubleshooting</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>Move is refused: a build is running</td><td>Stop it or wait, then move.</td></tr>
+    <tr><td>Move is refused: the destination is archived</td><td>Unarchive the destination first.</td></tr>
+    <tr><td>Move is refused: a template is in use</td><td>Detach the build configurations from the template first.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../projects/project-move-delete.html">Rename, move and delete</a></li>
+  <li><a href="../projects/project-ids.html">IDs</a></li>
+</ul>
+</main>
+</body>
+</html>

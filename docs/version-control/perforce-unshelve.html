@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Perforce: Unshelve · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="version-control/perforce-unshelve">
+<main class="doc">
+<h1>Perforce: Unshelve</h1>
+<p class="lead">A build step that puts a shelved Perforce changelist into the build's workspace, so the build tests a change that is not submitted yet.</p>
+
+<h2>When to use it</h2>
+<p>Use it when a build configuration uses the <a href="perforce-software.html">Perforce Software</a> version control and a build must test a shelf you name, for example from a build parameter. For a build configuration that uses a <a href="perforce-roots.html">Perforce root</a>, use <a href="perforce-root-unshelve.html">Perforce root: unshelve</a> instead. To test a shelf by hand, the <strong>Shelved changes</strong> tab of the Run dialog is easier. See <a href="perforce-shelves.html">Shelves</a>.</p>
+<p>A <strong>shelf</strong> is a set of files stored on the Perforce server but not submitted. <strong>Unshelve</strong> copies them into your workspace.</p>
+
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Build steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>, type <code>Unshelve</code> in <strong>Filter step types</strong> and click <strong>Perforce: Unshelve</strong>.</li>
+  <li>Fill in the fields below.</li>
+  <li>Make sure the step comes after the sync. The sync happens before all steps, so any position works. Put it before the compile step.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/version-control/perforce-unshelve.png" alt="The Perforce: Unshelve step form"><figcaption>The Perforce: Unshelve step.</figcaption></figure>
+
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Unshelve Changelist</strong></td><td>The number of the shelved changelist. Build parameters can be used.</td><td>Empty</td><td><code>${SHELF}</code></td></tr>
+    <tr><td><strong>Resolve Options</strong></td><td>What to do when a shelved file also changed in the workspace. <strong>Resolve: None</strong> does not resolve. <strong>Safe (-as)</strong> resolves only files with no conflict. <strong>Merge (-am)</strong> merges what it can. <strong>Force Merge (-af)</strong> merges and leaves conflict marks. <strong>Yours (-ay)</strong> keeps your edits. <strong>Theirs (-at)</strong> keeps the shelf content.</td><td>The first in the list</td><td>Resolve: Safe (-as)</td></tr>
+    <tr><td><strong>Clean up Review actions</strong></td><td>Removes review actions the unshelve left behind.</td><td>Off</td><td>Off</td></tr>
+    <tr><td><strong>Ignore this step if ChangeList value not set.</strong></td><td>If the changelist field is empty after parameters are filled in, the step does nothing and succeeds. Without it, an empty value fails the step.</td><td>Off</td><td>On</td></tr>
+  </tbody>
+</table>
+
+<h2>A worked example</h2>
+<p>The Skyforge team has a build parameter <code>SHELF</code> on <strong>Windows Build</strong>. Artists leave it empty for normal builds. A programmer who wants to test a shelf types its number.</p>
+<table>
+  <tbody>
+    <tr><td><strong>Unshelve Changelist</strong></td><td><code>${SHELF}</code></td></tr>
+    <tr><td><strong>Resolve Options</strong></td><td>Resolve: Safe (-as)</td></tr>
+    <tr><td><strong>Ignore this step if ChangeList value not set.</strong></td><td>On</td></tr>
+  </tbody>
+</table>
+
+<h2>What you see when it runs</h2>
+<p>The log shows the Perforce unshelve and the resolve. The changes of the build then list the shelved changelist first, followed by the changelists since the last build.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>You see</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>The step fails at once, with a number error</td><td>The field is empty or not a number, and <strong>Ignore this step if ChangeList value not set</strong> is off. Fill it in or tick the box.</td></tr>
+    <tr><td>The step fails on a build configuration with a Perforce root</td><td>Use <a href="perforce-root-unshelve.html">Perforce root: unshelve</a>.</td></tr>
+    <tr><td>Files stay in conflict</td><td>Choose a different <strong>Resolve Options</strong>, or bring the shelf up to date and shelve it again.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="perforce-root-unshelve.html">Perforce root: unshelve</a></li>
+  <li><a href="perforce-operations.html">Perforce operations</a> (Unshelve operation)</li>
+  <li><a href="perforce-shelves.html">Shelves</a>, <a href="../how-to/check-shelf-before-submit.html">Test a shelved change before you submit</a></li>
+</ul>
+</main>
+</body>
+</html>

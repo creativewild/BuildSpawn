@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Release notes · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="reference/release-notes">
+<main class="doc">
+<h1>Release notes</h1>
+<p class="lead">What each version of Buildspawn added or fixed, from 1.0 to 1.9.3, newest first.</p>
+
+<p>Installing a newer version over an older one always keeps your settings and data. Back up the data folder first. See <a href="../administration/backups.html">Backups and upgrades</a>. Every release includes everything in the older ones. Java 21 (Eclipse Temurin 21.0.13.1) is included in every server package and agent download since 1.4.</p>
+
+<table>
+  <thead><tr><th>Version</th><th>Build</th><th>Main theme</th></tr></thead>
+  <tbody>
+    <tr><td><a href="#v1-9-3">1.9.3</a></td><td>2.589-buildspawn.21</td><td>Fix: Resume from a step works with Perforce</td></tr>
+    <tr><td><a href="#v1-9-2">1.9.2</a></td><td>2.589-buildspawn.20</td><td>Two security fixes, agent tray app and terminal screen with a Certificates view, Windows service files</td></tr>
+    <tr><td><a href="#v1-9-1">1.9.1</a></td><td>2.589-buildspawn.19</td><td>Statistics charts fit their cards and redraw</td></tr>
+    <tr><td><a href="#v1-9">1.9</a></td><td>2.589-buildspawn.18</td><td>Trusted certificates, build name and status text, resizable sidebar</td></tr>
+    <tr><td><a href="#v1-8">1.8</a></td><td>2.589-buildspawn.17</td><td>Steam and Epic Games Store steps, values passed along build chains, project order, view mappings as a table</td></tr>
+    <tr><td><a href="#v1-7">1.7</a></td><td>2.589-buildspawn.16</td><td>Matrix blocks, Perforce operations step, agent parameters, new New Item page, new sign-in page</td></tr>
+    <tr><td><a href="#v1-6">1.6</a></td><td>2.589-buildspawn.15</td><td>Personal machines, agent terminal screen and tray app, new form layout on every settings page</td></tr>
+    <tr><td><a href="#v1-5">1.5</a></td><td>2.589-buildspawn.14</td><td>Fixes: parallel sides, Unstable steps, dialogs, Add parameter, Perforce checks, clearer wording</td></tr>
+    <tr><td><a href="#v1-4">1.4</a></td><td>2.589-buildspawn.13</td><td>Agents page, telemetry, pool icons and the Pool Scheduler, agents with Java included</td></tr>
+    <tr><td><a href="#v1-3">1.3</a></td><td>2.589-buildspawn.10 to .12</td><td>Test builds only; their changes are in 1.4</td></tr>
+    <tr><td><a href="#v1-2">1.2</a></td><td>2.589-buildspawn.9</td><td>The visual editor, parallel blocks, resume and retry, one Parameters tab, the terminal program</td></tr>
+    <tr><td><a href="#v1-1">1.1</a></td><td>2.589-buildspawn.8</td><td>New look, the build console with blocks and times, Linux and macOS packages</td></tr>
+    <tr><td><a href="#v1-0">1.0</a></td><td>2.589-buildspawn.5 to .7</td><td>The first release: projects, build configurations, Perforce, agents, Windows setup</td></tr>
+  </tbody>
+</table>
+
+<h2 id="v1-9-3">1.9.3</h2>
+<p>Build 2.589-buildspawn.21. Install it over 1.9.2, 1.9.1, 1.9 or 1.8.</p>
+<h3>Fixes</h3>
+<ul>
+  <li><strong>Resume from a step works with Perforce.</strong> Before, resuming a build of a build configuration with a Perforce root failed at its first step with a <code>NullPointerException</code>. The source records taken over from the failed build (the changelist, the credential and the login ticket) now belong to the resumed build. Git roots that tag builds are fixed the same way. See <a href="../running-builds/resume.html">Resume a build</a>.</li>
+</ul>
+<h3>Checked</h3>
+<ul>
+  <li>12 resume tests, including a new one for this case.</li>
+  <li>The server starts with no SEVERE lines in its log. Every agent download was compared with the tools built for it.</li>
+  <li>The Linux and macOS packages passed their package test with 0 failures.</li>
+</ul>
+
+<h2 id="v1-9-2">1.9.2</h2>
+<p>Build 2.589-buildspawn.20.</p>
+<h3>Security</h3>
+<ul>
+  <li><strong>Script Security 1436.1438.v3dc5ef7d16f2-buildspawn</strong> fixes a sandbox bypass through a partly written <code>@Builder</code> annotation name (SECURITY-4278).</li>
+  <li><strong>Pipeline: Groovy 4403.4405.va_b_cdb_b_d0b_89f-buildspawn</strong> fixes a sandbox bypass through field values in interfaces (SECURITY-4152).</li>
+  <li>The notice <em>Warnings have been published</em> for these two goes away.</li>
+</ul>
+<h3>Agents</h3>
+<p>Download the agent again from the server (<strong>New agent</strong> page) or copy the new files over the agent folder. The agent's settings and registration (<code>conf\buildspawn-agent.properties</code>) do not change.</p>
+<ul>
+  <li><strong>Windows tray app (<code>bin\Buildspawn Agent.exe</code>):</strong> the <strong>Certificates</strong> tab is there. In 1.9 and 1.9.1 the agent download still carried the old tray app without it, although the agent did receive the server's certificates. The old tray app could also fail to start on some machines; this one starts. When the tray starts the agent, what the agent prints goes to <code>logs\run-agent.log</code>, and unexpected errors of the tray app go to <code>logs\tray.log</code>.</li>
+  <li><strong>Terminal screen (<code>buildspawn-agent-tui</code>, every system):</strong> a new view 8, <strong>Certificates</strong>, shows the certificates from the server and the ones added on that machine. You can add a certificate file, remove one, see its details, switch the Windows certificate store and restart the agent. A new command <code>buildspawn-agent-tui certs list | add FILE | remove FINGERPRINT-OR-NAME | windows-store on|off</code> is for machines without a screen.</li>
+  <li><strong>Windows service:</strong> the download now includes the service definition (<code>bin\buildspawn-agent-service.xml</code>). Without it the service wrapper stopped with only <em>Unhandled exception</em> in the event log and no log file. <code>install-service.bat</code> can be run again on a machine where the service exists, for example after moving the agent folder. <code>uninstall-service.bat</code> and <code>stop-agent.bat</code> also work when the service definition is missing.</li>
+</ul>
+<h3>Checked</h3>
+<ul>
+  <li>Every agent download was opened and compared with the tools built for it: tray app, terminal screen and service files.</li>
+  <li>The server starts with 0 SEVERE lines. The Linux and macOS packages passed their test with 0 failures (64 checks).</li>
+</ul>
+
+<h2 id="v1-9-1">1.9.1</h2>
+<p>Build 2.589-buildspawn.19. Fixes only, on the <a href="../build-results/statistics.html">Statistics tab</a>.</p>
+<ul>
+  <li>The charts fit inside their cards at every desktop size, Windows scaling and sidebar width. They were about 12 pixels too wide everywhere.</li>
+  <li>The charts redraw when the page gets narrower: when its scrollbar appears, or when you resize or fold the sidebar.</li>
+  <li>The axis labels are readable. Before, a light outline made them look washed out.</li>
+  <li>For short ranges the date axis shows times, and it never repeats the same label.</li>
+</ul>
+<p>25 main pages were checked at 1920&times;1080 (125%) and 2560&times;1440 (150%), comparing every element with its card. Nothing spills out.</p>
+
+<h2 id="v1-9">1.9</h2>
+<p>Build 2.589-buildspawn.18.</p>
+<h3>Trusted certificates</h3>
+<p>Trust your company's root certificate authority without editing Java's own certificate file. The certificates you add are kept when you upgrade.</p>
+<ul>
+  <li><strong>Server:</strong> <strong>Settings &rsaquo; Security &rsaquo; Trusted certificates</strong> (administrators only). Paste Base64 text, or choose a <code>.pem</code>, <code>.crt</code>, <code>.cer</code>, <code>.der</code> or <code>.p7b</code> file. Check the preview, then add. Each certificate shows its name, issuer, validity and SHA-256 fingerprint, with badges for root, intermediate, not a CA, expired and already trusted. Private keys are refused and never kept.</li>
+  <li><strong>Also trust Windows' certificate store</strong> covers roots your IT team pushes with group policy.</li>
+  <li><strong>Send these to agents</strong> (on by default) passes the certificates to every agent, which uses them after it restarts. A table shows which agents are up to date.</li>
+  <li>A notice appears 30 days before an added certificate expires. Changes take effect after a restart, and the page tells you when one is needed.</li>
+  <li><strong>Windows app (<code>Buildspawn.exe</code>):</strong> a new Certificates tab with the same Add dialog and <strong>Restart now</strong>.</li>
+  <li><strong>Agent tray app:</strong> a new Certificates tab with <em>From the server</em> and <em>Added on this machine</em>.</li>
+  <li><strong>Terminal program:</strong> <code>buildspawn certs list | add FILE | remove FINGERPRINT-OR-NAME | windows-store on|off</code>.</li>
+</ul>
+<h3>Build scripts</h3>
+<ul>
+  <li><strong>Set the build's name:</strong> a step prints <code>##buildspawn[buildNumber '1.4.2-CL%build.vcs.number%']</code>. The last name printed wins.</li>
+  <li><strong>Set the status text:</strong> <code>##buildspawn[buildStatus text='{build.status.text}, uploaded to Steam branch qa']</code>. The text shows on the build page and in History. <code>status=</code> can only make the result worse, never better. See <a href="../build-results/build-name-and-status.html">The build name and status text</a>.</li>
+  <li><strong>New build value:</strong> <code>%build.triggeredBy.username%</code> (environment variable <code>BUILDSPAWN_TRIGGERED_BY</code>) holds the user who started the build. It follows chains and retries.</li>
+  <li>The guide's <a href="service-messages.html">Service messages</a> page lists every log command and build value, with PowerShell examples.</li>
+</ul>
+<h3>Look and feel</h3>
+<ul>
+  <li><strong>Resizable sidebar:</strong> drag the right edge of the left sidebar, from 200 pixels to half the window. Your width is remembered in your browser. Double-click the edge to reset it. With the keyboard, press <kbd>Tab</kbd> to the edge, then use the arrow keys (<kbd>Shift</kbd> for bigger steps).</li>
+  <li>No more <em>NEW</em> badges on pages. Spaces are fixed in the paused/archived banner and in the project list.</li>
+</ul>
+<h3>Fixes</h3>
+<ul>
+  <li><strong>Parameters table:</strong> the columns fit the card at every desktop size and Windows scaling, also with a wide sidebar. The Edit button stays inside the card, headings stay on one line, and long values end in &hellip; with the full text on hover.</li>
+  <li><strong>Deleting a template:</strong> Delete on a template's page works again; in 1.8 it showed <em>Page not found</em>. If build configurations use the template, they are detached first and each keeps a copy of its settings. The confirmation says how many. If you may not change one of those build configurations, nothing changes.</li>
+  <li><strong>Visual editor:</strong> opening a node's properties no longer shows an empty dialog with no Close button (a 1.8 bug).</li>
+  <li><strong>Fewer log warnings:</strong> visits from people who are not signed in no longer write a WARNING with a stack trace. Real errors still do.</li>
+  <li><strong>Security page saves completely:</strong> switching the sign-in method, for example to Entra ID, now saves the whole page. Before, the settings after the switch could be lost.</li>
+</ul>
+<p>Agents need 1.9 or newer to receive trusted certificates from the server. Older agents are listed as <em>Older agent</em>.</p>
+
+<h2 id="v1-8">1.8</h2>
+<p>Build 2.589-buildspawn.17.</p>
+<h3>Store uploads</h3>
+<ul>
+  <li><strong>Steam.</strong> Build steps in the Store group: <strong>Steam upload</strong> (app and depots, file mappings, file properties, the build description and the branch to set live), <strong>Steam: set branch live</strong>, <strong>Steam: check build</strong>, <strong>Steam: DRM wrap</strong>, <strong>Steam: workshop item</strong> and <strong>Install SteamCMD</strong>. The account is a <strong>Steam build account</strong> credential, with Steam Guard handled for you. The steps preview the generated build script, and the log hides secrets. Setting a branch live needs its own permission, in Pipeline as well.</li>
+  <li><strong>Epic Games Store.</strong> <strong>Epic Games Store upload</strong>, <strong>Epic: label binary</strong>, <strong>Epic: inspect binaries</strong>, <strong>Epic: copy binary</strong>, <strong>Epic: optimise patch</strong>, <strong>Epic: download binary</strong>, <strong>Epic: delete binary</strong> and <strong>Install BuildPatch Tool</strong>. The credential is an <strong>Epic Games Store</strong> credential, with a Publishing setting for studios that use their own self-service publishing tools. Agents report where the BuildPatch Tool is, and a project can set its own BuildPatch Tool folder.</li>
+</ul>
+<h3>Build chains</h3>
+<ul>
+  <li><code>reverse.dep.&lt;id&gt;.&lt;name&gt;</code> sets a parameter on a build configuration that this one depends on. <code>dep.&lt;id&gt;.&lt;name&gt;</code> reads a value from a dependency's build. <code>%param%</code> in a value is filled in from the current build's own parameters, so you enter a value once. The chain pages show which values were sent and where they came from.</li>
+  <li>A personal build of a dependency is never reused by a normal build. Side builds, composite builds and Matrix builds pass values correctly. The sender's build number is the real one.</li>
+  <li><strong>Matrix blocks:</strong> the visual editor shows a Matrix block as one card with its axes. An <em>include</em> row can set where it runs. The console has a lane chip for each combination.</li>
+</ul>
+<h3>Projects tree</h3>
+<ul>
+  <li><strong>Your own order:</strong> administrators can put projects and build configurations in any order, with a Reorder dialog and a reorder mode in the tree. Everyone sees the same order.</li>
+  <li><strong>Separators:</strong> administrators can add named separators to group items in the tree.</li>
+</ul>
+<h3>Perforce</h3>
+<ul>
+  <li><strong>View mappings as a table</strong> in the Perforce root form and in manual workspaces: each line is a row with its mode (include, exclude, overlay), and rows can be reordered. <code>#</code> comment lines are kept. It has a depot browser and suggestions, a quick-add bar and errors that say what is wrong. A preview shows what each line maps, and can count the files on request. Table and text stay in sync, and the saved text keeps the classic format. Stream workspaces show the stream's view read only; Limit View stays editable.</li>
+</ul>
+<h3>Agents and fixes</h3>
+<ul>
+  <li><strong>WebSocket by default:</strong> when the server's TCP agent port is off, agents connect over WebSocket by themselves. To turn this off, use <code>-noWebSocketFallback</code>.</li>
+  <li>On the file-serving address, a missing file shows a plain <em>Page not found</em> with no extra text, as before.</li>
+</ul>
+<p>The Steam and Epic steps have not yet been tested against real store accounts. Try them on a test app or branch first.</p>
+
+<h2 id="v1-7">1.7</h2>
+<p>Build 2.589-buildspawn.16.</p>
+<h3>Sign in and words</h3>
+<ul>
+  <li><strong>New sign-in page:</strong> the logo on the left, the form on the right, the branch lines behind. It follows the chosen theme, or the system's setting when the default theme is in use.</li>
+  <li><strong>A folder is now a "Project" and a job is a "Build configuration"</strong> in Buildspawn's own pages and in the plugins we build ourselves. Only the words changed: links, saved settings and the API are the same.</li>
+</ul>
+<h3>New Item</h3>
+<ul>
+  <li>A new <strong>New Item</strong> page: the name with a live check, an <strong>ID</strong> made from the project's ID and the name (you can edit it), the project it goes in (with a picker), <strong>Start from</strong> (Empty, Copy of an existing item, Template), the type as cards, and a summary. <strong>Create</strong> stays off until everything is valid and says why.</li>
+  <li>Types: Build configuration, Pipeline, Project, Build configuration template, and Multibranch Pipeline under <em>More types</em>. Multi-configuration project and Organization Folder are no longer offered; existing ones keep working.</li>
+</ul>
+<h3>Build configurations</h3>
+<ul>
+  <li>The first five tabs are always <strong>Overview</strong>, <strong>Change Log</strong>, <strong>History</strong>, <strong>Statistics</strong> and <strong>Settings</strong>, whatever plugins a build configuration has. Pipelines get the History tab too.</li>
+  <li><strong>Matrix mode for Parallel blocks:</strong> write the steps once, give the values (for example platform &times; config), exclude or add combinations, and every combination runs as its own side using <code>%platform%</code> and <code>%config%</code>. Choose where each combination runs, how many run at once, a <em>Try first</em> combination and what happens when one fails. The build page shows a grid of the results with <strong>Re-run</strong> for each combination, and the console has a lane for each. See <a href="../running-builds/side-builds.html">Side builds</a>.</li>
+  <li><strong>New build step Perforce operations</strong> (group Source control): Sync, Clean, Reconcile, Edit, Add, Delete, Revert, Submit, Shelve, Unshelve, Delete shelf, Tag build changelist, Integrate, Copy, Merge, Resolve, Label, or any other <code>p4</code> command. It uses the project's Perforce root (server, credential, workspace), so no password is typed into a step or shown in the log. Results such as a new changelist number go to the next steps. Dangerous commands are refused unless an administrator allows them under <strong>Settings &rsaquo; System &rsaquo; Perforce operations</strong>. The Administrator connection needs its own permission.</li>
+</ul>
+<h3>Agents</h3>
+<ul>
+  <li><strong>Built-in agent parameters:</strong> <code>agent.name</code>, <code>agent.pool</code>, <code>agent.labels</code>, <code>agent.type</code>, <code>agent.owner</code>, <code>agent.executors</code>, <code>agent.hostname</code>, <code>agent.os.family</code>, <code>agent.os.version</code>, <code>agent.memory.total.mb</code>, <code>agent.version</code>, <code>agent.work.dir</code>, <code>agent.work.dir.free.mb</code>, <code>agent.home.dir</code> and <code>agent.temp.dir</code>. Use them in agent requirements (for example <code>agent.name</code> matches <code>WIN-BUILD-0[1-4]</code>, or <code>agent.pool</code> equals <code>Unreal</code>) and in steps as <code>%agent.name%</code>. Administrators can offer environment variables as <code>env.NAME</code> under <strong>Settings &rsaquo; System &rsaquo; Agent environment variables</strong>. Names that look like secrets are refused.</li>
+</ul>
+<h3>Forms and pages</h3>
+<ul>
+  <li><strong>Lists in settings</strong> (post-build actions, parameters, columns, filters and more) are rows in one card that fold, with a summary line, drag to reorder and remove. <strong>+ Add</strong> opens a picker with search.</li>
+  <li><strong>Advanced&hellip;</strong> is now <strong>More options</strong>, with how many options are set and which.</li>
+  <li>Few choices are buttons, long lists have search. Perforce workspace options and Roles permissions have plain names instead of codes.</li>
+  <li>Simple pages (Move, Rename and Delete of a build, build configuration or project, Replay, Rebuild, Restart from stage, label settings, Edit description) are one card: what will happen, the fields, and the buttons in the bottom bar. Deleting a project asks you to type its name.</li>
+  <li>Who am I, Project relationship and label pages have tabs instead of a side menu.</li>
+  <li>View settings: the list of build configurations has a search box, <strong>Select all</strong> / <strong>Clear</strong> and a count.</li>
+  <li>Error pages (page not found, no access, something went wrong) use the normal layout with a way back. Technical details are folded and shown to administrators only.</li>
+</ul>
+<p>A few plugins we ship as published (Multibranch, JUnit, Pipeline steps help) still say <em>job</em> and <em>folder</em> in their texts.</p>
+
+<h2 id="v1-6">1.6</h2>
+<p>Build 2.589-buildspawn.15.</p>
+<h3>Personal machines: run builds on your own computer</h3>
+<ul>
+  <li><strong>My machines</strong> (account menu): connect your own computer as a personal agent. Only you can build on it, and only your own builds run there. It is hidden from everyone else.</li>
+  <li><strong>Run on my machine:</strong> start a build on one of your machines, either in its own copy of the workspace or in a folder you have already synced. A synced folder is never wiped or cleaned up. After the build, the shelved files are reverted, and only when the workspace has no other open files.</li>
+  <li><strong>Share</strong> a build from your machine with a link. See <a href="../running-builds/shared-builds.html">Shared builds</a>.</li>
+  <li>Builds are cancelled when your machine goes offline for longer than the time set under <strong>Settings &rsaquo; Security &rsaquo; Personal machines</strong>.</li>
+  <li>An administrator chooses which credentials personal machines may use; the rest are refused. The <strong>Use personal machines</strong> permission (Agent &rsaquo; UsePersonal) decides who can add one. See <a href="../running-builds/personal-builds.html">Personal builds and shelves</a>.</li>
+</ul>
+<h3>Agent app and terminal view</h3>
+<ul>
+  <li>Every agent download has a terminal view of its status: connection, current build, logs, workspaces and machine details. You can pause the agent (it finishes the current build first) or stop it from there.</li>
+  <li>On Windows an agent also comes with a notification-area app showing the same status, with Pause, Stop, Open logs and the connection history.</li>
+  <li>Agents report their state to the server every few seconds, so a paused or stopped agent shows why on its page and in the agents list.</li>
+</ul>
+<h3>Forms and pages</h3>
+<ul>
+  <li><strong>Every settings page uses the new form layout:</strong> an <em>On this page</em> index, the fields in cards, a summary card, real switches and choices instead of raw option text, help shown when you focus a field, checks when you leave a field, and advanced settings folded away. This covers system settings, security, build configurations and projects, agents, views, credentials, roles and permissions, Perforce, Vault, Unity, Unreal, telemetry and your user pages.</li>
+  <li><strong>One Save / Apply / Cancel bar</strong> on every page. It stays at the bottom of the window, is as wide as the page content and never covers anything.</li>
+  <li>Build configuration settings tabs never hang on the loading placeholder. If a part takes long, it says so and offers <strong>Reload</strong>. Version Control and Post-build Actions open in under a second.</li>
+  <li>Projects and the root project show their pages as sub-tabs, like the build configuration settings, instead of a side menu.</li>
+  <li>The Build Queue and Executors side cards are gone. The Queue page and the Agents list show both.</li>
+  <li><strong>Add Credentials</strong> no longer spins forever when you click it before hovering.</li>
+</ul>
+<h3>Permissions and logs</h3>
+<ul>
+  <li>Project-based security keeps its 1.5 layout: one card for each user or group, with what it grants as a summary and every permission grouped inside the card. The Entra ID matrix now uses the same cards, with an <em>Add from Entra ID</em> row for the people picker, or a name box with <strong>Add user</strong> and <strong>Add group</strong> when Graph search is off.</li>
+  <li>No more warning in the log when an agent disconnects while its output is still being closed.</li>
+</ul>
+<p>To serve Buildspawn under a path such as <code>https://your-host/buildspawn/</code>, add <code>--prefix=/buildspawn</code> to the extra arguments (Windows app: <strong>Settings &rsaquo; Advanced</strong>; or <code>arguments=</code> in <code>buildspawn.cfg</code>), then set the server URL in <strong>Settings &rsaquo; General</strong>.</p>
+
+<h2 id="v1-5">1.5</h2>
+<p>Build 2.589-buildspawn.14.</p>
+<h3>Builds and steps</h3>
+<ul>
+  <li><strong>Parallel blocks</strong> show <strong>Add step</strong> and <strong>Remove side</strong> on every side again.</li>
+  <li>A step whose tests fail shows <strong>Unstable</strong> instead of Success, and <strong>Resume</strong> keeps the earlier test results.</li>
+  <li>The <strong>Resumed from</strong> card is readable.</li>
+</ul>
+<h3>Parameters, dialogs and pages</h3>
+<ul>
+  <li><strong>Add parameter</strong> shows <strong>Type</strong> from the start; Remote opens the full form.</li>
+  <li>Overridden template parameters show <strong>overridden here</strong> with <strong>Reset</strong>.</li>
+  <li><strong>Dialogs no longer close when you click outside them.</strong> Use Close, Cancel or <kbd>Esc</kbd>.</li>
+  <li>The build configuration Overview drops the Health report and Permalinks cards. History, Appearance (dark), the token list and Groups are tidied up.</li>
+  <li>Add build step and Add build feature show plain descriptions only.</li>
+</ul>
+<h3>Agents, pools and Perforce</h3>
+<ul>
+  <li>Moves by hand, and their Undo, appear in the Pool Scheduler's activity. Scheduled days read <em>Mon&ndash;Fri</em>.</li>
+  <li>The built-in agent has one name everywhere. Long pool names and the next-move card are no longer cut off.</li>
+  <li>Perforce workspace names with <code>${NODE_NAME}</code> get a note instead of <em>Unknown Client</em>, and the false <em>Not currently connected</em> is gone.</li>
+  <li>User names may contain dots, for example <code>sam.lee</code>.</li>
+</ul>
+
+<h2 id="v1-4">1.4</h2>
+<p>Build 2.589-buildspawn.13. Install it over 1.2 or the 1.3 test builds.</p>
+<h3>Agents page</h3>
+<ul>
+  <li><strong>One list of agents.</strong> Online and offline agents are in one list, with <em>All</em>, <em>Online</em> and <em>Offline</em>, pool and platform filters, search, <strong>Warnings only</strong>, sorting and paging. The filters are kept in the address, so you can share a link to a filtered list.</li>
+  <li><strong>Live columns</strong> for CPU, memory, disk, GPU, network, pressure and freshness, coloured by your thresholds.</li>
+  <li><strong>Expanded rows</strong> show each busy executor's build: number, time, progress against the estimate, the current step and a stop button.</li>
+  <li><strong>A row menu</strong> with Mark offline, Bring back online, Reconnect, Show connection log, Move to pool and Delete. Mark offline, Bring back online and Move to pool can be undone.</li>
+  <li><strong>Unauthorized</strong> agents show only when some are waiting. Self-registration and rejected agents moved under <strong>Install agents &rsaquo; Agent registration</strong>.</li>
+</ul>
+<h3>Telemetry</h3>
+<ul>
+  <li>On by default. Every agent is sampled every 30 seconds, and every 2 seconds while someone watches its Telemetry tab.</li>
+  <li>History for 15 minutes, 1 hour, 6 hours and 24 hours on each agent's Telemetry tab, with <em>Live</em> and <em>Pause</em>.</li>
+  <li>Settings live under <strong>Agents &rsaquo; Configure monitors</strong>. Each agent can opt out with <strong>Collect telemetry from this agent</strong>.</li>
+</ul>
+<h3>Pools and the Pool Scheduler</h3>
+<ul>
+  <li>Each pool can have an icon and a colour. They show in the Agents sidebar, the Pools tab, the pool page and the move dialog. In the sidebar, pools open to show their agents as idle, busy or offline.</li>
+  <li>The <strong>Pool Scheduler</strong> moves agents between pools: by hand with Undo, on a weekly schedule, or with priority rules that borrow idle agents from lower-priority pools and give them back. It has Pause and an activity log. Renaming or deleting a pool or an agent updates the scheduler's rules.</li>
+</ul>
+<h3>Other changes</h3>
+<ul>
+  <li><strong>Documentation links</strong> on build configurations and projects, shown on a Documentation tab.</li>
+  <li><strong>Agent downloads include Java 21:</strong> Windows x64, Linux x64 and ARM, macOS Apple silicon and Intel. An agent machine needs nothing installed first. The server file is about 450 MB then, because it carries Java for the five agent platforms.</li>
+  <li>The theme switch in the top bar is a plain Light / Dark toggle.</li>
+  <li><strong>Windows:</strong> the app (<code>Buildspawn.exe</code>) is back next to the terminal program (<code>bin\buildspawn.exe</code>). The app shows the product version.</li>
+  <li>The recommended Java options now include <code>--enable-native-access=ALL-UNNAMED</code>. Existing settings files keep their own options. See <a href="settings-files.html">Settings files</a>.</li>
+</ul>
+
+<h2 id="v1-3">1.3</h2>
+<p>1.3 was only published as test builds (release candidates, builds 2.589-buildspawn.10 to .12). Everything in them is listed under 1.4.</p>
+
+<h2 id="v1-2">1.2</h2>
+<p>Build 2.589-buildspawn.9.</p>
+<h3>The visual editor</h3>
+<ul>
+  <li>A build configuration's steps are drawn as a graph you can edit: canvas, palette, wiring, undo, keyboard shortcuts and save. It is read only for people who can't edit.</li>
+  <li>One <strong>build configuration block</strong> holds the triggers, roots and settings. Parameters are a group wired into it, and each parameter lists the steps that use it.</li>
+  <li>A large properties dialog for each node, and a side panel that can stay open.</li>
+  <li><strong>Per-step overrides:</strong> a step can run on another machine and override environment values.</li>
+  <li><strong>Run view</strong> draws the latest or any chosen build over the graph, with live status.</li>
+</ul>
+<h3>Builds and steps</h3>
+<ul>
+  <li><strong>Parallel blocks:</strong> steps run side by side, on this machine or on others.</li>
+  <li><strong>Resume and retry:</strong> resume a failed build from a step, or retry a step when it fails.</li>
+  <li><strong>Wipe out workspace</strong> runs in the background with live progress.</li>
+  <li>The build console stays quick while a build streams long output.</li>
+</ul>
+<h3>Parameters and settings</h3>
+<ul>
+  <li><strong>One Parameters tab</strong> for configuration, <code>env.</code> and <code>system.</code> parameters. The time limit moved to the <strong>Build time</strong> card under Failure conditions.</li>
+  <li><code>%NAME%</code> works in batch and shell steps too.</li>
+  <li>Every setting has its own place in the settings homes, for build configurations and for projects.</li>
+  <li>Projects can have a coloured icon. Favourite colours are shared with the team.</li>
+</ul>
+<h3>Top bar</h3>
+<ul>
+  <li><strong>Manage</strong> is now called <strong>Settings</strong>. <strong>My changes</strong> moved into the account menu.</li>
+  <li>A theme switch where the bell was. Warnings for administrators show as a count on Settings.</li>
+  <li>A waiting build can be moved to the front of the queue.</li>
+</ul>
+<h3>Terminal program</h3>
+<ul>
+  <li><strong>The terminal program</strong>, <code>buildspawn</code>, on every system. On a first run it opens a five-step <strong>launch flow</strong>: home folder, port and memory, service or portable, admin password, start. <strong>Presets</strong> save your answers, so you can set up the next machine the same way.</li>
+  <li>The <strong>live monitor</strong> has seven views: Overview, Builds, Queue, Agents, Logs, Service and Settings. The Queue view says why each build waits. With an API token the monitor can stop builds, cancel queue items and take agents offline.</li>
+  <li>The Service and Settings views install and control the service and edit the settings file. They ask for administrator rights only when needed.</li>
+  <li>Every view has a text command for scripts: <code>status</code>, <code>builds</code>, <code>queue</code>, <code>agents</code>, <code>logs</code>, <code>service</code> and <code>set</code>, with <code>--json</code>. See <a href="terminal-commands.html">Terminal program commands</a>.</li>
+  <li>Windows setup puts the terminal program on the PATH.</li>
+</ul>
+<h3>Security and fixes</h3>
+<ul>
+  <li>A build can set parameters only with <code>##buildspawn[setParameter]</code> service messages. Only <code>env.NAME</code> reaches the environment, and names that change how programs start are blocked.</li>
+  <li>People who may only view settings no longer see secret values.</li>
+  <li>A build no longer hangs at the end when its artifacts are kept in remote storage.</li>
+  <li>Moving or copying a step no longer turns inherited steps into copies.</li>
+</ul>
+
+<h2 id="v1-1">1.1</h2>
+<p>Build 2.589-buildspawn.8.</p>
+<h3>New look</h3>
+<ul>
+  <li>A top bar with icons and a dark project tree on the left. Every page redesigned in light and dark themes.</li>
+  <li>The Dashboard can show a chosen time window. A project's health is the worst of the build configurations inside it.</li>
+  <li>Build pages show the Perforce changelist or Git commit. <strong>Re-run</strong> is the main button, and <strong>Keep</strong> is a pin.</li>
+  <li>Build configurations can take any icon from a searchable library of more than 5,000 icons and logos.</li>
+</ul>
+<h3>The build console</h3>
+<ul>
+  <li>The log is a tree of <strong>blocks</strong>, one for each build step. Perforce sync and the list of changes get their own blocks. Failed blocks open; passed blocks start closed.</li>
+  <li>A <strong>time on every line</strong>: show Clock, Elapsed or Off.</li>
+  <li>Filters (All, Important only, Errors only), error and warning counts, and search with <em>N of M</em> matches. Press <kbd>E</kbd> and <kbd>W</kbd> to jump between errors and warnings.</li>
+  <li>Links to single lines, live output with Follow, and long logs that load on demand.</li>
+  <li>Scripts can make their own blocks with <code>::group::</code> and <code>::endgroup::</code>, and their own warnings and errors. See <a href="../build-results/build-console.html">The build console</a>.</li>
+</ul>
+<h3>Linux and macOS</h3>
+<ul>
+  <li>Packages for Debian and Ubuntu (<code>.deb</code>) and for RHEL, Rocky and Fedora (<code>.rpm</code>), with a systemd service.</li>
+  <li>Portable folders for Linux x64 and ARM, and for macOS Apple silicon and Intel. Java is included in every package.</li>
+</ul>
+<h3>Other changes</h3>
+<ul>
+  <li>Single sign-on with Microsoft Entra ID and SAML, build time limits and console timestamps now come built in.</li>
+  <li>The Re-run dialog has one source row for each Git root.</li>
+</ul>
+
+<h2 id="v1-0">1.0</h2>
+<p>The first release, shipped as three release candidates (builds 2.589-buildspawn.5 to .7).</p>
+<h3>Main features</h3>
+<ul>
+  <li><strong>Projects</strong> that pass their settings, steps and parameters down to the build configurations inside them. A build configuration can override or reset what it inherits.</li>
+  <li><strong>Build configurations</strong> set up on separate pages: General, Version control, Build steps, Triggers, Failure conditions, Parameters, Build features and Agent requirements.</li>
+  <li><strong>Templates</strong>, and several version control roots on one build configuration.</li>
+  <li><strong>Runners</strong> for Command Line, Python, PowerShell, Maven, Gradle, Ant, .NET, NUnit, Node.js, Docker and more, plus Unity and Unreal Engine steps.</li>
+  <li><strong>Parallel tests and composite builds.</strong></li>
+  <li><strong>Perforce</strong> connections, streams, shelves, review status and a workbench page.</li>
+  <li><strong>Agents</strong> with install pages, requirements and telemetry.</li>
+  <li><strong>Tools</strong> with several versions per tool and a <code>%tool.id%</code> parameter.</li>
+  <li><strong>HashiCorp Vault</strong> secrets in parameters.</li>
+  <li><strong>Versioned settings</strong> stored in Git or Perforce.</li>
+  <li><strong>Users, groups and project roles</strong>, with pickers instead of typed names.</li>
+  <li>Most plugins come built in, so a new server works without downloads.</li>
+  <li>Windows setup with an optional Windows service, and a portable zip. Java is included.</li>
+</ul>
+<h3>Added during the release candidates</h3>
+<ul>
+  <li><strong>Faster Perforce pages:</strong> no page waits on the Perforce server. Lists of changes and shelves are stored and refreshed in the background.</li>
+  <li>The <strong>Run dialog</strong> opens at once and loads changes and shelves in the background.</li>
+  <li>A <strong>script editor</strong> for build steps, with colours, line numbers, search and <code>%</code> autocomplete of parameters. <code>%name%</code> references inside scripts, with safeguards for secrets.</li>
+  <li><strong>Version control parameters</strong> such as <code>%build.vcs.number%</code> and <code>%vcsroot.url%</code>.</li>
+  <li><strong>Re-run</strong> any finished build with the same sources and parameters, and <strong>Re-run with changes</strong> to pick other revisions or shelves.</li>
+  <li>Tabs that don't fit move into a <strong>More</strong> menu.</li>
+</ul>
+
+</main>
+</body>
+</html>

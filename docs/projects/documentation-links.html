@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Documentation links · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/documentation-links">
+<main class="doc">
+<h1>Documentation links</h1>
+<p class="lead">Link a build configuration to the pages your team needs: the runbook, the release checklist, the SDK versions. When a build fails at night, the answer is one click away.</p>
+
+<p>Documentation links are web addresses with a label and a short description. You can add them to a build configuration, to a project, or to both. They show on the build configuration's <strong>Documentation</strong> tab.</p>
+
+<figure class="shot">
+  <img src="../../assets/shots/projects/doc-tab.png" alt="The Documentation tab of Windows Build with the title Windows build runbook, a summary, and three link cards: Build runbook, Release checklist and Platform SDK versions, each with a description and the site name">
+  <figcaption>The Documentation tab, right after Overview.</figcaption>
+</figure>
+
+<p>The build feature has its own page: <a href="feature-documentation.html">Documentation</a>. Project links are in <a href="folder-settings.html">Project settings</a>.</p>
+<h2>Add a link</h2>
+<h3>On a build configuration</h3>
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Features</strong>.</li>
+  <li>Find <strong>Documentation</strong> and click <strong>Set up</strong> (or <strong>Edit</strong> if it is already on). You can also click <strong>Edit documentation</strong> on the Documentation tab.</li>
+  <li>Give the section a <strong>title</strong> and a one-line <strong>summary</strong>, for example <em>Windows build runbook</em> and <em>How the Windows build works, who owns it and what to do when it fails</em>.</li>
+  <li>Add a link for each page: a <strong>label</strong>, the <strong>address</strong> and a short <strong>description</strong>.</li>
+  <li>Save. Make sure the <strong>On</strong> switch of the Documentation card is on.</li>
+</ol>
+
+<h3>On a project</h3>
+<ol class="steps">
+  <li>Open the project and click <strong>Settings</strong>.</li>
+  <li>Scroll to <strong>Documentation</strong> under General.</li>
+  <li>Add a summary and the links, the same way, and click <strong>Save</strong>.</li>
+</ol>
+<p>Every build configuration in the project and its subprojects shows these links, under the project's name.</p>
+
+<div class="callout note"><p>Only <code>http</code> and <code>https</code> addresses are accepted. Links always open in a new browser tab.</p></div>
+
+<h2>Where links show</h2>
+<ul>
+  <li>The <strong>Documentation</strong> tab of a build configuration appears after <strong>Overview</strong> as soon as there is at least one link. Without links, there is no tab.</li>
+  <li>Each link is a card with its label, its description and the site it points to.</li>
+  <li>The project's links come first, then the build configuration's own links. Links of an outer project come before those of an inner one. Each group is headed with where it comes from, for example <strong>This job</strong>.</li>
+</ul>
+<div class="callout tip"><p>Don't want a project's links on one build configuration? Untick <strong>Show the project’s links on this build configuration</strong> in its Documentation card. Its own links still show.</p></div>
+<div class="callout tip"><p>Put the links everyone needs, such as the studio's build wiki, on the top project once. Put links for one platform, such as its SDK page, on that platform's build configuration.</p></div>
+</main>
+</body>
+</html>

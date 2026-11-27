@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Copy a stream (Main to Drop) · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/game-copy-stream">
+<main class="doc">
+<h1>Copy a stream (Main to Drop)</h1>
+<p class="lead">Promote a tested build from <code>//skyforge/main</code> to the release stream <code>//skyforge/drop</code> with a build that copies and submits.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>Two streams, for example the parent <code>//skyforge/main</code> and the target <code>//skyforge/drop</code>. The Drop stream is a child of Main, so a copy goes up the flow.</li>
+  <li>A <a href="../version-control/perforce-roots.html">Perforce root</a> whose <strong>Stream</strong> is the <strong>target</strong>, <code>//skyforge/drop</code>. The copy opens files in the workspace, so the workspace must be on the target stream.</li>
+  <li>A build user that may submit to <code>//skyforge/drop</code>.</li>
+</ul>
+
+<h2>Steps</h2>
+<ol class="steps">
+  <li>Create a build configuration <code>Promote to Drop</code>. Under <strong>Settings › Version Control</strong> choose <strong>Perforce root</strong> and pick the root on <code>//skyforge/drop</code>.</li>
+  <li>Go to <strong>Settings › Build steps</strong> and add <strong>Perforce operations</strong>. Name it <code>Copy Main to Drop</code>.</li>
+  <li>Click the <strong>Copy</strong> card.</li>
+  <li>In <strong>Branch mapping or stream</strong> type <code>//skyforge/drop</code>. In <strong>Source</strong> type <code>//skyforge/main</code>. The <strong>Command</strong> box now shows <code>p4 copy -S //skyforge/drop -P //skyforge/main</code>.</li>
+  <li>Set <strong>Preview only</strong> on the first time, to see what would be copied. Run it once, read the log, then turn it off.</li>
+  <li>Add a second <strong>Perforce operations</strong> step, <code>Submit the copy</code>. Click the <strong>Submit</strong> card. In <strong>Description</strong> type <code>Promote main to drop (build ${BUILD_NUMBER})</code>.</li>
+  <li>Click <strong>Save</strong>, then <strong>Run</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/how-to/game-copy-stream-step.png" alt="The Perforce operations step with Copy chosen, the stream feature-a and the command preview at the bottom"><figcaption>The Copy step with the stream and the command preview.</figcaption></figure>
+
+<h2>Check it worked</h2>
+<ul>
+  <li>The log of step 1 shows <code>$ p4 copy -S //skyforge/drop -P //skyforge/main</code> and the files opened.</li>
+  <li>The log of step 2 shows <code>$ p4 submit -d ...</code> and <code>P4: Step output CHANGELIST = ...</code> with the new changelist.</li>
+  <li>In the <strong>Submitted changes</strong> tab, the new changelist is on <code>//skyforge/drop</code>.</li>
+</ul>
+
+<h2>Troubleshooting</h2>
+<table>
+  <thead><tr><th>You see</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>Nothing to copy</td><td>Drop is already the same as Main. The submit step then fails with <em>No files are open</em>; that is the correct result.</td></tr>
+    <tr><td>The step says it needs a source and a target</td><td>Fill in <strong>Branch mapping or stream</strong>, or both <strong>Source</strong> and <strong>Target</strong> paths.</td></tr>
+    <tr><td>Submit fails with a permission error</td><td>The build user needs write access to the target stream in the Perforce protections table.</td></tr>
+  </tbody>
+</table>
+
+<h2>Next steps</h2>
+<div class="cards">
+  <a class="card" href="../version-control/perforce-operations.html"><h3>Perforce operations</h3><p>Every operation of the step.</p></a>
+  <a class="card" href="../version-control/perforce-streams.html"><h3>Streams</h3><p>Build one stream or many.</p></a>
+</div>
+</main>
+</body>
+</html>

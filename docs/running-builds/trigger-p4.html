@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Perforce trigger (P4) · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="running-builds/trigger-p4">
+<main class="doc">
+<h1>Perforce trigger (P4)</h1>
+<p class="lead">Starts a build when the Perforce server tells Buildspawn about a new change.</p>
+
+<h2>When to use it</h2>
+<p>Use it for the fastest start after a submit: no polling, no wait. The Perforce server calls Buildspawn on every submit, and Buildspawn checks the build configuration's roots for new changes.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Triggers</strong>.</li>
+  <li>Click <strong>Add new trigger</strong> and click <strong>Add</strong> next to <strong>P4 triggered build.</strong>.</li>
+  <li>The trigger has no settings. The page shows a line to set up on the Perforce server. Click the copy button.</li>
+  <li>Click <strong>Save</strong>.</li>
+  <li>On the Perforce server run <code>p4 triggers</code> and add the line to the list of triggers. The page shows it with a user and an API token. Create the token in <a href="../reference/api-tokens.html">API tokens</a>. The user needs the Build permission.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/running-builds/trigger-p4.png" alt="The Perforce trigger form, which has no settings and shows the server trigger line"><figcaption>The Perforce trigger form.</figcaption></figure>
+
+<h2>Every field</h2>
+<p>The trigger has no fields. What it needs is on the Perforce side:</p>
+<table>
+<thead><tr><th>Part</th><th>What it does</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>Trigger line</td><td>A <code>change-commit</code> trigger that posts the change number and server address to <code>/p4/change</code> of Buildspawn.</td><td><code>buildspawn change-commit //depot/... "curl -s -u USER:API_TOKEN -X POST -d payload={\"change\":%change%,\"p4port\":\"%serverport%\"} http://buildspawn/p4/change"</code></td></tr><tr><td>Credential match</td><td>Buildspawn starts only the build configurations whose Perforce credential has the same server address.</td><td><code>perforce:1666</code></td></tr>
+</tbody>
+</table>
+<h2>A worked example</h2>
+<p>Skyforge has one Perforce server, <code>perforce:1666</code>. The Windows Build has a Perforce root with a credential for that server. After the trigger line is added, a submit to <code>//depot/game/main</code> starts a build within seconds.</p>
+<h2>What you see when it runs</h2>
+<p>The build configuration gets a <strong>P4 Trigger Log</strong> page. A line says <em>P4: Changes found</em> and the build starts, or <em>P4: No changes</em>. The build's cause is the version control trigger.</p>
+<h2>Problems and fixes</h2>
+<table>
+<thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+<tbody>
+<tr><td>Nothing happens on submit</td><td>Check the trigger line with <code>p4 triggers -o</code>, and that the server can reach Buildspawn. Open the P4 Trigger Log page.</td></tr><tr><td>The call is refused</td><td>The user needs the Build permission, and the API token must be valid.</td></tr><tr><td>The wrong server</td><td>The port in the call must be contained in the full port of the credential.</td></tr>
+</tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="triggers.html">Triggers</a></li>
+  <li><a href="trigger-p4-root.html">Perforce root trigger</a></li>
+  <li><a href="../version-control/perforce.html">Perforce</a></li>
+  <li><a href="../how-to/params-run-on-perforce-submit.html">Run on every Perforce submit</a></li>
+</ul>
+</main>
+</body>
+</html>

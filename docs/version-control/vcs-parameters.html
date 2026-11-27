@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Version control parameters · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="version-control/vcs-parameters">
+<main class="doc">
+<h1>Version control parameters</h1>
+<p class="lead">Every build knows which code it checked out. Steps can read the commit, changelist, branch and folder as parameters.</p>
+
+<p>You don't define these parameters: Buildspawn fills them in when the build starts. Use them to stamp a version into your game, to name a package after the changelist, or to find a second root on disk.</p>
+
+<h2>When to use it</h2>
+<p>Use these values to stamp a version into your game, name a package after the changelist, or find the folder of a second root.</p>
+<h2>Available parameters</h2>
+<h3>About the build</h3>
+<table>
+  <thead><tr><th>Parameter</th><th>What it holds</th></tr></thead>
+  <tbody>
+    <tr><td><code>%build.vcs.number%</code></td><td>The revision the build used: the Git commit or the Perforce changelist.</td></tr>
+    <tr><td><code>%build.branch%</code></td><td>The branch or stream the build used.</td></tr>
+    <tr><td><code>%build.branch.isDefault%</code></td><td><code>true</code> when that is the default branch.</td></tr>
+    <tr><td><code>%build.vcs.branch.&lt;root&gt;%</code></td><td>The branch of one root.</td></tr>
+    <tr><td><code>%build.checkoutDir%</code></td><td>The folder on the agent where the code was checked out.</td></tr>
+    <tr><td><code>%build.changedFiles.file%</code></td><td>The path of a file that lists the files changed since the last build, one per line.</td></tr>
+    <tr><td><code>%build.is.personal%</code></td><td><code>true</code> for a personal build, for example of a Perforce shelf.</td></tr>
+    <tr><td><code>%build.triggeredBy.username%</code></td><td>The user ID of whoever started the build, or of the build chain. Empty for a schedule or a version control trigger. Also in the environment variable <code>BUILDSPAWN_TRIGGERED_BY</code>.</td></tr>
+  </tbody>
+</table>
+
+<h3>About each root</h3>
+<p>Replace <code>&lt;root&gt;</code> with the root's name. With only one root, you can leave it out: <code>%vcsroot.url%</code> works too.</p>
+<table>
+  <thead><tr><th>Parameter</th><th>What it holds</th></tr></thead>
+  <tbody>
+    <tr><td><code>%vcsroot.&lt;root&gt;.url%</code></td><td>The Git repository URL.</td></tr>
+    <tr><td><code>%vcsroot.&lt;root&gt;.branch%</code></td><td>The branch the root is set to build.</td></tr>
+    <tr><td><code>%vcsroot.&lt;root&gt;.port%</code></td><td>The Perforce server address.</td></tr>
+    <tr><td><code>%vcsroot.&lt;root&gt;.user%</code></td><td>The user the root signs in as.</td></tr>
+    <tr><td><code>%vcsroot.&lt;root&gt;.changelist%</code></td><td>The Perforce changelist that was synced.</td></tr>
+    <tr><td><code>%vcsroot.&lt;root&gt;.stream%</code></td><td>The Perforce stream.</td></tr>
+    <tr><td><code>%vcsroot.&lt;root&gt;.shelvedChangelist%</code></td><td>The shelf that was unshelved, in a personal build.</td></tr>
+  </tbody>
+</table>
+<div class="callout note"><p>No password or token ever appears in these parameters.</p></div>
+
+<h3>Environment variables</h3>
+<p>The same values also reach every step as environment variables, for scripts that read the environment:</p>
+<table>
+  <thead><tr><th>Variable</th><th>What it holds</th></tr></thead>
+  <tbody>
+    <tr><td><code>BUILD_VCS_NUMBER</code></td><td>The same as <code>%build.vcs.number%</code>.</td></tr>
+    <tr><td><code>VCS_ROOT_DIR_1</code>, <code>VCS_ROOT_DIR_2</code>, …</td><td>The folder of each root, when the build configuration has several.</td></tr>
+    <tr><td><code>P4_CHANGELIST</code></td><td>The Perforce changelist that was synced.</td></tr>
+    <tr><td><code>GIT_COMMIT</code>, <code>GIT_BRANCH</code></td><td>The Git commit and branch.</td></tr>
+    <tr><td><code>P4_PORT</code>, <code>P4_USER</code>, <code>P4_CLIENT</code>, <code>P4_ROOT</code>, <code>P4_TICKET</code></td><td>The Perforce connection, workspace and login ticket. See <a href="perforce-variables.html">Perforce variables</a>.</td></tr>
+    <tr><td><code>P4ROOT_&lt;ID&gt;_CHANGELIST</code> and others</td><td>Values of one Perforce root, named after the root ID.</td></tr>
+    <tr><td><code>GIT_COMMIT_1</code>, <code>P4_CHANGELIST_2</code>, …</td><td>With <a href="several-roots.html">several roots</a>, each variable also exists with the root number at the end. The first root that sets a variable also sets the plain name.</td></tr>
+  </tbody>
+</table>
+
+<h2>Use them in steps</h2>
+<p>Type <code>%</code> in the script editor of a step to see the list. For example, put the changelist into the package name:</p>
+<pre><code>powershell -File Build\ci.ps1 -Stage package -Platform Win64 -Changelist %build.vcs.number%</code></pre>
+<p>Name each build after its code with a <a href="../reference/service-messages.html#buildNumber">buildNumber</a> message from a step. The build number format on <strong>Settings › General</strong> is applied before the checkout, so it cannot use these values:</p>
+<pre><code>Write-Host "##buildspawn[buildNumber '1.4.%build.counter%-CL%build.vcs.number%']"</code></pre>
+<p>Or only run a slow step for real code changes, not personal builds:</p>
+<pre><code>if "%build.is.personal%"=="true" (
+  echo Personal build: skipping upload
+) else (
+  upload-build --changelist %build.vcs.number%
+)</code></pre>
+<div class="callout warning"><p>Branch names and other values from version control are put into script text only when they hold safe characters. A branch with odd characters is not expanded. In a script, prefer the environment variable.</p></div>
+
+<h2>What you see when it runs</h2>
+<p>On the build page, <strong>Parameters</strong> lists the values the build used. In the console, a step that prints <code>%build.vcs.number%</code> shows the changelist or commit.</p>
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>You see</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>The value stays as <code>%build.vcs.number%</code></td><td>The build configuration has no version control, or the name is misspelled.</td></tr>
+    <tr><td>A branch name is not filled in inside a script</td><td>It has unsafe characters. Read the environment variable instead.</td></tr>
+    <tr><td>The build number format cannot use the changelist</td><td>It is applied before the checkout. Use a <code>buildNumber</code> message from a step.</td></tr>
+  </tbody>
+</table>
+<h2>Related</h2>
+<ul>
+  <li><a href="../parameters/parameters.html">Parameters</a>: your own parameters and the three kinds.</li>
+  <li><a href="git.html">Git</a> and <a href="perforce.html">Perforce</a>: set up roots. <a href="perforce-variables.html">Perforce variables</a> and <a href="several-roots.html">Several roots</a>.</li>
+</ul>
+</main>
+</body>
+</html>

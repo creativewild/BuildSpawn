@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SAML sign-in · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="administration/saml">
+<main class="doc">
+<h1>SAML sign-in</h1>
+<p class="lead">Let people sign in through your company’s single sign-on (SSO) with the security realm <strong>miniOrange SAML 2.0</strong>.</p>
+
+<p>SAML 2.0 is a standard way for a company sign-in system (the <em>identity provider</em>, or IdP, for example Okta, Keycloak or Active Directory Federation Services) to tell another application (the <em>service provider</em>, or SP, which is Buildspawn here) who a person is. Buildspawn never sees the password.</p>
+
+<h2>When to use it</h2>
+<p>Use it when your company has an identity provider that speaks SAML 2.0 and you do not use Entra ID directly. If you use Entra ID, the <a href="entra-id.html">Entra ID realm</a> is simpler and also gives you groups and a people picker.</p>
+
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open <strong>Settings › Security</strong>. In <strong>Security Realm</strong> choose <strong>miniOrange SAML 2.0</strong>. The form only says to click <strong>Apply</strong> and configure the realm from the SAML page.</li>
+  <li>Click <strong>Apply</strong>.</li>
+  <li>Open <strong>Settings › miniOrange SAML SSO</strong>. The page has <strong>SP Configuration</strong> at the top and your identity provider settings below.</li>
+  <li>Copy the values of <strong>SP Entity ID</strong>, <strong>Audience URI</strong>, <strong>ACS URL</strong> and <strong>SP Logout URL</strong> into the application you create in your identity provider. You can also use <strong>Service Provider Metadata</strong> (an XML file) and <strong>Download SP Certificate</strong> to set up the IdP, if it accepts files.</li>
+  <li>In your identity provider, make sure it sends the user name (and, if you want it, the e-mail) in the sign-in answer. Note the names of the attributes it uses.</li>
+  <li>Back in Buildspawn, under <strong>IDP configuration</strong> choose one of three ways: <strong>I will enter metadata url</strong>, <strong>I will enter metadata file path</strong> or <strong>I will do manual configuration</strong>. Fill in the fields (see the table).</li>
+  <li>Click <strong>Validate metadata Url</strong> or <strong>Validate metadata File</strong> to check them, and the form fills the rest.</li>
+  <li>Under <strong>User Profile Configuration</strong> say which attribute holds the user name and the e-mail.</li>
+  <li>Click <strong>Test Configuration</strong>. A window opens, signs you in at your IdP and shows the attributes it received. Check the user name.</li>
+  <li>Make sure the <a href="authorization.html">authorization</a> gives <strong>Administer</strong> to the user name you will get from the IdP. Then click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/administration/saml.png" alt="The SAML single sign-on page with the service provider configuration and the fields for the identity provider"><figcaption>The SAML single sign-on page.</figcaption></figure>
+<div class="callout warning"><p>The server must be reachable by the address in the <strong>ACS URL</strong>, and your IdP must accept it. If you reach Buildspawn behind a proxy, set the real address in <strong>Buildspawn URL</strong> on <a href="system-settings.html">System settings</a>, so that these URLs show the public address.</p></div>
+
+<h2>Every field</h2>
+<h3>SP Configuration (read-only, to copy into the IdP)</h3>
+<table>
+  <tr><th>Field</th><th>What it is</th></tr>
+  <tr><td><strong>SP Entity ID</strong></td><td>The name of Buildspawn as a service provider. It is the base address of the server, for example <code>https://build.studio.example</code>.</td></tr>
+  <tr><td><strong>Audience URI</strong></td><td>Same value. The IdP puts it in the answer so Buildspawn knows the answer is meant for it.</td></tr>
+  <tr><td><strong>ACS URL</strong></td><td>The address where the IdP sends the sign-in answer: <code>https://build.studio.example/securityRealm/moSamlAuth</code>.</td></tr>
+  <tr><td><strong>SP Logout URL</strong></td><td>The address that signs a person out: <code>…/securityRealm/logout</code>.</td></tr>
+  <tr><td><strong>Service Provider Metadata</strong> and <strong>Download SP Certificate</strong></td><td>Links to the SP settings as an XML file and as a certificate, built from your last saved settings.</td></tr>
+</table>
+
+<h3>IDP configuration</h3>
+<table>
+  <tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr>
+  <tr><td><strong>Enter metadata url</strong></td><td>The address of the IdP’s metadata file. Buildspawn reads the entity ID, sign-in address and certificate from it. Use <strong>Validate metadata Url</strong> to check it.</td><td>Empty</td><td><code>https://idp.studio.example/metadata</code></td></tr>
+  <tr><td><strong>IDP Metadata</strong></td><td>The path of a metadata file on the server, when you downloaded it from the IdP. Use <strong>Validate metadata File</strong> to check it.</td><td>Empty</td><td><code>C:\buildspawn\idp-metadata.xml</code></td></tr>
+  <tr><td><strong>IDP Entity ID / Issuer</strong></td><td>The name the IdP gives itself in the answer.</td><td>From metadata</td><td><code>https://idp.studio.example/</code></td></tr>
+  <tr><td><strong>Single Sign On URL</strong></td><td>The IdP address that Buildspawn sends people to.</td><td>From metadata</td><td><code>https://idp.studio.example/sso</code></td></tr>
+  <tr><td><strong>Single Logout URL</strong></td><td>Greyed out in this edition.</td><td>—</td><td>—</td></tr>
+  <tr><td><strong>Name ID Format</strong></td><td>How the IdP names a person: <code>unspecified</code>, <code>emailAddress</code>, <code>persistent</code> or <code>transient</code>. Match what the IdP is set to send.</td><td>unspecified</td><td>emailAddress</td></tr>
+  <tr><td><strong>IDP Signing Certificate</strong></td><td>The certificate the IdP signs its answers with, in text (PEM) form. Buildspawn rejects answers that are not signed with it. Paste only the public certificate.</td><td>From metadata</td><td><code>-----BEGIN CERTIFICATE-----…</code></td></tr>
+  <tr><td><strong>Test Configuration</strong></td><td>Opens a test sign-in and shows the attributes that came back, or why it failed.</td><td>—</td><td>—</td></tr>
+</table>
+
+<h3>User Profile Configuration</h3>
+<table>
+  <tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr>
+  <tr><td><strong>Login … account by</strong> (the label also holds the name of the server)</td><td>Whether people are identified by <strong>User Name</strong> or by e-mail. Only the user name choice is available in this edition.</td><td>User Name</td><td>User Name</td></tr>
+  <tr><td><strong>Username Case Conversion</strong></td><td>Changes the user name to <strong>None</strong>, <strong>Lowercase</strong> or <strong>Uppercase</strong>. User names are case-sensitive, so this makes the name match the one in your permission grid. Be careful: if the case does not match, a person can lose their rights.</td><td>None</td><td>Lowercase</td></tr>
+  <tr><td><strong>Username Attribute</strong></td><td>The attribute in the answer that holds the user name. If you leave it empty, Buildspawn uses the NameID the IdP sends.</td><td>Empty</td><td><code>sAMAccountName</code></td></tr>
+  <tr><td><strong>Email Attribute</strong></td><td>The attribute that holds the e-mail address. If empty, Buildspawn uses the NameID.</td><td>Empty</td><td><code>mail</code></td></tr>
+  <tr><td><strong>Full Name Attribute</strong></td><td>Greyed out in this edition.</td><td>—</td><td>—</td></tr>
+  <tr><td><strong>Apply regex Pattern to the UserName</strong></td><td>Cuts the user name with a regular expression before it is used.</td><td>Off</td><td>On</td></tr>
+  <tr><td><strong>REGEX Pattern</strong></td><td>The expression. The first match becomes the user name. For <code>demo@example.com</code> the pattern <code>^.*?(?=@)</code> gives <code>demo</code>.</td><td>Empty</td><td><code>^.*?(?=@)</code></td></tr>
+</table>
+
+<h3>Advanced Configurations</h3>
+<table>
+  <tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr>
+  <tr><td><strong>SSO Binding Type</strong></td><td>How the sign-in request is sent to the IdP: <strong>HTTP-Redirect</strong> or <strong>HTTP-POST</strong>. Use what the IdP expects.</td><td>HTTP-Redirect</td><td>HTTP-Redirect</td></tr>
+  <tr><td><strong>SLO Binding Type</strong></td><td>Greyed out in this edition.</td><td>—</td><td>—</td></tr>
+  <tr><td><strong>Send Signed Request ?</strong></td><td>Greyed out in this edition.</td><td>Off</td><td>—</td></tr>
+  <tr><td><strong>Create new user after SSO?</strong></td><td>When on, a person who signs in for the first time gets a user record automatically. If you use the regex, the record uses the name after it.</td><td>Off</td><td>On</td></tr>
+  <tr><td><strong>Force Authentication</strong></td><td>Asks the IdP to make people sign in again, even if they already have a session there.</td><td>Off</td><td>Off</td></tr>
+  <tr><td><strong>Authentication Context Class</strong></td><td>The authentication context the IdP must use. Leave empty if you do not need one. Ask your IdP administrator for the right value.</td><td>None</td><td><code>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</code></td></tr>
+  <tr><td><strong>Update Attributes of Existing Users ?</strong></td><td>Greyed out in this edition.</td><td>Off</td><td>—</td></tr>
+  <tr><td><strong>Custom Attributes</strong></td><td>A list of extra attributes to keep with each user. Click <strong>Add Custom Attribute</strong>, and fill in the two fields in the next table.</td><td>None</td><td>See below</td></tr>
+  <tr><td><strong>Disable Default Login ?</strong>, <strong>Enable Custom Login Template</strong>, <strong>Custom Login Template</strong></td><td>Greyed out in this edition.</td><td>—</td><td>—</td></tr>
+</table>
+
+<h3>Custom attributes</h3>
+<table>
+  <tr><th>Field</th><th>What it does</th><th>Example</th></tr>
+  <tr><td><strong>Attribute Name in SAML Response</strong></td><td>The name of the attribute as the IdP sends it.</td><td><code>department</code></td></tr>
+  <tr><td><strong>Attribute Name in user properties</strong></td><td>The label under which the value is shown on the user’s <strong>Account</strong> page, in the section <strong>Saml Custom Attributes</strong>.</td><td><code>Department</code></td></tr>
+</table>
+<p>Each time the person signs in, the value is stored on their user. It appears in the section <strong>Saml Custom Attributes</strong> of <strong>Account</strong>, as <em>label : value</em>, and it is read-only. See <a href="user-settings.html">User settings</a>.</p>
+
+<h2>Buttons at the bottom</h2>
+<table>
+  <tr><th>Button</th><th>What it does</th></tr>
+  <tr><td><strong>Save</strong></td><td>Saves and goes back.</td></tr>
+  <tr><td><strong>Apply</strong></td><td>Saves and stays on the page.</td></tr>
+  <tr><td>The upload box</td><td>Takes a saved SAML configuration file (JSON) and fills the form. Use it to copy the settings from another server.</td></tr>
+</table>
+
+<h2>A worked example</h2>
+<p>Nightlight Games uses Keycloak. The administrator creates a SAML client in Keycloak with the ACS URL <code>https://build.nightlight.example/securityRealm/moSamlAuth</code>. In Buildspawn she pastes the Keycloak metadata address, clicks <strong>Validate metadata Url</strong>, sets <strong>Username Attribute</strong> to <code>preferred_username</code>, <strong>Email Attribute</strong> to <code>email</code>, <strong>Username Case Conversion</strong> to <strong>Lowercase</strong>, and ticks <strong>Create new user after SSO?</strong>. <strong>Test Configuration</strong> shows <code>dana.k</code> and her e-mail. She makes sure <code>dana.k</code> has <strong>Administer</strong> and saves.</p>
+
+<h2>What you see when it runs</h2>
+<ul>
+  <li>Visitors who are not signed in see the usual sign-in page. Signing in through SAML sends them to the IdP and back.</li>
+  <li>A person who signs in for the first time appears in the user list when <strong>Create new user after SSO?</strong> is on.</li>
+  <li>If the test fails, a page shows the problem and the answer the IdP sent.</li>
+</ul>
+
+<h2>Problems and fixes</h2>
+<table>
+  <tr><th>Problem</th><th>What to do</th></tr>
+  <tr><td><strong>Test Configuration</strong> fails with a signature error.</td><td>The <strong>IDP Signing Certificate</strong> is old or wrong. Take the current one from the IdP, or validate the metadata again.</td></tr>
+  <tr><td>The IdP says the ACS URL is not allowed.</td><td>The URL in the IdP must be exactly the <strong>ACS URL</strong> shown here. Check <code>http</code> against <code>https</code> and the host name.</td></tr>
+  <tr><td>Sign-in works but the person has no rights.</td><td>The user name from the IdP does not match the name in the grid. Check the case (use <strong>Username Case Conversion</strong>) and the attribute.</td></tr>
+  <tr><td>A new person cannot sign in.</td><td>Tick <strong>Create new user after SSO?</strong>, or create the user first.</td></tr>
+  <tr><td>You are locked out after saving.</td><td>See the recovery steps on <a href="security-realms.html">Security realms</a>.</td></tr>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="security-realms.html">Security realms</a></li>
+  <li><a href="authorization.html">Authorization</a></li>
+  <li><a href="user-settings.html">User settings</a></li>
+  <li><a href="entra-id.html">Entra ID sign-in</a></li>
+</ul>
+</main>
+</body>
+</html>

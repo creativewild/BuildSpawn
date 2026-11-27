@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Run Python tests and see the results · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/steps-python-tests-with-results">
+<main class="doc">
+<h1>Run Python tests and see the results</h1>
+<p class="lead">Run <code>pytest</code> with a Python step and show the results on the build.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>Python 3 on the agent, with <code>pytest</code> installed.</li>
+  <li>Tests in <code>tools/tests</code>.</li>
+</ul>
+
+<h2>Steps</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Build Steps</strong>.</li>
+  <li>Add a <strong>Python</strong> step named <code>Check assets</code>. Choose <strong>Module</strong>, type <code>pytest</code>.</li>
+  <li>In <strong>Arguments</strong> put <code>tools/tests</code> and, on the next line, <code>--junitxml=reports/assets.xml</code>.</li>
+  <li>In <strong>Test reports</strong> put <code>reports/assets.xml</code>.</li>
+  <li>Click <strong>Save</strong> and run the build.</li>
+</ol>
+
+<h2>Check it worked</h2>
+<p>The build gets a <strong>Tests</strong> tab. A failed test makes the step unstable and the results are still recorded.</p>
+
+<h2>Troubleshooting</h2>
+<ul>
+  <li><strong>No results.</strong> Check the path in <strong>Test reports</strong> against the <code>--junitxml</code> path.</li>
+  <li><strong>pytest not found.</strong> Use <strong>Environment tool › venv</strong> and install packages in an earlier step.</li>
+</ul>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../build-steps/python.html">Python</a></li>
+  <li><a href="../build-steps/common-step-fields.html">Fields every runner has</a></li>
+</ul>
+</main>
+</body>
+</html>

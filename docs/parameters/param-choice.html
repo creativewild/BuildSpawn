@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Choice parameter · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="parameters/param-choice">
+<main class="doc">
+<h1>Choice parameter</h1>
+<p class="lead">A list from which people pick one item.</p>
+
+<h2>When to use it</h2>
+<p>Use it when only a few values make sense: Development, Shipping or Debug; Win64, PS5 or Switch.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Parameters</strong>.</li>
+  <li>Click <strong>Add parameter</strong>.</li>
+  <li>Choose <strong>Value type › Select</strong>.</li>
+  <li>Type the <strong>Items</strong>, one per line. The first line is the default.</li>
+  <li>Click <strong>Save</strong>. The Parameters tab saves as you work, so there is no other Save button.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+<thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>Name</td><td>The parameter name.</td><td>Empty</td><td><code>PLATFORM</code></td></tr><tr><td>Choices / Items</td><td>One value per line. The first is the default. A line can be <code>label =&gt; value</code>. A Select that uses labels, a different default or Allow multiple is saved as a Typed parameter; a plain list is a Choice parameter.</td><td>Empty</td><td>Win64, PS5, Switch</td></tr><tr><td>Allow multiple</td><td>Several items can be ticked.</td><td>Off</td><td>On</td></tr><tr><td>Value separator</td><td>Between ticked values.</td><td>A comma</td><td><code>,</code></td></tr><tr><td>Description</td><td>Shown under the field.</td><td>Empty</td><td>Target platform</td></tr>
+</tbody>
+</table>
+
+<h2>A worked example</h2>
+<p>Parameter <code>PLATFORM</code> with items <code>Win64</code>, <code>PS5</code>, <code>Switch</code>. With <strong>Allow multiple</strong> on, a step receives <code>Win64,PS5</code> when two are ticked.</p>
+<h2>What you see when it runs</h2>
+<p>The Run dialog shows a drop-down list. The Parameters tab says <em>Asked when the build runs</em> with the type <em>choice</em>.</p>
+<h2>Problems and fixes</h2>
+<table>
+<thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+<tbody>
+<tr><td>Requires Choices</td><td>Type at least one item.</td></tr><tr><td>The default is not the first item</td><td>Set <strong>Value</strong> to the item you want first.</td></tr>
+</tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="parameters.html">Parameters</a></li>
+  <li><a href="param-references.html">Parameter references</a></li>
+  <li><a href="../running-builds/run-dialog.html">The Run dialog</a></li>
+</ul>
+</main>
+</body>
+</html>

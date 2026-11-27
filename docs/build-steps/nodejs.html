@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Node.js · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/nodejs">
+<main class="doc">
+<h1>Node.js</h1>
+<p class="lead">Runs a JavaScript file or script with <code>node</code>, or an <code>npm</code> or <code>yarn</code> command.</p>
+
+<h2>When to use it</h2>
+<p>Use it for web tools in your pipeline: a launcher website, an asset pipeline, or a script that talks to a store API. The agent needs Node.js.</p>
+
+<h2>How to set it up</h2>
+
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>. Type <code>Node.js</code> in <strong>Filter step types</strong> if you like, then click the <strong>Node.js</strong> tile (group <strong>Build tools</strong>).</li>
+  <li>Type a <strong>Step name</strong>, for example <code>Build site</code>.</li>
+  <li>Fill in the fields described below.</li>
+  <li>Optional: set <strong>Execute step</strong>, <strong>Conditions</strong> and <strong>Retry on failure</strong>. See <a href="step-list.html">The steps list and the step editor</a>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<figure class="shot small">
+  <img src="../../assets/shots/build-steps/nodejs.png" alt="The fields of the Node.js step in the step editor">
+  <figcaption>The fields of the Node.js step, as the step editor shows them.</figcaption>
+</figure>
+
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Run</strong></td><td><strong>Script in this step</strong>, <strong>File</strong>, <strong>npm command</strong> or <strong>yarn command</strong>.</td><td>Script in this step</td><td>npm command</td></tr>
+    <tr><td><strong>Script</strong></td><td>JavaScript in a code editor. <code>%name%</code> is replaced with that build parameter.</td><td>Empty</td><td><code>console.log(process.version)</code></td></tr>
+    <tr><td><strong>Script file</strong></td><td>Relative to the working directory.</td><td>Empty</td><td><code>tools/notify.js</code></td></tr>
+    <tr><td><strong>Arguments</strong></td><td>One argument per line. For a script or file they go to the script. For npm and yarn this is the command and what follows it, such as <code>run</code> on one line and <code>build</code> on the next. Pass a secret through the environment.</td><td>Empty</td><td><code>run</code> then <code>build</code></td></tr>
+    <tr><td><strong>Working directory, Environment variables, Test reports, Run step within container</strong></td><td>The same in every runner. See <a href="common-step-fields.html">Fields every runner has</a>.</td><td></td><td></td></tr>
+  </tbody>
+</table>
+
+
+<h2>A worked example</h2>
+<p>Build the studio's patch-notes site. Step name <code>Build site</code>, <strong>Run</strong> = <strong>npm command</strong>, <strong>Working directory</strong> <code>site</code>, <strong>Arguments</strong>:</p><pre><code>ci</code></pre><p>Add a second step with arguments <code>run</code> and <code>build</code>.</p>
+
+<h2>What you see when it runs</h2>
+<p>The console shows <code>$ npm ci</code> and then the npm output. A failing npm command fails the step with its exit code.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong><em>npm was not found on this agent</em> (or node, yarn)</strong></td><td>Install Node.js there or put the command on the <code>PATH</code>.</td></tr>
+    <tr><td><strong><em>The Node.js step has no npm or yarn command</em></strong></td><td>Put the command in <strong>Arguments</strong>, for example <code>install</code>.</td></tr>
+    <tr><td><strong><em>The Node.js step has no script / no script file</em></strong></td><td>Fill in the field for the mode you chose.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="script-editor.html">The script editor</a></li>
+  <li><a href="command-line.html">Command Line</a></li>
+  <li><a href="runners.html">Runners</a></li>
+  <li><a href="common-step-fields.html">Fields every runner has</a></li>
+</ul>
+</main>
+</body>
+</html>

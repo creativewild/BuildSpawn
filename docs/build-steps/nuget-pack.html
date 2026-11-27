@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NuGet Pack · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/nuget-pack">
+<main class="doc">
+<h1>NuGet Pack</h1>
+<p class="lead">Builds a <code>.nupkg</code> package from a <code>.nuspec</code> or project file with <code>nuget pack</code>, and can keep it as a build artifact.</p>
+
+<h2>When to use it</h2>
+<p>Use it to package shared game libraries, such as your gameplay framework, so other projects can use them from a feed.</p>
+
+<h2>How to set it up</h2>
+
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>. Type <code>NuGet Pack</code> in <strong>Filter step types</strong> if you like, then click the <strong>NuGet Pack</strong> tile (group <strong>Packages</strong>).</li>
+  <li>Type a <strong>Step name</strong>, for example <code>Pack framework</code>.</li>
+  <li>Fill in the fields described below.</li>
+  <li>Optional: set <strong>Execute step</strong>, <strong>Conditions</strong> and <strong>Retry on failure</strong>. See <a href="step-list.html">The steps list and the step editor</a>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<figure class="shot small">
+  <img src="../../assets/shots/build-steps/nuget-pack.png" alt="The fields of the NuGet Pack step in the step editor">
+  <figcaption>The fields of the NuGet Pack step, as the step editor shows them.</figcaption>
+</figure>
+
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Specification</strong></td><td>A <code>.nuspec</code> or a project file, relative to the working directory.</td><td>Empty (required)</td><td><code>Packaging/Framework.nuspec</code></td></tr>
+    <tr><td><strong>Output directory</strong></td><td>Passed as <code>-OutputDirectory</code>. Empty writes the package to the working directory.</td><td>Empty</td><td><code>out</code></td></tr>
+    <tr><td><strong>Version</strong></td><td>Passed as <code>-Version</code>. Empty uses the version in the specification.</td><td>Empty</td><td><code>1.4.%build.number%</code></td></tr>
+    <tr><td><strong>Keep the packages as build artifacts</strong></td><td>Archives the <code>.nupkg</code> files of the output directory with the build, also after a failed run.</td><td>Off</td><td>On</td></tr>
+    <tr><td><strong>Base directory</strong></td><td>Passed as <code>-BasePath</code>: the folder the files in the specification are looked up in. Empty uses the working directory.</td><td>Empty</td><td><code>Binaries</code></td></tr>
+    <tr><td><strong>Exclude files</strong></td><td>One pattern per line, each passed as <code>-Exclude</code>.</td><td>Empty</td><td><code>**/*.pdb</code></td></tr>
+    <tr><td><strong>Properties</strong></td><td>One <code>Name=value</code> per line, joined with semicolons into the single <code>-Properties</code> argument. A line cannot hold a semicolon.</td><td>Empty</td><td><code>Configuration=Release</code></td></tr>
+    <tr><td><strong>Create tool package</strong></td><td>Passed as <code>-Tool</code>.</td><td>Off</td><td>Off</td></tr>
+    <tr><td><strong>Include sources and symbols</strong></td><td>Passed as <code>-Symbols</code>: a symbols package is built with the sources.</td><td>Off</td><td>On</td></tr>
+    <tr><td><strong>Clean output directory</strong></td><td>Empties the output directory before packing. It must be a folder inside the working directory, never the working directory itself, so <strong>Output directory</strong> is required.</td><td>Off</td><td>On</td></tr>
+    <tr><td><strong>NuGet tool</strong></td><td>Path of <code>nuget.exe</code>. Empty takes <code>nuget</code> from the <code>PATH</code>.</td><td>Empty</td><td><code>C:\tools\nuget.exe</code></td></tr>
+    <tr><td><strong>Arguments</strong></td><td>One argument per line, such as <code>-Symbols</code>. Pass a secret through the environment.</td><td>Empty</td><td><code>-NoDefaultExcludes</code></td></tr>
+    <tr><td><strong>Working directory, Environment variables, Test reports, Run step within container</strong></td><td>The same in every runner. See <a href="common-step-fields.html">Fields every runner has</a>.</td><td></td><td></td></tr>
+  </tbody>
+</table>
+
+
+<h2>A worked example</h2>
+<p>Package the gameplay framework. Step name <code>Pack framework</code>, <strong>Specification</strong> <code>Packaging/Framework.nuspec</code>, <strong>Output directory</strong> <code>out</code>, <strong>Version</strong> <code>1.4.%build.number%</code>, tick <strong>Keep the packages as build artifacts</strong> and <strong>Clean output directory</strong>.</p>
+
+<h2>What you see when it runs</h2>
+<p>The console shows <code>$ nuget pack …</code> and <em>Successfully created package</em>. The package <code>Framework.1.4.57.nupkg</code> appears under <strong>Artifacts</strong> of the build.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong><em>The NuGet Pack step has no specification file</em></strong></td><td>Fill in <strong>Specification</strong>.</td></tr>
+    <tr><td><strong><em>A property of the NuGet Pack step is not Name=value, or holds a semicolon</em></strong></td><td>Use one <code>Name=value</code> per line, with no semicolons.</td></tr>
+    <tr><td><strong><em>The NuGet Pack step cleans its output directory but has none</em></strong></td><td>Set <strong>Output directory</strong> to a folder inside the working directory.</td></tr>
+    <tr><td><strong><em>The output directory … is not a folder inside the working directory, so it is not cleaned</em></strong></td><td>Use a relative folder such as <code>out</code>.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="nuget-installer.html">NuGet Installer</a></li>
+  <li><a href="nuget-publish.html">NuGet Publish</a></li>
+  <li><a href="../how-to/steps-pack-and-publish-nuget.html">Pack and publish a NuGet package</a></li>
+  <li><a href="runners.html">Runners</a></li>
+  <li><a href="common-step-fields.html">Fields every runner has</a></li>
+</ul>
+</main>
+</body>
+</html>

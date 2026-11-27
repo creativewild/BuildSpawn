@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Asked parameters (prompt) · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="parameters/param-prompt">
+<main class="doc">
+<h1>Asked parameters (prompt)</h1>
+<p class="lead">How a parameter asks for its value when a build starts, or keeps one fixed.</p>
+
+<h2>When to use it</h2>
+<p>Use it to decide what people see in the Run dialog. Some values must be typed every time (the version to release). Others must never change (the SDK path).</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Parameters</strong>.</li>
+  <li>Click <strong>Edit</strong> on a parameter, or <strong>Add parameter</strong>.</li>
+  <li>Click <strong>Customize the run dialog</strong>.</li>
+  <li>Choose <strong>Display</strong>, and fill in <strong>Label</strong> and <strong>Description</strong>. Tick <strong>Read-only</strong> if nobody may change the value.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+<thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>Display: Normal</td><td>The field is in the Run dialog. A plain Run starts the build at once with the defaults.</td><td>Normal</td><td>Normal</td></tr><tr><td>Display: Hidden</td><td>The field is left out of the Run dialog. The configured value is a fixed value the build always uses. Hidden is not protection: anyone who can read the build configuration can see the value.</td><td>-</td><td>Hidden</td></tr><tr><td>Display: Prompt</td><td>The <strong>Run</strong> button opens the Run dialog every time, so people must look at the value.</td><td>-</td><td>Prompt</td></tr><tr><td>Label</td><td>Shown in the Run dialog in place of the name.</td><td>The name</td><td>Version to release</td></tr><tr><td>Description</td><td>Shown under the field.</td><td>Empty</td><td>Like 1.4.0</td></tr><tr><td>Read-only</td><td>The configured value is always used. A build request cannot change it.</td><td>Off</td><td>On</td></tr>
+</tbody>
+</table>
+
+<h2>A worked example</h2>
+<p>The release build has <code>RELEASE_VERSION</code>, a Text parameter with a Regex rule <code>\d+\.\d+\.\d+</code>, label <em>Version to release</em> and display <strong>Prompt</strong>. The nightly schedule starts the same build with a fixed value, so it needs an explicit value too (see <a href="../how-to/params-ask-for-value.html">Ask for a value when a build starts</a>).</p>
+<h2>What you see when it runs</h2>
+<p>The Parameters tab shows <em>Asked when the build runs</em> and the value type for asked parameters, and <em>Fixed value</em> for hidden ones. The Run dialog opens when you click <strong>Run</strong> and lists the label, description and rules.</p>
+<h2>Problems and fixes</h2>
+<table>
+<thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+<tbody>
+<tr><td>A build started by a trigger has no value</td><td>A trigger, the API or the command line uses the default. Give the parameter a safe default, or use a <strong>Not empty</strong> rule so the build is refused.</td></tr><tr><td>Someone changed a read-only value</td><td>They cannot. The configured value is used.</td></tr>
+</tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="parameters.html">Parameters</a></li>
+  <li><a href="../running-builds/run-dialog.html">The Run dialog</a></li>
+  <li><a href="param-typed.html">Parameter with a value type</a></li>
+</ul>
+</main>
+</body>
+</html>

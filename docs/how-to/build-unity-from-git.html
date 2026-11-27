@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Build a Unity project from Git · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/build-unity-from-git">
+<main class="doc">
+<h1>Build a Unity project from Git</h1>
+<p class="lead">Check out a Unity project from Git and build a Windows player with the Unity Editor in batch mode.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>A <strong>project</strong> to hold the build configuration. See <a href="../projects/projects.html">Projects</a>.</li>
+  <li>The <strong>Git repository</strong> of your Unity project: its address, the branch, and credentials if it is private (an SSH key or an access token).</li>
+  <li>A <strong>build script</strong> in the project: a static method in a class under <code>Assets/Editor</code> that calls <code>BuildPipeline.BuildPlayer</code>. There is an example below.</li>
+  <li>An <strong>agent with the Unity Editor</strong> installed through Unity Hub, ideally the version your project uses, and the <code>git</code> command. Open the agent and click the <strong>Unity</strong> tab to see which Editors it found.</li>
+</ul>
+<figure class="shot">
+  <img src="../../assets/shots/how-to/build-unity-from-git-5.png" alt="The Unity tab of the agent win-build-01: Unity Editors on this agent, one Editor, parameter unity.path.6000.5.1, version 6000.5.1, found by Standard folder, path C:\Program Files\Unity\Hub\Editor\6000.5.1f1, with a Check again button, and a list of where the agent looks">
+  <figcaption>The agent's Unity tab lists the Editors a Unity step can use.</figcaption>
+</figure>
+<p>This is the build script used in this guide, in <code>Assets/Editor/BuildScript.cs</code>:</p>
+<pre><code>using UnityEditor;
+
+public static class BuildScript
+{
+    public static void BuildWindows()
+    {
+        var scenes = new[] { "Assets/Scenes/Main.unity" };
+        BuildPipeline.BuildPlayer(scenes, "Builds/Win64/SkyforgeMobile.exe",
+            BuildTarget.StandaloneWindows64, BuildOptions.None);
+    }
+}</code></pre>
+
+<h2>Steps</h2>
+<h3>Create the build configuration and connect Git</h3>
+<ol class="steps">
+  <li>Open your project, click <strong>New Item</strong>, type a name such as <code>Mobile Windows Build</code>, choose <strong>Freestyle project</strong> and click <strong>OK</strong>.</li>
+  <li>On the <strong>Settings</strong> tab, click <strong>Version Control</strong> and choose <strong>Git</strong>.</li>
+  <li>Type the <strong>Repository URL</strong>, for example <code>https://git.studio.example/skyforge/mobile.git</code>.</li>
+  <li>Pick the <strong>Credentials</strong>, or click <strong>Add</strong> to add an access token or SSH key. A public repository needs none.</li>
+  <li>Under <strong>Branches to build</strong>, type the branch in <strong>Branch Specifier</strong>, for example <code>*/main</code>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/how-to/build-unity-from-git-1.png" alt="The Version Control settings of HT1 Unity Windows Build: Git chosen, Repository URL file:///E:/buildspawn-docs/repos/skyforge-mobile.git, Credentials none, and Branch Specifier */main">
+  <figcaption>A Git root on the main branch. This demo uses a repository on the server's own disk.</figcaption>
+</figure>
+<div class="callout tip"><p>Add <code>Library/</code>, <code>Temp/</code>, <code>Logs/</code> and <code>Builds/</code> to your <code>.gitignore</code>. Unity rebuilds them, and they make checkouts slow.</p></div>
+
+<h3>Add the Unity step</h3>
+<ol class="steps" start="7">
+  <li>Click <strong>Build Steps</strong>, then <strong>Add build step</strong>. Type <code>Unity</code> in <strong>Filter step types</strong> and click the <strong>Unity</strong> tile.</li>
+  <li>In <strong>Step name</strong>, type <code>Build Windows player</code>.</li>
+  <li>Leave <strong>Project path</strong> empty if the Unity project is at the top of the repository. Otherwise type its folder, for example <code>Mobile</code>.</li>
+  <li>In <strong>Execute method</strong>, type the class and method of your build script: <code>BuildScript.BuildWindows</code>. The box suggests methods it found in <code>Assets/Editor</code> after a first checkout.</li>
+  <li>In <strong>Build target</strong>, type <code>StandaloneWindows64</code>. Unity switches to that platform before the project loads.</li>
+  <li>Keep <strong>Do not initialize the graphics device</strong> ticked. Build machines often have no screen.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/how-to/build-unity-from-git-2.png" alt="The Unity project part of the Unity step: Project path, Execute method BuildScript.BuildWindows, Build profile empty, Build target StandaloneWindows64, Standalone player Select, Player output path empty, and Do not initialize the graphics device ticked">
+  <figcaption>The project, the build method and the target platform.</figcaption>
+</figure>
+<div class="callout note"><p>With no build script, choose a <strong>Standalone player</strong> and fill in the <strong>Player output path</strong> instead. On Unity 6 you can also name a <strong>Build profile</strong> asset.</p></div>
+<ol class="steps" start="13">
+  <li>Under <strong>Unity installation</strong>, leave <strong>Detection mode</strong> on <strong>Auto</strong>. In <strong>Unity version</strong>, type the version your project needs, for example <code>2022.3</code>. Left empty, the step uses the version in <code>ProjectSettings/ProjectVersion.txt</code> if the agent has it, and the newest Editor on the agent if not.</li>
+  <li>To run your tests too, tick <strong>Run tests from the project</strong> under <strong>Unity tests</strong> and pick a <strong>Test platform</strong>. The step records the test results on the build.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/how-to/build-unity-from-git-3.png" alt="The Unity tests and Unity installation parts of the step: Run tests from the project unticked, Test platform Default, Test categories and Test names empty, Detection mode Auto and Unity version empty with the hint 2022.3">
+  <figcaption>Tests and the Unity version.</figcaption>
+</figure>
+
+<h3>Keep the player and run it</h3>
+<ol class="steps" start="16">
+  <li>Click <strong>Post-build Actions</strong>, add <strong>Archive the artifacts</strong> and type <code>Builds/**</code> in <strong>Files to archive</strong>. Click <strong>Save</strong>.</li>
+  <li>Click <strong>Run</strong>.</li>
+</ol>
+
+<h2>Check it worked</h2>
+<p>Open the build. The <strong>Build steps</strong> card shows <strong>Build Windows player</strong> with the Unity runner and its result, the summary shows the commit it built, and the player is under <strong>Build Artifacts</strong>.</p>
+<figure class="shot">
+  <img src="../../assets/shots/how-to/build-unity-from-git-4.png" alt="Build #2 of HT1 Unity Windows Build: Success, took 3 min 7 sec, commit 766996f; Build steps with Build Windows player, Unity, Success in 2 min 28 sec; post-build action Archive the artifacts; the Git revision and repository; and a Build Artifacts card">
+  <figcaption>A real build of the demo project: the step passed in 2 minutes 28 seconds.</figcaption>
+</figure>
+<p>On the <strong>Console Output</strong> tab, the Git checkout comes first, then one block for the Unity step. Expand it to read the Unity log. The first lines name the Editor the step picked and the full command line it ran.</p>
+<figure class="shot">
+  <img src="../../assets/shots/how-to/build-unity-from-git-6.png" alt="The Console Output of build #2 with blocks collapsed: Git clones skyforge-mobile.git and checks out commit 766996f, then the block Step 1/1: Build Windows player, Unity, 3,791 lines, 2 min 28 s, then Post-build actions, Archive the artifacts, and Finished: SUCCESS">
+  <figcaption>The checkout, then the Unity step as one block you can open.</figcaption>
+</figure>
+
+<h2>Troubleshooting</h2>
+<h3>The wrong Unity version ran</h3>
+<p>In <strong>Auto</strong> mode with an empty <strong>Unity version</strong>, the step takes the newest Editor on the agent when the project's own version isn't installed. Unity then upgrades the project in the workspace. Type the version in <strong>Unity version</strong>, and install that version on the agent. Check the agent's <strong>Unity</strong> tab and click <strong>Check again</strong> after you install it.</p>
+<h3>The step can't find a Unity Editor</h3>
+<p>The agent looks in Unity Hub's list, the usual install folders and the <code>UNITY_HOME</code> and <code>UNITY_HINT_PATH</code> variables. The agent must run as the user who installed Unity Hub. For an Editor in another folder, set <strong>Detection mode</strong> to the manual mode and fill in <strong>Unity folder</strong>.</p>
+<h3>Unity says the executeMethod class could not be found</h3>
+<p>The class must be in a folder named <code>Editor</code> and the method must be <code>public static</code>. Type it as <code>ClassName.MethodName</code>, with the namespace in front if the class has one.</p>
+<h3>A passed step shows a red error count</h3>
+<p>Unity prints some messages as errors even when the build works, for example from its licensing client. The step result comes from Unity's exit code. Click the count to jump to the line and decide if it matters.</p>
+
+<h2>Next steps</h2>
+<div class="cards">
+  <a class="card" href="../version-control/git.html"><h3>Git</h3><p>Branches, several roots and building another branch once.</p></a>
+  <a class="card" href="../build-steps/runners.html"><h3>Runners</h3><p>All the Unity step's options and the other runners.</p></a>
+  <a class="card" href="../running-builds/triggers.html"><h3>Triggers</h3><p>Build each push with a version control trigger.</p></a>
+  <a class="card" href="pass-values-between-steps.html"><h3>Pass a version number between steps</h3><p>Stamp the player with a version from an earlier step.</p></a>
+</div>
+</main>
+</body>
+</html>

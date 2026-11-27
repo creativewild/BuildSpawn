@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project icons · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/project-icons">
+<main class="doc">
+<h1>Project icons</h1>
+<p class="lead">Show the platform of a project or build configuration with an icon in the tree, in tables and in the Run dialog.</p>
+<h2>Why use them</h2><p>A tree with <em>PS5 Build</em>, <em>Xbox Series Build</em> and <em>Windows Build</em> is easier to scan when each has its platform icon. The icon shows in the project tree, in tables, in the page header and in the Run dialog. The build result is shown separately, as a dot.</p><h2>Set an icon</h2><ol class="steps">
+  <li>Open the project or build configuration and click <strong>Settings</strong>. For a build configuration open <strong>General</strong>.</li>
+  <li>Under <strong>Icon</strong> click the platform. The <strong>Sidebar preview</strong> shows how it looks.</li>
+  <li>Choose an <strong>Icon colour</strong> if you like (see below).</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/projects/bc-general.png" alt="The Icon choices on the General tab">
+  <figcaption>The platform icons on the General tab of a build configuration.</figcaption>
+</figure>
+<h2>The icons</h2><table>
+  <thead><tr><th>Icon</th><th>Use for</th></tr></thead>
+  <tbody>
+    <tr><td>Project</td><td>The default for a project.</td></tr>
+    <tr><td>PlayStation</td><td>PS4, PS5 and dev kit builds.</td></tr>
+    <tr><td>Xbox</td><td>Xbox builds.</td></tr>
+    <tr><td>Windows</td><td>Windows desktop builds.</td></tr>
+    <tr><td>Steam</td><td>Steam uploads and Steam Deck.</td></tr>
+    <tr><td>Nintendo Switch</td><td>Switch builds.</td></tr>
+    <tr><td>Apple</td><td>macOS builds.</td></tr>
+    <tr><td>iOS</td><td>iOS builds.</td></tr>
+    <tr><td>Android</td><td>Android builds.</td></tr>
+    <tr><td>Linux</td><td>Linux and dedicated server builds.</td></tr>
+    <tr><td>Software</td><td>Generic software.</td></tr>
+    <tr><td>Tools</td><td>Tools and pipelines.</td></tr>
+    <tr><td>Tests</td><td>Test builds.</td></tr>
+    <tr><td>Custom...</td><td>Any icon from the icon library.</td></tr>
+  </tbody>
+</table>
+<p><strong>Custom...</strong> or <strong>Browse the icon library...</strong> opens the library. Search it for any other icon.</p><h2>Icon colour</h2><table>
+  <thead><tr><th>Choice</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td>Default</td><td>The theme's normal icon colour.</td></tr>
+    <tr><td>Favourites</td><td>Colours your team keeps for reuse. <strong>Manage</strong> edits the list. They are shared with everyone.</td></tr>
+    <tr><td>Colours</td><td>A set chosen to read on both the light and the dark theme.</td></tr>
+    <tr><td>Custom</td><td>A colour as <code>RRGGBB</code>, one for the light theme and one for the dark theme. <strong>Clear</strong> removes it.</td></tr>
+  </tbody>
+</table>
+<h2>What is inherited</h2><p>A project without a choice keeps the project icon. A build configuration without a choice shows the generic icon. The icon is saved with the item and kept when you rename, move or copy it.</p><h2>A worked example</h2><p>In <strong>Game</strong>, <em>PS5 Build</em> gets PlayStation, <em>Xbox Series Build</em> gets Xbox and <em>Windows Build</em> gets Windows. The project <strong>Tools</strong> gets the Tools icon.</p><h2>Problems and fixes</h2><table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>The icon does not show</td><td>Save the page. The tree updates on the next page load.</td></tr>
+    <tr><td>The icon is hard to read in the dark theme</td><td>Pick a colour from <strong>Colours</strong>, which reads on both themes, or set a separate dark colour.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="projects.html">Projects</a></li>
+  <li><a href="bc-general.html">General</a></li>
+  <li><a href="folder-settings.html">Project settings</a></li>
+</ul>
+</main>
+</body>
+</html>

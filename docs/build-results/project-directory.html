@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The project directory · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-results/project-directory">
+<main class="doc">
+<h1>The project directory</h1>
+<p class="lead">The Projects page lists every project and build configuration with its latest result. Filter it by name or by result, open projects in place, and choose how large the icons are.</p>
+
+<figure class="shot">
+  <img src="../../assets/shots/build-results/directory-view.png" alt="The Projects page with the view tab All, a filter box, the Result list, the icon size buttons S, M and L, and the Directory table of four projects with their status, latest build, start time, duration and health">
+  <figcaption>The Projects page and its Directory.</figcaption>
+</figure>
+
+<h2>When to use it</h2>
+<p>Use the directory as your start page: to see at once what fails, to find a build configuration, and to open a build. For a short list of the things everybody must see, use the <a href="dashboard-widgets.html">Dashboard</a>.</p>
+
+<h2>Open the directory</h2>
+<p>Click <strong>Projects</strong> in the top bar. The title line counts what is there, for example <em>4 projects &middot; 21 build configurations &middot; 0 building &middot; 1 queued</em>.</p>
+
+<h2>The Directory table</h2>
+<table>
+  <tr><th>Column</th><th>What it shows</th></tr>
+  <tr><td><strong>Name</strong></td><td>A project (folder icon) or a build configuration (its platform icon), with its description. Click the arrow before a project to open it and see what is inside. Click a name to open its page. Click a column heading to close every open project again.</td></tr>
+  <tr><td><strong>Items</strong></td><td>For a project, how many items are directly inside it.</td></tr>
+  <tr><td><strong>Status</strong></td><td>For a project, how many build configurations fail, for example <em>2 failing</em>, or <em>All 12 passing</em>. For a build configuration, its last result: <em>Success</em>, <em>Failed</em>, <em>Unstable</em>, <em>Running</em> or <em>Not built</em>.</td></tr>
+  <tr><td><strong>Latest build</strong></td><td>The newest build, with its number. For a project, the newest build of anything inside it.</td></tr>
+  <tr><td><strong>Started (GMT)</strong></td><td>When that build started.</td></tr>
+  <tr><td><strong>Duration</strong></td><td>How long it took.</td></tr>
+  <tr><td><strong>Health</strong></td><td>A weather icon for the share of recent builds that passed. A project shows the worst health of what is inside it. Hover the icon for the percent.</td></tr>
+</table>
+<p>The heading line of the table says <em>Sorted by name</em>, or <em>Custom order</em> when administrators put the items in their own order. See <a href="../get-started/tour.html">A tour of the interface</a>.</p>
+
+<h2>Filter by name</h2>
+<ol class="steps">
+  <li>Click <strong>Filter projects and configurations</strong> and type part of a name, for example <code>windows</code>.</li>
+  <li>The table shows only the matching rows. <em>No project or configuration matches.</em> appears when nothing fits.</li>
+  <li>Clear the box to see everything again.</li>
+</ol>
+
+<h2>Filter by result</h2>
+<p>The list beside the filter box shows one result at a time:</p>
+<table>
+  <tr><th>Choice</th><th>Shows</th></tr>
+  <tr><td><strong>Result: Any</strong></td><td>Everything. This is the default.</td></tr>
+  <tr><td><strong>Result: Failed</strong></td><td>Build configurations whose last build failed.</td></tr>
+  <tr><td><strong>Result: Unstable</strong></td><td>Builds that passed but have failing tests.</td></tr>
+  <tr><td><strong>Result: Success</strong></td><td>Builds that passed.</td></tr>
+  <tr><td><strong>Result: Running</strong></td><td>Build configurations that are building now.</td></tr>
+  <tr><td><strong>Result: Not built</strong></td><td>Build configurations that never ran.</td></tr>
+</table>
+<p>You can use the name filter and the result together, for example <code>Result: Failed</code> and <code>console</code> to find failing console builds.</p>
+
+<h2>Icon size</h2>
+<p>The buttons <strong>S</strong>, <strong>M</strong> and <strong>L</strong> beside <em>Icon:</em> set how large the icons and rows are: small (16 pixels), medium (24) or large (32). Your choice is kept in your browser.</p>
+
+<h2>Views</h2>
+<p>The tab <strong>All</strong> lists everything. A view is an extra tab with only the items you pick, for example one for the console builds. Click the <strong>+</strong> beside the tabs to add a view. The list of build configurations there has a search box, <strong>Select all</strong> and <strong>Clear</strong> and a count. <strong>Build Chains</strong> opens the page of build chains: build configurations that depend on each other.</p>
+
+<h2>Legend and feeds</h2>
+<p>Under the table, <strong>Legend</strong> explains every status icon and health icon. The three links beside it are Atom feeds. See <a href="atom-feeds.html">Atom feeds</a>.</p>
+
+<h2>The root project page</h2>
+<p>The page of the root project (<em>Root project</em>) is a second way in. It shows <em>Configurations and subprojects</em> in a table with Name, Result, Latest build, Duration and Health, and a Filter box. A project that is paused or archived says so. <strong>Hide archived projects</strong> hides the archived ones. Its tabs are Overview, Build History, Perforce roots, Credentials, Build settings and Settings. Templates are listed in their own card below.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <tr><th>Problem</th><th>What to do</th></tr>
+  <tr><td>A project or build configuration is missing.</td><td>You see only what you may see. Ask a project administrator for the project viewer role. Archived projects are hidden: use <strong>Hide archived projects</strong> on the root project page to toggle them.</td></tr>
+  <tr><td>The filter finds nothing.</td><td>The result list may still say <em>Failed</em>. Set it to <em>Result: Any</em>.</td></tr>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="history.html">History</a></li>
+  <li><a href="dashboard-widgets.html">The Dashboard</a></li>
+  <li><a href="../projects/projects.html">Projects</a>: how to build the tree.</li>
+</ul>
+
+</main>
+</body>
+</html>

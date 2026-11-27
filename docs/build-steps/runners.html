@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Runners · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/runners">
+<main class="doc">
+<h1>Runners</h1>
+<p class="lead">A runner is the kind of work a step does, such as a command line or a Unity build. You pick one each time you add a build step. Each runner has its own page.</p>
+<div class="callout note"><p><strong>Resolve artifact dependencies</strong> is a step for Pipeline scripts, where you write it as <code>resolveArtifactDependencies()</code> inside <code>node</code>. It copies the artifact dependencies of the build configuration into the workspace. The step picker of an ordinary build configuration does not offer it, because a build configuration resolves its artifact dependencies by itself before the first step. See <a href="../parameters/dependencies.html">Dependencies</a>.</p></div>
+
+<h2 id="add">Add a step</h2>
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>. The runner picker opens, grouped by kind: <strong>Command line and scripts</strong>, <strong>Build tools</strong>, <strong>Containers</strong>, <strong>Tests</strong>, <strong>Packages</strong>, <strong>Upload and deploy</strong>, <strong>Code quality and coverage</strong>, <strong>Source control</strong> and <strong>Other</strong>.</li>
+  <li>Type in <strong>Filter step types</strong> to find a runner fast, then click its tile.</li>
+  <li>Give the step a <strong>Step name</strong>, such as <code>Compile</code>. The <strong>Step ID</strong> is made from the name and cannot change later.</li>
+  <li>Fill in the runner's fields and click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/build-steps/add-step.png" alt="The Add build step page with a Filter step types field and runner tiles grouped by kind">
+  <figcaption>The runner picker. Each tile says what the runner does.</figcaption>
+</figure>
+<p>Each tile says what the runner does and which tool the agent needs.</p>
+<figure class="shot">
+  <img src="../../assets/shots/build-steps/edit-step.png" alt="The Edit build step page for a Command Line step: Runner type with a Change link, Step name, a locked Step ID and an Enabled switch">
+  <figcaption>Editing a step. <strong>Change</strong> beside the runner type picks another runner.</figcaption>
+</figure>
+
+<h3>What every step has</h3>
+<p>Below the runner's own fields, every step has the same extra settings:</p>
+<ul>
+  <li><strong>Working directory</strong>, <strong>Environment variables</strong>, <strong>Test reports</strong> and <strong>Container settings</strong> (most runners). See <a href="common-step-fields.html">Fields every runner has</a>.</li>
+  <li><strong>Outputs</strong>, <strong>Run on</strong> and <strong>Files sent back</strong>: see <a href="parallel-blocks.html">Parallel blocks and overrides</a>.</li>
+  <li><strong>Execution</strong>: when the step runs, conditions and <strong>Retry on failure</strong>. See <a href="step-list.html">The steps list and the step editor</a> and <a href="resume-and-retry.html">Resume and retry</a>.</li>
+</ul>
+<p>Every step also gets a variable <code>BUILD_STEP_STATUS_&lt;ID&gt;</code> that later steps can read: <code>SUCCESS</code>, <code>FAILURE</code>, <code>UNSTABLE</code>, <code>SKIPPED</code>, <code>DISABLED</code> or <code>ABORTED</code>. See <a href="step-statuses.html">Step statuses</a>.</p>
+
+<h2>All runners</h2>
+<h3>Command line and scripts</h3>
+<table>
+  <thead><tr><th>Runner</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><a href="command-line.html">Command Line</a></td><td>A script or one program. Shell on Linux and macOS, batch on Windows.</td></tr>
+    <tr><td><a href="powershell.html">PowerShell</a></td><td>A script or <code>.ps1</code> file, with Windows PowerShell or <code>pwsh</code>.</td></tr>
+    <tr><td><a href="python.html">Python</a></td><td>A script, file or module with the Python interpreter.</td></tr>
+  </tbody>
+</table><h3>Build tools</h3>
+<table>
+  <thead><tr><th>Runner</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><a href="dotnet.html">.NET</a></td><td>The <code>dotnet</code> command: build, test, publish, restore, run.</td></tr>
+    <tr><td><a href="msbuild.html">MSBuild</a></td><td>Builds a Visual Studio project or solution.</td></tr>
+    <tr><td><a href="maven.html">Maven</a></td><td>Maven goals, with test reports and optional coverage.</td></tr>
+    <tr><td><a href="gradle.html">Gradle</a></td><td>Gradle tasks, using the project wrapper when there is one.</td></tr>
+    <tr><td><a href="ant.html">Ant</a></td><td>Ant targets with a build file and properties.</td></tr>
+    <tr><td><a href="nodejs.html">Node.js</a></td><td>A script or file with <code>node</code>, or an <code>npm</code> or <code>yarn</code> command.</td></tr>
+    <tr><td><a href="kotlin-script.html">Kotlin Script</a></td><td>A Kotlin script with <code>kotlinc -script</code>.</td></tr>
+    <tr><td><a href="csharp-script.html">C# Script</a></td><td>A C# script with <code>dotnet-script</code> or <code>csi</code>.</td></tr>
+    <tr><td><a href="rake.html">Rake</a></td><td>Ruby <code>rake</code> tasks, with RSpec and Cucumber reports.</td></tr>
+    <tr><td><a href="sbt.html">Simple Build Tool</a></td><td>Scala <code>sbt</code> commands.</td></tr>
+    <tr><td><a href="xcode.html">Xcode Project</a></td><td>Builds and tests with <code>xcodebuild</code> on a macOS agent.</td></tr>
+    <tr><td><a href="../game-builds/unity.html">Unity</a></td><td>Builds and tests a Unity project with the Editor in batch mode.</td></tr>
+    <tr><td><a href="../game-builds/unreal.html">Unreal Engine</a></td><td>BuildCookRun, BuildGraph, automation tests and more.</td></tr>
+  </tbody>
+</table><h3>Containers</h3>
+<table>
+  <thead><tr><th>Runner</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><a href="docker.html">Docker</a></td><td>Build an image, push it, or run any docker command.</td></tr>
+    <tr><td><a href="docker-compose.html">Docker Compose</a></td><td>Start, stop and build compose services.</td></tr>
+  </tbody>
+</table><h3>Tests</h3>
+<table>
+  <thead><tr><th>Runner</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><a href="nunit.html">NUnit</a></td><td>The NUnit 3 console runner, with failed-first and coverage.</td></tr>
+    <tr><td><a href="vstest.html">VSTest</a></td><td>Tests with <code>vstest.console.exe</code>.</td></tr>
+    <tr><td><a href="mstest.html">MSTest</a></td><td>Tests with the MSTest command line tool.</td></tr>
+  </tbody>
+</table><h3>Packages</h3>
+<table>
+  <thead><tr><th>Runner</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><a href="nuget-installer.html">NuGet Installer</a></td><td>Restore or install NuGet packages.</td></tr>
+    <tr><td><a href="nuget-pack.html">NuGet Pack</a></td><td>Build a <code>.nupkg</code>.</td></tr>
+    <tr><td><a href="nuget-publish.html">NuGet Publish</a></td><td>Push packages to a feed with a secret key.</td></tr>
+  </tbody>
+</table><h3>Upload and deploy</h3>
+<table>
+  <thead><tr><th>Runner</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><a href="ssh-exec.html">SSH Exec</a></td><td>Run commands on a remote server.</td></tr>
+    <tr><td><a href="ssh-upload.html">SSH Upload</a></td><td>Copy files over SFTP.</td></tr>
+    <tr><td><a href="ftp-upload.html">FTP Upload</a></td><td>Copy files to an FTP or FTPS server.</td></tr>
+    <tr><td><a href="smb-upload.html">SMB Upload</a></td><td>Copy files to a Windows or Samba share.</td></tr>
+    <tr><td><a href="container-deployer.html">Container Deployer</a></td><td>Deploy a WAR or EAR to Tomcat, JBoss or GlassFish.</td></tr>
+    <tr><td><a href="../game-builds/steam-upload.html">Steam upload and the other Steam steps</a></td><td>Upload a build to Steam.</td></tr>
+  </tbody>
+</table><h3>Code quality and coverage</h3>
+<table>
+  <thead><tr><th>Runner</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><a href="code-inspections.html">Code Inspections</a></td><td>Reads SARIF, Checkstyle, PMD and SpotBugs reports, or runs a tool.</td></tr>
+    <tr><td><a href="duplicates-finder.html">Duplicates finder</a></td><td>PMD copy-paste detector.</td></tr>
+    <tr><td><a href="fxcop.html">FxCop</a></td><td>FxCopCmd on .NET assemblies (Windows only).</td></tr>
+    <tr><td><a href="resharper-inspections.html">Inspections (ReSharper)</a></td><td><code>jb inspectcode</code> on a solution.</td></tr>
+    <tr><td><a href="resharper-duplicates.html">Duplicates (ReSharper)</a></td><td><code>dupfinder</code> on a solution.</td></tr>
+    <tr><td><a href="dotcover.html">dotCover</a></td><td>Runs a program under dotCover and writes a coverage report.</td></tr>
+  </tbody>
+</table><h3>Other</h3>
+<table>
+  <thead><tr><th>Runner</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><a href="shell-script.html">Execute shell</a></td><td>The classic shell step.</td></tr>
+    <tr><td><a href="batch-file.html">Execute Windows batch command</a></td><td>The classic batch step.</td></tr>
+    <tr><td><a href="run-with-timeout.html">Run with timeout</a></td><td>Wraps another step with a time limit.</td></tr>
+    <tr><td><a href="parallel-blocks.html">Parallel block</a></td><td>Runs groups of steps side by side. See also <a href="matrix-mode.html">Matrix mode</a>.</td></tr>
+    <tr><td><a href="configured-build-step.html">Configured build step</a></td><td>The wrapper that holds name, ID, policy, conditions and retry.</td></tr>
+  </tbody>
+</table>
+<div class="callout tip"><p>Add-ons you install can add more step types. They appear in the picker under <strong>Other</strong>.</p></div>
+<div class="callout note"><p>Runners never pass your fields through a shell, except the Command Line script and the classic shell and batch steps. A secret passed as a command-line argument can be seen by other processes on the agent, so pass secrets through the environment instead. See <a href="../parameters/secrets.html">Secrets</a>.</p></div>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="step-list.html">The steps list and the step editor</a></li>
+  <li><a href="common-step-fields.html">Fields every runner has</a></li>
+  <li><a href="script-editor.html">The script editor</a></li>
+  <li><a href="parallel-blocks.html">Parallel blocks and overrides</a></li>
+</ul>
+</main>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Archive the artifacts · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="post-build/archive-artifacts">
+<main class="doc">
+<h1>Archive the artifacts</h1>
+<p class="lead">Keeps files from the workspace with the build, so you can download them from the build page later.</p>
+<h2>When to use it</h2>
+<p>Use it for anything you want after the agent is cleaned: the game build, installers, crash symbols, logs. Archived files show on the <strong>Artifacts</strong> tab of the build. Later builds and other build configurations can use them as <a href="../parameters/dependencies.html">artifact dependencies</a>.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration, click <strong>Settings</strong>, then <strong>Post-build Actions</strong>. Click <strong>Add post-build action</strong> and choose <strong>Archive the artifacts</strong>.</li>
+  <li>In <strong>Files to archive</strong> type the files, relative to the workspace, for example <code>Builds/Win64/**</code>.</li>
+  <li>Open <strong>More options</strong> if you need to exclude files or change a switch.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<h2>Every field</h2>
+<p>The General tab of the build configuration has the same idea under <strong>Artifact paths</strong>, with the form <code>source =&gt; target folder</code>. See <a href="../projects/bc-general.html">General</a>.</p><table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Files to archive</td><td>Files to keep, as Ant patterns. Comma is the only separator. Only files inside the workspace can be archived.</td><td>Empty</td><td><code>Builds/Win64/**/*.zip</code></td></tr>
+    <tr><td>Excludes</td><td>Files that match are not archived, even if they match the first field. Comma separated.</td><td>Empty</td><td><code>**/*.pdb</code></td></tr>
+    <tr><td>Do not fail build if archiving returns nothing</td><td>Normally a build fails when no file matches. With this on, the build only gets a warning.</td><td>Off</td><td>Off</td></tr>
+    <tr><td>Archive artifacts only if build is successful</td><td>Failed builds keep no artifacts. Unstable builds still do.</td><td>Off</td><td>On</td></tr>
+    <tr><td>Fingerprint all archived artifacts</td><td>Record a fingerprint of each file, to track where it is used.</td><td>Off</td><td>Off</td></tr>
+    <tr><td>Use default excludes</td><td>Leave out files that version control tools make, such as <code>.git</code> folders.</td><td>On</td><td>On</td></tr>
+    <tr><td>Treat include and exclude patterns as case sensitive</td><td>Off makes <code>**/*.ZIP</code> match <code>.zip</code> files.</td><td>On</td><td>On</td></tr>
+    <tr><td>Follow symbolic links</td><td>Off: symbolic links in the workspace are ignored.</td><td>Off</td><td>Off</td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p>The <strong>Windows Build</strong> of Skyforge writes its output to <code>Output/</code>. The studio sets <strong>Files to archive</strong> to <code>Output/**</code> and <strong>Excludes</strong> to <code>**/*.pdb</code>. The symbol files stay out; the 2 GB game package stays in.</p><h2>What you see when it runs</h2>
+<p>The log says how many files were archived. The build page gets an <strong>Artifacts</strong> list with sizes.</p><pre class="terminal" data-title="build log">Archiving artifacts
+Archived 412 artifacts</pre>
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>No files found to archive</td><td>The pattern did not match. Paths are relative to the workspace. Check that an earlier step made the files. Turn on <strong>Do not fail build if archiving returns nothing</strong> only if empty output is normal.</td></tr>
+    <tr><td>Disk is filling up</td><td>Artifacts are kept as long as the build. Use <a href="../projects/bc-retention.html">retention</a> to keep artifacts for fewer builds than the builds themselves.</td></tr>
+    <tr><td>Files outside the workspace</td><td>They cannot be archived. Copy them into the workspace first.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="overview.html">After the build: overview</a></li>
+  <li><a href="../projects/bc-post-build-actions.html">Post-build actions tab</a></li>
+  <li><a href="../projects/bc-retention.html">Retention and discard old builds</a></li>
+  <li><a href="../how-to/projects-archive-build-output.html">Archive build output</a></li>
+</ul>
+</main>
+</body>
+</html>

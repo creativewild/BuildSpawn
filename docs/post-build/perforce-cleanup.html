@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Perforce: Cleanup · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="post-build/perforce-cleanup">
+<main class="doc">
+<h1>Perforce: Cleanup</h1>
+<p class="lead">Deletes the Perforce workspace (client) after the build.</p>
+<h2>When to use it</h2>
+<p>Use it with agents that are created and removed often, so the server does not collect old workspaces.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration, click <strong>Settings</strong>, then <strong>Post-build Actions</strong>. Click <strong>Add post-build action</strong> and choose <strong>Perforce: Cleanup</strong>.</li>
+  <li>Tick <strong>Delete Client</strong>. Tick <strong>Force Delete Client</strong> only if a normal delete fails.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Delete Client</td><td>Delete the workspace spec after the build (<code>p4 client -d</code>).</td><td>Off</td><td>On</td></tr>
+    <tr><td>Force Delete Client</td><td>Force the delete (<code>p4 client -f -d</code>).</td><td>Off</td><td>Off</td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p>Cloud build agents that are thrown away each night use <strong>Delete Client</strong>, so the Perforce server does not keep a workspace per agent.</p><h2>What you see when it runs</h2>
+<p>The log shows the workspace being deleted. Files on the agent are not touched.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>Delete fails: the client has opened files</td><td>Use <strong>Force Delete Client</strong>, or revert the files first.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="overview.html">After the build: overview</a></li>
+  <li><a href="../projects/bc-post-build-actions.html">Post-build actions tab</a></li>
+  <li><a href="../version-control/perforce.html">Perforce</a></li>
+</ul>
+</main>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Run with timeout · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/run-with-timeout">
+<main class="doc">
+<h1>Run with timeout</h1>
+<p class="lead">Wraps one other step with a time limit. When the time is up, the actions you choose run.</p>
+
+<h2>When to use it</h2>
+<p>Use it for a step that can hang, such as a device-kit test or a store upload, so it cannot hold an agent for hours.</p>
+
+<h2>How to set it up</h2>
+
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>. Type <code>Run with timeout</code> in <strong>Filter step types</strong> if you like, then click the <strong>Run with timeout</strong> tile (group <strong>Other</strong>).</li>
+  <li>Type a <strong>Step name</strong>, for example <code>Devkit tests</code>.</li>
+  <li>Fill in the fields described below.</li>
+  <li>Optional: set <strong>Execute step</strong>, <strong>Conditions</strong> and <strong>Retry on failure</strong>. See <a href="step-list.html">The steps list and the step editor</a>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<figure class="shot small">
+  <img src="../../assets/shots/build-steps/run-with-timeout.png" alt="The fields of the Run with timeout step in the step editor">
+  <figcaption>The fields of the Run with timeout step, as the step editor shows them.</figcaption>
+</figure>
+
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Time-out strategy</strong></td><td>When the step counts as too slow. <strong>Absolute</strong>: after a number of minutes. <strong>Elastic</strong>: a percentage of the mean duration of the last non-failing builds. <strong>Likely stuck</strong>: many times longer than previous builds. <strong>No Activity</strong>: no log output for a number of seconds. <strong>Deadline</strong>: a time of day.</td><td>Absolute</td><td>No Activity</td></tr>
+    <tr><td><strong>Timeout minutes (Absolute)</strong></td><td>Minutes before the step is stopped.</td><td>Empty</td><td><code>45</code></td></tr>
+    <tr><td><strong>Timeout seconds (No Activity)</strong></td><td>Terminate when there has been no log output for this many seconds.</td><td>Empty</td><td><code>300</code></td></tr>
+    <tr><td><strong>Deadline time, Deadline tolerance in minutes (Deadline)</strong></td><td>The time of day by which the step must be done, and how many minutes more it may take.</td><td>Empty</td><td><code>06:00</code>, <code>5</code></td></tr>
+    <tr><td><strong>Timeout as a percentage of recent non-failing builds, Number of Builds, Timeout minutes, Timeout minutes as the shortest timeout (Elastic)</strong></td><td>Elastic limit: the percentage of the mean duration, how many builds to look at, a default when there is no history, and the shortest allowed limit.</td><td>Empty</td><td><code>150</code>, <code>3</code>, <code>60</code>, <code>10</code></td></tr>
+    <tr><td><strong>Build Step</strong></td><td>The step to run under the limit. Pick any step type.</td><td>None</td><td>Command Line</td></tr>
+    <tr><td><strong>Time-out actions</strong></td><td>What to do on a time-out: <strong>Abort the build</strong>, <strong>Fail the build</strong>, <strong>Abort and restart the build</strong> (with <strong>Maximum restarts</strong>), <strong>Writing the build description</strong> (with a <strong>Description</strong>) or <strong>Perform BuildStep</strong> (with <strong>Ignore failure of the build step</strong> and <strong>Create a launcher for this build step</strong>).</td><td>Abort the build</td><td>Fail the build</td></tr>
+  </tbody>
+</table>
+
+
+<h2>A worked example</h2>
+<p>Stop the PS5 device-kit test if it prints nothing for five minutes. Step name <code>Devkit tests</code>, <strong>Time-out strategy</strong> <strong>No Activity</strong> with <code>300</code> seconds, <strong>Build Step</strong> a Command Line step that runs the tests, <strong>Time-out actions</strong> <strong>Fail the build</strong>.</p>
+
+<h2>What you see when it runs</h2>
+<p>The wrapped step runs as usual. When the limit is reached, the log says the step timed out and your actions run.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong>The step never times out</strong></td><td>Check that the strategy has its number filled in, and that the build step is set.</td></tr>
+    <tr><td><strong>The build is aborted but you wanted only a note</strong></td><td>Use <strong>Writing the build description</strong> instead of <strong>Abort the build</strong>.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="step-list.html">The steps list and the step editor</a></li>
+  <li><a href="resume-and-retry.html">Resume and retry</a></li>
+  <li><a href="runners.html">Runners</a></li>
+  <li><a href="common-step-fields.html">Fields every runner has</a></li>
+</ul>
+</main>
+</body>
+</html>

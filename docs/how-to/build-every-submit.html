@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Build every Perforce submit · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/build-every-submit">
+<main class="doc">
+<h1>Build every Perforce submit</h1>
+<p class="lead">Start a build on its own each time someone submits a change to your Perforce depot.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>A build configuration with at least one build step. See <a href="../projects/create-build-configuration.html">Create a build configuration</a>.</li>
+  <li>A Perforce connection (a P4 credential) with the server address and a build user, for example <strong>Studio Helix Core (buildbot)</strong>. You can also add one while you follow the steps.</li>
+  <li>The <strong>Configure</strong> permission on the build configuration.</li>
+  <li>At least one online agent that can run the build and reach the Perforce server.</li>
+</ul>
+<p>In this guide the build configuration is <strong>HT1 Every Submit</strong> in the <strong>How-to</strong> project. It syncs <code>//depot/skyforge/...</code>.</p>
+
+<h2>Steps</h2>
+<h3>Connect the build configuration to Perforce</h3>
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings</strong>, then <strong>Version Control</strong>.</li>
+  <li>Choose <strong>Perforce Software</strong>. (If several build configurations share one Perforce connection, choose <strong>Perforce root</strong> and pick the shared root instead. <strong>Several roots</strong> lets one build configuration use more than one.)</li>
+  <li>Under <strong>P4 Credentials</strong>, pick your connection, for example <strong>Studio Helix Core (buildbot)</strong>. If there is none yet, click <strong>Add</strong> and type the server, the user and the password or ticket.</li>
+  <li>Set <strong>Workspace behaviour</strong> to <strong>Manual (custom view)</strong>.</li>
+  <li>In <strong>Workspace name</strong>, type a name for your studio with the agent's name at the end, for example <code>skyforge-ci-${NODE_NAME}</code>. Each agent then gets its own workspace.</li>
+  <li>In <strong>View Mappings</strong>, add a row for each line of the view. The view is a table: each row has a mode (<strong>Include</strong>, <strong>Exclude</strong> or <strong>Overlay</strong>), a depot path and a workspace path. Type the depot path <code>//depot/skyforge/...</code>. The workspace path fills in from the workspace name, so it should read:
+<pre><code>//depot/skyforge/... //skyforge-ci-${NODE_NAME}/...</code></pre>
+You can also switch to the text view and paste the lines. The table and the text always stay in step. A preview shows what each line maps.</li>
+  <li>Under <strong>Populate options</strong>, keep <strong>Auto cleanup and sync</strong>. It syncs the new files and removes files that should not be there.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/how-to/build-every-submit-1.png" alt="The Version Control settings of HT1 Every Submit: Perforce Software chosen, P4 Credentials set to Studio Helix Core (buildbot), Workspace behaviour Manual (custom view), Workspace name skyforge-ht1-ci-${NODE_NAME} and the view mapping //depot/skyforge/... to the same workspace">
+  <figcaption>The Perforce connection, the workspace name and the view.</figcaption>
+</figure>
+
+<h3>Add the trigger</h3>
+<ol class="steps">
+  <li>Still in <strong>Settings</strong>, open <strong>Triggers</strong>.</li>
+  <li>Click <strong>Add new trigger</strong>. A list of trigger kinds opens.</li>
+  <li>Click <strong>Add</strong> on the <strong>VCS Trigger</strong> row.
+<figure class="shot">
+  <img src="../../assets/shots/how-to/build-every-submit-2.png" alt="The Add new trigger list: Finish Build Trigger, Schedule Trigger, P4 triggered build, Perforce shelve trigger, VCS Trigger and Retry build trigger, each with an Add or Edit button">
+  <figcaption>Pick <strong>VCS Trigger</strong>. Here it is already on the build configuration, so the row says Edit.</figcaption>
+</figure></li>
+  <li>In <strong>Poll schedule</strong>, type how often Buildspawn asks Perforce for new changes. <code>H/2 * * * *</code> checks about every 2 minutes.</li>
+  <li>Leave <strong>Quiet period</strong> empty, or type a number of seconds, such as <code>60</code>. Buildspawn then waits that long after a submit, so several submits close together go into one build.</li>
+  <li>Click <strong>Save</strong>.
+<figure class="shot">
+  <img src="../../assets/shots/how-to/build-every-submit-3.png" alt="The VCS Trigger form with Poll schedule H/2 * * * *, an empty Quiet period and the Ignore post-commit hooks box not ticked">
+  <figcaption>The VCS Trigger checks every Perforce and Git root of the build configuration.</figcaption>
+</figure></li>
+  <li>Click <strong>Run</strong> once. The first build tells Buildspawn which change it has already built. From then on, each new submit starts a build.</li>
+</ol>
+
+<div class="callout tip"><p>Polling is the simplest way and needs nothing on the Perforce server. If your Perforce administrator can add a server trigger that calls Buildspawn after each submit, add <strong>P4 triggered build</strong> as well. Builds then start at once instead of at the next poll.</p></div>
+
+<h2>Check it worked</h2>
+<ol class="steps">
+  <li>Open the <strong>Perforce Software Polling Log</strong> tab of the build configuration. It shows the last check: the change it found and whether it is new. <em>Polling no changes found</em> means the latest change is already built.</li>
+  <li>Submit a change to a file inside the view. Within the poll time (plus the quiet period) a new build appears in <strong>History</strong>.</li>
+  <li>Open the build and click <strong>Changes</strong>. It lists the changelist you submitted.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/how-to/build-every-submit-4.png" alt="The Perforce Software Polling Log: polling found last change 259, the head check says it is built already, and the log ends with No changes">
+  <figcaption>The polling log after a check with nothing new to build.</figcaption>
+</figure>
+
+<h2>Troubleshooting</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>A submit did not start a build.</td><td>Open the <strong>Perforce Software Polling Log</strong>. Check that the submitted files are inside your <strong>View Mappings</strong>; changes outside the view are ignored. Also check that the trigger is not disabled and that the build configuration or its project is not paused.</td></tr>
+    <tr><td>Every submit starts its own build and the queue fills up.</td><td>Set a <strong>Quiet period</strong> on the trigger, for example <code>120</code> seconds. Submits that arrive during it go into the same build.</td></tr>
+    <tr><td>Two agents fight over one workspace, or files are missing.</td><td>The workspace name must end with <code>${NODE_NAME}</code> in both <strong>Workspace name</strong> and the right-hand side of the view. Two agents must never share one workspace.</td></tr>
+    <tr><td><strong>Workspace name</strong> shows <em>Not currently connected to a Perforce server</em>.</td><td>This check on the settings form can show even when the connection is fine. Run a build and read its log: if the sync works, the connection works. If it fails, check the server address, user and password of the P4 credential.</td></tr>
+  </tbody>
+</table>
+
+<h2>Next steps</h2>
+<div class="cards">
+  <a class="card" href="check-shelf-before-submit.html"><h3>Test a shelved change</h3><p>Build a shelf before you submit it.</p></a>
+  <a class="card" href="../version-control/perforce.html"><h3>Perforce</h3><p>Connections, streams, shelves and the workbench pages.</p></a>
+  <a class="card" href="../running-builds/triggers.html"><h3>Triggers</h3><p>All trigger kinds, schedules and quiet periods.</p></a>
+  <a class="card" href="../version-control/vcs-parameters.html"><h3>Version control parameters</h3><p>Use the changelist number in your steps.</p></a>
+</div>
+</main>
+</body>
+</html>

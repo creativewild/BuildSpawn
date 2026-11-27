@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Run steps in a Docker container · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/steps-run-in-docker-container">
+<main class="doc">
+<h1>Run steps in a Docker container</h1>
+<p class="lead">Run a step inside a container image, so the agent needs Docker but not the tool.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>Docker running on the agent.</li>
+  <li>An image that has the tool, here <code>python:3.12</code>.</li>
+</ul>
+
+<h2>Steps</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Build Steps</strong>.</li>
+  <li>Add a <strong>Python</strong> step named <code>Check assets</code>. Choose <strong>Module</strong> and type <code>pytest</code>.</li>
+  <li>Scroll to <strong>Container settings</strong>. In <strong>Run step within container</strong> type <code>python:3.12</code>.</li>
+  <li>Open <strong>Container options</strong> if you need an <strong>Image platform</strong>, a <strong>Pull policy</strong> or extra <code>docker run</code> arguments.</li>
+  <li>Click <strong>Save</strong> and run the build.</li>
+</ol>
+
+<h2>Check it worked</h2>
+<p>The step runs in a new container with the workspace mounted, and the build continues on the agent. Files the step writes in the workspace are there afterwards.</p>
+
+<h2>Troubleshooting</h2>
+<ul>
+  <li><strong>Docker could not be started on this agent.</strong> Install Docker there.</li>
+  <li><strong>The daemon did not answer.</strong> Start the Docker service.</li>
+  <li><strong>A Windows image on a Linux agent.</strong> Run the step on a Windows agent.</li>
+  <li><strong>A JDK or environment tool is refused.</strong> The image brings its own tools. Set the JDK to <strong>Inherit</strong> and the environment tool to <strong>None</strong>.</li>
+</ul>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../build-steps/common-step-fields.html">Fields every runner has</a></li>
+  <li><a href="../build-steps/docker.html">Docker</a></li>
+  <li><a href="../build-steps/python.html">Python</a></li>
+</ul>
+</main>
+</body>
+</html>

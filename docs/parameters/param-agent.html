@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent parameters · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="parameters/param-agent">
+<main class="doc">
+<h1>Agent parameters</h1>
+<p class="lead">Values that describe the machine a build runs on, such as its name, operating system and free disk space.</p>
+
+<h2>When to use them</h2>
+<p>Use them in two places. In <strong>Agent requirements</strong>, to pick a machine (for example <code>agent.os.family</code> equals <code>windows</code>). In a step, to read facts about the machine the build runs on, as <code>%agent.name%</code>.</p>
+<h2>How to use them</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Agent requirements</strong> to add a rule on an agent parameter.</li>
+  <li>Or type <code>%agent.name%</code> in a step field or a script. The build reads it from the agent that runs the step.</li>
+  <li>To add your own agent parameters, open the agent in <strong>Agents</strong> and add a parameter. Names that start with <code>agent.</code> are reserved. A name starts with a letter or digit and holds letters, digits, <code>.</code>, <code>_</code> and <code>-</code>, up to 100 characters. A value is up to 1000 characters.</li>
+</ol>
+<h2>Every built-in agent parameter</h2>
+<table>
+<thead><tr><th>Name</th><th>What it holds</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td><code>agent.name</code></td><td>Name of the agent.</td><td><code>win-build-01</code></td></tr><tr><td><code>agent.labels</code></td><td>Labels of the agent, separated by spaces.</td><td><code>windows unreal</code></td></tr><tr><td><code>agent.pool</code></td><td>Pool the agent is in.</td><td><code>Windows</code></td></tr><tr><td><code>agent.type</code></td><td>permanent, cloud or personal.</td><td><code>permanent</code></td></tr><tr><td><code>agent.owner</code></td><td>Owner of a personal machine.</td><td><code>dana.k</code></td></tr><tr><td><code>agent.executors</code></td><td>Number of executors.</td><td><code>2</code></td></tr><tr><td><code>agent.hostname</code></td><td>Host name of the machine.</td><td><code>BUILD01</code></td></tr><tr><td><code>agent.os.name</code></td><td>Operating system name.</td><td><code>Windows 11</code></td></tr><tr><td><code>agent.os.family</code></td><td>windows, linux or macos.</td><td><code>windows</code></td></tr><tr><td><code>agent.os.version</code></td><td>Operating system version.</td><td><code>10.0</code></td></tr><tr><td><code>agent.os.arch</code></td><td>Processor architecture.</td><td><code>amd64</code></td></tr><tr><td><code>agent.cpu.count</code></td><td>Number of processors.</td><td><code>16</code></td></tr><tr><td><code>agent.memory.total.mb</code></td><td>Total memory in MB.</td><td><code>65536</code></td></tr><tr><td><code>agent.java.version</code></td><td>Java version of the agent.</td><td><code>21</code></td></tr><tr><td><code>agent.version</code></td><td>Agent program version.</td><td><code>1.9.3</code></td></tr><tr><td><code>agent.work.dir</code></td><td>Work folder of the agent.</td><td><code>D:\agent</code></td></tr><tr><td><code>agent.work.dir.free.mb</code></td><td>Free space of the work folder in MB.</td><td><code>120000</code></td></tr><tr><td><code>agent.home.dir</code></td><td>Folder the agent runs from.</td><td><code>C:\buildspawn</code></td></tr><tr><td><code>agent.temp.dir</code></td><td>Temporary folder of the agent.</td><td><code>C:\Temp</code></td></tr>
+</tbody>
+</table>
+<p>An administrator can also show chosen environment variables of the agent as <code>env.NAME</code>. Only the ones listed are read, because environment variables can hold secrets.</p>
+<h2>A worked example</h2>
+<p>A Unreal Engine build needs a Windows machine with 50 GB free. Add two rules in Agent requirements: <code>agent.os.family</code> equals <code>windows</code> and <code>agent.work.dir.free.mb</code> is at least <code>50000</code>. In a step, print where it ran:</p><pre><code>echo Built on %agent.name% in pool %agent.pool%</code></pre>
+<h2>What you see when it runs</h2>
+<p>The log shows the value in place of the reference, for example <code>Built on win-build-01 in pool Windows</code>. The agent's page lists all its parameters in blocks: agent, system, folders and environment.</p>
+<h2>Problems and fixes</h2>
+<table>
+<thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+<tbody>
+<tr><td>The reference stays as written</td><td>The build has no agent, or the name is not in the table. Check the spelling.</td></tr><tr><td>My custom name is refused</td><td>Do not start it with <code>agent.</code>.</td></tr>
+</tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../reference/build-values.html">Build values</a></li>
+  <li><a href="../agents/agents-page.html">The Agents page</a></li>
+  <li><a href="parameters.html">Parameters</a></li>
+</ul>
+</main>
+</body>
+</html>

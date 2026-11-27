@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Remote trigger · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="running-builds/trigger-remote">
+<main class="doc">
+<h1>Remote trigger</h1>
+<p class="lead">Lets a script or another system start a build with a web request and a token.</p>
+
+<h2>When to use it</h2>
+<p>Use it when something outside Buildspawn must start a build: a store webhook, a nightly script of another team, a chat command. It is off by default.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Triggers</strong>.</li>
+  <li>Turn on the <strong>Remote trigger</strong> switch at the bottom.</li>
+  <li>Copy the <strong>Token</strong>. It is shown once and hidden after you save.</li>
+  <li>Use the example <code>curl</code> line.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/running-builds/trigger-remote.png" alt="The Triggers page of Windows Build with the Remote trigger switched on, its token and the example web request"><figcaption>The Remote trigger section, with its token and an example request.</figcaption></figure>
+
+<h2>Every field</h2>
+<table>
+<thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>Remote trigger (switch)</td><td>On or off. Shown when security is on or the build configuration already has a token.</td><td>Off</td><td>On</td></tr><tr><td>Token</td><td>The secret in the request. Copy and Regenerate buttons. Regenerate makes a new token, shows it once, and the old one stops working at once.</td><td>Generated</td><td>(hidden)</td></tr><tr><td>Use my own token</td><td>Type a token of 8 to 200 letters, digits or <code>. _ ~ -</code> and click <strong>Save token</strong>.</td><td>Empty</td><td><code>skyforge-nightly-2026</code></td></tr>
+</tbody>
+</table>
+
+<h2>A worked example</h2>
+<p>A store webhook starts the Release build:</p><pre><code>curl -X POST "http://buildspawn/job/Game/job/Release/build?token=TOKEN"
+curl -X POST "http://buildspawn/job/Game/job/Release/buildWithParameters?token=TOKEN&amp;CONFIG=Shipping"</code></pre>
+<h2>What you see when it runs</h2>
+<p>The call answers with a status and the build is queued. The build's cause says it was started by a remote request. A value that someone typed with a token is not written into scripts (see <a href="../parameters/param-references.html">Parameter references</a>).</p>
+<h2>Problems and fixes</h2>
+<table>
+<thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+<tbody>
+<tr><td>The switch is missing</td><td>Security is off and the build configuration has no token.</td></tr><tr><td>A 403 answer</td><td>The token is wrong or was regenerated.</td></tr><tr><td>The token is refused when I set my own</td><td>It must be 8 to 200 letters, digits or the characters . _ ~ -</td></tr>
+</tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="triggers.html">Triggers</a></li>
+  <li><a href="../reference/api-tokens.html">API tokens</a></li>
+</ul>
+</main>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Perforce: Label build · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="post-build/perforce-label-build">
+<main class="doc">
+<h1>Perforce: Label build</h1>
+<p class="lead">Creates a Perforce label for the changelist that the build synced, with a name and description you choose.</p>
+<h2>When to use it</h2>
+<p>This is the label action of the Perforce root settings. Use it for a simple label. If you need a branch filter or a root choice, use <a href="perforce-label.html">Label in Perforce (VCS labeling)</a>.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration, click <strong>Settings</strong>, then <strong>Post-build Actions</strong>. Click <strong>Add post-build action</strong> and choose <strong>Perforce: Label build</strong>.</li>
+  <li>Set the <strong>Label Name</strong> and <strong>Label Description</strong>.</li>
+  <li>Tick <strong>Only tag on build success</strong> if failed builds must not be labelled.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Label Name</td><td>The name of the label. Build variables may be used.</td><td><code>buildspawn-</code> plus the name of the build configuration</td><td><code>skyforge-${BUILD_NUMBER}</code></td></tr>
+    <tr><td>Label Description</td><td>The description text.</td><td><code>Buildspawn post-build label.</code></td><td><code>Skyforge nightly</code></td></tr>
+    <tr><td>Only tag on build success</td><td>Label only when the build succeeded.</td><td>Off</td><td>On</td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p><strong>Release Build</strong> labels the synced changelist as <code>skyforge-release-${BUILD_NUMBER}</code> only on success.</p><h2>What you see when it runs</h2>
+<p>The log says the label was created for the changelist.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>Label name is not valid</td><td>Perforce label names cannot contain spaces or <code>@#*%</code>. Use letters, digits, <code>-</code> and <code>_</code>.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="overview.html">After the build: overview</a></li>
+  <li><a href="../projects/bc-post-build-actions.html">Post-build actions tab</a></li>
+  <li><a href="perforce-label.html">Label in Perforce (VCS labeling)</a></li>
+  <li><a href="../version-control/perforce.html">Perforce</a></li>
+</ul>
+</main>
+</body>
+</html>

@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Service messages · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="reference/service-messages">
+<main class="doc">
+<h1>Service messages</h1>
+<p class="lead">Special lines a build prints to talk to Buildspawn: set a parameter, record a number, name the build, set its status, or group the log into blocks.</p>
+
+<p>A service message is a normal line of output. Your script prints it with <code>echo</code>, <code>Write-Host</code>, <code>print</code> or any other command. Buildspawn spots the line while the build runs and acts on it. Any tool that can print text can use them.</p>
+<p>There are two families:</p>
+<table>
+  <thead><tr><th>Family</th><th>Looks like</th><th>Used for</th></tr></thead>
+  <tbody>
+    <tr><td><a href="#buildspawn-messages">Buildspawn messages</a></td><td><code>##buildspawn[name attribute='value']</code></td><td>Setting parameters, recording statistics, naming the build and setting its status</td></tr>
+    <tr><td><a href="#log-markers">Log markers</a></td><td><code>::group::Name</code></td><td>Blocks, warnings and errors in the build console</td></tr>
+  </tbody>
+</table>
+
+<h2 id="buildspawn-messages">Buildspawn messages</h2>
+
+<h3 id="format">Message format</h3>
+<pre class="no-copy"><code>##buildspawn[messageName attribute='value' attribute='value']</code></pre>
+<p>A message with one value can leave out the attribute name:</p>
+<pre class="no-copy"><code>##buildspawn[messageName 'value']</code></pre>
+<ul>
+  <li>The line contains <code>##buildspawn[</code>, the message name, then attributes, then <code>]</code>.</li>
+  <li>Each attribute is <code>name='value'</code>, in single quotes, with a space before it.</li>
+  <li>Spell it exactly like this. Other spellings are ignored.</li>
+  <li>Only the processes a build step starts, while the step runs, can send messages: its script or its tool. The same line anywhere else in the log is refused, with a line that says so.</li>
+</ul>
+<table>
+  <thead><tr><th>Message</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><a href="#setParameter"><code>setParameter</code></a></td><td>Sets a value for the later steps.</td></tr>
+    <tr><td><a href="#buildStatisticValue"><code>buildStatisticValue</code></a></td><td>Records a number to chart across builds.</td></tr>
+    <tr><td><a href="#buildNumber"><code>buildNumber</code></a></td><td>Gives the build its name, such as <code>1.4.212-CL48213</code>.</td></tr>
+    <tr><td><a href="#buildStatus"><code>buildStatus</code></a></td><td>Sets the build's status text, and can make its result worse.</td></tr>
+  </tbody>
+</table>
+
+<h3 id="escapes">Escaping special characters</h3>
+<p>Inside a value, put a vertical bar <code>|</code> in front of special characters:</p>
+<table>
+  <thead><tr><th>Write</th><th>To get</th></tr></thead>
+  <tbody>
+    <tr><td><code>|'</code></td><td>a single quote <code>'</code></td></tr>
+    <tr><td><code>||</code></td><td>a vertical bar <code>|</code></td></tr>
+    <tr><td><code>|[</code> and <code>|]</code></td><td>square brackets <code>[</code> and <code>]</code></td></tr>
+    <tr><td><code>|n</code></td><td>a new line</td></tr>
+    <tr><td><code>|r</code></td><td>a carriage return</td></tr>
+  </tbody>
+</table>
+
+<h3 id="setParameter">setParameter</h3>
+<p>Sets a value for the build steps that come after this one.</p>
+<pre><code>##buildspawn[setParameter name='version' value='1.4.212']</code></pre>
+<table>
+  <thead><tr><th>Name you use</th><th>What it sets</th><th>Later steps read it as</th></tr></thead>
+  <tbody>
+    <tr><td><code>version</code></td><td>A build parameter. It is not put into the environment.</td><td><code>%version%</code></td></tr>
+    <tr><td><code>env.GAME_VERSION</code></td><td>The environment variable <code>GAME_VERSION</code></td><td><code>%env.GAME_VERSION%</code>, or <code>$GAME_VERSION</code> / <code>%GAME_VERSION%</code> in a script</td></tr>
+    <tr><td><code>system.build.flavour</code></td><td>A system property, kept as it is. It is not an environment variable.</td><td><code>%system.build.flavour%</code></td></tr>
+  </tbody>
+</table>
+<p>From a few common shells:</p>
+<pre><code># Bash
+echo "##buildspawn[setParameter name='env.GAME_VERSION' value='1.4.212']"
+
+# PowerShell
+Write-Host "##buildspawn[setParameter name='env.GAME_VERSION' value='1.4.212']"
+Write-Host "##buildspawn[setParameter name='package' value='$($zip.FullName)']"
+
+# Windows batch
+echo ##buildspawn[setParameter name='env.GAME_VERSION' value='1.4.212']
+
+# Python
+print("##buildspawn[setParameter name='env.GAME_VERSION' value='1.4.212']")</code></pre>
+<p>The rules:</p>
+<table>
+  <thead><tr><th>Rule</th><th>Detail</th></tr></thead>
+  <tbody>
+    <tr><td>Who can set values</td><td>Only the processes a build step starts, while the step runs: its script or its tool. The same line anywhere else in the log is refused, for example in a commit message or after the step ended.</td></tr>
+    <tr><td>Names</td><td>Start with a letter or <code>_</code>. Then letters, digits, <code>.</code>, <code>_</code> and <code>-</code>. 100 characters at most.</td></tr>
+    <tr><td>Values</td><td>8,192 characters at most.</td></tr>
+    <tr><td>How many</td><td>200 values per build at most.</td></tr>
+    <tr><td>Same name as a build parameter</td><td>The new value replaces it for the later steps. The log says so once for each name.</td></tr>
+    <tr><td>Blocked environment names</td><td>Names that change which programs run or how they start are refused, for example <code>PATH</code>, <code>LD_LIBRARY_PATH</code>, <code>PYTHONPATH</code>, <code>NODE_OPTIONS</code>, <code>JAVA_TOOL_OPTIONS</code>, and every <code>DYLD_*</code> and <code>GIT_*</code> name. An administrator can allow them with <strong>Let build steps set any environment variable</strong> in the system settings.</td></tr>
+    <tr><td>Refusals</td><td>Each refused message gets a line in the build log that says why.</td></tr>
+    <tr><td>Resumed builds</td><td>A build that resumes from a later step keeps the values the earlier steps set.</td></tr>
+  </tbody>
+</table>
+<p>A step can also declare <strong>outputs</strong> in the step editor. Each output must then be set with <code>setParameter</code> before the step ends. See <a href="../parameters/set-from-build.html">Set parameters from a build</a> for worked examples.</p>
+
+<h3 id="buildStatisticValue">buildStatisticValue</h3>
+<p>Records a number for this build, such as code coverage, a package size or a load time. Buildspawn charts it across builds on the build configuration's <strong>Statistics</strong> tab, where you can add custom charts.</p>
+<pre><code>##buildspawn[buildStatisticValue key='coverage' value='81.5']</code></pre>
+<table>
+  <thead><tr><th>Attribute</th><th>Rule</th></tr></thead>
+  <tbody>
+    <tr><td><code>key</code></td><td>The name of the number. Letters, digits, <code>.</code>, <code>-</code> and <code>_</code>, 100 characters at most.</td></tr>
+    <tr><td><code>value</code></td><td>A number, for example <code>12</code>, <code>-3.5</code> or <code>1.2e6</code>.</td></tr>
+  </tbody>
+</table>
+<ul>
+  <li>If a build reports the same key twice, the last value counts.</li>
+  <li>A build keeps 200 keys at most.</li>
+  <li>A line with a bad key or a value that isn't a number is ignored.</li>
+</ul>
+<pre><code># PowerShell: report the size of the Windows package in megabytes
+$mb = [math]::Round((Get-Item Build\Game-Win64.zip).Length / 1MB, 1)
+Write-Host "##buildspawn[buildStatisticValue key='package.win64.mb' value='$mb']"
+
+# The same in Bash
+size=$(du -m Build/Game-Win64.zip | cut -f1)
+echo "##buildspawn[buildStatisticValue key='package.win64.mb' value='$size']"</code></pre>
+
+<h3 id="buildNumber">buildNumber</h3>
+<p>Gives the build its name. The name shows on the build page, in the History tab and on chain pages. The build number itself, its address and its links stay the same.</p>
+<pre><code>##buildspawn[buildNumber '1.4.%build.counter%-CL48213']</code></pre>
+<p>References in the name are filled in as in the build number format on <strong>Settings › General</strong>, and a few more:</p>
+<table>
+  <thead><tr><th>Write</th><th>To get</th></tr></thead>
+  <tbody>
+    <tr><td><code>%build.counter%</code></td><td>The build number, for example <code>212</code>.</td></tr>
+    <tr><td><code>%name%</code></td><td>A build parameter, or a value an earlier step set with <code>setParameter</code>.</td></tr>
+    <tr><td><code>%build.vcs.number%</code>, <code>%build.triggeredBy.username%</code> and the other build values</td><td>The changelist or commit, who started the build, and so on. See <a href="#build-values">Values a script can read</a>.</td></tr>
+    <tr><td><code>{build.number}</code></td><td>The build's name so far, to add to it.</td></tr>
+    <tr><td><code>%%</code></td><td>One percent sign.</td></tr>
+  </tbody>
+</table>
+<pre><code># PowerShell: name the build after the version and the changelist
+Write-Host "##buildspawn[buildNumber '1.4.%build.counter%-CL%build.vcs.number%']"
+
+# ... or after a value the script worked out
+$cl = (p4 -p $env:P4_PORT -u $env:P4_USER -P $env:P4_TICKET changes -m1 "//depot/game/main/...#have") -replace '^Change (\d+).*','$1'
+Write-Host "##buildspawn[buildNumber '1.4.%build.counter%-CL$cl']"</code></pre>
+<ul>
+  <li>If a step sends it more than once, the last name counts.</li>
+  <li>A name that refers to an unknown parameter or to a password is refused. The build keeps its name and the log says why.</li>
+  <li>200 characters at most.</li>
+</ul>
+
+<h3 id="buildStatus">buildStatus</h3>
+<p>Sets the build's status text: the short line next to the result on the build page and in the History tab, such as <em>Success</em> or <em>Tests passed: 120</em>.</p>
+<pre><code>##buildspawn[buildStatus text='Uploaded to store branch qa' status='SUCCESS']</code></pre>
+<table>
+  <thead><tr><th>Attribute</th><th>Rule</th></tr></thead>
+  <tbody>
+    <tr><td><code>text</code></td><td>The new status text, 500 characters at most. <code>{build.status.text}</code> in it stands for the text the build would show anyway, so <code>text='{build.status.text}, uploaded'</code> gives <em>Tests passed: 120, uploaded</em>.</td></tr>
+    <tr><td><code>status</code></td><td>Optional: <code>SUCCESS</code>, <code>UNSTABLE</code> or <code>FAILURE</code>. It is applied when the build ends. It can only make the result worse, never better: a failed build stays failed even if a script sends <code>SUCCESS</code>.</td></tr>
+  </tbody>
+</table>
+<pre><code># PowerShell: say where the build went, and mark it unstable if the upload was partial
+if ($uploaded -lt $total) {
+  Write-Host "##buildspawn[buildStatus text='Uploaded $uploaded of $total depots' status='UNSTABLE']"
+} else {
+  Write-Host "##buildspawn[buildStatus text='{build.status.text}, uploaded to store branch qa']"
+}</code></pre>
+<p>The last text a build sends counts. The status text shows once the build has finished. A text that holds a password parameter's value is refused.</p>
+
+<h3 id="artifacts-from-a-script">Keeping files a script names</h3>
+<p>To keep files whose path a script works out, set it with <code>setParameter</code> as an environment value and use it in the artifact pattern on <strong>Settings › General</strong>: the script sends <code>##buildspawn[setParameter name='env.PACKAGE_DIR' value='out\build\1.4.212']</code> and the pattern is <code>${PACKAGE_DIR}\*.zip =&gt; builds</code>.</p>
+
+<h2 id="log-markers">Log markers</h2>
+<p>Log markers shape how the <a href="../build-results/build-console.html">build console</a> shows your output. Each marker is a line of its own, at the start of the line. Spaces before it are allowed.</p>
+<table>
+  <thead><tr><th>Marker</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>::group::Name</code></td><td>Starts a block called <em>Name</em>. Blocks can sit inside other blocks.</td></tr>
+    <tr><td><code>::group::Name::Details</code></td><td>Starts a block and shows <em>Details</em> after the name in its header, for example a count.</td></tr>
+    <tr><td><code>::endgroup::</code></td><td>Ends the innermost open block.</td></tr>
+    <tr><td><code>::endgroup::STATUS</code></td><td>Ends the block and says how it ended: <code>SUCCESS</code>, <code>UNSTABLE</code>, <code>FAILURE</code>, <code>ABORTED</code> or <code>SKIPPED</code>.</td></tr>
+    <tr><td><code>::warning::Text</code></td><td>Shows <em>Text</em> as a warning. It counts in the console's warning total.</td></tr>
+    <tr><td><code>::error::Text</code></td><td>Shows <em>Text</em> as an error. It counts in the console's error total.</td></tr>
+  </tbody>
+</table>
+<pre><code>echo "::group::Cook content::Win64"
+UnrealEditor-Cmd.exe Game.uproject -run=cook -targetplatform=Windows
+echo "::endgroup::"
+
+echo "::group::Compile shaders"
+build-shaders --platform win64 || echo "::warning::Shader cache was rebuilt from scratch"
+echo "::endgroup::SUCCESS"
+
+echo "::error::Missing texture: Content/Props/Crate_D.uasset"</code></pre>
+<p>The same in PowerShell:</p>
+<pre><code>Write-Host "::group::Cook content::Win64"
+&amp; UnrealEditor-Cmd.exe Game.uproject -run=cook -targetplatform=Windows
+if ($LASTEXITCODE -ne 0) { Write-Host "::error::Cooking failed with exit code $LASTEXITCODE" }
+Write-Host "::endgroup::"
+
+Write-Host "::warning::Shader cache was rebuilt from scratch"</code></pre>
+<p>The plain text log stays readable: the marker line shows as the block name, or as the warning or error text.</p>
+
+<h2 id="build-values">Values a script can read</h2>
+<p>The complete list of references and environment variables is on <a href="build-values.html">Build values</a>.</p>
+<p>Besides your own parameters, every step can read these:</p>
+<table>
+  <thead><tr><th>Parameter</th><th>Environment variable</th><th>What it holds</th></tr></thead>
+  <tbody>
+    <tr><td><code>%build.counter%</code>, <code>%build.number%</code></td><td><code>BUILD_NUMBER</code></td><td>The build number.</td></tr>
+    <tr><td><code>%build.triggeredBy.username%</code></td><td><code>BUILDSPAWN_TRIGGERED_BY</code></td><td>The user ID of whoever started the build. For a build another build started, the user who started the first one, when known. Empty for a schedule or a version control trigger.</td></tr>
+    <tr><td><code>%build.vcs.number%</code></td><td><code>BUILD_VCS_NUMBER</code></td><td>The changelist or commit the build used.</td></tr>
+    <tr><td><code>%build.checkoutDir%</code></td><td><code>WORKSPACE</code></td><td>The checkout folder on the agent.</td></tr>
+    <tr><td><code>%agent.hostname%</code> and the other <code>agent.*</code> values</td><td></td><td>About the agent the build runs on.</td></tr>
+    <tr><td></td><td><code>P4_PORT</code>, <code>P4_USER</code>, <code>P4_CLIENT</code>, <code>P4_TICKET</code></td><td>In a build with a Perforce root: its server, user, workspace and a login ticket, so <code>p4 -p $env:P4_PORT -u $env:P4_USER -c $env:P4_CLIENT -P $env:P4_TICKET changes -m1 //...</code> works with no password in the script.</td></tr>
+  </tbody>
+</table>
+<pre><code># PowerShell: who started the build
+Write-Host "Started by $env:BUILDSPAWN_TRIGGERED_BY"
+if ("%build.triggeredBy.username%" -eq "") { Write-Host "Started by a schedule or a check-in" }</code></pre>
+
+<h2 id="tips">Tips</h2>
+<ul>
+  <li>Close every <code>::group::</code> with <code>::endgroup::</code>. Otherwise the output that follows lands inside the open block.</li>
+  <li>Never print a secret in a message. The line is part of the build log like any other.</li>
+  <li>Prefer <code>env.NAME</code> only when a later tool needs an environment variable. A plain build parameter is safer and shows up in <code>%name%</code> references.</li>
+  <li>If a value seems missing, search the build log for the message. A refusal line next to it says why.</li>
+</ul>
+</main>
+</body>
+</html>

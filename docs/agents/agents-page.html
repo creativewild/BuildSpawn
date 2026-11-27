@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Agents page · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="agents/agents-page">
+<main class="doc">
+<h1>The Agents page</h1>
+<p class="lead">Agents are the machines that run your builds. The Agents page lists them all in one live table, with their health, their current builds and quick actions.</p>
+
+<p>Click <strong>Agents</strong> in the top bar. A red number on it means some agents are offline.</p>
+<figure class="shot">
+  <img src="../../assets/shots/agents/agents-page.png" alt="The Agents page: the pools in the side panel, a summary strip with Total agents, Building, Idle, Offline, Average CPU and Average memory, a filter bar, and a table of agents with status, current build, CPU, memory, disk, network, GPU, pressure and freshness">
+  <figcaption>The Agents tab: the summary strip, the filter bar and the live list.</figcaption>
+</figure>
+
+<h2>The page at a glance</h2>
+<ul>
+  <li>The <strong>header</strong> counts agents, online and offline agents, and busy executors (an <em>executor</em> is one slot that runs one build at a time; an agent can have several).</li>
+  <li>The buttons on the right: <strong>Refresh</strong>, <strong>Configure monitors</strong> (see <a href="telemetry.html">Telemetry</a>), <strong>Install agents</strong> (see <a href="install-agent.html">Install an agent</a>) and <strong>New Node</strong>.</li>
+  <li>The <strong>tabs</strong>: Agents, Pools (see <a href="pool-scheduler.html">The Pool Scheduler</a>), Clouds (see <a href="clouds.html">Clouds</a>) and Load Statistics. An <strong>Unauthorized</strong> tab appears only when agents are waiting for approval. In the top bar, a red number on <strong>Agents</strong> counts the offline agents.</li>
+  <li>The <strong>side panel</strong> lists your pools. See <a href="pools.html">Pools</a>.</li>
+</ul>
+
+<h2>The summary strip</h2>
+<p>Six cards sit above the list:</p>
+<table>
+  <thead><tr><th>Card</th><th>What it counts</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Total agents</strong></td><td>All agents, and how many send telemetry.</td></tr>
+    <tr><td><strong>Building</strong></td><td>Agents running at least one build, with their share of all agents.</td></tr>
+    <tr><td><strong>Idle</strong></td><td>Online agents with nothing to do.</td></tr>
+    <tr><td><strong>Offline</strong></td><td>Agents that are not connected, and how many of them were marked offline by hand.</td></tr>
+    <tr><td><strong>Average CPU</strong> and <strong>Average memory</strong></td><td>Across all online agents, with a small chart of the last refreshes.</td></tr>
+  </tbody>
+</table>
+
+<h2>The list</h2>
+<p>Each row is one agent. The coloured bar on the left of a row shows its worst value: yellow for a warning, red for critical.</p>
+<table>
+  <thead><tr><th>Column</th><th>What it shows</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Agent</strong></td><td>The name, the operating system and the pool, with the pool's icon. Click the name to open the agent, or the pool to open the pool.</td></tr>
+    <tr><td><strong>Status</strong></td><td>Idle, Building or Offline, and how many executors are free. "Marked offline" means someone took it offline by hand.</td></tr>
+    <tr><td><strong>Current build</strong></td><td>The build it runs, with its number and time so far. For an offline agent, the reason.</td></tr>
+    <tr><td><strong>CPU</strong>, <strong>Memory</strong>, <strong>Disk</strong>, <strong>Network</strong>, <strong>GPU</strong></td><td>Live values from <a href="telemetry.html">telemetry</a>, with small bars and charts.</td></tr>
+    <tr><td><strong>Pressure</strong></td><td>One number for how loaded the agent is, from 0 to 100. It weighs CPU 35%, memory 30%, disk used 15%, disk input/output 10% and GPU 10%.</td></tr>
+    <tr><td><strong>Freshness</strong></td><td>How old the latest sample is: Fresh, Stale (no sample for a while) or Offline.</td></tr>
+  </tbody>
+</table>
+<div class="callout note"><p>The colours come from the thresholds under <strong>Configure monitors</strong>. They only colour the page; they never stop or fail a build. On the screenshots in this guide the disk shows <em>Critical</em> on every agent, because the demo machine's D: drive is nearly full.</p></div>
+<p>The list refreshes by itself every 5 seconds (<strong>Live · 5 s</strong> at the bottom). Below it you can choose how many <strong>Rows</strong> to show per page and move between pages.</p>
+
+<figure class="shot"><img src="../../assets/shots/agents/agents-running.png" alt="The Agents page while win-build-01 runs a build: its row shows Building, the build Game » Shader Warmup #1 in the Current build column and one of two executors busy"><figcaption>An agent that is running a build shows it in the Current build column.</figcaption></figure>
+<h2>Filters, search and sorting</h2>
+<p>Use the bar above the list to find agents:</p>
+<ul>
+  <li><strong>All / Online / Offline</strong> chips, each with a count.</li>
+  <li><strong>Pool</strong>: one pool or all pools.</li>
+  <li><strong>Platform</strong>: Windows, Linux, macOS and so on.</li>
+  <li><strong>Search agents</strong>: type part of a name.</li>
+  <li><strong>Warnings only</strong>: show only agents with a warning or critical value. Offline agents count as warnings.</li>
+  <li><strong>Sort</strong>: the default, <em>Offline first</em>, puts offline agents at the top and then sorts by pressure. The arrow button flips the order.</li>
+</ul>
+<p>Under the <strong>Offline</strong> filter the list shows each agent's launch method instead of its live values.</p>
+<div class="callout tip"><p>Your filters are kept in the page address. Bookmark it, or send it to a colleague, and the list opens with the same filters. The old address for disconnected agents opens the Offline filter.</p></div>
+
+<h2>Expanded rows</h2>
+<p>Click the arrow at the start of a row to open it.</p>
+<figure class="shot">
+  <img src="../../assets/shots/agents/agents-expanded.png" alt="The row of ps5-devkit-01 opened: the executors, the CPU, memory, disk I/O and network values, telemetry freshness, the file systems with their free space, and buttons for Telemetry, Open agent, Build history and Settings">
+  <figcaption>An open row. The busy executor's build is at the top.</figcaption>
+</figure>
+<p>The open row shows:</p>
+<ol class="steps">
+  <li><strong>Each busy executor's build</strong>: the executor number, the build with a link, a progress bar against the usual duration, the time so far and the estimate (for example <em>25m 56s of ~4m</em>), the current step, and <strong>×</strong> to stop the build. Idle executors are not listed.</li>
+  <li><strong>Details</strong>: CPU cores, memory and swap, disk read and write, network in and out, telemetry freshness and uptime, the agent's pool, executors and labels, and its connection.</li>
+  <li><strong>Filesystems</strong>: every drive with how full it is.</li>
+  <li><strong>GPU(s)</strong>, when the agent has a graphics card that telemetry can read.</li>
+  <li>Buttons to open the agent's <strong>Telemetry</strong> tab, the agent page, its <strong>Build history</strong>, its <strong>Settings</strong> and the running build.</li>
+</ol>
+
+<h2 id="the-row-menu">The row menu</h2>
+<p>Click <strong>⋯</strong> at the end of a row for the actions you are allowed to use on that agent.</p>
+<figure class="shot">
+  <img src="../../assets/shots/agents/agents-row-menu.png" alt="The row menu of win-build-01 with Mark offline (Running builds finish first), Move to pool, Show connection log and Delete agent">
+  <figcaption>The row menu of an online agent.</figcaption>
+</figure>
+<table>
+  <thead><tr><th>Action</th><th>What it does</th><th>Undo</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Mark offline</strong></td><td>Stops new builds from starting on the agent. Running builds finish first.</td><td>Yes</td></tr>
+    <tr><td><strong>Bring back online</strong></td><td>For an agent marked offline by hand: it takes builds again.</td><td>Yes</td></tr>
+    <tr><td><strong>Reconnect</strong></td><td>For a disconnected agent the server can start itself: tries to launch it again.</td><td>No</td></tr>
+    <tr><td><strong>Move to pool…</strong></td><td>Opens a dialog to put the agent in another pool.</td><td>Yes</td></tr>
+    <tr><td><strong>Show connection log</strong></td><td>Shows the agent's connection log in a pop-up.</td><td>No</td></tr>
+    <tr><td><strong>Delete agent</strong></td><td>Removes the agent after you confirm.</td><td>No</td></tr>
+  </tbody>
+</table>
+
+<h3>Messages and Undo</h3>
+<p>After an action, a short message appears at the bottom of the page. For Mark offline, Bring back online and Move to pool, it has an <strong>Undo</strong> button for a few seconds.</p>
+<figure class="shot">
+  <img src="../../assets/shots/agents/agents-toast.png" alt="The Agents list with win-build-02 now offline and marked offline, and a message at the bottom: win-build-02 is offline. Running builds finish first. Undo">
+  <figcaption>The message after Mark offline. Click Undo to bring the agent straight back.</figcaption>
+</figure>
+<ol class="steps">
+  <li>Click <strong>⋯</strong> on the agent's row and choose <strong>Mark offline</strong>.</li>
+  <li>The row moves to the top with the status <em>Offline · Marked offline</em>, and the message appears.</li>
+  <li>Changed your mind? Click <strong>Undo</strong> in the message. The agent is online again.</li>
+</ol>
+<div class="callout note"><p>Anyone allowed to mark an agent offline can also bring it back online.</p></div>
+
+<h3>Move to pool</h3>
+<figure class="shot">
+  <img src="../../assets/shots/agents/move-to-pool.png" alt="The Move win-build-01 to pool dialog listing the pools Default, Windows, Linux and Consoles with their icons and agent counts; Windows is selected">
+  <figcaption>Pick the new pool and click Move.</figcaption>
+</figure>
+<p>The dialog lists every pool with its icon and number of agents. Pick one and click <strong>Move</strong>. The agent now runs only builds of the projects assigned to that pool. See <a href="pools.html">Pools</a>.</p>
+
+<h3>Show connection log</h3>
+<figure class="shot">
+  <img src="../../assets/shots/agents/connection-log.png" alt="The Connection log pop-up for win-build-02: inbound agent connected, remoting version, launcher, protocol WebSocket, This is a Windows agent, Agent successfully connected and online; buttons Open full log and Close">
+  <figcaption>The connection log, without leaving the list.</figcaption>
+</figure>
+<p>The pop-up shows how the agent connected. Lines that report a problem, such as <em>refused</em> or <em>failed</em>, are shown in red. Click <strong>Open full log</strong> for the agent's full Log tab.</p>
+
+<h2>Personal machines</h2>
+<p>A personal machine (see <a href="personal-agents.html">Personal agents</a>) is listed only for its owner and for administrators. Other users do not see it. It is marked as personal with the owner's name, and it cannot be moved to another pool.</p>
+
+<h2>Open one agent</h2>
+<p>Click an agent's name to open its page. It shows the connection state and the reason when it is offline, the commands to connect it, its pool, its labels and its executors. The tabs and links of the agent page:</p>
+<ul>
+  <li><strong>Status</strong>, with <strong>Connect the agent</strong> and the download for this node (see <a href="agent-connection.html">Connect an agent</a>).</li>
+  <li><strong>Parameters</strong>: what the agent reported (see <a href="agent-labels-requirements.html">Labels and agent requirements</a>).</li>
+  <li><strong>Telemetry</strong> (see <a href="telemetry.html">Telemetry</a>), <strong>Build History</strong> and <strong>Load Statistics</strong>.</li>
+  <li><strong>Compatible Configurations</strong>: the build configurations this agent can run.</li>
+  <li><strong>Configure</strong> (see <a href="agent-settings.html">Agent settings</a>) and <strong>Delete Agent</strong>.</li>
+  <li><strong>Script Console</strong>, for administrators.</li>
+</ul>
+<p>When the agent is paused or stopped from its <a href="windows-tray-app.html">tray app</a> or <a href="agent-terminal.html">terminal program</a>, the agent page and the list say why, because agents report their state to the server every few seconds.</p>
+
+<h2>Tips</h2>
+<ul>
+  <li>Tick <strong>Warnings only</strong> each morning to see at once which machines need attention.</li>
+  <li>To work on a machine, mark it offline first. Running builds finish, and no new ones start.</li>
+  <li>Open a row to stop a stuck build without leaving the page.</li>
+</ul>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="install-agent.html">Install an agent</a> and <a href="agent-settings.html">Agent settings</a></li>
+  <li><a href="pools.html">Pools</a> and <a href="pool-scheduler.html">The Pool Scheduler</a></li>
+  <li><a href="telemetry.html">Telemetry</a></li>
+  <li><a href="personal-agents.html">Personal agents</a></li>
+</ul>
+</main>
+</body>
+</html>

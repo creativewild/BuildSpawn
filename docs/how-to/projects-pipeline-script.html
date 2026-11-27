@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Make a Pipeline from a script · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/projects-pipeline-script">
+<main class="doc">
+<h1>Make a Pipeline from a script</h1>
+<p class="lead">Create a Pipeline build configuration, write the script in Buildspawn or keep it in version control, and handle the sandbox.</p>
+<p>The studio builds the launcher with a Pipeline. First the script is typed in Buildspawn to try it. Then it moves to a script file in Git.</p>
+<h2>Before you start</h2>
+<ul>
+  <li>The <strong>Create</strong> permission on the project.</li>
+  <li>For the SCM version: a Git or Perforce repository that holds the file, and a credential that may read it.</li>
+</ul>
+<h2>Steps</h2>
+<h3>Write the script in Buildspawn</h3>
+<ol class="steps">
+  <li>Open the project and click <strong>New Item</strong>. Type <code>Launcher</code>.</li>
+  <li>Under <strong>Type</strong> choose <strong>Pipeline</strong>. Click <strong>Create</strong>.</li>
+  <li>Open the <strong>Pipeline</strong> tab. <strong>Definition</strong> is <strong>Pipeline script</strong>.</li>
+  <li>Type the script into <strong>Script</strong>. Leave <strong>Use Groovy Sandbox</strong> on.</li>
+  <li>Click <strong>Save</strong> and <strong>Run</strong>.</li>
+</ol>
+<pre><code>pipeline {
+  agent any
+  stages {
+    stage("Build") { steps { bat "build.bat" } }
+    stage("Test")  { steps { bat "test.bat" } }
+  }
+}</code></pre>
+<h3>Move the script to version control</h3>
+<ol class="steps">
+  <li>Put the same text in a file such as <code>ci/build.pipeline</code> in the repository and commit it.</li>
+  <li>Open the Pipeline, <strong>Settings › Pipeline</strong>. Set <strong>Definition</strong> to <strong>Pipeline script from SCM</strong>.</li>
+  <li>Choose the <strong>SCM</strong> and fill in the repository and credential.</li>
+  <li>In <strong>Script Path</strong> replace the name the field starts with by the path of your file, for example <code>ci/build.pipeline</code>. Leave <strong>Lightweight checkout</strong> on.</li>
+  <li>Click <strong>Save</strong> and <strong>Run</strong>.</li>
+</ol>
+<h3>Handle the sandbox</h3>
+<ol class="steps">
+  <li>If a build fails with <em>Scripts not permitted to use method ...</em>, ask an administrator to open <strong>Script approval</strong> in the global settings.</li>
+  <li>The administrator reads the signature and approves it only if it is safe.</li>
+  <li>Run the build again.</li>
+</ol>
+<h2>Check it worked</h2>
+<ol class="steps">
+  <li>The build page shows the stages <em>Build</em> and <em>Test</em> as a graph with times.</li>
+  <li><strong>Settings › Build Steps</strong> lists the stages read from the script.</li>
+  <li>Edit the file in Git, commit and run again: the build uses the new file.</li>
+</ol>
+<h2>Troubleshooting</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>Script file not found</td><td>The <strong>Script Path</strong> or the branch is wrong.</td></tr>
+    <tr><td>Scripts not permitted to use method</td><td>The sandbox blocked it. Get it approved or change the script.</td></tr>
+    <tr><td>The script waits for approval</td><td>The sandbox is off and you are not an administrator. Turn it on.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../projects/type-pipeline.html">Pipeline</a></li>
+  <li><a href="../projects/bc-build-steps.html">Build Steps</a></li>
+  <li><a href="../visual-editor/canvas.html">Canvas and palette</a></li>
+</ul>
+</main>
+</body>
+</html>

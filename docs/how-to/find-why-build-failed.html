@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Find out why a build failed · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/find-why-build-failed">
+<main class="doc">
+<h1>Find out why a build failed</h1>
+<p class="lead">Go from a red build to the line, the test or the change that broke it in a few clicks.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>You can see the project: you need at least the Project viewer role on it.</li>
+  <li>A build has failed. In the project tree on the left, a build configuration with a red dot has a failed last build.</li>
+</ul>
+
+<h2>Steps</h2>
+<ol class="steps">
+  <li>Open the failed build. Click the build configuration in the project tree, then the build number with a red <strong>Failed</strong> label in its <strong>History</strong> list. The <strong>Failed</strong> button above that list hides the builds that passed. The <strong>History</strong> page in the top bar lists the builds of every project.</li>
+  <li>On the <strong>Overview</strong> tab, look at <strong>Build steps</strong>. The failed step has a red band and a red cross, with the reason beside it, for example <em>Failed — the process exited with code 1</em>.</li>
+  <li>Read <strong>Decided by</strong> in the <strong>Summary</strong> card. It says what made the build fail, for example <em>Failed: Step "Upload build" exited with code 1</em>.</li>
+  <li>Click <strong>Log</strong> on the failed step. The <strong>Console Output</strong> tab opens at that step.</li>
+  <li>Click <strong>Errors only</strong> in the console toolbar. You now see only error lines, inside the blocks they belong to.</li>
+  <li>Press <kbd>E</kbd> to jump from one error to the next, and <kbd>W</kbd> for warnings. Click <strong>All</strong> to see the lines around an error again.</li>
+  <li>To find something else, click <strong>Search in log</strong> and type a word, such as a file name or an error code like <code>C4996</code>. Move between matches with the up and down arrows beside the box.</li>
+  <li>If the build has a <strong>Test Result</strong> tab, click it. <strong>All Failed Tests</strong> lists the tests that failed. Click the arrow beside a test to read its error message and stack trace.</li>
+  <li>Click the <strong>Changes</strong> tab to see the changelists or commits that are new in this build. When a test that passed yesterday fails today, the cause is often in this list.</li>
+</ol>
+
+<figure class="shot">
+  <img src="../../assets/shots/how-to/find-why-build-failed-1.png" alt="The Overview tab of build #1 of HT3 Nightly upload, status Failed: Build steps lists Compile and Run tests as Success and Upload build with a red band, Failed — the process exited with code 1; the Summary card says Decided by: Failed: Step Upload build exited with code 1 and Tests (1 failure) Gameplay.Inventory.Inventory_StackLimit; on the right the Resume from here card">
+  <figcaption>Step 2: the failed step stands out on the Overview tab. The Summary also names the failed test.</figcaption>
+</figure>
+
+<figure class="shot">
+  <img src="../../assets/shots/how-to/find-why-build-failed-2.png" alt="The Console Output tab with Errors only selected and the counter 5 errors: under Step 2/3 Run tests, the block Run gameplay tests shows the line Inventory_StackLimit: expected 99 items in a stack, got 100; under Step 3/3 Upload build, the block Upload to the build share shows Cannot reach \\fileserver\builds\skyforge: the network path was not found, then the step's exit code and Finished: FAILURE">
+  <figcaption>Step 5: <strong>Errors only</strong> keeps the block structure, so you see which step and block each error came from.</figcaption>
+</figure>
+
+<figure class="shot">
+  <img src="../../assets/shots/how-to/find-why-build-failed-3.png" alt="The Test Result tab: 1 failure (+1), 0 skipped, 12 tests (+12), a bar mostly green with a red part, All Failed Tests lists Gameplay.Inventory.Inventory_StackLimit taking 0.12 sec, and All Tests shows the package Gameplay">
+  <figcaption>Step 8: the failed test. The numbers in brackets compare with the build before.</figcaption>
+</figure>
+
+<h2>If the failed step has a name from your script</h2>
+<p>Steps that print <code>::group::</code> lines show their own blocks inside the step. A failed block opens by itself, so the error is often in view as soon as you open the console. Failed steps also write the line <em>Failed: Step "Name" exited with code N</em>, and <strong>Decided by</strong> on the Overview repeats it. If a script set a status text, it shows beside the result. See <a href="../build-results/build-name-and-status.html">The build name and status text</a>.</p>
+
+<h2>Check it worked</h2>
+<p>You found the cause when you can say three things:</p>
+<ul>
+  <li><strong>Where</strong> it failed: the step and block, from the Overview and the console.</li>
+  <li><strong>What</strong> failed: the error line or the failed test with its message.</li>
+  <li><strong>Why now</strong>: the change in the <strong>Changes</strong> tab, or "nothing changed" (then it is the machine or the network, see below).</li>
+</ul>
+<p>Click a line number in the console to put a link to that line in the address bar. Send it to the person who can fix the problem.</p>
+
+<h2>Troubleshooting</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Errors only</strong> shows nothing useful.</td><td>Some tools write errors as plain lines. Click <strong>All</strong>, open the failed step and read its last lines, or search for <code>error</code>. Make your own scripts print <code>::error::</code> lines; see <a href="group-build-output.html">Organise your build log with blocks</a>.</td></tr>
+    <tr><td>The <strong>Changes</strong> tab says <em>No changes.</em></td><td>The build used the same changelist or commit as the build before it. The info line in the header still shows which one. If the code did not change, compare the agent, the parameters and the time with the last good build.</td></tr>
+    <tr><td>The same code passes on a re-run.</td><td>The failure is flaky: a network share, a device kit or a crashing tool. Add <strong>Retry on failure</strong> to that step. See <a href="../build-steps/resume-and-retry.html">Resume and retry</a>.</td></tr>
+    <tr><td>There is no <strong>Test Result</strong> tab.</td><td>The step did not publish a test report. Set <strong>Test reports</strong> on the step, for example <code>reports/*.xml</code>. See <a href="../build-steps/runners.html">Runners</a>.</td></tr>
+  </tbody>
+</table>
+
+<h2>Next steps</h2>
+<ul>
+  <li><a href="rerun-from-failed-step.html">Re-run a failed build from the failing step</a> once the problem is fixed.</li>
+  <li><a href="../build-results/build-console.html">The build console</a>: every filter, key and tool in the console.</li>
+  <li><a href="../build-results/changes-artifacts-tests.html">Changes, artifacts and tests</a>.</li>
+  <li><a href="monitor-from-terminal.html">Watch the server from a terminal</a>: list failed builds without a browser.</li>
+  <li><a href="run-compare-two-builds.html">Compare two builds</a>: find what differs between the last good build and the failed one.</li>
+  <li><a href="../build-results/statistics.html">The Statistics tab</a>: see whether the failures started at one date or one agent.</li>
+</ul>
+</main>
+</body>
+</html>

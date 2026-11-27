@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Views · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/views">
+<main class="doc">
+<h1>Views</h1>
+<p class="lead">A view is a tab that shows a chosen set of build configurations, so each team sees only what it cares about.</p>
+
+<h2>When to use it</h2>
+<p>Use views when a project or the Projects page holds more build configurations than one person needs. For example, make a tab <strong>Release</strong> for the builds that ship, a tab <strong>Nightly</strong> for the scheduled ones and a tab <strong>Failing</strong> for the ones you must look at. A view only changes what you see. It never moves, copies or changes a build configuration, and one build configuration can be in many views.</p>
+
+<h2>Where the tabs are</h2>
+<p>The tab bar sits under the page title, on the Projects page and on the Overview of a project. Every place that can hold views starts with one tab called <strong>All</strong>. It shows everything. It is the default view at first, and the default view cannot be deleted.</p>
+<figure class="shot"><img src="../../assets/shots/projects/views-tabs.png" alt="The Projects page with the tab bar: All, Game and Engine, and the plus button"><figcaption>The tab bar of views.</figcaption></figure>
+<ul>
+  <li><strong>The tabs</strong> are sorted by name, not by the order you created them.</li>
+  <li><strong>+</strong> at the end of the tab bar (its tooltip is <strong>New View</strong>) adds a view. It shows only if you have the View create permission.</li>
+  <li><strong>Rename</strong>: open the tab, click the <strong>⋯</strong> menu in the page header, choose <strong>Edit View</strong> and change <strong>Name</strong>.</li>
+  <li><strong>Delete</strong>: open the tab, click <strong>⋯</strong> and choose <strong>Delete View</strong>. Buildspawn asks <em>Delete the view ‘Release’?</em>. Deleting a view never deletes the build configurations in it. The default view cannot be deleted, and neither can the last view.</li>
+</ul>
+<p>The same <strong>⋯</strong> menu also holds the Atom feeds of the view (<strong>All</strong>, <strong>Failures</strong>, <strong>Just latest builds</strong>).</p>
+
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the Projects page, or the project that should hold the view.</li>
+  <li>Click <strong>+</strong> in the tab bar.</li>
+  <li>Type a <strong>Name</strong>, for example <code>Release</code>. Under <strong>Type</strong> choose <strong>List View</strong>, <strong>My View</strong> or, where offered, <strong>Include a global view</strong>. Click <strong>Create</strong>.</li>
+  <li>On <strong>Edit View</strong>, fill in the fields in the tables below. The top of the page shows a <strong>Summary</strong>: how many items the view shows now, its type and the pattern if there is one.</li>
+  <li>Click <strong>Save</strong>. The view opens.</li>
+</ol>
+<p>If a view with that name already exists, Buildspawn says <em>A view already exists with the name “Release”</em>.</p>
+
+<h2>View types</h2>
+<table>
+  <thead><tr><th>Type</th><th>What it shows</th></tr></thead>
+  <tbody>
+    <tr><td><strong>List View</strong></td><td>Items in a simple list. You choose which build configurations show. Details below.</td></tr>
+    <tr><td><strong>My View</strong></td><td>Automatically all the build configurations that the current user has access to. It has no settings of its own.</td></tr>
+    <tr><td><strong>Include a global view</strong></td><td>Shows the content of another view that lives at the top of the server. See <a href="#include-a-global-view">Include a global view</a>.</td></tr>
+  </tbody>
+</table>
+
+<h2 id="list-view">List View: every field</h2>
+<p>These are the sections of <strong>Edit View</strong> for a List View.</p>
+<h3>General</h3>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Name</strong></td><td>The text on the tab. Change it to rename the view. If another view already has the same display name, Buildspawn warns you.</td><td>What you typed in <strong>+</strong></td><td><code>Release</code></td></tr>
+    <tr><td><strong>Description</strong></td><td>Describe the purpose of the view. It shows at the top of the view.</td><td>Empty</td><td><code>Builds that go to players.</code></td></tr>
+  </tbody>
+</table>
+<h3>Jobs</h3>
+<p>The section title is <strong>Jobs</strong> and its help line says <em>Select the build configurations to show in this view.</em></p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Recurse in subfolders</strong></td><td>Off: the list holds only the items directly in the project that owns the view. On: Buildspawn also looks inside every project below, and the tick list shows the nested items too. Names are then written with the path, such as <code>Game/Win64</code>.</td><td>Off</td><td>On, for a view on the Projects page that should reach into every game</td></tr>
+    <tr><td>The list of projects (tick boxes)</td><td>Tick the build configurations to show. Tick a project to show the project itself.</td><td>None ticked</td><td>Tick <code>Win64 Build</code> and <code>PS5 Build</code></td></tr>
+    <tr><td><strong>Use a pattern instead</strong></td><td>A tick box. When it is on, the field <strong>Pattern</strong> shows.</td><td>Off</td><td>On</td></tr>
+    <tr><td><strong>Pattern</strong></td><td>A regular expression, a text pattern that is tried on the name of every item. Every item whose whole name matches is added, on top of the ticked ones. The pattern has to match the whole name, so <code>Win64</code> alone matches nothing; write <code>Win64.*</code>. To leave something out, use a negative lookahead: <code>(?!test.*).*</code> shows everything not starting with <code>test</code>. With <strong>Recurse in subfolders</strong> on, the name includes the path.</td><td>Empty</td><td><code>(Win64|PS5)-.*</code></td></tr>
+  </tbody>
+</table>
+<h3>Filters</h3>
+<p>This section only shows when a filter type is installed. Click <strong>Add Build Configuration Filter</strong> and choose a type. A filter works on the list that the ticks and the pattern produced. It only removes items. It never adds new ones.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Status Filter</strong></td><td>A list with two choices. <strong>Enabled build configurations only</strong> hides the disabled ones. <strong>Disabled build configurations only</strong> shows only the disabled ones.</td><td>No filter</td><td><strong>Enabled build configurations only</strong></td></tr>
+  </tbody>
+</table>
+<h3>Columns</h3>
+<p>Click <strong>Add column</strong> to add one, drag the handle of a column to change its order and use the delete button to remove it. The table of the view shows the columns left to right in the order of this list.</p>
+<table>
+  <thead><tr><th>Column</th><th>What it shows</th><th>In a new view</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Name</strong></td><td>The name of the build configuration, a link to it.</td><td>Yes</td></tr>
+    <tr><td><strong>Items</strong></td><td>For a project, how many items it holds.</td><td>Yes</td></tr>
+    <tr><td><strong>Status</strong></td><td>The result of the last build as a coloured icon.</td><td>Yes</td></tr>
+    <tr><td><strong>Latest build</strong></td><td>The number of the last build, a link to it.</td><td>Yes</td></tr>
+    <tr><td><strong>Started</strong></td><td>When the last build started.</td><td>Yes</td></tr>
+    <tr><td><strong>Last Duration</strong></td><td>How long the last build took (the column header reads <strong>Duration</strong>).</td><td>Yes</td></tr>
+    <tr><td><strong>Weather</strong></td><td>A health icon from the last few builds.</td><td>Yes</td></tr>
+    <tr><td><strong>Build Button</strong></td><td>A button that starts a build. It shows only when you may build.</td><td>Yes</td></tr>
+    <tr><td><strong>Last Success</strong></td><td>The last build that passed.</td><td>No</td></tr>
+    <tr><td><strong>Last Stable</strong></td><td>The last build that passed with no warnings.</td><td>No</td></tr>
+    <tr><td><strong>Last Failure</strong></td><td>The last build that failed.</td><td>No</td></tr>
+  </tbody>
+</table>
+<p>A new view starts with the columns marked <em>Yes</em>, in the order of the table. Plugins can add more columns, for example a Git branch column.</p>
+<h3>Widgets</h3>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Filter build queue</strong></td><td>If ticked, only build configurations in this view show in the queue.</td><td>Off</td></tr>
+    <tr><td><strong>Filter build executors</strong></td><td>If ticked, only the executors that could run the build configurations of this view show.</td><td>Off</td></tr>
+  </tbody>
+</table>
+<div class="callout note"><p>Archived build configurations and generated hidden ones never show in a view. A view that shows nothing says <em>This view has no build configurations associated with it</em> and links to <strong>add some existing build configurations</strong> and to create a <strong>new build configuration</strong> in this view.</p></div>
+<div class="callout tip"><p>When you create a build configuration from inside a List View, you can tick <strong>Add to current view</strong> so the new one is added for you. It is ticked at first when the view lists items by name, or when it uses no pattern and no filter.</p></div>
+
+<h2 id="include-a-global-view">Include a global view</h2>
+<p>Shows the content of a view that was made at the top of the server. Use it inside a project when you want the same list as a view on the Projects page.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>View name</strong></td><td>A list of the global views. Choose the one to show. Its help line says <em>The name of a global view that will be shown.</em></td><td>The first one in the list</td><td><code>Release</code></td></tr>
+  </tbody>
+</table>
+<p>If the chosen view is later renamed or deleted, the tab shows <em>Global view Release does not exist</em>. Open <strong>Edit View</strong> and choose another one.</p>
+
+<h2>Automatic views of multibranch projects and organization folders</h2>
+<p>A multibranch project or an organization folder makes its own views. They list the branches or repositories that Buildspawn found, one view per category. A view called <strong>All</strong> comes first. In the list of view types they are named <strong>Multibranch Project All view</strong> and <strong>Organization folder All view</strong>. You cannot create them yourself, and you do not set them up: they follow what the scan finds. See <a href="type-multibranch.html">Multibranch</a> and <a href="type-organization-folder.html">Organization folder</a>.</p>
+
+<h2 id="my-views">My Views</h2>
+<p>My Views holds views that only you see. Open your user page (click your name at the top right) and choose <strong>My Views</strong>. It has its own tab bar, a <strong>+</strong> to add a view and an <strong>All</strong> tab, just like the Projects page. The views you add here are private: other users do not see them.</p>
+<p>In your own settings you can pick the tab bar for My Views and which of your views opens first (<strong>Default View</strong>). See <a href="../administration/user-settings.html">User settings</a>. A <strong>My View</strong> inside it lists every build configuration you may open, which makes a good personal start page.</p>
+
+<h2>System settings for views</h2>
+<p>Open <strong>Settings › System</strong>. See <a href="../administration/system-settings.html">System settings</a> for the whole page.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Default view</strong></td><td>The view that opens first on the Projects page. The list holds all the top-level views. It shows only when there is more than one view. The default view cannot be deleted.</td><td><strong>All</strong></td><td><code>Release</code></td></tr>
+    <tr><td><strong>Views Tab Bar</strong></td><td>Chooses how the tabs are drawn. A plugin can offer its own tab bar. When only the built-in bar exists, which is the case in a standard Buildspawn, nothing is offered and this field is hidden. The same is true for the tab bar of My Views.</td><td>The built-in tab bar (<strong>Default Views TabBar</strong>)</td><td>Hidden</td></tr>
+  </tbody>
+</table>
+
+<h2>A worked example</h2>
+<p>The studio has the projects <strong>Game</strong> and <strong>Tools</strong>. The release manager wants one tab for the builds that go to players.</p>
+<ol class="steps">
+  <li>Open the Projects page and click <strong>+</strong>.</li>
+  <li>Name: <code>Release</code>. Type: <strong>List View</strong>. Click <strong>Create</strong>.</li>
+  <li>Tick <strong>Recurse in subfolders</strong>. The tick list now also shows the items inside <strong>Game</strong> and <strong>Tools</strong>.</li>
+  <li>Tick <strong>Use a pattern instead</strong> and type <code>Game/(Win64|PS5)-Release</code> in <strong>Pattern</strong>.</li>
+  <li>Under <strong>Filters</strong> click <strong>Add Build Configuration Filter</strong>, choose <strong>Status Filter</strong> and <strong>Enabled build configurations only</strong>.</li>
+  <li>Under <strong>Columns</strong> click <strong>Add column</strong>, choose <strong>Last Success</strong>, then drag it to sit after <strong>Latest build</strong>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<h2>What you see</h2>
+<p>A new tab <strong>Release</strong> appears next to <strong>All</strong>. Its table lists <code>Game/Win64-Release</code> and <code>Game/PS5-Release</code> with the columns you chose. Disabled ones are left out. The <strong>Summary</strong> on <strong>Edit View</strong> reads <em>Shows 2 items.</em> and <em>Also includes</em> followed by your pattern.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>The view is empty.</td><td>Tick at least one build configuration or switch on a pattern. A filter alone adds nothing. Check that the pattern matches the whole name, and add <code>.*</code> at the end.</td></tr>
+    <tr><td>Items inside a project are missing.</td><td>Switch on <strong>Recurse in subfolders</strong>, and write the pattern with the path.</td></tr>
+    <tr><td>There is no <strong>+</strong>.</td><td>You do not have the permission to create views. Ask an administrator. See <a href="../administration/users-and-permissions.html">Users, groups and permissions</a>.</td></tr>
+    <tr><td>There is no <strong>Delete View</strong>.</td><td>You are on the default view, or the last view. Choose another <strong>Default view</strong> in System settings first.</td></tr>
+    <tr><td>A new build configuration is not in the tab.</td><td>A view of ticked names does not add new items by itself. Tick the new one, or use a pattern.</td></tr>
+    <tr><td><em>An error occurred when retrieving build configurations for this view</em></td><td>Open the Buildspawn log for details. Often a pattern is not a valid regular expression.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="projects.html">Projects</a></li>
+  <li><a href="../how-to/projects-team-view.html">Make a tab that shows only your team's build configurations</a></li>
+  <li><a href="../administration/system-settings.html">System settings</a></li>
+  <li><a href="../administration/user-settings.html">User settings</a></li>
+</ul>
+</main>
+</body>
+</html>

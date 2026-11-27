@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roles · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="administration/roles">
+<main class="doc">
+<h1>Roles</h1>
+<p class="lead">A role is a named set of permissions, such as <em>Developer</em>, that you give to a user or a group on a project in one step.</p>
+
+<h2>When to use it</h2>
+<p>Use roles when you do not want to tick single permissions on a card. You give a role on a project, and it applies to that project and everything inside it. Give a role at <strong>Root</strong> and it applies to the whole server. Roles work only with the authorization <strong>Project-based security</strong>. See <a href="authorization.html">Authorization</a>.</p>
+<p>A role is a shortcut. When you assign it, Buildspawn ticks the matching permissions in the permission grid. The grid still decides what people can do, and you can change any box there.</p>
+
+<h2>The built-in roles</h2>
+<p>Built-in roles are fixed. You cannot change or delete them.</p>
+<table>
+  <tr><th>Role</th><th>What it allows</th><th>Where</th></tr>
+  <tr><td><strong>Project viewer</strong></td><td>See the project, its build configurations and builds, and download artifacts.</td><td>Any project</td></tr>
+  <tr><td><strong>Developer</strong></td><td>Project viewer, plus run and stop builds, read settings, use workspaces, edit build descriptions and tag sources.</td><td>Any project</td></tr>
+  <tr><td><strong>Project administrator</strong></td><td>Developer, plus configure, create, move and delete build configurations and subprojects, manage views, and assign roles here. Below Root, also the project’s credentials.</td><td>Any project</td></tr>
+  <tr><td><strong>Build settings administrator</strong></td><td>Change the steps, publishers, wrappers and parameters this project passes on. These run in every build configuration below it, with those build configurations’ credentials.</td><td>Any project</td></tr>
+  <tr><td><strong>Agent manager</strong></td><td>Add, configure, connect, disconnect, build on and delete agents, and move them between pools. Nothing on projects. Creating or editing a pool stays with the system administrator.</td><td>Root only</td></tr>
+  <tr><td><strong>System administrator</strong></td><td>Everything on the server.</td><td>Root only</td></tr>
+</table>
+
+<h2>The Roles page</h2>
+<p><strong>Settings › Roles</strong> shows the table of built-in and custom roles (<strong>Role</strong>, <strong>What it allows</strong>, <strong>Kind</strong>, <strong>Actions</strong>) and the form <strong>New custom role</strong>. Only administrators can open it. If Project-based security is off, a yellow note says <em>Roles can’t be assigned because project-based security isn’t in use.</em> You can still prepare custom roles.</p>
+<figure class="shot">
+  <img src="../../assets/shots/administration/roles-page.png" alt="Settings, Roles, with the table of built-in roles and the New custom role form">
+  <figcaption>Settings › Roles: the built-in roles and the form to make your own.</figcaption>
+</figure>
+
+<h3>Make a custom role</h3>
+<ol class="steps">
+  <li>Open <strong>Settings › Roles</strong>.</li>
+  <li>Under <strong>New custom role</strong> type a <strong>Name</strong>, for example <code>Release manager</code>.</li>
+  <li>Type a <strong>Description</strong>. It is shown beside the role wherever it can be given.</li>
+  <li>Under <strong>Permissions</strong> tick what the role holds. Each group (<strong>Overall</strong>, <strong>Credentials</strong>, <strong>Agent</strong>, <strong>Build configuration</strong>, <strong>Run</strong>, <strong>View</strong>, <strong>SCM</strong>, <strong>Perforce</strong>) has <strong>Tick all</strong> and <strong>Clear</strong>. The box <em>Find a permission</em> filters the list.</li>
+  <li>The card <strong>This role</strong> shows the name and <em>n of m permissions ticked</em>. Check it.</li>
+  <li>Click <strong>Save role</strong>. It now appears on every project’s <strong>Roles</strong> tab.</li>
+</ol>
+<table>
+  <tr><th>Field</th><th>What it does</th><th>Limit</th><th>Example</th></tr>
+  <tr><td><strong>Name</strong></td><td>The name people see when they assign the role.</td><td>1 to 80 characters, not used by another role</td><td>Release manager</td></tr>
+  <tr><td><strong>Description</strong></td><td>One line shown next to the role.</td><td>Up to 500 characters</td><td>Runs and publishes release builds</td></tr>
+  <tr><td><strong>Permissions</strong></td><td>The permissions the role holds.</td><td>At least one. <strong>Administer</strong> cannot be chosen: use <strong>System administrator</strong>.</td><td>Build, Cancel, Workspace, Read</td></tr>
+</table>
+<ul>
+  <li>Below Root, only the project permissions of a role apply.</li>
+  <li>Whoever gives a role must hold every permission in it, unless they are a system administrator.</li>
+  <li>A role that holds exactly the same as another role is refused: <em>This holds exactly what the role … holds. Use that role.</em></li>
+  <li>To edit or delete a custom role, use the buttons in its row. Saving or deleting a role changes only <em>future</em> assignments. People who already have it keep their permissions.</li>
+</ul>
+
+<h2>Give a role on a project</h2>
+<ol class="steps">
+  <li>Open the project (or the Root project for the whole server) and click the <strong>Roles</strong> tab.</li>
+  <li>Click <strong>Assign a role</strong>.</li>
+  <li>Choose <strong>Type</strong>: <strong>User</strong> or <strong>Group</strong>.</li>
+  <li>Type the <strong>User ID or group name</strong>. A group must exist first (see <a href="users.html">Users and groups</a>).</li>
+  <li>Choose the <strong>Role</strong>.</li>
+  <li>Click <strong>Assign</strong>. The person or group appears in the table <strong>Assigned on this project</strong> (or <strong>Assigned at Root</strong>).</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/administration/roles-project.png" alt="The Roles tab of a project: the Assign a role form, the roles assigned on the project and the roles inherited from above"><figcaption>The Roles tab of a project.</figcaption></figure>
+
+<h3>What the Roles tab shows</h3>
+<table>
+  <tr><th>Part</th><th>What it shows</th></tr>
+  <tr><td><strong>Assigned here</strong></td><td>Columns <strong>User or group</strong>, <strong>Role</strong>, <strong>Grants here</strong> and <strong>Actions</strong> (<strong>Remove</strong>). A row that fits no role shows <em>Custom</em> or <em>A mix that fits no role</em>, and <strong>See the grid</strong>.</td></tr>
+  <tr><td><strong>Inherited from above</strong></td><td>Roles given on a parent project or at Root, with their <strong>Source</strong>. Change them where they were given. A note says when a project blocks inheritance.</td></tr>
+  <tr><td><strong>Effective roles</strong></td><td>Type a <strong>User ID</strong> and click <strong>Show</strong> to see every role that person gets here, and through which group.</td></tr>
+  <tr><td><strong>Full permission grid</strong></td><td>The cards of this project, for custom permissions and the inheritance choice. Each realm’s grid shows only while that realm is in use.</td></tr>
+  <tr><td><strong>What each role allows</strong></td><td>A short list of the roles and their descriptions.</td></tr>
+</table>
+
+<h3>Rules and safeguards</h3>
+<ul>
+  <li><strong>System administrator</strong> and <strong>Agent manager</strong> can only be given at Root.</li>
+  <li>The last system administrator cannot be removed: <em>Refused: nobody else who can sign in would be a system administrator.</em></li>
+  <li>You cannot give <strong>System administrator</strong> to a group like <code>authenticated</code>, because everyone would become an administrator.</li>
+  <li>To include people who are not signed in, use the group <code>anonymous</code>. It is not a user.</li>
+  <li>A row marked <em>Gives nobody anything</em> points to a user or group that was deleted. Remove it, or create the user or group again.</li>
+  <li>People must also be able to reach the project: they need <strong>Overall › Read</strong> at Root, and <strong>Read</strong> on the projects above. Otherwise a message says <em>Cannot reach this project yet</em>.</li>
+</ul>
+
+<h2>The “Roles” note on the Security page</h2>
+<p>On <strong>Settings › Security</strong>, under the permission cards, a section <strong>Roles</strong> explains how roles relate to the cards. When project-based security is on, it says the <strong>Roles</strong> tab ticks preset boxes in the table above, that you can still change any box, and that people need <strong>Overall › Read</strong> to reach a project. A link, <strong>Open the roles of Root</strong>, goes to the Root roles. When another strategy is on, it says to choose <strong>Project-based security</strong> and tick at least <strong>Administer</strong> for yourself first.</p>
+
+<h2>From the terminal</h2>
+<p>The server’s command line has three commands for scripts. See <a href="../reference/terminal-commands.html">Terminal commands</a> for how to call it.</p>
+<table>
+  <tr><th>Command</th><th>What it does</th></tr>
+  <tr><td><code>list-roles [PROJECT]</code></td><td>Lists the roles, or who holds which role on a project.</td></tr>
+  <tr><td><code>assign-role ROLE PROJECT -user|-group NAME</code></td><td>Gives a user or group a role on a project or at Root.</td></tr>
+  <tr><td><code>remove-role ROLE PROJECT -user|-group NAME</code></td><td>Takes a role away.</td></tr>
+</table>
+<p><code>PROJECT</code> is the full name of the project, or <code>/</code> for Root.</p>
+
+<h2>A worked example</h2>
+<p>You want one person from the build team to release builds of the project <em>HT2</em>, without letting them change settings. On <strong>Settings › Roles</strong> you make the role <em>Release manager</em> with <strong>Read</strong>, <strong>Build</strong>, <strong>Cancel</strong>, <strong>Workspace</strong> and <strong>Update</strong> (under Run). On the <strong>Roles</strong> tab of <em>HT2</em> you give it to the group <code>release-team</code>. Afterwards, <strong>Effective roles</strong> for <code>sam.lee</code> shows <em>Release manager, through group release-team</em>.</p>
+
+<h2>What you see when it runs</h2>
+<ul>
+  <li>People with the role see the project and the buttons their role allows. They do not see the others.</li>
+  <li>The group page (<strong>Settings › Groups</strong>) lists the roles of each group.</li>
+</ul>
+
+<h2>Problems and fixes</h2>
+<table>
+  <tr><th>Problem</th><th>What to do</th></tr>
+  <tr><td>No <strong>Roles</strong> tab.</td><td>Choose <strong>Project-based security</strong> on <strong>Settings › Security</strong>.</td></tr>
+  <tr><td><em>There is no group …</em></td><td>Create the group first on <strong>Settings › Groups</strong>.</td></tr>
+  <tr><td><em>… does not hold exactly … on this row. Change it in the full permission grid.</em></td><td>The row was changed in the grid. Edit it in the grid.</td></tr>
+  <tr><td>Role cannot be assigned: you do not hold every permission in it.</td><td>Ask a system administrator, or a person who has all of them.</td></tr>
+  <tr><td>The person is a Developer but sees nothing.</td><td>They also need <strong>Overall › Read</strong>. Give it to <strong>Authenticated Users</strong>.</td></tr>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="authorization.html">Authorization</a></li>
+  <li><a href="users.html">Users and groups</a></li>
+  <li><a href="users-and-permissions.html">Users and permissions</a></li>
+  <li><a href="../how-to/give-team-access.html">Give a team access to its projects</a></li>
+</ul>
+</main>
+</body>
+</html>

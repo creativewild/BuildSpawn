@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Perforce connections · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="version-control/perforce-connections">
+<main class="doc">
+<h1>Perforce connections</h1>
+<p class="lead">A connection is a stored Perforce credential: the server address, the user and a password or ticket, kept encrypted and never shown.</p>
+
+<h2>When to use it</h2>
+<p>Every Perforce root, Perforce Software setting and Perforce operations step signs in through a credential. Make one credential per build user. The same page also covers <strong>Administrator connections</strong>, which let a few steps do admin work, and the Perforce variables a build gets (<code>P4_PORT</code>, <code>P4_USER</code>, <code>P4_CLIENT</code>, <code>P4_TICKET</code>). See <a href="perforce-variables.html">Perforce variables</a> for those.</p>
+
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the credentials page where the credential should be visible: the project's, or the server's under <strong>Manage Buildspawn › Credentials</strong>.</li>
+  <li>Click <strong>Add credentials</strong> and choose <strong>Perforce Password Credential</strong> or <strong>Perforce Ticket Credential</strong>.</li>
+  <li>Fill in the fields below.</li>
+  <li>Click <strong>Test Connection</strong> (administrators only). Fix any error.</li>
+  <li>Click <strong>Create</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/version-control/perforce-credential-form.png" alt="The New credential dialog with the Perforce password type chosen: P4Port, SSL connection, Username and Password"><figcaption>The Perforce password credential form.</figcaption></figure>
+<p>You can also add a credential from the root form: the <strong>Credential</strong> picker has an <strong>Add</strong> button. The connection page of a build configuration (<strong>Perforce connection</strong> tab) shows the server and user in use and checks that they work.</p>
+
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>ID</strong>, <strong>Description</strong></td><td>The name you pick this credential by.</td><td>Generated</td><td><code>helix-buildbot</code></td></tr>
+    <tr><td><strong>P4Port</strong></td><td>Host and port of the server. Do not type <code>ssl:</code>; use the checkbox.</td><td></td><td><code>perforce.studio.example:1666</code></td></tr>
+    <tr><td><strong>SSL connection</strong></td><td>Use SSL.</td><td>Off</td><td>On</td></tr>
+    <tr><td><strong>Trust</strong></td><td>With SSL: the fingerprint of the server's certificate. Optional if the server has a CA certificate. <strong>Test Connection</strong> shows the fingerprint the first time.</td><td></td><td><code>7A:B3:...</code></td></tr>
+    <tr><td><strong>Username</strong></td><td>The Perforce user for builds. It needs at least the <code>open</code> protection level.</td><td></td><td><code>buildbot</code></td></tr>
+    <tr><td><strong>Password</strong> (password credential)</td><td>The user's password.</td><td></td><td></td></tr>
+    <tr><td><strong>Login with ticket value</strong> / <strong>Ticket</strong> (ticket credential)</td><td>A valid session ticket. Make one with <code>p4 -u buildbot -p perforce:1666 login -ap</code>. The <code>-a</code> lets it work from any machine.</td><td></td><td></td></tr>
+    <tr><td><strong>Use P4TICKETS file</strong> / <strong>P4TICKETS</strong> (ticket credential)</td><td>The full path of a tickets file on the agent.</td><td></td><td><code>C:\Users\build\p4tickets.txt</code></td></tr>
+    <tr><td><strong>All Hosts</strong> (advanced, password)</td><td>Ask for a ticket that works on all hosts.</td><td>Off</td><td></td></tr>
+    <tr><td><strong>Retry</strong> (advanced)</td><td>How many times to retry a connection or task. The wait grows with each try (n squared seconds).</td><td>0</td><td><code>3</code></td></tr>
+    <tr><td><strong>Tick interval (ms)</strong> (advanced)</td><td>A <em>waiting</em> message goes to the log after this long, so long commands do not look stuck. 0 turns it off.</td><td>0</td><td><code>30000</code></td></tr>
+    <tr><td><strong>RPC_SOCKET_SO_TIMEOUT_NICK</strong> (advanced)</td><td>Read and write timeout of the connection in milliseconds. 0 turns timeouts off.</td><td>0</td><td></td></tr>
+    <tr><td><strong>P4HOST</strong> (advanced)</td><td>Host name to pretend to be.</td><td></td><td></td></tr>
+    <tr><td><strong>Enable user session</strong>, <strong>Minimum session life</strong> (advanced)</td><td>Caches the user and ticket expiry. While the ticket has at least this much life left, no login check is done.</td><td>Off, 0</td><td></td></tr>
+  </tbody>
+</table>
+
+<h2>Administrator connections</h2>
+<p>Some work needs more rights than a build user has: removing a workspace another user owns, or a custom command. An <strong>Administrator connection</strong> is a connection with admin or super access, defined with the root. On the roots page, <strong>Administrator Access</strong> opens the list. An administrator must also turn on <strong>Allow Administrator connection</strong> in the Perforce operations settings, and the person who sets up a step needs the Perforce permission <strong>Use administrator connection</strong>. See <a href="perforce-operations.html">Perforce operations</a>.</p>
+
+<h2>A worked example</h2>
+<p>Skyforge has one build user <code>buildbot</code>. An administrator adds a <strong>Perforce Ticket Credential</strong> with ID <code>helix-buildbot</code>, P4Port <code>perforce.studio.example:1666</code>, SSL on, Trust set, the ticket from <code>p4 login -ap</code>, and a Tick interval of <code>30000</code>. All roots of the <strong>Game</strong> project use it.</p>
+
+<h2>What you see when it runs</h2>
+<p>The log of a Perforce operation starts with <code>P4: buildbot@ssl:perforce.studio.example:1666 (...)</code>. The password and the ticket never appear. If a secret would be printed, it is replaced by <code>********</code>.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>You see</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>The password or ticket is rejected</td><td>Buildspawn shows the problem on the build configuration page and in its settings. Update the credential. Tickets expire: make one with <code>-a</code> and a long-lived user.</td></tr>
+    <tr><td>SSL trust error</td><td>Click <strong>Test Connection</strong> to get the fingerprint, and paste it into <strong>Trust</strong>.</td></tr>
+    <tr><td>The credential is not in the picker</td><td>It must be defined on the same project as the root, or above.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="perforce-roots.html">Perforce roots</a>, <a href="perforce-variables.html">Perforce variables</a>, <a href="../how-to/game-p4-ticket-script.html">Use P4 commands in a script with the P4 ticket</a></li>
+</ul>
+</main>
+</body>
+</html>

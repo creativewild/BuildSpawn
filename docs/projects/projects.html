@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Projects · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/projects">
+<main class="doc">
+<h1>Projects</h1>
+<p class="lead">Projects are folders that group build configurations and pass settings down to them. Set something once on a project and every build configuration inside gets it.</p>
+
+<p>A studio usually has one project per game or tool, for example <strong>Game</strong>, <strong>Engine</strong> and <strong>Tools</strong>. Inside a project you keep the <strong>build configurations</strong> (the things that run, such as <em>Windows Build</em> or <em>PS5 Build</em>) and, if you like, more projects inside it (subprojects).</p>
+
+<figure class="shot">
+  <img src="../../assets/shots/projects/project-game.png" alt="The Game project page: the tabs Overview, Build History, Perforce roots, Build settings, Pause and archive, Credentials, Settings and Build Chains, and a table of its three build configurations with result, latest build, duration and health">
+  <figcaption>The Game project. The table lists its build configurations with their latest result.</figcaption>
+</figure>
+
+<h2>What a project holds</h2>
+<p>Open a project from the project tree on the left, or from the Projects page. The header shows its name, how many build configurations fail, and the <strong>New Item</strong> button. The tabs are:</p>
+<table>
+  <thead><tr><th>Tab</th><th>What you find there</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Overview</strong></td><td>The build configurations and subprojects inside, with result, latest build, duration and health. Use <strong>Filter</strong> to find one by name. The play button starts a build; the <strong>…</strong> menu holds more actions.</td></tr>
+    <tr><td><strong>Build History</strong></td><td>Every build of every build configuration in this project, newest first.</td></tr>
+    <tr><td><strong>Perforce roots</strong></td><td>Perforce connections that the build configurations below can share. See <a href="../version-control/perforce.html">Perforce</a>.</td></tr>
+    <tr><td><strong>Build settings</strong></td><td>Build steps and parameters that every build configuration below gets. See <a href="#passes-down">What a project passes down</a>.</td></tr>
+    <tr><td><strong>Pause and archive</strong></td><td>Stop every build configuration inside from starting builds, or archive the whole project.</td></tr>
+    <tr><td><strong>Credentials</strong></td><td>Passwords, keys and tokens that only the build configurations in this project can use.</td></tr>
+    <tr><td><strong>Settings</strong></td><td>The project's own settings: name, ID, description, documentation links, versioned settings, connections and templates.</td></tr>
+    <tr><td><strong>Build Chains</strong></td><td>Builds that start other builds, drawn as chains.</td></tr>
+  </tbody>
+</table>
+<p>Inside the project, the tabs of a project are described on this page. The coloured dot after a project in the tree is the worst result inside it: if one build configuration fails, the project shows red.</p>
+
+<h3>Project settings</h3>
+<p>Open <strong>Settings</strong> on the project. The side menu groups the settings:</p>
+<ul>
+  <li><strong>Project:</strong> <strong>General</strong> (name, display name, description, documentation links), <strong>ID</strong>, <strong>Versioned Settings</strong> (keep the project's settings in Git or Perforce, see <a href="../version-control/versioned-settings.html">Versioned settings</a>) and <strong>Connections</strong>.</li>
+  <li><strong>Build:</strong> <strong>Build settings</strong> and <strong>Templates</strong>. The number beside each shows how many items it holds.</li>
+  <li><strong>Shared with the jobs below:</strong> <strong>Perforce roots</strong> and <strong>Credentials</strong>.</li>
+</ul>
+<figure class="shot">
+  <img src="../../assets/shots/projects/project-settings.png" alt="The Settings tab of the Game project with the fields Name, Configuration ID, Display name and Description, and a Documentation section below">
+  <figcaption>The project's General settings. The ID is used by other settings to refer to the project.</figcaption>
+</figure>
+<div class="callout tip"><p>The <strong>Display name</strong> is what people see in lists and in the tree. Leave it empty to show the name. To change the name itself, and the address of the project, use <strong>Rename</strong> in the page header.</p></div>
+
+<h2 id="passes-down">What a project passes down</h2>
+<p>A project can hand settings to everything below it. A build configuration then runs with its own settings <em>plus</em> what its projects give it. The chain goes from the <strong>Root project</strong> (the top of the server, under <strong>Settings</strong>), through each project and subproject, to the build configuration.</p>
+<p>A project passes down:</p>
+<ul>
+  <li><strong>Build steps</strong>, which run in every build configuration below, before the configuration's own steps.</li>
+  <li><strong>Parameters</strong>: configuration parameters, <code>env.</code> environment variables and <code>system.</code> properties. See <a href="../parameters/parameters.html">Parameters</a>.</li>
+  <li><strong>Post-build actions</strong> and <strong>build features</strong> that wrap the build.</li>
+  <li><strong>Perforce roots</strong>, <strong>credentials</strong> and <strong>documentation links</strong>.</li>
+</ul>
+<figure class="shot">
+  <img src="../../assets/shots/projects/project-build-settings.png" alt="The Build settings tab of the Game project: an empty Build steps list with an Add build step button, and a Parameters table with Add parameter, filters for Configuration, Environment and System, and a Folder properties card">
+  <figcaption>The project's Build settings: steps and parameters for every build configuration below.</figcaption>
+</figure>
+
+<h3>Change what a build configuration inherits</h3>
+<p>On a build configuration's <strong>Build Steps</strong> and <strong>Parameters</strong> pages, an inherited item has a chip that says where it comes from. For each inherited item you can:</p>
+<ul>
+  <li><strong>Override</strong> it: change it for this build configuration only. The project's item stays as it is.</li>
+  <li><strong>Disable in this job</strong>: switch it off for this build configuration only.</li>
+  <li><strong>Reset</strong>: drop your override or your disable and go back to what the project gives.</li>
+</ul>
+<p>A subproject can do the same with what its parent project gives. If something was switched off higher up, the page shows <strong>Disabled above</strong>: change it on the project that switched it off.</p>
+<div class="callout warning"><p>Changing what a project passes down needs the <strong>build settings</strong> permission on that project, not just Configure. Without it, the Build settings tab is read-only. An administrator grants it with project roles; see <a href="../administration/users-and-permissions.html">Users, groups and permissions</a>.</p></div>
+
+<h2>Create a project</h2>
+<ol class="steps">
+  <li>Open the project you want the new one to sit in, or the Projects page for a top-level project.</li>
+  <li>Click <strong>New Item</strong> (or <strong>+</strong> at the top of the project tree).</li>
+  <li>Type a name, for example <code>Engine</code>. Check the <strong>ID</strong>.</li>
+  <li>Under <strong>Type</strong>, click the card <strong>Project</strong> and click <strong>Create</strong>.</li>
+  <li>On the settings page that opens, add a description and, if you like, an icon and a colour. Click <strong>Save</strong>.</li>
+</ol>
+<p>Now add build configurations to it: see <a href="create-build-configuration.html">Create a build configuration</a>.</p>
+
+<h3>More about projects</h3>
+<ul>
+  <li><a href="item-types.html">Item types</a>: every type on the New Item page, and the ones that are hidden.</li>
+  <li><a href="project-tree-order.html">Tree order and separators</a>: put items in your own order and group them.</li>
+  <li><a href="project-pause-archive.html">Pause and archive</a>: stop a whole project, or take it out of use. Everything inside is paused or archived too.</li>
+  <li><a href="project-icons.html">Project icons</a>: platform icons.</li>
+  <li><a href="project-ids.html">IDs and the parent-ID prefix</a>: why a rename or a move never breaks a dependency.</li>
+  <li><a href="project-move-delete.html">Rename, move and delete</a>: with the checks that warn you before something breaks.</li>
+  <li><a href="views.html">Views</a>: tabs that show only some build configurations, with every List View field.</li>
+  <li><a href="project-copy-settings.html">Copying settings</a> and <a href="templates.html">Templates</a>.</li>
+  <li><a href="folder-settings.html">Project settings</a>: every field of the project settings.</li>
+</ul>
+<div class="callout tip"><p>Projects and build configurations keep a stable <strong>ID</strong> even when you rename or move them. Other settings refer to the ID, so a rename never breaks a dependency.</p></div>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="item-types.html">Item types</a></li>
+  <li><a href="settings-homes.html">Settings homes</a></li>
+  <li><a href="../how-to/projects-organise-game.html">Organise projects for a game</a></li>
+  <li><a href="views.html">Views</a></li>
+  <li><a href="../how-to/projects-team-view.html">Make a tab that shows only your team's build configurations</a></li>
+  <li><a href="../how-to/share-settings-with-a-project.html">Share settings with a whole project</a></li>
+</ul>
+</main>
+</body>
+</html>

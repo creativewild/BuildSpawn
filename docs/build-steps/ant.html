@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ant · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/ant">
+<main class="doc">
+<h1>Ant</h1>
+<p class="lead">Runs Apache Ant targets with a build file and properties.</p>
+
+<h2>When to use it</h2>
+<p>Use it for Java projects that still build with Ant, such as an Android launcher or an old server tool.</p>
+
+<h2>How to set it up</h2>
+
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>. Type <code>Ant</code> in <strong>Filter step types</strong> if you like, then click the <strong>Ant</strong> tile (group <strong>Build tools</strong>).</li>
+  <li>Type a <strong>Step name</strong>, for example <code>Build launcher</code>.</li>
+  <li>Fill in the fields described below.</li>
+  <li>Optional: set <strong>Execute step</strong>, <strong>Conditions</strong> and <strong>Retry on failure</strong>. See <a href="step-list.html">The steps list and the step editor</a>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<figure class="shot small">
+  <img src="../../assets/shots/build-steps/ant.png" alt="The fields of the Ant step in the step editor">
+  <figcaption>The fields of the Ant step, as the step editor shows them.</figcaption>
+</figure>
+
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Targets</strong></td><td>One target per line. Empty runs the default target of the build file.</td><td>Empty</td><td><code>clean</code> then <code>dist</code></td></tr>
+    <tr><td><strong>Build file from</strong></td><td><strong>Path to a build file</strong> or <strong>Content written here</strong>.</td><td>Path to a build file</td><td>Path to a build file</td></tr>
+    <tr><td><strong>Build file</strong></td><td>Passed as <code>-f</code>. Empty lets Ant use <code>build.xml</code> in the working directory.</td><td>Empty</td><td><code>tools/build.xml</code></td></tr>
+    <tr><td><strong>Build file content</strong></td><td>The <code>build.xml</code> itself. It is written to a temporary file in the working directory, passed as <code>-f</code> and removed afterwards. Build parameters are in the environment as <code>env.NAME</code>.</td><td>Empty</td><td>An Ant project</td></tr>
+    <tr><td><strong>Properties</strong></td><td>One <code>name=value</code> per line, passed as <code>-Dname=value</code>. Other processes can see them, so pass a secret through the environment.</td><td>Empty</td><td><code>version=1.4</code></td></tr>
+    <tr><td><strong>Ant home path</strong></td><td>Where Ant is installed. Empty takes <code>ant</code> from the <code>PATH</code>, and the build configuration then needs an agent that has it. May use <code>%name%</code> parameters.</td><td>Empty</td><td><code>C:\tools\ant</code></td></tr>
+    <tr><td><strong>Code coverage</strong></td><td>None or JaCoCo, as in Gradle and Maven.</td><td>None</td><td>JaCoCo</td></tr>
+    <tr><td><strong>JaCoCo folder on the agent</strong></td><td>An unpacked JaCoCo download with <code>lib/jacocoagent.jar</code> and <code>lib/jacococli.jar</code>. The agent goes into <code>JAVA_TOOL_OPTIONS</code>, so every JVM prints a <em>Picked up JAVA_TOOL_OPTIONS</em> line.</td><td>Empty</td><td><code>C:\tools\jacoco</code></td></tr>
+    <tr><td><strong>Class folders for the report</strong></td><td>Folders with compiled classes, one per line, relative to the working directory. Empty keeps only the exec file and makes no report.</td><td>Empty</td><td><code>build/classes</code></td></tr>
+    <tr><td><strong>Include classes</strong></td><td>One class pattern per line, such as <code>com.acme.*</code>. A star matches any characters, a question mark one. Empty measures every class. Only letters, digits, dot, star, question mark, dollar, underscore and dash.</td><td>Empty</td><td><code>com.studio.*</code></td></tr>
+    <tr><td><strong>Exclude classes</strong></td><td>One class pattern per line. A match is left out of the totals. The HTML report still lists it.</td><td>Empty</td><td><code>*.Generated*</code></td></tr>
+    <tr><td><strong>JDK</strong></td><td><strong>Inherit</strong> uses the JDK of the build configuration, or the <code>java</code> of the agent. A JDK from <strong>Settings › Tools</strong> sets <code>JAVA_HOME</code> for this step. Not available in a container: the image brings its own Java.</td><td>Inherit</td><td>JDK 21</td></tr>
+    <tr><td><strong>JVM command line parameters</strong></td><td>One parameter per line, such as <code>-Xmx2g</code>. They go in the variable the tool reads and are added to what is set there. A parameter cannot hold a space or quote. Do not put a secret here.</td><td>Empty</td><td><code>-Xmx2g</code></td></tr>
+    <tr><td><strong>Working directory, Environment variables, Test reports, Run step within container</strong></td><td>The same in every runner. See <a href="common-step-fields.html">Fields every runner has</a>.</td><td></td><td></td></tr>
+  </tbody>
+</table>
+
+
+<h2>A worked example</h2>
+<p>Build a distribution jar for the launcher. Step name <code>Build launcher</code>, <strong>Targets</strong> <code>clean</code> and <code>dist</code> on two lines, <strong>Properties</strong> <code>version=1.4.%build.number%</code>.</p>
+
+<h2>What you see when it runs</h2>
+<p>The console shows <code>$ ant -Dversion=1.4.57 clean dist</code> and Ant's target list. A <code>BUILD FAILED</code> line fails the step. With JaCoCo on, the build page shows the coverage totals.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong><em>Ant was not found on this agent</em></strong></td><td>Install Ant or set <strong>Ant home path</strong>.</td></tr>
+    <tr><td><strong><em>The Ant step is set to a build file written in the step, and it is empty</em></strong></td><td>Type the build file, or switch to <strong>Path to a build file</strong>.</td></tr>
+    <tr><td><strong><em>A property of the Ant step is not name=value</em></strong></td><td>Use <code>name=value</code>. A name holds letters, digits, dot, dash and underscore.</td></tr>
+    <tr><td><strong><em>The JaCoCo folder is not set / has no lib/jacocoagent.jar</em></strong></td><td>Point <strong>JaCoCo folder on the agent</strong> to the unpacked download.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="gradle.html">Gradle</a></li>
+  <li><a href="maven.html">Maven</a></li>
+  <li><a href="runners.html">Runners</a></li>
+  <li><a href="common-step-fields.html">Fields every runner has</a></li>
+</ul>
+</main>
+</body>
+</html>

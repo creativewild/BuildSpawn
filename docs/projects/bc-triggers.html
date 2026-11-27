@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Triggers · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/bc-triggers">
+<main class="doc">
+<h1>Triggers</h1>
+<p class="lead">What starts a build by itself: a new change, a schedule, another build, or a web request. This page explains how the tab works.</p>
+<h2>When to use it</h2>
+<p>Use it to make builds start without a person. Each trigger is one entry that you can switch off without deleting it. Every kind of trigger has its own page in the Running builds section.</p>
+<figure class="shot">
+  <img src="../../assets/shots/projects/bc-triggers.png" alt="The Triggers tab of Windows Build">
+  <figcaption>The Triggers tab.</figcaption>
+</figure>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings</strong>. Then click <strong>Triggers</strong>.</li>
+  <li>Click <strong>Add new trigger</strong> and choose the kind.</li>
+  <li>Fill in its fields and save the trigger.</li>
+  <li>Use the switch on a trigger to turn it off.</li>
+  <li>For the Remote trigger, copy the address and token shown once.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Add new trigger</td><td>Opens a picker of the trigger kinds: VCS, Schedule, Finish Build, Retry build, Perforce and Remote.</td><td>-</td><td>-</td></tr>
+    <tr><td>On/Off switch</td><td>A disabled trigger stays saved but never starts a build.</td><td>On</td><td>On</td></tr>
+    <tr><td>Remote trigger</td><td>Lets a script or another system start a build with a web request. Anyone with the token can start a build without logging in. <strong>Regenerate</strong> makes a new token, shows it once, and the old one stops at once.</td><td>Off</td><td>On</td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p><strong>Windows Build</strong> has a VCS trigger on the Perforce stream and a Schedule trigger at 02:00 for a full build.</p><h2>What you see when it runs</h2>
+<p>A started build says why it started, for example <em>Started by a VCS trigger</em> or <em>Started by timer</em>.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>Nothing starts</td><td>Check that the trigger is on, that polling is on for the root and that the build configuration is not paused.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="settings-homes.html">Settings homes</a></li>
+  <li><a href="../running-builds/trigger-vcs.html">VCS trigger</a></li>
+  <li><a href="../running-builds/trigger-schedule.html">Schedule trigger</a></li>
+  <li><a href="../running-builds/trigger-finish-build.html">Finish Build trigger</a></li>
+  <li><a href="../running-builds/trigger-remote.html">Remote trigger</a></li>
+</ul>
+</main>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pipeline · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/type-pipeline">
+<main class="doc">
+<h1>Pipeline</h1>
+<p class="lead">A Pipeline is a build written as a script. The script, typed in Buildspawn or kept as a file in version control, defines stages, parallel work and approvals.</p>
+<h2>When to use it</h2>
+<p>Use it when your team already writes build logic in code, or when the build needs branching logic that is hard to draw as a list of steps. For most game builds a <a href="type-build-configuration.html">build configuration</a> is easier to read and edit. A Pipeline needs someone who can write Groovy.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the project and click <strong>New Item</strong>. Type a name.</li>
+  <li>Under <strong>Type</strong> choose <strong>Pipeline</strong>. Click <strong>Create</strong>.</li>
+  <li>On <strong>Settings</strong> open the <strong>Pipeline</strong> tab. Under <strong>Definition</strong> choose <strong>Pipeline script</strong> (the script is written here) or <strong>Pipeline script from SCM</strong> (the script is a file in version control).</li>
+  <li>Fill in the fields of the definition (see the tables). Leave <strong>Use Groovy Sandbox</strong> on if you can.</li>
+  <li>Click <strong>Save</strong>, then <strong>Run</strong>.</li>
+</ol>
+<h2>Every field</h2>
+<h3>Pipeline script</h3><table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Script</td><td>The Groovy script that defines the Pipeline. Use the Pipeline Syntax link for help with the steps.</td><td>Empty</td><td><code>pipeline { agent any ... }</code></td></tr>
+    <tr><td>Use Groovy Sandbox</td><td>Run the script in a sandbox with limited abilities. Off: if you are not an administrator, the script waits until an administrator approves it.</td><td>On</td><td>On</td></tr>
+  </tbody>
+</table>
+<h3>Pipeline script from SCM</h3><table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>SCM</td><td>Where the repository with your pipeline script file is: Git or Perforce. It is checked out on the server to read the script.</td><td>None</td><td>Git</td></tr>
+    <tr><td>Script Path</td><td>The path of the script file in the repository, separated by <code>/</code> on every platform. The field starts with a default file name: replace it with the path of your file. The script always runs in the Groovy sandbox.</td><td>A default file name</td><td><code>ci/build.pipeline</code></td></tr>
+    <tr><td>Lightweight checkout</td><td>Read only the script from the SCM, without a full checkout. Faster, but there is no change log or polling from this checkout, and build parameters are not put into the SCM settings. Use <code>checkout scm</code> in the script to get changes and polling.</td><td>On</td><td>On</td></tr>
+  </tbody>
+</table>
+<h3>Other tabs of a Pipeline</h3><ul>
+  <li><strong>General</strong>, <strong>Build Triggers</strong> and <strong>Parameters</strong> work as on a build configuration. Concurrent builds can also abort the running build when a newer one starts.</li>
+  <li><strong>Build Steps</strong> shows the stages read from the text of the script. It does not edit them and it does not run the script. A Pipeline from SCM shows only where the file is, because it is read when a build starts.</li>
+  <li><strong>Run behaviour</strong> in <a href="bc-workspace-options.html">Workspace options</a>: resume after a restart, durability and stashes.</li>
+  <li>The <strong>Visual editor</strong> can edit declarative Pipelines. See <a href="../visual-editor/canvas.html">Canvas and palette</a>.</li>
+  <li>A template gives a Pipeline only its parameters.</li>
+</ul>
+<h3>The sandbox and script approval</h3><p>The Groovy sandbox lets a script call only methods that an administrator has approved. If the script calls something else, the build fails with <em>Scripts not permitted to use method ...</em>. An administrator opens <strong>Script approval</strong> in the global settings, reads the pending signature and approves it, or removes it. If you turn the sandbox off, the whole script needs approval by an administrator, unless you are one. Keep the sandbox on, and keep the script small.</p><div class="callout warning"><p>Never approve a signature you do not understand. An approved signature is allowed for every sandboxed script on the server, not only this Pipeline.</p></div>
+<h2>A worked example</h2>
+<p>The studio keeps <code>ci/build.pipeline</code> in the Git repository of the launcher. <strong>Definition</strong> is <em>Pipeline script from SCM</em>, <strong>SCM</strong> is Git with the repository address and the credential, <strong>Script Path</strong> is <code>ci/build.pipeline</code>. The file has three stages: <em>Build</em>, <em>Test</em> and <em>Package</em>. See the how-to <a href="../how-to/projects-pipeline-script.html">Make a Pipeline from a script</a>.</p><pre><code>pipeline {
+  agent any
+  stages {
+    stage("Build")   { steps { bat "build.bat" } }
+    stage("Test")    { steps { bat "test.bat" } }
+    stage("Package") { steps { bat "package.bat" } }
+  }
+}</code></pre>
+<h2>What you see when it runs</h2>
+<p>The build page shows the stages as a graph, with the result and time of each. The console log is one block per step. The History tab lists the builds, as for a build configuration. Failed builds can be replayed or restarted from a stage.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>Scripts not permitted to use method ...</td><td>The sandbox blocked a call. Ask an administrator to approve the signature, or change the script.</td></tr>
+    <tr><td>Waiting for approval</td><td>You turned off the sandbox and are not an administrator. Turn it on again, or ask for approval.</td></tr>
+    <tr><td>Script file not found</td><td>The <strong>Script Path</strong> is wrong, or the branch has no file. Check the path and the branch of the SCM.</td></tr>
+    <tr><td>A step of the Build Steps tab cannot be edited</td><td>Pipeline steps are in the script. Edit the script or the file in version control.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="item-types.html">Item types</a></li>
+  <li><a href="../how-to/projects-pipeline-script.html">Make a Pipeline from a script</a></li>
+  <li><a href="bc-build-steps.html">Build Steps</a></li>
+  <li><a href="../visual-editor/canvas.html">Canvas and palette</a></li>
+</ul>
+</main>
+</body>
+</html>

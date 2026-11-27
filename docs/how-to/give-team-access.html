@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Give a team access to its projects · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/give-team-access">
+<main class="doc">
+<h1>Give a team access to its projects</h1>
+<p class="lead">Put a team in a group and give the group a role on its project, so everyone in it can see and run that project's builds, and nothing else.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>You are a system administrator (you have the Overall: Administer permission).</li>
+  <li>People sign in with Buildspawn's own user database. With single sign-on, users and their groups come from your identity provider, so skip the parts about creating users.</li>
+  <li><strong>Settings › Security › Authorization</strong> is set to <strong>Project-based security</strong>. Only this choice gives every project a <strong>Roles</strong> tab. With another choice, <strong>Settings › Roles</strong> shows a yellow note that roles are off.</li>
+  <li>The group <strong>All users</strong> has <strong>Overall: Read</strong> in the permission cards under <strong>Settings › Security</strong>. Without it, people can sign in but see nothing at all.</li>
+</ul>
+<p>In this example, the art team gets the <strong>Developer</strong> role on the project <strong>How-to</strong>: they can see its build configurations, run and stop builds and read the logs.</p>
+
+<h2>Steps</h2>
+<h3>Create the group</h3>
+<ol class="steps">
+  <li>Click <strong>Settings</strong> in the top bar, then <strong>Groups</strong> under <strong>Security</strong>.</li>
+  <li>Click <strong>Create group</strong>.</li>
+  <li>Type a <strong>Name</strong>, for example <code>ht3-artists</code>. The <strong>ID</strong> is filled in from the name. Change it now if you want, because it can't change later.</li>
+  <li>Type a <strong>Description</strong>, for example <code>The art team</code>.</li>
+  <li>Leave <strong>Parent group</strong> at <strong>None (top level)</strong>, unless this team is part of a bigger group that already has roles.</li>
+  <li>Click <strong>Create group</strong>.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/how-to/give-team-access-2.png" alt="The Create group dialog on the Groups page, with the fields Name, ID (with the hint Made from the name. Letters, digits, dot, dash and underscore only. Fixed after the group is created), Description, Parent group set to None (top level), and the buttons Cancel and Create group">
+  <figcaption>The Create group dialog.</figcaption>
+</figure>
+
+<h3>Create the users</h3>
+<ol class="steps">
+  <li>Click <strong>Users</strong> under <strong>Security</strong>, then <strong>Create User</strong>.</li>
+  <li>Type a <strong>Username</strong>, for example <code>ht3-artist</code>. Use letters, digits, dashes and underscores only.</li>
+  <li>Type the <strong>Password</strong> twice, the <strong>Full name</strong> (for example <code>Alex Artist</code>) and the <strong>Email</strong>.</li>
+  <li>Click <strong>Create User</strong>.</li>
+  <li>In the list, click <strong>Add to group</strong> on the new user's row and pick <strong>ht3-artists</strong>.</li>
+</ol>
+<p>Repeat for each person in the team. Someone who already has an account only needs step 5.</p>
+
+<h3>Give the group a role on the project</h3>
+<ol class="steps">
+  <li>Open the project, for example <strong>How-to</strong>, from the project tree.</li>
+  <li>Click the <strong>Roles</strong> tab.</li>
+  <li>Click <strong>Assign a role</strong>.</li>
+  <li>Choose <strong>Group</strong> and type the group name, <code>ht3-artists</code>.</li>
+  <li>Pick the role <strong>Developer</strong> and click <strong>Assign</strong>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<p>The role applies to the project and everything inside it: its subprojects and build configurations. Which role to pick:</p>
+<table>
+  <thead><tr><th>The team should…</th><th>Role</th></tr></thead>
+  <tbody>
+    <tr><td>see builds and download artifacts</td><td>Project viewer</td></tr>
+    <tr><td>also run and stop builds and read settings</td><td>Developer</td></tr>
+    <tr><td>also change build configurations and give roles on the project</td><td>Project administrator</td></tr>
+  </tbody>
+</table>
+
+<h2>Check it worked</h2>
+<figure class="shot">
+  <img src="../../assets/shots/how-to/give-team-access-1.png" alt="Settings › Groups: the built-in group All users (ID authenticated, members Everyone) and the group ht3-artists (ID ht3-artists, description How-to: the art team, 1 member, 0 subgroups, No roles yet), with a settings button and a red bin on its row">
+  <figcaption>The new group with one member. Once the role is given, the <strong>Roles</strong> column lists it.</figcaption>
+</figure>
+<ol class="steps">
+  <li>On <strong>Settings › Groups</strong>, the group's row shows the number of <strong>Members</strong> and, after you assign it, the role in <strong>Roles</strong>.</li>
+  <li>Open the project's <strong>Roles</strong> tab. The group is listed with <strong>Developer</strong>.</li>
+  <li>Sign out, and sign in as one of the team (or ask them to). They see the <strong>How-to</strong> project in the project tree, with a <strong>Run</strong> button on its build configurations. Other projects are not shown.</li>
+</ol>
+
+<h2>Troubleshooting</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>There is no <strong>Roles</strong> tab on the project.</td><td>Authorization is not set to <strong>Project-based security</strong>. Change it under <strong>Settings › Security</strong>. Before you save, make sure your own user still has <strong>Overall: Administer</strong>, or you lock yourself out.</td></tr>
+    <tr><td>The user signs in and sees an empty page, or <em>Access denied</em>.</td><td><strong>All users</strong> lacks <strong>Overall: Read</strong>. Add it in the permission cards under <strong>Settings › Security</strong>.</td></tr>
+    <tr><td><strong>Create User</strong> says the user name is not allowed.</td><td>User names can only hold letters, digits, underscores and dashes. Write <code>alex-artist</code> instead of <code>alex.artist</code>.</td></tr>
+    <tr><td>The ID on a permission card has a yellow <em>ambiguous</em> label.</td><td>A user and a group share that name. Open the row and choose user or group.</td></tr>
+  </tbody>
+</table>
+
+<h2>Next steps</h2>
+<ul>
+  <li><a href="../administration/users-and-permissions.html">Users and permissions</a>: every role, custom roles and the permission cards.</li>
+  <li><a href="../administration/roles.html">Roles</a>, <a href="../administration/users.html">Users and groups</a> and <a href="../administration/authorization.html">Authorization</a>: each in full.</li>
+  <li>With Entra ID, your groups come from Entra ID: see <a href="admin-sign-in-entra-id.html">Sign in with Entra ID</a>.</li>
+  <li><a href="../projects/projects.html">Projects</a>: how a project passes settings down to everything inside it.</li>
+  <li><a href="script-with-api-token.html">Start builds from a script</a> with a user that has only the rights the script needs.</li>
+</ul>
+</main>
+</body>
+</html>

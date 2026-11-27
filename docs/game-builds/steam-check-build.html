@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Steam: check build · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="game-builds/steam-check-build">
+<main class="doc">
+<h1>Steam: check build</h1>
+<p class="lead">Wait until Steam lists your uploaded build, and check that a branch exists.</p>
+
+<h2>When to use it</h2>
+<p>Use it between <a href="steam-upload.html">Steam upload</a> and <a href="steam-set-live.html">Steam: set branch live</a>. Steam can take a moment to list a new build, and setting a build live on a branch that does not exist fails. This step needs no SteamCMD. It calls Steam's Web API.</p>
+
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Add a <strong>Secret text</strong> credential that holds your publisher Steam Web API key. See <a href="../how-to/use-a-secret.html">Credentials</a>.</li>
+  <li>Open the build configuration and go to <strong>Settings › Build steps › Add build step › Steam: check build</strong>.</li>
+  <li>Choose the <strong>Steam Web API key</strong>.</li>
+  <li>Type the <strong>App ID</strong> and the <strong>Branch</strong>. Leave <strong>Build ID</strong> on <code>%BUILD_ID%</code> to check the build of the earlier upload step.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/game-builds/steam-check-build.png" alt="The Steam: check build step form with App ID, Build ID and Branch"><figcaption>The Steam: check build step.</figcaption></figure>
+
+<h2>Every field</h2>
+<table>
+  <tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr>
+  <tr><td><strong>Steam Web API key</strong></td><td>A Secret text credential with the key. It is not the build account.</td><td>None</td><td><code>steam-web-key</code></td></tr>
+  <tr><td><strong>App ID</strong></td><td>Your app number.</td><td>None</td><td><code>1000480</code></td></tr>
+  <tr><td><strong>Build ID</strong></td><td>The build to look for. Must be a number once parameters are filled in.</td><td><code>%BUILD_ID%</code></td><td><code>%BUILD_ID%</code></td></tr>
+  <tr><td><strong>Branch</strong></td><td>The branch that must exist.</td><td>Empty</td><td><code>nightly</code></td></tr>
+  <tr><td><strong>Wait until the build is listed</strong></td><td>The step fails when the build does not show in time.</td><td>On</td><td>On</td></tr>
+  <tr><td><strong>Fail when the branch does not exist</strong></td><td>A branch must be made in Steamworks first.</td><td>On</td><td>On</td></tr>
+  <tr><td><strong>Call Steam from the server</strong></td><td>Off: the call is made from the agent of the build. On: from the Buildspawn server.</td><td>Off</td><td>Off</td></tr>
+  <tr><td><strong>Wait at most (minutes)</strong></td><td>How long to wait for the build to be listed.</td><td><code>10</code></td><td><code>10</code></td></tr>
+  <tr><td><strong>Hands on to later steps</strong></td><td>The values it sets: <code>BUILD_FOUND</code> and <code>BRANCH_BUILD_ID</code> (the build that is live on the branch).</td><td>Not editable</td><td></td></tr>
+</table>
+
+<h2>A worked example</h2>
+<p>After uploading build <code>15870342</code> for app <code>1000480</code>, check branch <code>nightly</code> with the default wait of 10 minutes. When it passes, your tests run, and then <a href="steam-set-live.html">Set branch live</a> publishes the build.</p>
+
+<h2>What you see when it runs</h2>
+<ul>
+  <li><em>Build 15870342 is not in the list of builds yet. Waiting.</em> repeated until Steam lists it.</li>
+  <li><em>the branch nightly exists</em>. The key is shown as <code>********</code>.</li>
+</ul>
+
+<h2>Problems and fixes</h2>
+<table>
+  <tr><th>Message</th><th>What to do</th></tr>
+  <tr><td>No Steam Web API key is chosen / The Web API key … does not exist, or this job may not use it</td><td>Choose a Secret text credential the build configuration may use.</td></tr>
+  <tr><td>The build ID … is missing or is not a number</td><td>An earlier upload step must set <code>BUILD_ID</code>. A preview upload gives none.</td></tr>
+  <tr><td>Build … did not show in the list of builds within … minutes</td><td>Raise <strong>Wait at most (minutes)</strong>, and check the App ID.</td></tr>
+  <tr><td>the branch … does not exist</td><td>Create it on the Builds page in Steamworks, or turn off <strong>Fail when the branch does not exist</strong>.</td></tr>
+  <tr><td>Steam answered …</td><td>Steam refused the call. The text after it is Steam's answer. Check the key and the App ID.</td></tr>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="steam-upload.html">Steam upload</a></li>
+  <li><a href="steam-set-live.html">Steam: set branch live</a></li>
+  <li><a href="steam-overview.html">Steam upload: overview</a></li>
+</ul>
+</main>
+</body>
+</html>

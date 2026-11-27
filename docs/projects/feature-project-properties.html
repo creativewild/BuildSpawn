@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project Properties · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/feature-project-properties">
+<main class="doc">
+<h1>Project Properties</h1>
+<p class="lead">Gives the build configuration the properties set on the projects above it.</p>
+<h2>When to use it</h2>
+<p>Use it when a project holds a list of properties (name and value pairs, set in the project settings under <strong>List of project properties</strong>) and you want builds in it to see them as environment variables. Examples are the studio name, a server address or a share path.</p>
+<figure class="shot">
+  <img src="../../assets/shots/projects/feat-project-properties.png" alt="The Project Properties form">
+  <figcaption>The Project Properties form.</figcaption>
+</figure>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration, click <strong>Settings</strong>, then <strong>Build Features</strong>. Click <strong>Add build feature</strong> and choose <strong>Project Properties</strong>.</li>
+  <li>There is nothing to fill in. Click <strong>Save</strong>.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>(no fields)</td><td>The feature inherits every property defined in the project settings of the parent project, or of any project above it.</td><td>Off</td><td>-</td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p>The <strong>Game</strong> project lists the property <code>DROP_SHARE</code> with the value <code>\\files\skyforge\drops</code>. A build configuration with this feature can read <code>%DROP_SHARE%</code> in a step.</p><h2>What you see when it runs</h2>
+<p>The properties are in the environment of every step. A build configuration in a project with no properties gets nothing extra.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>The variable is not there</td><td>Check the <strong>List of project properties</strong> on the project, and that this feature is on.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="bc-build-features.html">The Build Features tab</a></li>
+  <li><a href="folder-settings.html">Project settings: List of project properties</a></li>
+</ul>
+</main>
+</body>
+</html>

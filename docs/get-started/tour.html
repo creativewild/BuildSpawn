@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A tour of the interface · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="get-started/tour">
+<main class="doc">
+<h1>A tour of the interface</h1>
+<p class="lead">Every Buildspawn page has the same three parts: the top bar, the sidebar and the page itself. Learn them once and you can find anything.</p>
+
+<figure class="shot">
+  <img src="../../assets/shots/build-results/project-directory.png" alt="The Projects page with the top bar, the sidebar with the project tree and the list of projects">
+  <figcaption>The Projects page: top bar, sidebar and page.</figcaption>
+</figure>
+
+<h2>The top bar</h2>
+<p>The dark bar at the top is always there. From left to right:</p>
+<table>
+  <tr><th>Item</th><th>What it does</th></tr>
+  <tr><td>Logo</td><td>Takes you back to the start page.</td></tr>
+  <tr><td><strong>Dashboard</strong></td><td>Widgets with the builds, failures, queue and agents your team should see first. An administrator arranges it. See <a href="../build-results/dashboard-widgets.html">The Dashboard</a>.</td></tr>
+  <tr><td><strong>Projects</strong></td><td>All projects and build configurations, with their latest results. See <a href="../build-results/project-directory.html">The project directory</a>.</td></tr>
+  <tr><td><strong>History</strong></td><td>Every build that ran, newest first, with a timeline by agent and the filters All, Failed, Running and Mine. See <a href="../build-results/history.html">History</a>.</td></tr>
+  <tr><td><strong>Queue</strong></td><td>Builds that wait for a free agent. The number shows how many wait now. See <a href="../running-builds/queue.html">The queue</a>.</td></tr>
+  <tr><td><strong>Agents</strong></td><td>The build machines, their pools and live telemetry. A red number counts agents that are offline or disconnected.</td></tr>
+  <tr><td><strong>Settings</strong></td><td>Server administration: users, security, tools, plugins and more. A red number counts notices that need an administrator, for example a certificate that is about to expire.</td></tr>
+  <tr><td>Search workspace</td><td>Finds projects, build configurations, builds, agents and settings pages by name. Press <kbd>Ctrl</kbd> + <kbd>K</kbd> to jump to it from anywhere.</td></tr>
+  <tr><td>Actions menu</td><td>The three-line button beside the theme switch holds extra actions for the page you are on.</td></tr>
+  <tr><td>Light / dark switch</td><td>Switches between the light and the dark theme. Your choice is saved with your account.</td></tr>
+  <tr><td>Account menu</td><td>The round button with your initial. It opens <strong>Profile</strong>, <strong>My changes</strong>, <strong>Account</strong> (password and API tokens), <strong>Appearance</strong> and <strong>Sign out</strong>. If an administrator allows personal machines and you may use them, <strong>My machines</strong> is here too.</td></tr>
+</table>
+
+<h2>The sidebar</h2>
+<p>The panel on the left changes with the page you are on. On the Projects, Dashboard and build pages it shows the <strong>project tree</strong>.</p>
+<ul>
+  <li>Click the arrow beside a project to open it and see what is inside. The coloured dot after each name is its latest result: green passed, red failed, blue running. The number counts the build configurations inside.</li>
+  <li>Type in <strong>Search by name</strong> to filter the tree.</li>
+  <li>The three buttons beside the title: <strong>New Item</strong> (+) creates a project or build configuration, <strong>Reorder mode</strong> lets administrators drag items into their own order, and the last one hides the panel. Everyone sees the order administrators choose. Administrators can also add named separators to group items.</li>
+</ul>
+<h3>Make the sidebar wider or narrower</h3>
+<p>Drag the right edge of the sidebar. The width can go from 200 pixels to half of the window. Your width is remembered in your browser. Double-click the edge to reset it. With the keyboard, press <kbd>Tab</kbd> until the edge has focus, then use the arrow keys (hold <kbd>Shift</kbd> for bigger steps).</p>
+<p>On the Agents page the same panel lists the agent pools, and on the Settings page it lists the settings sections.</p>
+<figure class="shot">
+  <img src="../../assets/shots/get-started/agents-page.png" alt="The Agents page: the pools in the sidebar, the summary cards, the filters, and the list of agents with their status, current build and live CPU, memory, disk, network and GPU use">
+  <figcaption>The Agents page. The sidebar lists the pools; the table shows each agent live.</figcaption>
+</figure>
+
+<h2>Pages and tabs</h2>
+<p>Most pages follow the same pattern:</p>
+<ul>
+  <li>A <strong>breadcrumb</strong> at the top shows the path, for example <em>Dashboard &rsaquo; Game &rsaquo; Windows Build</em>. Click any part to go up. The small arrow beside a part opens a menu of its neighbours.</li>
+  <li>The <strong>title</strong> with the status chips and the main actions on the right, such as <strong>Run</strong>.</li>
+  <li><strong>Tabs</strong> for the parts of the page. More holds the tabs that don't fit.</li>
+</ul>
+<p>A build configuration always starts with the same five tabs, whatever else it has: <strong>Overview</strong>, <strong>Change Log</strong>, <strong>History</strong>, <strong>Statistics</strong> and <strong>Settings</strong>. Tabs from plugins, such as Perforce pages, come after them.</p>
+<figure class="shot">
+  <img src="../../assets/shots/running-builds/build-configuration.png" alt="The page of the Windows Build build configuration with its tabs and the Run button">
+  <figcaption>A build configuration: the five fixed tabs first, then the others.</figcaption>
+</figure>
+
+<h2>Words you will see</h2>
+<table>
+  <tr><th>Word</th><th>Meaning</th></tr>
+  <tr><td>Project</td><td>A folder that groups build configurations and other projects, and passes its settings down.</td></tr>
+  <tr><td>Build configuration</td><td>One kind of build, with its steps, triggers and settings.</td></tr>
+  <tr><td>Build</td><td>One run of a build configuration, with a number such as #7.</td></tr>
+</table>
+
+<h2>Themes</h2>
+<p>Click the light / dark switch in the top bar to change the theme. More options are under <strong>Settings &rsaquo; Appearance</strong>. See <a href="../administration/appearance.html">Appearance and themes</a>.</p>
+
+<h2>Where to go next</h2>
+<div class="cards three">
+  <a class="card" href="../running-builds/run-dialog.html"><h3>Run a build</h3><p>Every option of the Run dialog.</p></a>
+  <a class="card" href="../build-results/build-page.html"><h3>Read a build</h3><p>The build page and every tab.</p></a>
+  <a class="card" href="../build-results/statistics.html"><h3>See trends</h3><p>Charts of duration, tests and more.</p></a>
+</div>
+
+</main>
+</body>
+</html>

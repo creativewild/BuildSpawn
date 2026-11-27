@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Settings homes · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/settings-homes">
+<main class="doc">
+<h1>Settings homes</h1>
+<p class="lead">Each build configuration keeps its settings in a few clear sections, called settings homes. Every setting has one place, so you always know where to look.</p>
+<p>Open a build configuration and click the <strong>Settings</strong> tab. A second row of tabs shows the settings homes. The ones that do not fit sit under <strong>More</strong>. A number beside a tab counts its items, for example <strong>Build Steps 3</strong>.</p>
+<figure class="shot">
+  <img src="../../assets/shots/projects/bc-general.png" alt="The Settings tab of Windows Build with the row of settings homes: General, Version Control, Perforce connection, Build Steps, Triggers, Failure Conditions, Build Features, Parameters, Post-build Actions, Visual editor and More">
+  <figcaption>The settings homes of a build configuration, open on General.</figcaption>
+</figure>
+<h2>The homes</h2>
+<table>
+  <thead><tr><th>Home</th><th>What it holds</th><th>Page</th></tr></thead>
+  <tbody>
+    <tr><td>General</td><td>Name, ID, icon, build number, artifact rules, build options, clean-up rules and checkout options.</td><td><a href="bc-general.html">General</a></td></tr>
+    <tr><td>Version Control</td><td>The Git and Perforce roots to fetch.</td><td><a href="bc-version-control.html">Version Control</a></td></tr>
+    <tr><td>Perforce connection</td><td>Server, workspace and sync settings. Shown when the build configuration uses Perforce.</td><td><a href="../version-control/perforce.html">Perforce</a></td></tr>
+    <tr><td>Build Steps</td><td>The steps in the order they run.</td><td><a href="bc-build-steps.html">Build Steps</a></td></tr>
+    <tr><td>Triggers</td><td>What starts a build.</td><td><a href="bc-triggers.html">Triggers</a></td></tr>
+    <tr><td>Failure Conditions</td><td>When a build counts as failed or unstable.</td><td><a href="bc-failure-conditions.html">Failure Conditions</a></td></tr>
+    <tr><td>Build Features</td><td>Setup and reporting around the steps.</td><td><a href="bc-build-features.html">Build Features</a></td></tr>
+    <tr><td>Parameters</td><td>Every value the build passes to its steps.</td><td><a href="bc-parameters.html">Parameters</a></td></tr>
+    <tr><td>Post-build Actions</td><td>What happens after the build.</td><td><a href="bc-post-build-actions.html">Post-build Actions</a></td></tr>
+    <tr><td>Visual editor</td><td>The same settings drawn as a graph.</td><td><a href="../visual-editor/canvas.html">The visual editor</a></td></tr>
+    <tr><td>More › Templates</td><td>The templates this build configuration is based on.</td><td><a href="templates.html">Templates</a></td></tr>
+    <tr><td>More › Dependencies</td><td>What this build waits for, and what waits for it.</td><td><a href="bc-dependencies.html">Dependencies</a></td></tr>
+    <tr><td>More › Agent Requirements</td><td>Which agents may run it.</td><td><a href="bc-agent-requirements.html">Agent Requirements</a></td></tr>
+    <tr><td>More › Other settings</td><td>Settings of add-ons with no page of their own.</td><td><a href="bc-other-settings.html">Other settings</a></td></tr>
+    <tr><td>More › ID</td><td>The stable ID, its aliases and links.</td><td><a href="project-ids.html">IDs</a></td></tr>
+  </tbody>
+</table>
+<h2>Saving</h2>
+<p>Some homes have a <strong>Save bar</strong> at the bottom of the window. It is as wide as the page and never covers anything. Nothing changes until you click <strong>Save</strong> (or <strong>Apply</strong> to save and stay on the page). The bar says <em>No unsaved changes</em> when there is nothing to save, and <strong>Cancel</strong> leaves without saving. Other homes, such as Build Features, save each change at once. Their bar says <em>Changes on this page are saved as you make them</em>.</p>
+<h2>Inherited settings</h2>
+<p>On Build Steps, Parameters, Build Features and Post-build Actions an item can come from a project or a template. It has a chip with the name of its source. You can <strong>Override</strong> it here, <strong>Disable in this job</strong>, or <strong>Reset</strong> it. See <a href="projects.html#passes-down">What a project passes down</a>.</p>
+<h2>Who can change what</h2>
+<p>Changing settings needs the <strong>Configure</strong> permission on the build configuration. Without it the homes are read-only and say so.</p>
+<div class="callout tip"><p>Do you prefer a picture? Open <strong>Visual editor</strong> on the Settings tab. The form and the visual editor edit the same settings.</p></div>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="create-build-configuration.html">Create a build configuration</a></li>
+  <li><a href="job-settings.html">Job settings</a></li>
+  <li><a href="folder-settings.html">Project settings</a></li>
+  <li><a href="../visual-editor/canvas.html">Canvas and palette</a></li>
+</ul>
+</main>
+</body>
+</html>

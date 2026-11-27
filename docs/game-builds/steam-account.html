@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Steam build account · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="game-builds/steam-account">
+<main class="doc">
+<h1>Steam build account</h1>
+<p class="lead">The credential that holds the Steam account your build signs in with, and how it handles Steam Guard.</p>
+
+<h2>When to use it</h2>
+<p>Create one for every Steam account the steps <a href="steam-upload.html">Steam upload</a>, <a href="steam-drm-wrap.html">Steam: DRM wrap</a> and <a href="steam-workshop.html">Steam: workshop item</a> use. The password and Steam Guard data stay in the credential. They are never typed into a step, written into a script or shown in the log.</p>
+<div class="callout tip"><p>Use a dedicated build account with only the permissions <strong>Edit App Metadata</strong> and <strong>Publish App Changes To Steam</strong>, and access to the apps it builds.</p></div>
+
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the project (or <strong>Manage Buildspawn › Credentials</strong> for the whole server) and go to its <strong>Credentials</strong>. Click <strong>Add credentials</strong>.</li>
+  <li>Choose the kind <strong>Steam build account</strong>.</li>
+  <li>Fill in <strong>User name</strong> and <strong>Password</strong>.</li>
+  <li>Choose a <strong>Steam Guard</strong> mode (below) and follow its steps.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/game-builds/steam-account-form.png" alt="The New credential dialog with the Steam build account type chosen and the three Steam Guard cards"><figcaption>The Steam build account form.</figcaption></figure>
+
+<h2>Every field</h2>
+<table>
+  <tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr>
+  <tr><td><strong>User name</strong></td><td>The account name, not an email address.</td><td>None</td><td><code>skyforge_build</code></td></tr>
+  <tr><td><strong>Password</strong></td><td>The account password. Stored encrypted and never shown.</td><td>None</td><td></td></tr>
+  <tr><td><strong>Used for</strong></td><td>A note for people, such as which game the account is for. Not enforced.</td><td>Empty</td><td><code>Skyforge only</code></td></tr>
+  <tr><td><strong>Steam Guard</strong></td><td>One of three cards: <strong>Stored session</strong>, <strong>Machine login</strong>, <strong>Generated codes</strong>.</td><td>Stored session</td><td>Stored session</td></tr>
+  <tr><td><strong>Agents that may use it</strong></td><td>One agent name per line. Empty means any agent.</td><td>Empty</td><td><code>win-build-01</code></td></tr>
+  <tr><td><strong>Agent for the sign-in and the test</strong></td><td>Which agent runs the sign-in or the test. The built-in node is also offered.</td><td>First in the list</td><td><code>win-build-01</code></td></tr>
+</table>
+<p>The buttons <strong>Sign in</strong> and <strong>Test sign-in</strong> run SteamCMD on that agent.</p>
+
+<h2>The three Steam Guard modes</h2>
+<h3>Stored session (default)</h3>
+<p>You sign in once on the credential. Click <strong>Sign in</strong>, type the <strong>Steam Guard code</strong> Steam sends you, and click the button in the dialog. The result is kept encrypted in the credential, sent to the agent for each run and then removed from it. The <strong>State</strong> shows <em>Ready</em>, <em>Sign-in expired</em> or <em>Never signed in</em>, and who signed in. If Steam changes the stored session during a run, Buildspawn saves the new one back.</p>
+<p>Each agent gets its own private copy. Jobs that use this account on one agent wait for each other.</p>
+
+<h3>Machine login</h3>
+<p>Sign in once by hand on each agent, in its SteamCMD folder. Buildspawn never sees the files. The step signs in with the account name only, so no password is used. Never sign in again with a password on that agent, because that changes the Steam Guard token.</p>
+
+<h3>Generated codes</h3>
+<p>Type the <strong>Shared secret</strong> of the account's Steam authenticator. Buildspawn makes the Steam Guard code from it at each run, so no one needs to sign in.</p>
+<div class="callout warning"><p>This is not an official feature of Steam. The shared secret is the second factor of the account and it is kept on this server. Use it only for an account that can do nothing but build.</p></div>
+
+<h2>A worked example</h2>
+<p>Create the credential <code>steam-build</code> for the user <code>skyforge_build</code>. Keep <strong>Stored session</strong>, pick the agent <code>win-build-01</code>, click <strong>Sign in</strong>, type the code Steam emailed you, and save. The <strong>State</strong> changes to <em>Ready</em>. In your Steam upload step, choose <strong>steam-build</strong>.</p>
+
+<h2>What you see when it runs</h2>
+<ul>
+  <li>The step log shows <em>account skyforge_build (credential steam-build, stored session), app …</em>. The password is never shown.</li>
+  <li>When the stored session was renewed: <em>The stored session of … was refreshed.</em></li>
+  <li><strong>Test sign-in</strong> shows <em>Signed in as skyforge_build.</em></li>
+</ul>
+
+<h2>Problems and fixes</h2>
+<table>
+  <tr><th>Message</th><th>What to do</th></tr>
+  <tr><td>Steam asked for a Steam Guard code. Sign in again on the credential</td><td>Stored session ran out. Click <strong>Sign in</strong> again. Buildspawn does not retry a login, to protect the account.</td></tr>
+  <tr><td>Steam asked for a Steam Guard code for … Sign in again by hand on the agent</td><td>Machine login: sign in by hand in the agent's SteamCMD folder.</td></tr>
+  <tr><td>Steam refused the password for the account …</td><td>Fix the password and save.</td></tr>
+  <tr><td>The sign-in of … has expired</td><td>The credential is marked <em>Sign-in expired</em>. Sign in again.</td></tr>
+  <tr><td>The build account … may not be used on the agent …</td><td>Add the agent to <strong>Agents that may use it</strong> or empty the list.</td></tr>
+  <tr><td>The Steam build account … does not exist, or this job may not use it</td><td>Create it where the build configuration can see it, such as its project.</td></tr>
+  <tr><td>Gave up waiting for the build account … after … minutes</td><td>Another Steam step is holding the account on that agent. Wait, or use another account or agent.</td></tr>
+  <tr><td>The agent … is not there or is offline</td><td>Choose an online agent for the sign-in.</td></tr>
+  <tr><td>SteamCMD could not reach Steam</td><td>Check the network or proxy on the agent.</td></tr>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="steam-overview.html">Steam upload: overview</a></li>
+  <li><a href="steam-upload.html">Steam upload</a></li>
+  <li><a href="install-steamcmd.html">Install SteamCMD</a></li>
+</ul>
+</main>
+</body>
+</html>

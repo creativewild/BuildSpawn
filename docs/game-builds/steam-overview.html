@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Steam upload: overview · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="game-builds/steam-overview">
+<main class="doc">
+<h1>Steam upload: overview</h1>
+<p class="lead">Buildspawn can send your game build to Steam, check that Steam has it, and set it live on a beta branch, all from build steps.</p>
+
+<h2>When to use it</h2>
+<p>Use these steps when your studio ships on Steam and you want every good build to reach a Steam branch without anyone running tools by hand. Steam delivers games with <strong>SteamPipe</strong>. You upload files to Steam, and players download only the parts that changed.</p>
+
+<h2>Words you need</h2>
+<table>
+  <tr><th>Word</th><th>What it means</th></tr>
+  <tr><td>App ID</td><td>The number Steam gives your game, for example <code>1000480</code>.</td></tr>
+  <tr><td>Depot</td><td>A group of files in the app. Studios often use one depot per system or language. Each depot has its own number.</td></tr>
+  <tr><td>Build ID</td><td>The number Steam gives to one upload.</td></tr>
+  <tr><td>Branch</td><td>A named channel players can opt into, such as <code>nightly</code>. Players do not see a build until you set it live on a branch.</td></tr>
+  <tr><td>SteamCMD</td><td>Valve's command-line tool that does the upload. The steps run it for you on the agent.</td></tr>
+  <tr><td>Build account</td><td>The Steam account the upload signs in with. You store it as a <a href="steam-account.html">Steam build account</a> credential.</td></tr>
+</table>
+
+<h2>The steps</h2>
+<p>All Steam steps are in the <strong>Upload and deploy</strong> group of the step picker.</p>
+<div class="cards three">
+  <a class="card" href="install-steamcmd.html"><h3>Install SteamCMD</h3><p>Download SteamCMD on an agent that does not have it.</p></a>
+  <a class="card" href="steam-upload.html"><h3>Steam upload</h3><p>Upload depots to Steam, and optionally set the build live on a branch.</p></a>
+  <a class="card" href="steam-drm-wrap.html"><h3>Steam: DRM wrap</h3><p>Wrap a program with the Steam DRM wrapper on its own.</p></a>
+  <a class="card" href="steam-check-build.html"><h3>Steam: check build</h3><p>Wait for the build to show on Steam and check that a branch exists.</p></a>
+  <a class="card" href="steam-set-live.html"><h3>Steam: set branch live</h3><p>Set a build live on a branch after your tests pass.</p></a>
+  <a class="card" href="steam-workshop.html"><h3>Steam: workshop item</h3><p>Create or update a Steam Workshop item.</p></a>
+</div>
+<p>The account used by the steps that run SteamCMD is described on <a href="steam-account.html">Steam build account</a>.</p>
+
+<h2>How the pieces fit</h2>
+<ol class="steps">
+  <li>Add a <a href="steam-account.html">Steam build account</a> credential and sign in once.</li>
+  <li>Add <strong>Install SteamCMD</strong> as the first step, unless your agents already have SteamCMD.</li>
+  <li>Build your game with an earlier step, for example <a href="unity.html">Unity</a> or <a href="unreal.html">Unreal Engine</a>.</li>
+  <li>Add <strong>Steam upload</strong>. It uploads the files and gives later steps the <code>BUILD_ID</code>.</li>
+  <li>Optionally add <strong>Steam: check build</strong> and <strong>Steam: set branch live</strong> after your tests. These two call Steam's Web API and need a Web API key, not SteamCMD.</li>
+</ol>
+
+<h2>Two kinds of secret</h2>
+<ul>
+  <li>The <strong>Steam build account</strong> (user name, password and Steam Guard data) is used by the steps that run SteamCMD: Steam upload, DRM wrap and Workshop item.</li>
+  <li>The <strong>Steam Web API key</strong> is a <strong>Secret text</strong> credential. Check build and Set branch live use it.</li>
+</ul>
+<p>Neither is ever written into a script or shown in the log.</p>
+
+<h2>What Buildspawn will not do</h2>
+<ul>
+  <li>A build cannot set the <strong>default</strong> branch live. The names <code>default</code> and <code>public</code> are refused. Set the default branch live on the Builds page in Steamworks.</li>
+  <li>A build cannot create a branch. Make the branch in Steamworks first.</li>
+  <li>If Steam wants the account holder to confirm a change on the Steam Mobile app, the step stops with a message. It never waits for a phone.</li>
+</ul>
+
+<h2>Permission to set a branch live</h2>
+<p>Setting a build live has its own permission, <strong>Steam / Set branch live</strong>, on the build configuration. The person who starts a build that sets a branch live needs it. Without it the step stops before anything is sent to Steam.</p>
+
+<h2>Agents</h2>
+<p>The SteamCMD steps need <code>steamcmd</code> on the agent. Buildspawn reads it from the agent's tool report and holds the build back from agents that lack it. Steam upload works on Windows, Linux and macOS, and a Windows depot can be uploaded from a Linux agent, because an upload only copies files. The agent needs a connection to Steam.</p>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../how-to/game-unity-perforce-steam.html">Build Unity from Perforce and upload to a Steam branch</a></li>
+  <li><a href="unity.html">Unity</a> and <a href="unreal.html">Unreal Engine</a></li>
+  <li><a href="../version-control/perforce.html">Perforce</a></li>
+</ul>
+</main>
+</body>
+</html>

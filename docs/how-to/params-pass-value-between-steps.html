@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pass a value from one step to the next · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/params-pass-value-between-steps">
+<main class="doc">
+<h1>Pass a value from one step to the next</h1>
+<p class="lead">Work out a value in one step and use it in a later step.</p>
+
+<h2>When to use this</h2>
+<p>Use it when a step discovers something that later steps need: a version, a package name, a folder.</p>
+<h2>Steps</h2>
+<ol class="steps">
+  <li>Open the first step of the build configuration (<strong>Settings › Build steps</strong>).</li>
+  <li>In its PowerShell script, read the value and print a <code>setParameter</code> message (below).</li>
+  <li>In a later step, type <code>%version%</code> where the value belongs.</li>
+  <li>Save and run.</li>
+</ol>
+<h2>A worked example</h2>
+<pre><code>$v = (Get-Content Build\version.txt).Trim()
+Write-Host "##buildspawn[setParameter name='version' value='$v']"</code></pre><p>A later step: <code>powershell -File Build\ci.ps1 -Stage package -Version %version%</code>.</p>
+<h2>What you see when it runs</h2>
+<p>The console shows the message line. The later step shows the value in its command. Use the name <code>env.VERSION</code> instead to get an environment variable.</p>
+<h2>Problems and fixes</h2>
+<table>
+<thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+<tbody>
+<tr><td>The value is missing in the same step</td><td>It reaches only the steps after the one that printed it.</td></tr><tr><td>The message is refused</td><td>Only a step's own script can send it. The log says why.</td></tr>
+</tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../parameters/set-from-build.html">Set parameters from a build</a></li>
+  <li><a href="../reference/service-messages.html">Service messages</a></li>
+</ul>
+</main>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Build Unity from Perforce and upload to a Steam branch · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/game-unity-perforce-steam">
+<main class="doc">
+<h1>Build Unity from Perforce and upload to a Steam branch</h1>
+<p class="lead">Sync your game from Perforce, build a Windows player with Unity, and upload it to a Steam beta branch, all in one build configuration.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>A <strong>Perforce connection</strong> (server, build user and password or ticket) and the depot path of your game, for example <code>//depot/skyforge/...</code>. See <a href="../version-control/perforce.html">Perforce</a>.</li>
+  <li>A Windows agent with the <strong>Unity Editor</strong> and a build script in the project, for example <code>BuildScript.BuildWindows</code>, that writes the player to <code>Builds/Win64</code>. See <a href="../game-builds/unity.html">Unity</a>.</li>
+  <li>A <strong>Steam build account</strong> credential you have signed in with. See <a href="../game-builds/steam-account.html">Steam build account</a>.</li>
+  <li>Your Steam <strong>App ID</strong>, the <strong>Depot ID</strong>, and a <strong>beta branch</strong> that already exists in Steamworks, for example <code>nightly</code>.</li>
+</ul>
+
+<h2>Steps</h2>
+<h3>Connect Perforce</h3>
+<ol class="steps">
+  <li>Open your project, click <strong>New Item</strong>, name it <code>Steam Nightly</code>, choose <strong>Freestyle project</strong> and click <strong>OK</strong>.</li>
+  <li>Go to <strong>Settings › Version Control</strong> and choose <strong>Perforce Software</strong>.</li>
+  <li>Pick the <strong>P4 Credentials</strong>, set <strong>Workspace behaviour</strong> to <strong>Manual (custom view)</strong>, and type the <strong>Workspace name</strong> <code>skyforge-steam-${NODE_NAME}</code>.</li>
+  <li>In <strong>View Mappings</strong> type <code>//depot/skyforge/... //skyforge-steam-${NODE_NAME}/...</code>.</li>
+  <li>Choose <strong>Auto cleanup and sync</strong> and click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/how-to/game-unity-perforce-steam-scm.png" alt="The Version Control tab with Perforce Software chosen and the workspace name skyforge-nightly-${NODE_NAME}"><figcaption>The Perforce settings.</figcaption></figure>
+
+<h3>Build the player with Unity</h3>
+<ol class="steps">
+  <li>Open <strong>Build steps › Add build step › Unity</strong>.</li>
+  <li>Set <strong>Step name</strong> to <code>Build Windows player</code>, fill in the project path and the execute method <code>BuildScript.BuildWindows</code>. Every Unity field is on the <a href="../game-builds/unity.html">Unity page</a>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<h3>Install SteamCMD</h3>
+<ol class="steps">
+  <li>Add the step <strong>Install SteamCMD</strong> and keep its defaults. See <a href="../game-builds/install-steamcmd.html">Install SteamCMD</a>. Skip this if your agent already has SteamCMD.</li>
+  <li>Place it before the Unity step or right after it. It only has to come before the upload.</li>
+</ol>
+
+<h3>Upload to the Steam branch</h3>
+<ol class="steps">
+  <li>Add the step <strong>Steam upload</strong>.</li>
+  <li>Choose the <strong>Steam build account</strong> <code>steam-build</code>.</li>
+  <li>Keep <strong>Scripts</strong> on <strong>Generate</strong>. Type <strong>App ID</strong> <code>1000480</code> and <strong>Content root</strong> <code>Builds/Win64</code>.</li>
+  <li>In the depot row, type <strong>Depot ID</strong> <code>1000481</code>. Add a file mapping with <strong>Local path</strong> <code>*</code>, <strong>Depot path</strong> <code>.</code> and <strong>Include subfolders</strong> on. In <strong>Leave out</strong> type <code>*.pdb</code>.</li>
+  <li>Under <strong>Branch and release</strong>, type <code>nightly</code> in <strong>Set live on branch</strong>. Type <code>%build.number% CL%build.vcs.number%</code> as the <strong>Build description</strong>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/how-to/game-unity-perforce-steam-step.png" alt="The Steam upload step with app 1234560, depot 1234561 and branch nightly"><figcaption>The Steam upload step.</figcaption></figure>
+<ol class="steps" start="6">
+  <li>The step list now reads: Install SteamCMD, Unity, Steam upload. Click <strong>Run</strong>.</li>
+</ol>
+<div class="callout tip"><p>Turn on <strong>Preview build</strong> for a first run. It writes the file list and logs and uploads nothing, so you can check the depot mapping safely.</p></div>
+
+<h2>Check it worked</h2>
+<ul>
+  <li>The log shows the Perforce sync, the Unity build, and then <em>Steam: Step output BUILD_ID = …</em> and <em>set live on branch nightly</em>.</li>
+  <li>The build page has the saved SteamCMD logs under <strong>Artifacts › steam-logs</strong>.</li>
+  <li>In Steamworks, open the <strong>Builds</strong> page. The build and its description are listed, and branch <code>nightly</code> points to it.</li>
+</ul>
+<figure class="shot"><img src="../../assets/shots/how-to/game-unity-perforce-steam-console.png" alt="The console of the finished build with the Upload to the nightly branch block opened and the BUILD_ID line"><figcaption>The console of the finished build.</figcaption></figure>
+
+<h2>Troubleshooting</h2>
+<table>
+  <tr><th>Problem</th><th>What to do</th></tr>
+  <tr><td>The step says Steam asked for a Steam Guard code</td><td>Sign in again on the credential. See <a href="../game-builds/steam-account.html">Steam build account</a>.</td></tr>
+  <tr><td>Branch … does not exist</td><td>Create the branch in Steamworks. A build cannot create it.</td></tr>
+  <tr><td>The branch cannot be set live by a build</td><td>You typed <code>default</code>. Use a beta branch and set the default branch live in Steamworks.</td></tr>
+  <tr><td>Depot … matches no file</td><td>The <strong>Content root</strong> is wrong. It is relative to the workspace.</td></tr>
+  <tr><td>SteamCMD was not found on the agent</td><td>Add <strong>Install SteamCMD</strong> before the upload.</td></tr>
+</table>
+<p>To set the build live only after tests pass, leave <strong>Set live on branch</strong> empty and add <a href="../game-builds/steam-check-build.html">Steam: check build</a> and <a href="../game-builds/steam-set-live.html">Steam: set branch live</a> after the tests.</p>
+
+<h2>Next steps</h2>
+<div class="cards">
+  <a class="card" href="../game-builds/steam-upload.html"><h3>Steam upload</h3><p>Every setting of the upload step.</p></a>
+  <a class="card" href="../game-builds/steam-overview.html"><h3>Steam upload: overview</h3><p>How the Steam steps fit together.</p></a>
+  <a class="card" href="../version-control/perforce.html"><h3>Perforce</h3><p>Streams, shelves and shared roots.</p></a>
+  <a class="card" href="../game-builds/unity.html"><h3>Unity</h3><p>All fields of the Unity step.</p></a>
+</div>
+</main>
+</body>
+</html>

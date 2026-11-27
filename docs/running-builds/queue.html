@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The queue · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="running-builds/queue">
+<main class="doc">
+<h1>The queue</h1>
+<p class="lead">Builds wait in the queue until an agent that can run them is free. The Queue page shows what waits, why, and in which order.</p>
+
+<p>Click <strong>Queue</strong> in the top bar. The number beside it shows how many builds wait now.</p>
+
+<h2>Read the queue</h2>
+<figure class="shot">
+  <img src="../../assets/shots/running-builds/queue.png" alt="The Build Queue page with one queued build, Engine » Linux Server Build, with its wait reason, a Why is it waiting? link and a Move to top button">
+  <figcaption>The Build Queue. The build waits for an executor on a Linux agent.</figcaption>
+</figure>
+<p>Each row is one waiting build:</p>
+<table>
+  <thead><tr><th>Column</th><th>What it shows</th></tr></thead>
+  <tbody>
+    <tr><td><strong>#</strong></td><td>Its place in the queue. Number 1 starts first.</td></tr>
+    <tr><td><strong>Build configuration</strong></td><td>What will run, with its project.</td></tr>
+    <tr><td><strong>Triggered by</strong></td><td>Who or what started it: a user, a trigger, another build.</td></tr>
+    <tr><td><strong>Time in queue</strong></td><td>How long it has waited.</td></tr>
+    <tr><td><strong>Wait reason</strong></td><td>Why it cannot start yet, for example <em>Not in a pool assigned to this project</em>, an agent that is offline, or a missing <a href="../projects/settings-homes.html">agent requirement</a>. Click <strong>Why is it waiting?</strong> for the full story.</td></tr>
+    <tr><td><strong>Agents</strong></td><td>How many agents could run it.</td></tr>
+    <tr><td><strong>Estimated start</strong></td><td>When it should start, from the builds running now. <em>Unknown</em> when no agent can take it.</td></tr>
+  </tbody>
+</table>
+<p>The top right of the list shows how many builds run and how many executors are free. Use <strong>All</strong> and <strong>Mine</strong> at the top to see every waiting build or only yours.</p>
+
+<p>The card title shows how many builds wait. On its right it shows how many builds run and how many executors are free, for example <em>No builds running &middot; 3 of 3 executors free</em>. When the queue is empty, the page says <em>No builds in the queue</em> and shows the free capacity. When the server is shutting down, it says no further builds will be performed.</p>
+<p>A build whose position you set by hand shows a marker: <em>Placed by hand: keeps this position until it starts</em>. A build configuration with a build priority shows <em>Priority N</em>. Side builds of a Parallel block wait in the queue like any other build, and show as <em>Side build of #N</em> under their main build.</p>
+
+<h2>The order</h2>
+<p>Builds start in this order:</p>
+<ol class="steps">
+  <li>Builds someone moved by hand come first.</li>
+  <li>Then builds of build configurations with a higher <strong>build priority</strong>. Priority runs from −100 to 100 and is set on <strong>Settings › General</strong> of the build configuration.</li>
+  <li>Then the builds that were queued first.</li>
+</ol>
+
+<h2>Reorder and remove builds</h2>
+<ul>
+  <li><strong>Move to top</strong>: the build becomes number 1.</li>
+  <li><strong>⋯ menu</strong>: move the build up or down one place, or cancel it.</li>
+  <li><strong>Drag</strong>: grab the handle at the left of a row and drop it where you want.</li>
+</ul>
+<p>You can move builds of build configurations you are allowed to run. Administrators can move any build.</p>
+<p>To put a build at the top when you start it, tick <strong>Put the build to the queue top</strong> in the <a href="run-dialog.html">Run dialog</a>.</p>
+<div class="callout tip"><p>If a build waits a long time, read its wait reason first. Often an agent is offline or in the wrong pool. See <a href="../agents/pools.html">Pools</a> and <a href="../agents/agents-page.html">The Agents page</a>.</p></div>
+
+<h3>Cancel a queued build</h3>
+<p>Use the <strong>&hellip;</strong> menu of the row and choose <strong>Cancel</strong>. Buildspawn asks <em>Cancel the queued build of ...?</em> before it does it. Someone who may stop builds of that build configuration can cancel it. In the terminal program's Queue view, press <kbd>c</kbd> (it needs an API token). See <a href="stop-a-build.html">Stop a build</a>.</p>
+
+<h2>Builds that never wait for an agent</h2>
+<p>Some builds only coordinate other builds, such as the parent of <a href="parallel-and-composite.html">parallel tests</a>. These composite builds start at once and use no agent, so they never block the queue.</p>
+</main>
+</body>
+</html>

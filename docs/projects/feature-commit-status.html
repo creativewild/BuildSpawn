@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Commit status publisher · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/feature-commit-status">
+<main class="doc">
+<h1>Commit status publisher</h1>
+<p class="lead">Tells your code host or review tool whether a build passed, so people see the result next to the commit or review.</p>
+<div class="callout note"><p>In the list of build features this is called <strong>Commit status publisher for Git hosts</strong>.</p></div>
+<h2>When to use it</h2>
+<p>Use it when people review changes before they merge, and you want a green or red mark on the change itself. It supports Helix Swarm (for Perforce) and GitHub, GitLab, Bitbucket Cloud and Gitea (for Git).</p>
+<figure class="shot">
+  <img src="../../assets/shots/projects/feat-commit-status.png" alt="The Commit status publisher form with its publisher choices">
+  <figcaption>The Commit status publisher form.</figcaption>
+</figure>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration, click <strong>Settings</strong>, then <strong>Build Features</strong>. Click <strong>Add build feature</strong> and choose <strong>Commit status publisher</strong>.</li>
+  <li>At the top, choose the publisher: <strong>Helix Swarm</strong>, <strong>GitHub</strong>, <strong>GitLab</strong>, <strong>Bitbucket Cloud</strong> or <strong>Gitea</strong>.</li>
+  <li>Fill in the fields for that publisher (see the tables).</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<h2>Every field</h2>
+<h3>Git hosts: GitHub, GitLab, Bitbucket Cloud, Gitea</h3><table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Git host</td><td>Which host receives the status.</td><td>The one you picked</td><td>GitHub</td></tr>
+    <tr><td>Server URL</td><td>The address of the REST API. Fill it only for GitHub Enterprise, or a self-hosted GitLab or Gitea. Empty uses the default of the host: <code>https://api.github.com</code>, <code>https://gitlab.com/api/v4</code>, <code>https://api.bitbucket.org/2.0</code> or <code>https://gitea.com/api/v1</code>.</td><td>Host default</td><td><code>https://git.studio.example/api/v1</code></td></tr>
+    <tr><td>Access token</td><td>A Secret text credential that holds the access token. It is read when the build runs and is sent in a request header. It is never shown or written to the log.</td><td>None (required)</td><td><code>git-status-token</code></td></tr>
+    <tr><td>Repository filter</td><td>Optional. A status is sent only for checkouts whose repository URL contains this text. Empty sends it for every version control root.</td><td>Empty</td><td><code>skyforge-game</code></td></tr>
+    <tr><td>Test connection</td><td>A button that checks the host, the address and the token.</td><td>-</td><td>-</td></tr>
+  </tbody>
+</table>
+<h3>Helix Swarm</h3><table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Swarm server</td><td>The Swarm server to report to.</td><td>None (required)</td><td><code>swarm.studio.example</code></td></tr>
+    <tr><td>Code review comments</td><td>Also post the result as a comment on the review, besides its Tests section.</td><td>Off</td><td>On</td></tr>
+    <tr><td>Create Swarm test</td><td>A button that makes the test definition in Swarm. It needs a Swarm administrator. It adds the test to the Global Workflow, On Update, blocking nothing. Without an administrator, make the test in Swarm by hand.</td><td>-</td><td>-</td></tr>
+  </tbody>
+</table>
+<p>The same Swarm setting is also available as <strong>Publish build status to Helix Swarm</strong> in the <a href="job-settings.html">job settings</a>.</p><h2>A worked example</h2>
+<p>The Skyforge launcher is in Git on a self-hosted Gitea. The studio picks <strong>Gitea</strong>, sets <strong>Server URL</strong> to <code>https://git.studio.example/api/v1</code>, and chooses the credential <code>gitea-status-token</code>. Every pull request now shows a Buildspawn status: build passed.</p><h2>What you see when it runs</h2>
+<p>When the build starts, the status is <em>pending</em>. When it ends it becomes <em>success</em>, <em>failure</em> or <em>error</em>, with a link back to the build. The summary on the Build Features tab shows <em>Build status on Gitea</em>.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>Choose an access token</td><td>The token field is empty. Add a Secret text credential and pick it.</td></tr>
+    <tr><td>Choose a Swarm server</td><td>Pick the server from the list. An administrator adds Swarm servers in the global settings.</td></tr>
+    <tr><td>Test connection fails</td><td>Check the address of the API (it must end in the API path), and that the token may write commit statuses.</td></tr>
+    <tr><td>No status appears</td><td>The status is sent for each checkout of a version control root. Check the <strong>Repository filter</strong>.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="bc-build-features.html">The Build Features tab</a></li>
+  <li><a href="../version-control/git.html">Git</a></li>
+  <li><a href="../version-control/perforce-shelves.html">Shelves and personal builds</a></li>
+  <li><a href="job-settings.html">Job settings</a></li>
+</ul>
+</main>
+</body>
+</html>

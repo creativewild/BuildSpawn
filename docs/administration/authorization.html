@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Authorization · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="administration/authorization">
+<main class="doc">
+<h1>Authorization</h1>
+<p class="lead">Authorization decides what each person may see and do, once the security realm has said who they are.</p>
+
+<h2>When to use it</h2>
+<p>You set the authorization strategy when you set up the server, and again when you want to give a team its own rights. For a studio with several teams, choose <strong>Project-based security</strong> and use <a href="roles.html">roles</a>. For a small server, <strong>Matrix-based security</strong> is enough. If people sign in with Entra ID, choose <strong>Entra ID Matrix-based security</strong>.</p>
+
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open <strong>Settings › Security</strong>. You need <strong>Administer</strong>.</li>
+  <li>Find the section <strong>Authorization</strong> and open the drop-down.</li>
+  <li>Pick a strategy (see the next section).</li>
+  <li>For a matrix strategy, click <strong>Add user</strong> or <strong>Add group</strong>, type the name, and tick permissions on the card (see <a href="#cards">Permission cards</a>).</li>
+  <li>Make sure your own user or group has <strong>Administer</strong>. Then click <strong>Save</strong>.</li>
+</ol>
+<div class="callout warning"><p>If you save a matrix without <strong>Administer</strong> for yourself, you lose access to Settings. The recovery steps are on <a href="security-realms.html">Security realms</a>.</p></div>
+<figure class="shot">
+  <img src="../../assets/shots/administration/security-page.png" alt="The Authorization section with the strategy drop-down, the filter box, Add user and Add group buttons and the first permission cards">
+  <figcaption>The Authorization section: the strategy drop-down, the filter and the permission cards.</figcaption>
+</figure>
+
+<h2>The strategies</h2>
+<table>
+  <tr><th>Strategy</th><th>What it does</th><th>Use it when</th></tr>
+  <tr><td><strong>Anyone can do anything</strong></td><td>No checks. Everyone, even people who are not signed in, has full control.</td><td>A private test on one computer, or a trusted network where people only need a profile.</td></tr>
+  <tr><td><strong>Legacy mode</strong></td><td>The old behaviour. Whoever has the role <code>admin</code> has full control. Everyone else, including anonymous visitors, can only read.</td><td>You need to keep the behaviour of a very old setup. Prefer a matrix.</td></tr>
+  <tr><td><strong>Logged-in users can do anything</strong></td><td>Every signed-in user has full control. A visitor who is not signed in only reads. The checkbox <strong>Allow anonymous read access</strong> says whether they may read at all. It is on by default. A warning says to use it only if every signed-in user is fully trusted.</td><td>A small, trusted team that wants to know who did what.</td></tr>
+  <tr><td><strong>Matrix-based security</strong></td><td>One list of permission cards for the whole server. Each card is one user or one group.</td><td>You want exact control, and the same rights on every project.</td></tr>
+  <tr><td><strong>Project-based security</strong></td><td>The server list, plus a list on each project and a <strong>Roles</strong> tab. Rights given on a project apply to everything inside it.</td><td>Several teams, each with its own project. The right choice for most studios.</td></tr>
+  <tr><td><strong>Entra ID Matrix-based security</strong></td><td>A matrix that finds users and groups in your Entra ID directory. See <a href="entra-id.html">Entra ID sign-in</a>.</td><td>The security realm is <strong>Entra ID</strong>.</td></tr>
+  <tr><td><strong>Old Entra ID Matrix-based security (do not use)</strong></td><td>An earlier form of the Entra ID matrix, kept so that old settings load. It is not recommended.</td><td>Never for a new setup. If you have it, switch to <strong>Entra ID Matrix-based security</strong> and add the cards again.</td></tr>
+</table>
+<p>Changing the strategy does not delete users. It only changes who may do what.</p>
+
+<h2 id="cards">Permission cards</h2>
+<p>The matrix strategies show one <strong>card</strong> for each user or group. A card is a bar with the name, a short summary of what is allowed, three small buttons, and an arrow. Click the bar to open the card and see every permission, grouped by area.</p>
+<figure class="shot"><img src="../../assets/shots/administration/authorization-cards.png" alt="The Authorization matrix with one permission card closed, showing its name and summary, and one card open with grouped permissions"><figcaption>Cards in the matrix. Click the bar of a card to open it.</figcaption></figure>
+<table>
+  <tr><th>Part of the card</th><th>What it does</th></tr>
+  <tr><td>Name</td><td>The user or group. A group has two small people in its icon, a user has one.</td></tr>
+  <tr><td>Summary</td><td>A one-line list of what is ticked. <em>No permissions granted</em> shows when nothing is.</td></tr>
+  <tr><td>Grant all</td><td>Ticks every permission for this card.</td></tr>
+  <tr><td>Remove all</td><td>Clears every permission on this card.</td></tr>
+  <tr><td>Bin</td><td>Removes the card. The built-in cards <strong>Anonymous</strong> and <strong>Authenticated Users</strong> have no bin.</td></tr>
+  <tr><td>Open card</td><td>The permissions are grouped: <strong>Overall</strong>, <strong>Credentials</strong>, <strong>Agent</strong>, <strong>Build configuration</strong>, <strong>Run</strong>, <strong>View</strong>, <strong>SCM</strong> and <strong>Perforce</strong>. Hover over the help icon beside a permission to read what it allows.</td></tr>
+  <tr><td><em>implied</em></td><td>A permission can be granted by another one. For example <strong>Administer</strong> grants all others. The implied ones show as ticked and say <em>(implied)</em>. You can not clear them without clearing the one that grants them.</td></tr>
+</table>
+<p>Above the cards:</p>
+<ul>
+  <li><strong>Filter users and groups</strong> hides cards that do not match what you type.</li>
+  <li>The funnel button, <strong>Filter by permission</strong>, shows only the cards that hold the permissions you pick. <strong>Reset</strong> clears it.</li>
+  <li><strong>Add user</strong> and <strong>Add group</strong> make a new card. In the dialog you can search users and groups that Buildspawn knows (<em>Search by ID or name</em>). If your realm does not list its people, type the name exactly as the realm has it.</li>
+</ul>
+<h3>The two special cards</h3>
+<table>
+  <tr><th>Card</th><th>Who it is</th></tr>
+  <tr><td><strong>Anonymous</strong></td><td>People who are not signed in.</td></tr>
+  <tr><td><strong>Authenticated Users</strong></td><td>Everybody who is signed in. It is the same as the group <strong>All users</strong>. Give it <strong>Read</strong> under <strong>Overall</strong>, so that every signed-in person can open the server and find the projects they were given.</td></tr>
+</table>
+<h3>Ambiguous names</h3>
+<p>A name that could be a user and also a group gets a yellow <em>ambiguous</em> label, and a warning appears above the cards. If your realm lets people choose their own user names or create groups, one could get extra rights. Use the two buttons on the card, <em>Migrate ambiguous permissions assignment to user</em> or <em>to group</em>, to make it exact. A monitor on the Settings overview lists every ambiguous entry.</p>
+
+<h2>Project-based security</h2>
+<p>With this choice you still have the server cards. In addition, every project has a <strong>Roles</strong> tab with:</p>
+<ul>
+  <li>the roles given on that project (see <a href="roles.html">Roles</a>), and</li>
+  <li>a <strong>Full permission grid</strong> for rights that roles cannot express and for the inheritance choice.</li>
+</ul>
+<p>A person gets what <em>any</em> of the cards, roles or grids allows. Nothing here takes a right away, except the inheritance choice below.</p>
+<h3>Inheritance strategy</h3>
+<p>A project’s grid has an <strong>Inheritance Strategy</strong>. It says which rights the project takes from above.</p>
+<table>
+  <tr><th>Choice</th><th>What it means</th></tr>
+  <tr><td><strong>Inherit permissions from parent ACL</strong></td><td>The project keeps its own cards and also gets every right of the project above it. At the top level, the server cards apply. This is the usual choice.</td></tr>
+  <tr><td><strong>Inherit globally defined permissions</strong></td><td>The project gets the server cards directly, but not rights given on projects above it.</td></tr>
+  <tr><td><strong>Do not inherit permission grants from other ACLs</strong></td><td>Only the cards of this project count. To stop people being locked out, system administrators (<strong>Administer</strong>) still have access.</td></tr>
+</table>
+<p>On a project’s <strong>Roles</strong> tab a note says <em>This project blocks inheritance</em> when this choice is used.</p>
+<div class="callout tip"><p>People also need <strong>Read</strong> on every project above the one they work in, and <strong>Read</strong> under <strong>Overall</strong>, to reach it. Give <strong>Authenticated Users</strong> <strong>Overall › Read</strong> and then use roles for the rest.</p></div>
+
+<h2>Entra ID Matrix-based security</h2>
+<p>It has the same cards, filters and buttons. The difference is the <strong>Add from Entra ID</strong> row: a people picker that searches your directory, and a button <strong>Add</strong>. It is explained on <a href="entra-id.html">Entra ID sign-in</a>.</p>
+
+<h2>Every permission</h2>
+<p>Hover over the help icon on a card to see the same text in Buildspawn. Some permissions do not appear on the card, because other permissions already grant them.</p>
+<h3>Overall</h3>
+<table>
+  <tr><th>Permission</th><th>What it allows</th></tr>
+  <tr><td>Administer</td><td>Everything. System-wide settings and the most sensitive actions.</td></tr>
+  <tr><td>Manage</td><td>Change parts of the system settings that cannot harm the stability or security of the server.</td></tr>
+  <tr><td>Read</td><td>See almost every page. Take it from <strong>Anonymous</strong> and give it to <strong>Authenticated Users</strong> if only signed-in people may look.</td></tr>
+  <tr><td>Configure update center, Run scripts, Upload plugins</td><td>Old permissions. Use <strong>Administer</strong> instead.</td></tr>
+</table>
+<h3>Credentials</h3>
+<table>
+  <tr><th>Permission</th><th>What it allows</th></tr>
+  <tr><td>Create</td><td>Add credentials to a store.</td></tr>
+  <tr><td>Update</td><td>Change credentials.</td></tr>
+  <tr><td>View</td><td>See the stored credentials in the list (not the secrets).</td></tr>
+  <tr><td>Delete</td><td>Remove credentials.</td></tr>
+  <tr><td>ManageDomains</td><td>Create, change and delete credential domains.</td></tr>
+</table>
+<h3>Agent</h3>
+<table>
+  <tr><th>Permission</th><th>What it allows</th></tr>
+  <tr><td>Build</td><td>Run build configurations on agents as that user.</td></tr>
+  <tr><td>Configure</td><td>Change agents.</td></tr>
+  <tr><td>Connect</td><td>Connect agents, or mark them online.</td></tr>
+  <tr><td>Create</td><td>Add agents.</td></tr>
+  <tr><td>Delete</td><td>Delete agents.</td></tr>
+  <tr><td>Disconnect</td><td>Disconnect agents, or mark them temporarily offline.</td></tr>
+  <tr><td>Provision</td><td>Start new agents from a cloud.</td></tr>
+  <tr><td>UsePersonal</td><td>Add your own machine and run your builds on it. See <a href="../agents/personal-agents.html">Personal agents</a>.</td></tr>
+</table>
+<h3>Build configuration</h3>
+<table>
+  <tr><th>Permission</th><th>What it allows</th></tr>
+  <tr><td>Read</td><td>See a build configuration.</td></tr>
+  <tr><td>Discover</td><td>Lower than Read. Anonymous visitors who open the address are sent to the sign-in page instead of getting a “not found” error.</td></tr>
+  <tr><td>ExtendedRead</td><td>Read the settings. Secrets in builds may become visible, so give it with care.</td></tr>
+  <tr><td>Build</td><td>Start a build.</td></tr>
+  <tr><td>Cancel</td><td>Cancel a waiting build or stop a running one.</td></tr>
+  <tr><td>Workspace</td><td>Browse and download the files in the workspace of a build.</td></tr>
+  <tr><td>Configure</td><td>Change the build configuration.</td></tr>
+  <tr><td>BuildSettings</td><td>Change the steps, publishers, wrappers and parameters a project passes on to the build configurations below it. Only <strong>Administer</strong> implies it, because these run in every build configuration below.</td></tr>
+  <tr><td>Create</td><td>Create a new build configuration.</td></tr>
+  <tr><td>Delete</td><td>Delete a build configuration.</td></tr>
+  <tr><td>Move</td><td>Move a build configuration from one project (or the top) to another.</td></tr>
+</table>
+<h3>Run</h3>
+<table>
+  <tr><th>Permission</th><th>What it allows</th></tr>
+  <tr><td>Delete</td><td>Delete a build from the history.</td></tr>
+  <tr><td>Update</td><td>Change the description and other properties of a build, for example to leave a note about a failure.</td></tr>
+  <tr><td>Replay</td><td>Run a Pipeline build again with a changed script.</td></tr>
+</table>
+<h3>View, SCM and Perforce</h3>
+<table>
+  <tr><th>Permission</th><th>What it allows</th></tr>
+  <tr><td>View: Read</td><td>See views.</td></tr>
+  <tr><td>View: Create, Configure, Delete</td><td>Make, change and delete views.</td></tr>
+  <tr><td>SCM: Tag</td><td>Tag the sources of a build in version control.</td></tr>
+  <tr><td>Perforce: UseAdministratorConnection</td><td>Use the administrator connection to Perforce.</td></tr>
+</table>
+
+<h2>A worked example</h2>
+<p>The studio chooses <strong>Project-based security</strong>. In the server matrix, <strong>Authenticated Users</strong> gets <strong>Overall › Read</strong>, and the group <em>Admins</em> gets <strong>Administer</strong>. The art team’s project <em>HT3</em> has a role <em>Developer</em> for the group <em>ht3-artists</em>. The art team sees the server, can open <em>HT3</em>, run its builds, and sees nothing else that it was not given.</p>
+
+<h2>What you see when it runs</h2>
+<ul>
+  <li>People without a permission do not see the buttons for it. Pages they may not read answer with <em>Page not found</em> or send them to sign in.</li>
+  <li>The <strong>Summary</strong> card on the Security page names the realm and the strategy.</li>
+  <li>The card summary lists what each user or group has.</li>
+</ul>
+
+<h2>Problems and fixes</h2>
+<table>
+  <tr><th>Problem</th><th>What to do</th></tr>
+  <tr><td>You lost access to Settings after saving.</td><td>See the recovery steps on <a href="security-realms.html">Security realms</a>. Next time add yourself with <strong>Administer</strong> before you save.</td></tr>
+  <tr><td>Someone signs in and sees an empty server.</td><td>Give <strong>Authenticated Users</strong> <strong>Overall › Read</strong>.</td></tr>
+  <tr><td>A project has no <strong>Roles</strong> tab.</td><td>The strategy is not <strong>Project-based security</strong>.</td></tr>
+  <tr><td>A permission cannot be cleared.</td><td>It is implied by another one on the same card. Clear that one first.</td></tr>
+  <tr><td>A card says <em>ambiguous</em>.</td><td>Use the user or group button on the card to make it exact.</td></tr>
+  <tr><td>A grant does nothing.</td><td>The name does not exist in the realm. Remove the card and add it again by search.</td></tr>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="roles.html">Roles</a></li>
+  <li><a href="users.html">Users and groups</a></li>
+  <li><a href="security-realms.html">Security realms</a></li>
+  <li><a href="entra-id.html">Entra ID sign-in</a></li>
+  <li><a href="users-and-permissions.html">Users and permissions</a></li>
+  <li><a href="../how-to/give-team-access.html">Give a team access to its projects</a></li>
+</ul>
+</main>
+</body>
+</html>

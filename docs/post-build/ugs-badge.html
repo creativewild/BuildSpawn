@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UGS metadata server badge · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="post-build/ugs-badge">
+<main class="doc">
+<h1>UGS metadata server badge</h1>
+<p class="lead">Sets a badge for a changelist on an Unreal Game Sync metadata server, so developers see in UGS whether the changelist built.</p>
+<h2>When to use it</h2>
+<p>Use it with an Unreal Engine project in Perforce. The full page, with a worked example, is <a href="../game-builds/ugs-badge.html">UGS metadata server badge</a> in the Game builds section.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration, click <strong>Settings</strong>, then <strong>Post-build Actions</strong>. Click <strong>Add post-build action</strong> and choose <strong>UGS metadata server badge</strong>.</li>
+  <li>Type the <strong>Server URL</strong> and use <strong>Test connection</strong>.</li>
+  <li>Type the <strong>Badge</strong> name and the <strong>Project</strong> depot path.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Server URL</td><td>The metadata server, for example <code>http://localhost:3000</code>.</td><td>Empty</td><td><code>http://ugs.studio.example:3000</code></td></tr>
+    <tr><td>Badge</td><td>The badge name shown in UGS.</td><td>Empty</td><td><code>Editor</code></td></tr>
+    <tr><td>Project</td><td>The depot path of the project folder, not the .uproject file.</td><td>Empty</td><td><code>//UE5/Main/Samples/Games/Lyra</code></td></tr>
+    <tr><td>Credentials</td><td>Optional. A Secret text credential sent as a bearer token. Metadata servers in a closed network usually need none.</td><td>None</td><td>-</td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p>After the <strong>Windows Build</strong>, badge <code>Editor</code> for <code>//UE5/Main/Skyforge</code> turns green in UGS for the built changelist.</p><h2>What you see when it runs</h2>
+<p>The log shows the update sent to the server. The badge changes in UGS.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>Test connection fails</td><td>Check the address and that the metadata server is running.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="overview.html">After the build: overview</a></li>
+  <li><a href="../projects/bc-post-build-actions.html">Post-build actions tab</a></li>
+  <li><a href="../game-builds/ugs-badge.html">UGS metadata server badge (full page)</a></li>
+  <li><a href="../game-builds/unreal.html">Unreal Engine step</a></li>
+</ul>
+</main>
+</body>
+</html>

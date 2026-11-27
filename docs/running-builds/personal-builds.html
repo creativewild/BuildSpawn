@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Personal builds and shelves · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="running-builds/personal-builds">
+<main class="doc">
+<h1>Personal builds and shelves</h1>
+<p class="lead">A personal build tries your own change, not yet submitted, on the real build steps. It never changes the status of the build configuration, so nobody sees a red build because of your experiment.</p>
+
+<h2>When to use it</h2>
+<p>Use a personal build before you submit a change to Perforce: shelve it, run a personal build of the shelf and submit only when it passes. You can also run a build on your own computer when a build farm slot is far away or you need your own tools.</p>
+
+<h2>What makes a build personal</h2>
+<ul>
+  <li>A build is personal when you tick <strong>Personal build</strong> in the <a href="run-dialog.html">Run dialog</a>, when you run shelved changes, or when you pick <strong>My machine</strong>.</li>
+  <li>A shelve trigger on a build configuration starts a personal build for each new shelf. See <a href="triggers.html">Triggers</a>.</li>
+  <li>Only you and administrators see the build. Other people get a page-not-found answer for it and do not find it in build lists, unless you <a href="shared-builds.html">share it</a>.</li>
+  <li>The build configuration's status and its last successful build, for dependencies on that, come from regular builds only. A personal build also does not start other build configurations.</li>
+</ul>
+<p>A personal build is marked <strong>Personal</strong> in the build list and on the build page. Its Summary has a <strong>Personal build</strong> row, such as <em>Personal build of shelf 260 by dana.k</em>, that links to the shelf.</p>
+
+<h2>Run a personal build of a shelf</h2>
+<ol class="steps">
+  <li>Shelve your change in Perforce, for example <code>p4 shelve -c 260</code>.</li>
+  <li>Open the build configuration and click the button with the sliders beside <strong>Run</strong>.</li>
+  <li>Open the <strong>Shelved changes</strong> tab. Tick your shelf, or type its number in <strong>Shelved changelist IDs</strong>. Separate several numbers with commas.</li>
+  <li>Click <strong>Run personal build</strong>.</li>
+</ol>
+<p>The build syncs the code, then unshelves each change in the order you gave (<code>p4 unshelve</code>) and merges what is older than the head (<code>p4 resolve -am</code>). If two changes conflict, the build fails and names the files. Then it runs the steps. Step by step instructions with a worked example are in <a href="../how-to/check-shelf-before-submit.html">Test a shelved change before you submit</a>.</p>
+
+<h2>Run on my machine</h2>
+<p>With <strong>My machine</strong> you run the build on your own computer, as a personal agent. Only you can build on it, and only your own builds run there. It is hidden from everyone else.</p>
+<h3>Add your machine</h3>
+<ol class="steps">
+  <li>Open your account menu and choose <strong>My machines</strong>. You see it only when an administrator has turned on <strong>Personal machines</strong> under <strong>Settings &rsaquo; Security</strong>, and you have the <em>Use a personal machine</em> permission (under Agents in the permission table).</li>
+  <li>Add a machine and give it a name. Buildspawn shows a secret once and an agent download set up for it. Unzip it on your computer and start the agent. It connects by itself, and the page says <em>Waiting for name to connect</em> until then.</li>
+  <li>Choose how builds use your workspace (see the table).</li>
+</ol>
+<table>
+  <tr><th>Workspace choice</th><th>What it means</th></tr>
+  <tr><td><strong>Own copy</strong> (A)</td><td>The build uses its own copy of the workspace. The first sync is full.</td></tr>
+  <tr><td><strong>My workspace</strong> (B)</td><td>The build uses a folder you have already synced, with its Perforce client. The agent unshelves into it and reverts the shelved files after the build, and only when the client has no other open files. A synced folder is never wiped or cleaned up.</td></tr>
+</table>
+<h3>Run a build on it</h3>
+<ol class="steps">
+  <li>Open the Run dialog and choose <strong>My machine &middot; name</strong> in <strong>Agent</strong>, or pick your shelf on the Shelved changes tab and click <strong>Run on my machine</strong>.</li>
+  <li>The dialog shows <em>Personal: only you see this build</em> and how many builds the machine runs at a time.</li>
+</ol>
+<ul>
+  <li>When your machine is offline, the build waits for it, up to the time an administrator set under <strong>Settings &rsaquo; Security &rsaquo; Personal machines</strong> (<em>Offline machine: cancel waiting builds after</em>). Then it is cancelled and says why.</li>
+  <li>An administrator chooses which credentials personal machines may use. A build configuration that uses another credential stops before it starts, and the dialog says so.</li>
+  <li>If an administrator turns personal machines off, your machines stay listed but take no builds.</li>
+</ul>
+
+<h2>What you see when it runs</h2>
+<ul>
+  <li>The build has a <strong>Personal</strong> chip. The Parameters tab shows <code>p4.status = shelved</code> and <code>p4.review</code> with your changelist number for a Perforce shelf.</li>
+  <li>The Changes tab lists your shelved changelist.</li>
+  <li>The console says which agent it ran on. On your own machine, the cause reads <em>Personal build on name by you</em>.</li>
+</ul>
+
+<h2>Problems and fixes</h2>
+<table>
+  <tr><th>Problem</th><th>What to do</th></tr>
+  <tr><td>My shelf is not in the list.</td><td>Only shelves with files inside the build configuration's view are listed. Check the view on <strong>Settings &rsaquo; Version Control</strong>, and refresh the list.</td></tr>
+  <tr><td>The build fails before the steps and names files.</td><td>Your shelf conflicts with newer submits. Resolve them, shelve again and run another personal build.</td></tr>
+  <tr><td>My machine does not take the build.</td><td>Check that the agent is online, that personal machines are on, and that you still have the permission. The queue shows <em>Only name's own builds run on machine</em> for other people's builds.</td></tr>
+  <tr><td>The build turned the configuration red.</td><td>It did not. Look for a regular build that failed at the same time.</td></tr>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="shared-builds.html">Shared builds</a></li>
+  <li><a href="run-dialog.html">The Run dialog</a></li>
+  <li><a href="../version-control/perforce.html">Perforce</a>: shelves, review status and the workbench pages.</li>
+  <li><a href="../how-to/check-shelf-before-submit.html">Test a shelved change before you submit</a></li>
+</ul>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unity build settings · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="game-builds/unity-license">
+<main class="doc">
+<h1>Unity build settings</h1>
+<p class="lead">A build feature that activates a Unity license before your Unity steps, returns it afterwards, and sets the asset cache server.</p>
+
+<h2>When to use it</h2>
+<p>Use it when your build agents do not already have a signed-in, licensed Unity Editor. A Unity Plus or Pro license is tied to a serial number and a Unity account. Buildspawn activates it, builds, and gives the seat back so another agent can use it. A Unity Personal license uses a license file. You can also use the feature only to point Unity at an asset cache server, which makes imports faster.</p>
+
+<h2>How to set it up</h2>
+<p>First add the secrets as credentials. The feature never takes a typed password.</p>
+<ol class="steps">
+  <li>For a <strong>Plus or Pro</strong> license, add a <strong>Secret text</strong> credential that holds the serial number, and a <strong>Username with password</strong> credential for the Unity account. For a <strong>Personal</strong> license, add a <strong>Secret file</strong> (or <strong>Secret text</strong>) credential that holds the <code>.ulf</code> file, up to 100 KB.</li>
+  <li>Open the build configuration and go to <strong>Settings › Build features</strong>.</li>
+  <li>Click <strong>Add build feature</strong> and choose <strong>Unity build settings</strong>. There is one per build configuration.</li>
+  <li>Choose the <strong>License</strong>, the <strong>License scope</strong> and pick the credentials.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/game-builds/unity-license.png" alt="The Unity build settings feature with the sections Unity license, Unity installation and Asset cache"><figcaption>The Unity build settings build feature.</figcaption></figure>
+
+<h2>Every field</h2>
+<h3>Unity license</h3>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>License</strong></td><td><strong>None</strong> leaves licensing to the agent. <strong>Unity Plus or Pro license</strong> uses a serial number and a Unity account. <strong>Unity Personal license</strong> uses a license file.</td><td>None</td><td>Unity Plus or Pro license</td></tr>
+    <tr><td><strong>License scope</strong></td><td><strong>Build step</strong>: activate and return for every Unity step in the build configuration. <strong>Build configuration</strong>: activate once for the whole build and return at the end.</td><td>Build step</td><td>Build configuration</td></tr>
+    <tr><td><strong>Serial number</strong></td><td>A Secret text credential that holds the serial number. Shown for a Plus or Pro license.</td><td>None</td><td><code>unity-serial</code></td></tr>
+    <tr><td><strong>Unity account</strong></td><td>A Username with password credential for the Unity account. Used to activate and to return a Plus or Pro license.</td><td>None</td><td><code>unity-build-account</code></td></tr>
+    <tr><td><strong>License file</strong></td><td>A Secret file or Secret text credential that holds the <code>.ulf</code> file. It can only be used on the machine that the matching <code>.alf</code> file came from. Shown for a Personal license.</td><td>None</td><td><code>unity-personal-ulf</code></td></tr>
+  </tbody>
+</table>
+
+<h3>Unity installation</h3>
+<p>These say which Editor the license commands use.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Detection mode</strong></td><td><strong>Auto</strong> picks an Editor the agent found. <strong>Manual</strong> uses the folder below.</td><td>Auto, or Manual when a folder is set</td><td>Auto</td></tr>
+    <tr><td><strong>Unity version</strong></td><td>Auto mode. Such as <code>2022.3</code>. Empty takes the latest Editor on the agent. Unity steps of the build configuration use it when they name none.</td><td>Empty</td><td><code>6000.0</code></td></tr>
+    <tr><td><strong>Unity folder</strong></td><td>Manual mode. The folder that holds the Unity Editor.</td><td>Empty</td><td><code>C:\Program Files\Unity\Hub\Editor\6000.0.23f1</code></td></tr>
+  </tbody>
+</table>
+
+<h3>Asset cache</h3>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Cache server address</strong></td><td>A Unity Accelerator or cache server, as <code>host:port</code>. If the project's asset pipeline is version 1 or unknown, Unity gets <code>-CacheServerIPAddress</code>. If it is version 2, Unity gets <code>-EnableCacheServer</code> and <code>-cacheServerEndpoint</code>. The log says which one was used.</td><td>Empty</td><td><code>unity-cache.studio.example:10080</code></td></tr>
+  </tbody>
+</table>
+
+<h2>How activation and return work</h2>
+<ul>
+  <li><strong>Plus or Pro, scope Build step:</strong> before each Unity step, Buildspawn runs the Editor with <code>-serial</code>, <code>-username</code> and <code>-password</code> to activate. After the step, it runs the Editor with <code>-returnlicense</code>. It returns the license even when the step fails or is stopped.</li>
+  <li><strong>Plus or Pro, scope Build configuration:</strong> it activates once before the first step and returns once before the build ends.</li>
+  <li><strong>Personal:</strong> the <code>.ulf</code> content is written to a temporary file, the Editor runs with <code>-manualLicenseFile</code>, and the file is deleted afterwards. A Personal license is never returned.</li>
+  <li>The serial number, the password and the license file content are hidden in the whole build log, not only in the license steps.</li>
+</ul>
+<div class="callout warning"><p>While the license commands run, other programs on the agent can see their arguments. Use an agent that only your team can log on to.</p></div>
+
+<h2>A worked example</h2>
+<p>Skyforge has two Windows agents and one Unity Pro seat. The build configuration <code>Windows Build</code> has a Unity step to run tests and one to build the player. The studio sets:</p>
+<table>
+  <thead><tr><th>Field</th><th>Value</th></tr></thead>
+  <tbody>
+    <tr><td>License</td><td>Unity Plus or Pro license</td></tr>
+    <tr><td>License scope</td><td>Build configuration (one activation for both steps)</td></tr>
+    <tr><td>Serial number</td><td><code>unity-serial</code></td></tr>
+    <tr><td>Unity account</td><td><code>unity-build-account</code></td></tr>
+    <tr><td>Unity version</td><td><code>6000.0</code></td></tr>
+    <tr><td>Cache server address</td><td><code>unity-cache.studio.example:10080</code></td></tr>
+  </tbody>
+</table>
+
+<h2>What you see when it runs</h2>
+<ul>
+  <li>A block named <em>Activate Unity license</em> (or <em>Activate Personal Unity license</em>) in the log. Each command line is shown with its secrets as <code>********</code>.</li>
+  <li>Your Unity steps.</li>
+  <li>A block named <em>Return Unity license</em> at the end.</li>
+  <li>On the steps list, the feature's summary shows the license, <em>Cache server host:port</em>, <em>Unity version</em> or <em>Unity folder</em>.</li>
+</ul>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>A warning <em>Process exited with code ... Unity log:</em> follows the activation.</td><td>Activation failed. Read the Unity log printed there. Check the serial, the account password and that the seat is free.</td></tr>
+    <tr><td><em>Could not return the Unity license</em>.</td><td>The account or network failed during the return. Return the seat by hand in your Unity account page.</td></tr>
+    <tr><td>Personal activation fails.</td><td>A <code>.ulf</code> file only works on the machine that made the matching <code>.alf</code>. Run the build on that agent.</td></tr>
+    <tr><td><em>The address should be host:port.</em></td><td>Write the cache server as <code>host:port</code>.</td></tr>
+    <tr><td><em>... is not a Unity version.</em></td><td>Use a version such as <code>2022.3</code>.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<div class="cards">
+  <a class="card" href="unity.html"><h3>Unity step</h3><p>Build, test and run methods.</p></a>
+  <a class="card" href="../how-to/use-a-secret.html"><h3>Use a secret</h3><p>Add credentials safely.</p></a>
+</div>
+</main>
+</body>
+</html>

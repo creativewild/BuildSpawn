@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Run on every Perforce submit · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/params-run-on-perforce-submit">
+<main class="doc">
+<h1>Run on every Perforce submit</h1>
+<p class="lead">Start a build when a change is submitted to Perforce.</p>
+
+<h2>When to use this</h2>
+<p>Use it to build each submit quickly. You can poll, or let Perforce call Buildspawn.</p>
+<h2>Steps</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Triggers</strong>.</li>
+  <li>To poll: add the <strong>VCS Trigger</strong>, set <strong>Poll schedule</strong> to <code>H/5 * * * *</code> and a <strong>Quiet period</strong> of <code>30</code>.</li>
+  <li>To start at once: add <strong>P4 triggered build.</strong> (or <strong>Perforce root: build when the Perforce server triggers it</strong> on a Perforce root). Copy the line it shows.</li>
+  <li>On the Perforce server, run <code>p4 triggers</code> and add the line to the list.</li>
+  <li>Save, then submit a test change.</li>
+</ol>
+<h2>A worked example</h2>
+<p>Skyforge uses the second way for the Windows Build. A submit to <code>//depot/game/main</code> starts a build within seconds.</p>
+<h2>What you see when it runs</h2>
+<p>The build's change log lists the changelist. <code>%build.vcs.number%</code> is that number.</p>
+<h2>Problems and fixes</h2>
+<table>
+<thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+<tbody>
+<tr><td>Nothing starts</td><td>Open the <strong>P4 Trigger Log</strong> page and check the trigger line and API token.</td></tr>
+</tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../running-builds/trigger-p4.html">Perforce trigger (P4)</a></li>
+  <li><a href="../running-builds/trigger-p4-root.html">Perforce root trigger</a></li>
+  <li><a href="../running-builds/trigger-vcs.html">VCS trigger</a></li>
+  <li><a href="build-every-submit.html">Build every submit</a></li>
+</ul>
+</main>
+</body>
+</html>

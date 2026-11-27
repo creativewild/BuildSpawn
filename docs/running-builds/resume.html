@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Resume a build · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="running-builds/resume">
+<main class="doc">
+<h1>Resume a build</h1>
+<p class="lead">Pick up a failed or stopped build at the step that failed, on the same agent and in the same workspace, so the steps that already passed do not run again.</p>
+
+<h2>When to use it</h2>
+<p>Use it when a long build fails near the end: a two-hour cook, then a package step that fails because a file share was offline. You fix the cause outside the build, then resume. Resume runs the same code again. It does not pick up new changes. To build new changes, use <a href="rerun.html">Re-run with changes</a> and choose <em>Latest</em>.</p>
+
+<h2>Resume, re-run or retry</h2>
+<table>
+  <tr><th>Tool</th><th>What it does</th><th>Use it when</th></tr>
+  <tr><td><strong>Resume</strong></td><td>A new build on the same agent and workspace, with no new sync, starting at a step you choose. The revision and parameters are copied from the failed build.</td><td>The problem was the machine or the network, and the work done so far is still good.</td></tr>
+  <tr><td><strong>Re-run</strong></td><td>A new build of the same sources and parameters from the start.</td><td>The workspace was used by another build, or you want to see whether a failure is flaky.</td></tr>
+  <tr><td><strong>Retry</strong></td><td>A step, or the whole build, runs again on its own after a failure.</td><td>A failure is flaky and you want Buildspawn to try again without you.</td></tr>
+</table>
+
+<h2>Resume a failed build</h2>
+<ol class="steps">
+  <li>Open the failed build. Its page has a <strong>Resume from here</strong> card on the right. It checks three things and shows a tick for each: the agent is online, the workspace still exists, and no other build used the workspace since.</li>
+  <li>Click <strong>Resume from step N</strong> at the top of the page. It is next to <strong>Re-run</strong>. The failed step in <strong>Build steps</strong> has the same button.</li>
+  <li>A message says <em>Resume queued</em>. The new build starts, on the same agent, at step N.</li>
+</ol>
+<h3>Resume from an earlier step</h3>
+<ol class="steps">
+  <li>Click the button with the sliders beside <strong>Re-run</strong>. Its tooltip says <em>Re-run with changes&hellip;</em>.</li>
+  <li>Under <strong>Start from step</strong>, pick <em>The beginning</em> (a re-run), any step that passed, or the step marked <em>Failed here</em>. Later steps are not offered.</li>
+  <li>Read the blue box. It sums up what will happen: the sources, the parameters, the agent and workspace, and which steps show as done.</li>
+  <li>The button now says <strong>Resume from step N</strong>. Click it.</li>
+</ol>
+<p>In the dialog, the sources, the agent and the clean checkout are locked for a resume, because it uses the sources, agent and workspace of the original.</p>
+<figure class="shot">
+  <img src="../../assets/shots/build-results/build-page-failed.png" alt="The page of a failed build with the Resume from here card, which says resume is not available because the agent is offline, and the Re-run from the start button">
+  <figcaption>A failed build whose agent is offline. The card says why resume is not available, and Re-run from the start is the main button.</figcaption>
+</figure>
+
+<figure class="shot"><img src="../../assets/shots/build-results/resume-card.png" alt="Build #1 of Content Cook, failed at step 2: the Resume from step 2 button at the top, the failed step with its own Resume button, and the Resume from here card on the right with its checks"><figcaption>A failed build that can be resumed. The card lists what Buildspawn checked.</figcaption></figure>
+<h2>When resume is not available</h2>
+<p>The <strong>Resume</strong> button is greyed out, the main button says <strong>Re-run from the start</strong>, and the card names the reason:</p>
+<table>
+  <tr><th>Reason</th><th>What to do</th></tr>
+  <tr><td><em>Agent is offline</em>, or <em>The agent no longer exists</em></td><td>Bring the agent back online and try again, or re-run from the start.</td></tr>
+  <tr><td><em>Agent no longer matches the build configuration</em></td><td>The settings no longer let that agent run it, for example a changed label. Re-run from the start.</td></tr>
+  <tr><td><em>The workspace is gone</em>: wiped, or the folder no longer exists</td><td>Someone used <strong>Wipe Out Current Workspace</strong>. The files the earlier steps made are gone. Re-run from the start.</td></tr>
+  <tr><td><em>Another build used the workspace</em></td><td>Its files no longer match what the failed build made, so the step could work on the wrong files. Re-run from the start.</td></tr>
+  <tr><td>The build passed, or has no failed step</td><td>Only a failed or stopped build with a failed step can be resumed.</td></tr>
+</table>
+<p>Resume needs the same permission as Re-run. It works for build configurations with build steps. Pipelines cannot be resumed.</p>
+
+<h2>What you see when it runs</h2>
+<figure class="shot">
+  <img src="../../assets/shots/build-results/console-resumed.png" alt="The console of a resumed build: steps 1 and 2 show Done in #1 with a link to the log of #1, and step 3 runs">
+  <figcaption>A resumed build. Steps 1 and 2 show <em>Done in #1</em>, with a link to their logs. Step 3 runs.</figcaption>
+</figure>
+<ul>
+  <li>The new build has a new number. Its Cause says <em>Resumed #1 from step 3</em>.</li>
+  <li>The first lines of the console say <em>Resumed #1 from step 3</em> and <em>Same agent and workspace as #1. Workspace not modified since #1 finished</em>.</li>
+  <li>Skipped steps show <strong>Done in #1</strong> with <strong>Open in #1 log</strong>. The sources step says it was skipped and where the revision came from: <em>Skipped: revision info copied from #1</em>.</li>
+  <li>The steps from N on run, and the post-build actions run again.</li>
+  <li>The values that earlier steps set with <code>##buildspawn[setParameter]</code> are kept, and so are the earlier test results.</li>
+  <li>The Overview has a <strong>Resumed from</strong> card with the agent and the workspace.</li>
+  <li>A clean checkout is never done: <em>Not deleting the files in the checkout directory: a resumed build continues in the workspace as it was</em>.</li>
+</ul>
+
+<h2>Resume with Perforce</h2>
+<p>Resume works with a build configuration that has a Perforce root. The source records the failed build took (the changelist, the credential and the login ticket) now belong to the resumed build, so it continues without syncing again. Git roots that tag builds work the same way.</p>
+<div class="callout note"><p>In 1.9.2 and older, resuming a build with a Perforce root failed at its first step with a <code>NullPointerException</code> in <code>CredentialsProvider.findCredentialById</code>. 1.9.3 fixes this. Upgrade the server to 1.9.3 to resume such builds.</p></div>
+
+<h2>Parallel blocks and chains</h2>
+<ul>
+  <li>For a build with a <a href="parallel-and-composite.html">Parallel block</a> on separate machines, the sides that passed are reused (<em>Passed in #1: not run again</em>) and their files are copied again. Only the side that failed runs again, from its failed step, on its own machine.</li>
+  <li>The files the sides sent back are kept for a resume until the build passes, then they are deleted.</li>
+</ul>
+
+<h2>Retry</h2>
+<p>You can also make Buildspawn try again by itself:</p>
+<ul>
+  <li><strong>Retry on failure</strong> on a step runs the step again before the build gives up. Set it in the step's Execution section. See <a href="../build-steps/resume-and-retry.html">Resume and retry</a>.</li>
+  <li>The <strong>Retry build trigger</strong> starts a failed build again after a delay. It resumes the failed build at the failed step when it can, and the log says <em>Retry 1 of 3 scheduled in 60 seconds: it resumes this build at the failed step</em>. When a resume is not possible, it says <em>This build cannot be resumed (reason): the retry starts from the beginning</em>. See <a href="triggers.html">Triggers</a>.</li>
+</ul>
+
+<h2>Problems and fixes</h2>
+<table>
+  <tr><th>Problem</th><th>What to do</th></tr>
+  <tr><td>The resumed build fails the same way.</td><td>The cause is still there, or it is in the code. Resume does not sync new changes. Submit a fix, then use <strong>Re-run with changes</strong> and choose <em>Latest</em>.</td></tr>
+  <tr><td>The build waits: <em>a build that resumes #N needs this agent's workspace first</em>.</td><td>Another resume holds the workspace. It starts when that one has run.</td></tr>
+  <tr><td>The Resume button is missing.</td><td>The build passed, or you do not have the Build permission.</td></tr>
+  <tr><td>A resumed build with a Perforce root fails at the first step with a <code>NullPointerException</code>.</td><td>The server is older than 1.9.3. Upgrade it.</td></tr>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../how-to/rerun-from-failed-step.html">Re-run a failed build from the failing step</a>: a worked example.</li>
+  <li><a href="rerun.html">Re-run a build</a></li>
+  <li><a href="../build-steps/resume-and-retry.html">Resume and retry</a>: retry a step.</li>
+</ul>
+
+</main>
+</body>
+</html>

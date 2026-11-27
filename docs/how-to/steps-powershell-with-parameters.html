@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Run a PowerShell script with parameters · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/steps-powershell-with-parameters">
+<main class="doc">
+<h1>Run a PowerShell script with parameters</h1>
+<p class="lead">Pass the configuration and output folder from your build parameters to a PowerShell script in your repository.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>A Windows agent with PowerShell. Windows PowerShell 5.1 is enough.</li>
+  <li>A script in your repository, here <code>Build/pack.ps1</code>.</li>
+  <li>Build parameters <code>CONFIG</code> and <code>OUT_DIR</code> on the build configuration. See <a href="../parameters/parameters.html">Parameters</a>.</li>
+</ul>
+
+<h2>Steps</h2>
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Steps</strong>, then click <strong>Add build step</strong>.</li>
+  <li>Click the <strong>PowerShell</strong> tile and name the step <code>Pack build</code>.</li>
+  <li>Set <strong>Run</strong> to <strong>File</strong> and <strong>Script file</strong> to <code>Build/pack.ps1</code>.</li>
+  <li>In <strong>Arguments</strong>, type one argument per line:<pre><code>-Config
+%CONFIG%
+-Out
+%OUT_DIR%</code></pre>Build parameters in <code>%name%</code> form are filled in when the step runs. Each line stays one argument, so a value with spaces is safe.</li>
+  <li>Leave <strong>Add -NoProfile argument</strong> on. If the agent's policy blocks scripts, tick <strong>Bypass the execution policy</strong>.</li>
+  <li>The script reads its parameters:<pre><code>param([string]$Config, [string]$Out)
+Write-Host "Packing $Config into $Out"</code></pre></li>
+  <li>Click <strong>Save</strong> and run the build.</li>
+</ol>
+
+<h2>Check it worked</h2>
+<p>Open the build and its console. The step block shows the PowerShell command and <code>Packing Shipping into Builds\Win64</code>. For a secret, do not use an argument: set a password parameter and read <code>$env:NAME</code> in the script.</p>
+
+<h2>Troubleshooting</h2>
+<ul>
+  <li><strong>The policy blocks the script.</strong> Tick <strong>Bypass the execution policy</strong>.</li>
+  <li><strong>Arguments are empty in the script.</strong> Check that <strong>Script execution mode</strong> is the file mode. In stdin mode arguments are not passed.</li>
+  <li><strong>The script file was not found.</strong> The path is relative to the <strong>Working directory</strong>.</li>
+</ul>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../build-steps/powershell.html">PowerShell</a></li>
+  <li><a href="../build-steps/script-editor.html">The script editor</a></li>
+  <li><a href="use-a-secret.html">Use a secret</a></li>
+</ul>
+</main>
+</body>
+</html>

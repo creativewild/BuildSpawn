@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>E-mail Notification · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="post-build/email">
+<main class="doc">
+<h1>E-mail Notification</h1>
+<p class="lead">Sends an email when a build fails, and when it is fixed.</p>
+<h2>When to use it</h2>
+<p>It is the same setting as the build feature <a href="../projects/feature-notifications.html">Notifications</a>. Use it when someone must hear about a broken build without opening Buildspawn.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration, click <strong>Settings</strong>, then <strong>Post-build Actions</strong>. Click <strong>Add post-build action</strong> and choose <strong>E-mail Notification</strong>.</li>
+  <li>Type the <strong>Recipients</strong>, separated by spaces.</li>
+  <li>Choose the two options if you need them. Click <strong>Save</strong>.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Recipients</td><td>Whitespace-separated addresses. Build variables may be used.</td><td>Empty</td><td><code>build-team@studio.example</code></td></tr>
+    <tr><td>Send e-mail for every unstable build</td><td>On: every unstable build sends mail.</td><td>On</td><td>On</td></tr>
+    <tr><td>Send separate e-mails to individuals who broke the build</td><td>Also mail the people whose changes were in the broken build.</td><td>Off</td><td>On</td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p><strong>Release Build</strong> mails <code>release-team@studio.example</code>. When the build breaks, the team gets one mail. When it is fixed, one more.</p><h2>What you see when it runs</h2>
+<p>The mail comes from the server mail settings. Its subject says the build is failed, unstable or back to normal.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>No mail arrives</td><td>Ask an administrator to check the mail server in the global settings.</td></tr>
+    <tr><td>Too many unstable mails</td><td>Turn off <strong>Send e-mail for every unstable build</strong>.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="overview.html">After the build: overview</a></li>
+  <li><a href="../projects/bc-post-build-actions.html">Post-build actions tab</a></li>
+  <li><a href="../projects/feature-notifications.html">Notifications (build feature)</a></li>
+</ul>
+</main>
+</body>
+</html>

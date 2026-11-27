@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Perforce shelves and personal builds · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="version-control/perforce-shelves">
+<main class="doc">
+<h1>Perforce shelves and personal builds</h1>
+<p class="lead">Build a shelved change on top of the latest code before it reaches the depot.</p>
+
+<h2>When to use it</h2>
+<p>A <strong>shelf</strong> (shelved changelist) holds files someone has not submitted. A <strong>personal build</strong> syncs the latest code, puts the shelf on top and runs the steps. It tells the author whether the change works before it breaks the main line. It does not change the status of the build configuration or its last successful build.</p>
+
+<h2>How to set it up</h2>
+<h3>Build a shelf by hand</h3>
+<ol class="steps">
+  <li>Open the build configuration and click the arrow beside <strong>Run</strong> to open the <a href="../running-builds/run-dialog.html">Run dialog</a>.</li>
+  <li>Open the <strong>Shelved changes</strong> tab.</li>
+  <li>Tick one or more shelves, or type the numbers in <strong>Shelved changelist IDs</strong>, separated by commas, for example <code>16, 17</code>. Empty means a regular build.</li>
+  <li>Click <strong>Run Build</strong>.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/version-control/perforce-shelves-tab.png" alt="The Shelves tab of the Windows Build with the Shelved and Pending switch, a User filter and an empty table">
+  <figcaption>The Shelves tab. Here nobody has shelved files in the view.</figcaption>
+</figure>
+<p>The build unshelves each change in the order given after the sync (<code>p4 unshelve</code>) and merges what is older than the head (<code>p4 resolve -am</code>). A conflict fails the build and names the files. The build is marked <strong>Personal</strong>.</p>
+<h3>Build every new shelf</h3>
+<ol class="steps">
+  <li>Open <strong>Settings › Triggers</strong>, click <strong>Add new trigger</strong> and add <strong>Perforce shelve trigger</strong>.</li>
+  <li>Fill in the fields below and click <strong>Save</strong>.</li>
+</ol>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Schedule</strong></td><td>How often to look for new shelves, in cron syntax, for example <code>H/2 * * * *</code>. Empty means only when a Perforce trigger calls Buildspawn.</td></tr>
+    <tr><td><strong>Keyword</strong></td><td>Only changelists whose description contains this text, for example <code>#buildspawn</code>. Required unless a description pattern or users are set.</td></tr>
+    <tr><td><strong>Description pattern</strong></td><td>A regular expression the description must match. Empty means any.</td></tr>
+    <tr><td><strong>Users</strong></td><td>Perforce users whose shelves count, separated by spaces or commas. Empty means everyone.</td></tr>
+    <tr><td><strong>Build customization</strong></td><td>Start every build clean, and give <code>name=value</code> parameters, one per line. Names that start with <code>p4.</code> belong to Buildspawn.</td></tr>
+  </tbody>
+</table>
+<p>Only files in the build configuration's workspace view count. Each new revision of a matching shelf starts one personal build. Shelves that exist when the trigger starts, or when you change its filters, wait for their next revision.</p>
+
+<h2>The Shelves tab</h2>
+<p>The <strong>Shelves</strong> tab lists shelved changelists in the view, with a switch between <strong>Shelved</strong> and <strong>Pending (not shelved)</strong>, a user filter, and the columns Change, Description, User, Workspace, Files, Date and Personal build. Search by number, user, workspace or description. A shelf page shows its files and diffs. Lists show their age and have a <strong>Refresh</strong> button. If the list is cut, it says <em>Showing N of M shelved changes</em>; type any other number in the field.</p>
+
+<h2>Review status with Swarm</h2>
+<ul>
+  <li>Changelist and shelf pages show the review a change belongs to.</li>
+  <li>The job property <strong>Publish build status to Helix Swarm</strong> posts the result to the review as a test, and optionally also as a comment. <strong>Create Swarm test</strong> needs a Swarm administrator; otherwise you make the test in Swarm by hand, with the Base64 of a Buildspawn user and API token that may build the configuration. Add Swarm servers in the system settings.</li>
+  <li>The <strong>Build Review</strong> tab starts a build for a review by hand, with the review, change, status and the pass, fail and update addresses. Swarm usually does this for you. The build then has <code>P4_REVIEW</code> and <code>P4_REVIEW_TYPE</code>.</li>
+</ul>
+
+<h2>A worked example</h2>
+<p>An artist changes a material, runs <code>p4 shelve -c 48790</code> and writes <code>#buildspawn</code> in the description. The shelve trigger on <strong>Windows Build</strong> sees it within two minutes and starts personal build <strong>#212</strong>. The artist reads the result and submits.</p>
+
+<h2>What you see when it runs</h2>
+<p>The build has a <strong>Personal</strong> chip. <strong>Summary</strong> shows <code>p4.status = shelved</code>, <code>p4.review</code> with the changelist, and the shelf and owner. <strong>Changes</strong> lists the shelved changelist. The shelf's <strong>Personal build</strong> column links back.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>You see</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>My shelf is not listed</td><td>Only shelves with files in the view are shown. Check the view, then click <strong>Refresh</strong>.</td></tr>
+    <tr><td>The build fails before the steps and names files</td><td>The shelf conflicts with newer submits. Update, resolve, shelve again and run a new build.</td></tr>
+    <tr><td>The trigger did not build</td><td>Check the keyword and users. An older shelf needs a new revision.</td></tr>
+    <tr><td>A chosen build machine is offline</td><td>The build waits a few minutes, then is cancelled.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../how-to/check-shelf-before-submit.html">Test a shelved change before you submit</a>, <a href="perforce-root-unshelve.html">Perforce root: unshelve</a>, <a href="perforce-operations.html">Perforce operations</a>, <a href="../running-builds/triggers.html">Triggers</a></li>
+</ul>
+</main>
+</body>
+</html>

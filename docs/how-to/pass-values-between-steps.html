@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pass a version number between steps · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/pass-values-between-steps">
+<main class="doc">
+<h1>Pass a version number between steps</h1>
+<p class="lead">Work out a version number in one step and use it in the steps after it, with one <code>##buildspawn</code> line.</p>
+
+<p>A step passes a value on by printing a <em>service message</em>: a line that starts with <code>##buildspawn</code>. Buildspawn reads it from the step's output and gives the value to every later step. You don't need files or extra scripts.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>A build configuration you can edit. Here it is <strong>HT1 Version Pass</strong> in the <strong>How-to</strong> project.</li>
+  <li>A way to work out the version: a file in your workspace, a tag, or a rule such as "1.4 plus the build number".</li>
+</ul>
+
+<h2>Steps</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Build Steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>, pick <strong>Command Line</strong> and name the step <code>Work out version</code>.</li>
+  <li>Choose <strong>Custom script</strong> and type the script. It prints the version twice: once as a build parameter, once as an environment variable.
+<pre><code>@echo off
+rem Work out the version: 1.4 plus the build number.
+set V=1.4.%BUILD_NUMBER%
+echo Version is %V%
+echo ##buildspawn[setParameter name='version' value='%V%']
+echo ##buildspawn[setParameter name='env.GAME_VERSION' value='%V%']</code></pre>
+  To read the version from a file in your workspace instead:
+<pre><code>for /f %%v in (Build\version.txt) do echo ##buildspawn[setParameter name='version' value='%%v']</code></pre>
+  Click <strong>Save</strong>.</li>
+  <li>Click <strong>Add build step</strong> again, pick <strong>Command Line</strong> and name it <code>Package</code>. Use the value with <code>%version%</code>, or read <code>GAME_VERSION</code> from the environment:
+<pre><code>@echo off
+echo Packaging Skyforge-%version%.zip
+echo GAME_VERSION in the environment: %GAME_VERSION%</code></pre>
+  Click <strong>Save</strong>.</li>
+  <li>Click <strong>Run</strong>.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/how-to/pass-values-between-steps-1.png" alt="The Build Steps page of HT1 Version Pass with two Command Line steps: 1 Work out version and 2 Package">
+  <figcaption>Two steps: the first works out the version, the second uses it.</figcaption>
+</figure>
+
+<p>On a Linux or macOS agent, or in a PowerShell step, print the same line:</p>
+<pre><code># Shell
+v=$(cat Build/version.txt)
+echo "##buildspawn[setParameter name='version' value='$v']"
+
+# PowerShell
+$v = (Get-Content Build\version.txt).Trim()
+Write-Host "##buildspawn[setParameter name='version' value='$v']"</code></pre>
+
+<h2>Check it worked</h2>
+<p>Open the build and click <strong>Console Output</strong>, then <strong>Expand all</strong>. The first step prints the two <code>##buildspawn</code> lines. The second step prints the version it received.</p>
+<figure class="shot">
+  <img src="../../assets/shots/how-to/pass-values-between-steps-2.png" alt="The console of HT1 Version Pass #1: step 1 Work out version prints Version is 1.4.1 and the two setParameter lines; step 2 Package prints Packaging Skyforge-1.4.1.zip and GAME_VERSION in the environment: 1.4.1">
+  <figcaption>Step 1 sets the value; step 2 reads 1.4.1 both ways.</figcaption>
+</figure>
+
+<h2>Troubleshooting</h2>
+<ul>
+  <li><strong>The later step still sees the old value, or <code>%version%</code> as text.</strong> The value reaches the steps <em>after</em> the one that printed it, not the rest of the same step. Print the message in an earlier step.</li>
+  <li><strong>The log says the name was refused.</strong> Some environment variables can't be set from a step, such as <code>PATH</code>, <code>COMSPEC</code> or any <code>GIT_*</code> name. Pick another name, or use a plain name without <code>env.</code>. See <a href="../parameters/set-from-build.html">Set parameters from a build</a>.</li>
+  <li><strong>The value is cut off or wrong.</strong> Quotes and line breaks must be escaped with <code>|</code>: write <code>|'</code> for a quote and <code>|n</code> for a new line.</li>
+  <li><strong>Nothing happens.</strong> The message must come from the step's own output, in single quotes, exactly as <code>##buildspawn[setParameter name='…' value='…']</code>. A batch script that echoes its commands also prints the line with <code>%V%</code> unexpanded; start it with <code>@echo off</code> to keep the log clean.</li>
+</ul>
+
+<h2>Next steps</h2>
+<ul>
+  <li><a href="../parameters/set-from-build.html">Set parameters from a build</a>: the rules, the refused names and step outputs.</li>
+  <li><a href="../reference/service-messages.html">Service messages</a>: every <code>##buildspawn</code> message.</li>
+  <li><a href="../parameters/parameters.html">Parameters</a>: configuration, <code>env.</code> and <code>system.</code> parameters.</li>
+  <li><a href="share-settings-with-a-project.html">Share settings between build configurations</a>.</li>
+</ul>
+</main>
+</body>
+</html>

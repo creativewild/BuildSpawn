@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Matrix mode for Parallel blocks · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/matrix-mode">
+<main class="doc">
+<h1>Matrix mode for Parallel blocks</h1>
+<p class="lead">Write the steps once, list the values they should run with, and Buildspawn runs one side for every combination, such as every platform and every configuration.</p>
+<h2>When to use it</h2>
+<p>Use Matrix mode when the same steps must run for several platforms or configurations, for example Win64, PS5 and Xbox, each in Development and Shipping. In plain <strong>Sides</strong> mode you would write each side by hand. In Matrix mode you write the steps once and use the values as <code>%platform%</code> and <code>%config%</code>.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Steps</strong>.</li>
+  <li>Click <strong>Add Parallel block</strong>. Name it, for example <code>Cook all platforms</code>.</li>
+  <li>Under <strong>How the block is built</strong> click <strong>Change to Matrix</strong> (the choices are <strong>Sides</strong> and <strong>Matrix</strong>). If the block already has several sides, Buildspawn asks first: the steps of the first side stay as the matrix steps and the other sides are dropped.</li>
+  <li>Under <strong>Axes</strong> click <strong>Add axis</strong>. Type an <strong>Axis name</strong> such as <code>platform</code> and its values, separated by commas, such as <code>Win64, PS5, XboxSeriesX</code>. Add more axes if you need them.</li>
+  <li>Optional: add <strong>Exclude</strong> rows for combinations that must not run, and <strong>Include</strong> rows for extra values or new combinations.</li>
+  <li>Under <strong>Steps</strong> click <strong>Add step</strong> and add the steps. In any step field write <code>%platform%</code> for the axis value. Every step also gets the value as an environment variable of the same name.</li>
+  <li>Choose <strong>Run on</strong> rules, <strong>Files sent back</strong>, <strong>Max at once</strong>, <strong>Try first</strong> and <strong>If a combination fails</strong>.</li>
+  <li>Click <strong>Save block</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/build-steps/matrix-mode.png" alt="A Parallel block in Matrix mode with the axes PLATFORM (Win64, Win32) and CONFIG (Development, Shipping), giving four combinations"><figcaption>Matrix mode: two axes make four combinations.</figcaption></figure><h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>How the block is built</strong></td><td><strong>Sides</strong>: you write each side by hand. <strong>Matrix</strong>: sides are made from values.</td><td>Sides</td><td>Matrix</td></tr>
+    <tr><td><strong>Axes</strong></td><td>Each axis has an <strong>Axis name</strong> (letters, digits and underscores) and its values. Every value of one axis meets every value of the others. At most 4 axes and 256 combinations in all.</td><td>None</td><td><code>platform</code> = Win64, PS5; <code>config</code> = Development, Shipping</td></tr>
+    <tr><td><strong>Exclude</strong></td><td>Rows of combinations that must not run. A combination that has all the values of a row is dropped.</td><td>None</td><td>platform = PS5 and config = Development</td></tr>
+    <tr><td><strong>Include</strong></td><td>Extra values for the combinations a row matches, or a new combination when it matches none.</td><td>None</td><td>platform = Win64, sign = yes</td></tr>
+    <tr><td><strong>Steps</strong></td><td>Written once. Every combination runs them with its own values. Read a value as <code>%platform%</code>.</td><td>None</td><td><code>Build.bat %platform% %config%</code></td></tr>
+    <tr><td><strong>Run on</strong></td><td>Where each combination runs. Rules are checked top to bottom and the first match wins. A rule says <strong>When</strong> an axis has some values, or <strong>Anything else</strong>, and then picks an <strong>Agent requirement</strong>, <strong>A pool or label</strong> (for example <code>pool:Consoles</code> or <code>console-%platform%</code>) or <strong>Same machine as before</strong>.</td><td>As the rules</td><td>When platform is PS5: pool Consoles</td></tr>
+    <tr><td><strong>Files sent back</strong></td><td>Rules for the files each combination sends back to the main build. <code>%platform%</code> stands for the value of that combination.</td><td>All changed files</td><td><code>Saved/StagedBuilds/%platform%/**</code></td></tr>
+    <tr><td><strong>Max at once</strong></td><td>How many combinations run at the same time. The rest wait in the queue. Empty means all at once.</td><td>Empty</td><td>3</td></tr>
+    <tr><td><strong>Try first</strong></td><td>One combination that runs alone first. The rest start only if it passes. It ignores Max at once.</td><td>None</td><td>platform = Win64, config = Development</td></tr>
+    <tr><td><strong>If a combination fails</strong></td><td><strong>Let the others finish</strong>: every combination runs to its end and results are kept. <strong>Fail fast</strong>: no new combination starts, running ones finish. <strong>Stop the others</strong>: no new one starts and the running ones are stopped at once. The build fails after the block in all three cases.</td><td>Let the others finish</td><td>Fail fast</td></tr>
+    <tr><td><strong>Fallback after, Passes on</strong></td><td>As in <a href="parallel-blocks.html">Parallel blocks</a>.</td><td>10 minutes</td><td></td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p>The <strong>Game / Windows Build</strong> build configuration cooks a Unreal Engine game for three platforms and two configurations.</p><ol class="steps">
+  <li>Add a Parallel block <code>Cook</code> and change it to <strong>Matrix</strong>.</li>
+  <li>Axis <code>platform</code>: <code>Win64, PS5, XboxSeriesX</code>. Axis <code>config</code>: <code>Development, Shipping</code>. That makes 6 combinations.</li>
+  <li>Exclude <code>platform = PS5</code> with <code>config = Development</code>. 5 combinations remain.</li>
+  <li>Add one Command Line step: <code>Build\Cook.bat %platform% %config%</code>.</li>
+  <li>Run on: when <code>platform</code> is <code>PS5</code> or <code>XboxSeriesX</code>, <strong>A pool or label</strong> <code>pool:Consoles</code>; anything else, <strong>Same machine as before</strong>.</li>
+  <li>Set <strong>Max at once</strong> to <code>3</code>, <strong>Try first</strong> to Win64 Development and <strong>Files sent back</strong> to <code>Saved/StagedBuilds/%platform%/**</code>. Click <strong>Save block</strong>.</li>
+</ol>
+<h2>What you see when it runs</h2>
+<p>The build page shows a grid of the results, one cell per combination, with <strong>Re-run</strong> for a single combination. The console has one lane per combination. The Build Steps list shows the block with a tag such as <em>5 combinations</em>. A trend panel shows how the combinations did over the last builds.</p>
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong><em>An axis name is a word of letters, digits and underscores</em></strong></td><td>Use a name like <code>platform</code>. Spaces and dashes are refused.</td></tr>
+    <tr><td><strong><em>The matrix makes N combinations. The most it can run is 256</em></strong></td><td>Remove values or an axis, or add Exclude rows.</td></tr>
+    <tr><td><strong><em>Two axes are called …</em></strong></td><td>Give each axis its own name.</td></tr>
+    <tr><td><strong><em>Max at once is a whole number of 1 or more</em></strong></td><td>Type a number, or leave the field empty.</td></tr>
+    <tr><td><strong>Changing from Matrix back to Sides</strong></td><td>Each combination becomes a side with the same steps. Buildspawn asks first, and unsaved changes in the block are lost.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="parallel-blocks.html">Parallel blocks and overrides</a></li>
+  <li><a href="../running-builds/parallel-and-composite.html">Parallel and composite builds</a></li>
+  <li><a href="../how-to/run-steps-in-parallel.html">Run steps in parallel</a></li>
+  <li><a href="../visual-editor/canvas.html">The canvas</a></li>
+</ul>
+</main>
+</body>
+</html>

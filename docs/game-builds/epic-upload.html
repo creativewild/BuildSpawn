@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Epic Games Store upload · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="game-builds/epic-upload">
+<main class="doc">
+<h1>Epic Games Store upload</h1>
+<p class="lead">Upload a packaged game to Epic as a new binary, with its launch program, files, prerequisites and metadata.</p>
+
+<h2>When to use it</h2>
+<p>Use it at the end of a build that has made a packaged game folder, when you want that build on the Epic Games Store. It is the step that creates a new binary. After it, optimise the patch and label the binary.</p>
+<div class="callout note"><p>Every Epic step runs the Epic <strong>BuildPatch Tool</strong> on the agent. The agent needs the tool: see <a href="install-buildpatch-tool.html">Install BuildPatch Tool</a>. A step that needs a newer tool than the agent has stops with a message that names the version the agent has.</p></div>
+
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration, then <strong>Settings › Build steps › Add build step</strong>.</li>
+  <li>Type <code>Epic</code> in <strong>Filter step types</strong> and click <strong>Epic Games Store upload</strong>.</li>
+  <li>Under <strong>Connection</strong>, pick the <strong>Epic Games Store credential</strong>. The box below it shows the product, artifact, publishing mode and tool that were found.</li>
+  <li>Under <strong>Build</strong>, type the <strong>Build root</strong>, the <strong>Build version</strong> and the <strong>Launch program</strong>.</li>
+  <li>Choose which files go in, and fill in any other section you need.</li>
+  <li>Check the <strong>Command</strong> summary at the bottom. The secret shows only as the name of an environment variable.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/game-builds/epic-upload.png" alt="The Epic Games Store upload step with the Connection and Build sections filled in"><figcaption>The Epic Games Store upload step: Connection and Build.</figcaption></figure>
+
+<h2>Every field</h2>
+<h3>Connection</h3>
+<table>
+<thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>Epic Games Store credential</td><td>The credential that holds your BuildPatch Tool keys. The list shows the credentials you may use. The secret is never typed in the step, never written to a file and never shown in the log.</td><td>None. The step fails if you pick nothing.</td><td><code>Epic Store (Skyforge)</code></td></tr>
+<tr><td>Artifact ID</td><td>The Epic artifact to work on. Leave it empty to use the <strong>Default artifact ID</strong> of the credential.</td><td>Empty (the credential default)</td><td><code>0f2b8a6c9d1e4c37a5e8b1d6c2f94a70</code></td></tr>
+<tr><td>BuildPatch Tool program</td><td>The full path of the BuildPatch Tool program on the agent. Leave it empty to use the tool the agent reported.</td><td>Empty (the tool the agent reported)</td><td><code>D:/Tools/BuildPatchTool/BuildPatchTool.exe</code></td></tr>
+</tbody>
+</table>
+<h3>Build</h3>
+<table>
+<thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>Build root</td><td>The folder in the workspace that holds the packaged game. Put it near the drive root: Windows paths are limited to 260 characters. Buildspawn warns when a file path in it is longer than 240.</td><td>Empty (required)</td><td><code>build/WindowsPackaged</code></td></tr>
+<tr><td>Build version</td><td>The version Epic knows this binary by. It must be new for the artifact, for every platform. One to 100 characters: letters, digits and <code>. + - _</code> only. The field checks the rule as you type.</td><td><code>${BUILD_NUMBER}</code></td><td><code>1.4.${BUILD_NUMBER}-Windows</code></td></tr>
+<tr><td>This is downloadable content (DLC)</td><td>Tick it when this upload is a DLC item. Buildspawn writes an empty launch program. Each DLC item has its own artifact. The base game and other DLC must not be in the build root, or must be left out with the list below. No two items may hold the same file path.</td><td>Off</td><td>Off</td></tr>
+<tr><td>Launch program</td><td>The program inside the build root that the launcher starts. For a Mac app use the path inside it. It is marked executable for you. Required unless DLC is ticked, and it must exist in the build root.</td><td>Empty</td><td><code>Skyforge.exe</code> or <code>Game.app/Contents/MacOS/Game</code></td></tr>
+<tr><td>Launch arguments</td><td>Arguments the launcher gives the program.</td><td>Empty</td><td><code>-windowed</code></td></tr>
+</tbody>
+</table>
+<h3>Files</h3>
+<table>
+<thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>Everything in the build root</td><td>Every file below the build root goes in.</td><td>Chosen</td><td>-</td></tr>
+<tr><td>Only these files</td><td>Nothing but the files in the list goes in.</td><td>Not chosen</td><td>-</td></tr>
+<tr><td>Everything except these</td><td>All files except the ones in the list.</td><td>Not chosen</td><td>-</td></tr>
+<tr><td>List</td><td>One entry per line: a path in the build root with forward slashes. In the list to leave out you can also write <code>R"regular expression"</code> or <code>W"wildcard*"</code>. Lines that start with <code>#</code> are comments. The list is written to a file outside the build root. Needs BuildPatch Tool 1.6.0 for <code>R"..."</code> and <code>W"..."</code>.</td><td>Empty</td><td><code>Content/Movies/intro.bk2</code></td></tr>
+</tbody>
+</table>
+<h3>File attributes</h3>
+<p>Mark files executable, or give them tags. The launch program does not need to be listed. Tags feed the launcher's selective download, which Epic calls beta: ask an Epic representative before you use it.</p>
+<table>
+<thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>Files › Add file</td><td>Adds one row. Each row has the three fields below.</td><td>No rows</td><td>-</td></tr>
+<tr><td>File (in a row)</td><td>The path in the build root.</td><td>Empty</td><td><code>Binaries/Win64/Helper.exe</code></td></tr>
+<tr><td>Executable (in a row)</td><td>Marks the file executable.</td><td>Off</td><td>On</td></tr>
+<tr><td>Tags (in a row)</td><td>Tags for selective download, separated by commas.</td><td>Empty</td><td><code>movies</code></td></tr>
+<tr><td>Use my own attributes file</td><td>The path of an attributes file you wrote. When set, the rows above are not used.</td><td>Empty</td><td><code>Config/epic-attributes.txt</code></td></tr>
+</tbody>
+</table>
+<h3>Prerequisites and uninstall</h3>
+<table>
+<thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>Prerequisite IDs</td><td>The IDs of the prerequisites the game needs, separated by commas.</td><td>Empty</td><td><code>VCRedist2022,DirectX9</code></td></tr>
+<tr><td>Prerequisite installer</td><td>The installer inside the build root that installs them.</td><td>Empty</td><td><code>Prereqs/vc_redist.x64.exe</code></td></tr>
+<tr><td>Prerequisite arguments</td><td>Arguments for the installer. The buttons <code>$[RootDirectory]</code>, <code>$[LogDirectory]</code> and <code>$[Quote]</code> insert placeholders. They stay as typed. A quote mark you type becomes <code>$[Quote]</code>.</td><td>Empty</td><td><code>/install /quiet /log $[LogDirectory]vc.log</code></td></tr>
+<tr><td>Uninstall program</td><td>A program that cleans up when the player uninstalls. Needs BuildPatch Tool 1.6.0.</td><td>Empty</td><td><code>Tools/cleanup.exe</code></td></tr>
+<tr><td>Uninstall arguments</td><td>Arguments for it.</td><td>Empty</td><td><code>--remove-saves</code></td></tr>
+</tbody>
+</table>
+<h3>Metadata and checks</h3>
+<table>
+<thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>Save the metadata</td><td>Saves what went into the binary as the build artifact <code>epic/metadata-&lt;version&gt;</code>. Needs BuildPatch Tool 1.8.8. With an older tool, Buildspawn fetches the metadata after the upload.</td><td>On</td><td>On</td></tr>
+<tr><td>Metadata format</td><td>Shown when the metadata is saved. <strong>JSON</strong> or <strong>Text (human form)</strong>.</td><td>JSON</td><td>JSON</td></tr>
+<tr><td>Encoding</td><td>Shown when the metadata is saved. <strong>UTF-8</strong> or <strong>UTF-16</strong>.</td><td>UTF-8</td><td>UTF-8</td></tr>
+<tr><td>Check access first</td><td>Reads the binaries of the artifact before the upload. It fails fast on a wrong key, and fails when the version already exists.</td><td>On</td><td>On</td></tr>
+<tr><td>Verbose logs</td><td>More detail in the tool log. Needs BuildPatch Tool 1.7.0.</td><td>Off</td><td>Off</td></tr>
+</tbody>
+</table>
+<h3>Options</h3>
+<table>
+<thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>Stop after (minutes)</td><td>The step is stopped after this time.</td><td>180</td><td><code>180</code></td></tr>
+<tr><td>Tries on network errors</td><td>How many times the step runs BuildPatch Tool when it fails because of a network problem. A wrong key or a missing permission is never tried again.</td><td>1</td><td><code>3</code></td></tr>
+<tr><td>Wait between tries (seconds)</td><td>The pause between two tries.</td><td>30</td><td><code>60</code></td></tr>
+<tr><td>Save the tool&rsquo;s logs with the build</td><td>Whether the logs BuildPatch Tool wrote on the agent are kept as build artifacts in <code>epic-logs</code>. Choices: <strong>Only when the step fails</strong>, <strong>Always</strong>, <strong>Never</strong>.</td><td>Only when the step fails</td><td><strong>Always</strong></td></tr>
+<tr><td>Keep working data in memory</td><td>Uses no cloud folder on disk. For agents with a small disk. Needs BuildPatch Tool 1.8.8. Without it, every run uses a fresh folder on the agent for the tool's working data and deletes it afterwards.</td><td>Off</td><td>Off</td></tr>
+<tr><td>Fail the build on warnings</td><td>Fails the step when BuildPatch Tool gave warnings, for example when metadata could not be written. Without it, warnings only show in the log.</td><td>Off</td><td>On</td></tr>
+</tbody>
+</table>
+<h3>Hands on to later steps</h3>
+<table>
+<thead><tr><th>Name</th><th>What it holds</th></tr></thead>
+<tbody>
+<tr><td><code>EPIC_BUILD_VERSION</code></td><td>The version that was uploaded.</td></tr>
+<tr><td><code>EPIC_ARTIFACT_ID</code></td><td>The artifact it went to.</td></tr>
+<tr><td><code>EPIC_METADATA_FILE</code></td><td>The saved metadata file, when there is one.</td></tr>
+<tr><td><code>EPIC_LOG_FOLDER</code></td><td>The folder of the saved tool logs, <code>epic-logs</code>, when logs were kept.</td></tr>
+</tbody>
+</table>
+
+<h2>A worked example</h2>
+<p>An Unreal Engine step packaged Skyforge into <code>build/WindowsPackaged</code>. The next step is <strong>Epic Games Store upload</strong>:</p>
+<table>
+<thead><tr><th>Field</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td>Epic Games Store credential</td><td><code>Epic Store (Skyforge)</code></td></tr>
+<tr><td>Build root</td><td><code>build/WindowsPackaged</code></td></tr>
+<tr><td>Build version</td><td><code>1.4.${BUILD_NUMBER}-Windows</code></td></tr>
+<tr><td>Launch program</td><td><code>Skyforge.exe</code></td></tr>
+<tr><td>Files</td><td>Everything except <code>W"*.pdb"</code></td></tr>
+<tr><td>Prerequisite IDs / installer / arguments</td><td><code>VCRedist2022</code> / <code>Prereqs/vc_redist.x64.exe</code> / <code>/install /quiet</code></td></tr>
+<tr><td>Save the logs</td><td>Only when the step fails</td></tr>
+</tbody>
+</table>
+
+<h2>What you see when it runs</h2>
+<pre class="terminal" data-title="build log"><span class="t-dim">Epic: credential Epic Store (Skyforge), product 8c1d5f, artifact 0f2b8a..., Publishing: Labels set by builds</span>
+Epic: version 1.4.57-Windows follows the rule (1 to 100 characters, a-z A-Z 0-9 . + - _)
+Epic: access check with ListBinaries
+Epic: access check: 12 binaries, newest 1.4.56-Windows, version 1.4.57-Windows is new
+Epic: the secret is in the environment of that process only
+...
+Epic: metadata saved as epic/metadata-1.4.57-Windows.json
+Epic: Step output EPIC_BUILD_VERSION = 1.4.57-Windows
+Epic: Step output EPIC_ARTIFACT_ID = 0f2b8a...
+Epic: the temporary folder is removed</pre>
+<p>The metadata file is under <strong>Artifacts</strong> on the build page. The binary appears on the artifact in the Epic Developer Portal.</p>
+<figure class="shot"><img src="../../assets/shots/game-builds/epic-console.png" alt="The console of an Epic upload build with the Upload to Epic block opened to show the Epic log lines"><figcaption>The console of an upload, with the Epic log lines.</figcaption></figure>
+
+<h2>Problems and fixes</h2>
+<table>
+<thead><tr><th>Message</th><th>What to do</th></tr></thead>
+<tbody>
+<tr><td>Version ... already exists for artifact ...</td><td>Versions must be unique per artifact, for every platform. Include <code>${BUILD_NUMBER}</code> and the platform in <strong>Build version</strong>.</td></tr>
+<tr><td>The version rule is not met</td><td>Use 1 to 100 characters from <code>a-z A-Z 0-9 . + - _</code>.</td></tr>
+<tr><td>The step needs a build root</td><td>Type the folder that holds the packaged game.</td></tr>
+<tr><td>The build root ... is not a folder on this agent</td><td>The package step did not make it, or it is relative to a different place. The path is relative to the workspace.</td></tr>
+<tr><td>The launch program ... is not in the build root</td><td>Fix the path, or tick DLC.</td></tr>
+<tr><td>BuildPatch Tool was not found on agent ...</td><td>Add <a href="install-buildpatch-tool.html">Install BuildPatch Tool</a> before this step.</td></tr>
+<tr><td>An option needs a newer tool</td><td>The message names the version the agent has. Update the tool, or turn the option off.</td></tr>
+<tr><td>The step ran longer than N minutes</td><td>Raise <strong>Stop after (minutes)</strong>. A first upload of a large game can take hours.</td></tr>
+<tr><td>Epic did not accept the Client ID and Client Secret / no access</td><td>See <a href="epic-credentials.html#problems-and-fixes">the credential page</a>.</td></tr>
+</tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="epic-optimise.html">Epic: optimise patch</a> and <a href="epic-label.html">Epic: label binary</a>: the next steps.</li>
+  <li><a href="../how-to/game-publish-epic.html">Publish a build to the Epic Games Store</a></li>
+  <li><a href="epic-credentials.html">Epic Games Store credential</a></li>
+  <li><a href="unreal.html">Unreal Engine</a></li>
+</ul>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What is Buildspawn · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="get-started/what-is-buildspawn">
+<main class="doc">
+<h1>What is Buildspawn</h1>
+<p class="lead">Buildspawn is a build server. It checks out your code, runs your build steps on your own machines and shows you what happened.</p>
+
+<h2>What it does</h2>
+<p>A build server takes the boring, repeatable work off your team. When someone submits a change, Buildspawn:</p>
+<ul>
+  <li>notices the change in Git or Perforce;</li>
+  <li>picks a free machine (an <em>agent</em>) that can build it;</li>
+  <li>runs your build steps there: compile, cook, test, package, upload;</li>
+  <li>keeps the result: the log, the test results and the files you want to keep (<em>artifacts</em>);</li>
+  <li>shows everyone on the team whether the build passed or failed, and why.</li>
+</ul>
+<figure class="shot">
+  <img src="../../assets/shots/build-results/project-directory.png" alt="The Projects page of a game studio's server with four projects">
+  <figcaption>The Projects page of a game studio's server.</figcaption>
+</figure>
+
+<h2>The main ideas</h2>
+<table>
+  <tr><th>Word</th><th>What it means</th></tr>
+  <tr><td>Project</td><td>A folder that groups build configurations and other projects, for example <em>Game</em> or <em>Engine</em>. Settings you put on a project, such as parameters or version control connections, pass down to everything inside it.</td></tr>
+  <tr><td>Build configuration</td><td>One kind of build, for example <em>Game / Windows Build</em>. It says where the code comes from, which steps to run, when to start and what to keep. A <em>template</em> is a build configuration others can start from.</td></tr>
+  <tr><td>Build</td><td>One run of a build configuration, with a number (#1, #2 &hellip;), a result, a log and its changes.</td></tr>
+  <tr><td>Step</td><td>One thing a build does: a command line, a PowerShell script, a Unity or Unreal Engine build, a test run, a store upload and so on.</td></tr>
+  <tr><td>Agent</td><td>A machine that runs builds. Each agent has one or more executors, so it can run that many builds at once.</td></tr>
+  <tr><td>Pool</td><td>A group of agents, for example Windows, Linux or Consoles. You give pools to projects, so builds land on the right machines.</td></tr>
+  <tr><td>Parameter</td><td>A named value a build can use, such as <code>CONFIG=Shipping</code>. Secrets are parameters whose value is hidden everywhere.</td></tr>
+  <tr><td>Queue</td><td>Where a build waits until an agent that can run it is free.</td></tr>
+</table>
+
+<h2>Made for game studios</h2>
+<p>Buildspawn works for any software, but it has extra help for games:</p>
+<ul>
+  <li><strong>Perforce</strong> as a first-class version control system: streams, shelves, review status, a workbench page and a <em>Perforce operations</em> build step, next to Git.</li>
+  <li><strong>Unity and Unreal Engine</strong> build steps, with the right fields for each engine.</li>
+  <li><strong>Store uploads:</strong> build steps for Steam and the Epic Games Store.</li>
+  <li><strong>Agent telemetry</strong>, including GPU use, so you can see which build machines are busy or short of disk.</li>
+  <li><strong>Pools</strong> with platform icons for Windows, Linux, macOS and consoles, and a Pool Scheduler that moves agents between pools at set times or when urgent builds wait.</li>
+  <li><strong>Parallel blocks and Matrix builds</strong> that cook several platforms at once, and <strong>resume</strong> from the failed step so a two-hour cook does not run again.</li>
+  <li><strong>Personal builds and personal machines:</strong> test a shelf, or run a build on your own computer, before anything reaches the depot.</li>
+</ul>
+
+<h2>The visual editor</h2>
+<p>You can set up the steps of a build configuration as a graph: boxes for steps, lines for the order, and a run view that draws a real build over the graph. You can also use plain forms. Both edit the same settings.</p>
+
+<h2>What you need</h2>
+<ul>
+  <li>One computer for the server: Windows, Linux or macOS. Java is included in every download, so you don't install it yourself.</li>
+  <li>Any number of computers as agents. The agent download also includes Java. The server can run small builds itself while you try things out.</li>
+  <li>A web browser on a desktop or laptop screen. You use Buildspawn through its web pages. There is also a terminal program on every system and, on Windows, a small app to start and stop the server.</li>
+</ul>
+
+<h2>The parts of this guide</h2>
+<div class="cards three">
+  <a class="card" href="install.html"><h3>Get started</h3><p>Install, first start, a tour of the interface.</p></a>
+  <a class="card" href="../running-builds/run-dialog.html"><h3>Running builds</h3><p>Run, queue, re-run, resume, stop.</p></a>
+  <a class="card" href="../build-results/build-page.html"><h3>Build results</h3><p>The build page, console, charts and history.</p></a>
+</div>
+<p>Ready to try it? Go to <a href="install.html">Install the server</a>. It takes a few minutes.</p>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Move agents to another pool every evening · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/night-pool-schedule">
+<main class="doc">
+<h1>Move agents to another pool every evening</h1>
+<p class="lead">Lend a machine to another pool every weekday evening, for example to run night devkit builds, and get it back before people arrive.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>You are an administrator.</li>
+  <li>Both pools exist, for example <code>HT2 Spare</code> (where the agent lives by day) and <code>HT2 Devkits</code> (where it works at night). See <a href="set-up-console-pool.html">Create a pool for console devkits</a>.</li>
+  <li>Check the scheduler's time zone: it is shown at the top of the Pool Scheduler, for example <strong>Times in Europe/London</strong>. Change it under <strong>Settings</strong> if needed.</li>
+</ul>
+
+<h2>Steps</h2>
+<ol class="steps">
+  <li>Open <strong>Agents</strong>, click the <strong>Pools</strong> tab, then <strong>Scheduled moves</strong>.</li>
+  <li>Click <strong>Add scheduled move</strong>.</li>
+  <li>In <strong>Agent</strong>, pick the machine, for example <code>ht-win-agent-01</code>. The list shows which pool each agent is in now.</li>
+  <li>In <strong>From pool</strong>, pick <code>HT2 Spare</code>. Or pick <strong>Any pool</strong> to move it from wherever it is.</li>
+  <li>In <strong>To pool</strong>, pick <code>HT2 Devkits</code>.</li>
+  <li>Set <strong>Time</strong> to <code>20:00</code>.</li>
+  <li>Under <strong>Days</strong>, click the quick pick <strong>Mon–Fri</strong>.</li>
+  <li>Tick <strong>Move it back at</strong> and set <code>07:00</code>. This adds the return move as a second rule, on the same days.</li>
+  <li>Tick <strong>Clean work folder first</strong> only if the night builds need a clean disk.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/how-to/night-pool-schedule-1.png" alt="The Add scheduled move dialog: Agent ht-win-agent-01 now in HT2 Spare, From pool HT2 Spare, To pool HT2 Devkits, Time 20:00, Days Mon to Fri, Move it back at 07:00 ticked, On"><figcaption>One dialog adds the evening move and the morning return.</figcaption></figure>
+
+<h2>Check it worked</h2>
+<ol class="steps">
+  <li>The <strong>Scheduled moves</strong> list now has two rows for the agent: <code>HT2 Spare</code> → <code>HT2 Devkits</code> at 20:00, and back at 07:00, both <strong>Mon–Fri</strong> and switched <strong>On</strong>. <strong>Last run</strong> says <strong>Never</strong> until the first evening.</li>
+  <li>On the <strong>Overview</strong> tab, the <strong>Next scheduled move</strong> card shows the next time and agent.</li>
+  <li>The next morning, check <strong>Recent moves</strong> on the <strong>Overview</strong> tab: it lists both moves with the time and the rule that made them.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/how-to/night-pool-schedule-2.png" alt="The Scheduled moves list: ht-win-agent-01 from HT2 Spare to HT2 Devkits at 20:00 Mon–Fri, and from HT2 Devkits to HT2 Spare at 07:00 Mon–Fri, both On, Last run Never"><figcaption>The evening move and its return.</figcaption></figure>
+<figure class="shot"><img src="../../assets/shots/how-to/night-pool-schedule-3.png" alt="The Pool Scheduler Overview: Waiting builds, Borrowed agents, Moves today and Next scheduled move cards, Capacity per pool with HT2 Devkits and HT2 Spare, and Recent moves"><figcaption>The Overview tab shows the next move and, later, the moves made.</figcaption></figure>
+<div class="callout tip"><p>To test the rules without waiting for the evening, click <strong>Run due rules now</strong>. It runs every move whose time has already passed today.</p></div>
+
+<h2>Troubleshooting</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>The agent didn't move at 20:00.</td><td>If it was busy, it moves as soon as its build ends, up to 2 hours late; after that the move is skipped and logged. Offline agents are skipped. Check <strong>Recent moves</strong> for the note.</td></tr>
+    <tr><td>Nothing moved at all.</td><td>The scheduler may be <strong>Paused</strong> (see the strip at the top), or the rule's <strong>On</strong> switch is off.</td></tr>
+    <tr><td>The agent moved an hour early or late.</td><td>The scheduler's time zone differs from yours. Change it under <strong>Settings</strong>.</td></tr>
+    <tr><td>The agent is not in the <strong>Agent</strong> list.</td><td>Personal agents are never moved, so they are not listed.</td></tr>
+  </tbody>
+</table>
+
+<h2>Next steps</h2>
+<ul>
+  <li><a href="../agents/pool-scheduler.html">The Pool Scheduler</a>: the board, pause, settings and the activity log.</li>
+  <li><a href="borrow-agents-for-release.html">Give release builds priority on agents</a>.</li>
+</ul>
+</main>
+</body>
+</html>

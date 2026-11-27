@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Passing parameters in a build chain · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="parameters/build-chains">
+<main class="doc">
+<h1>Passing parameters in a build chain</h1>
+<p class="lead">A build can tell the builds it depends on what to build, and can read what they used. Both work along a chain of snapshot dependencies.</p>
+
+<p>Take a release build that depends on a Windows build and a PS5 build. Both need to be built as <em>Shipping</em>, and each for its own platform. You set that once, in the release build, and the dependencies get it.</p>
+
+<p>A chain is made of <a href="dependencies.html">snapshot dependencies</a>. Artifact dependencies copy files between builds; they are on the same page.</p>
+<h2>Down the chain: reverse.dep</h2>
+<p>A parameter named <code>reverse.dep.&lt;ID&gt;.&lt;name&gt;</code> sets <code>&lt;name&gt;</code> in the dependency build of the build configuration with that ID. <code>&lt;ID&gt;</code> is the build configuration ID shown under the title of the build configuration.</p>
+<table>
+  <thead><tr><th>Name</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>reverse.dep.Game_Win64Shipping.platform</code></td><td>Sets <code>platform</code> in the dependency build of Game_Win64Shipping.</td></tr>
+    <tr><td><code>reverse.dep.*.config</code></td><td>Sets <code>config</code> in every dependency of the chain, at any depth.</td></tr>
+    <tr><td><code>reverse.dep.Game_Cook.env.REGION</code></td><td>The name can be an <code>env.</code> or <code>system.</code> parameter too.</td></tr>
+  </tbody>
+</table>
+<p>You can set them anywhere a build gets parameters: in the build configuration's own parameters, in parameters it inherits from a project or template, in the Run dialog, and from the API or a trigger. They are not passed to the steps of the build that sets them; they mean nothing there.</p>
+
+<h3>Which value wins</h3>
+<ol>
+  <li>A value typed in the Run dialog beats a configured one.</li>
+  <li>A value for the exact build configuration beats a <code>*</code> value.</li>
+  <li>A value from a closer build beats one from further up the chain.</li>
+</ol>
+<p>A build in the middle of the chain can send values to its own dependencies in the same way.</p>
+
+<h3>Two builds ask for different values</h3>
+<p>A build configuration is built once in a chain. If two builds ask one dependency for different values at the same rank, the chain is not started. The Run dialog says which builds asked for what, and the API answers with the same text.</p>
+
+<h3>The target has no such parameter</h3>
+<p>The value is added to that build as a plain build parameter. The Run dialog shows a warning, so a typo is seen before you run. A name that matches no dependency of the chain is ignored, with a warning in the Run dialog and one line in the build log.</p>
+
+<h3>References in a value</h3>
+<p>A value may hold <code>%name%</code> references, such as <code>%game.version%-%build.number%</code>. The build that sends the value fills them in from its own parameters, once, before it passes the value on. A value that came from another build is not filled in again. A reference that names nothing stays as written, with a warning. A reference to a secret makes the value a secret. The Run dialog shows the result next to the value, for example <code>&rarr; 1.4-57</code>.</p>
+
+<h3>Reuse, re-run and secrets</h3>
+<ul>
+  <li>A finished dependency build is used again only if it ran with the same values. Otherwise a new build starts.</li>
+  <li>A password parameter can be passed down. It stays masked everywhere and is left out of that comparison, so a changed secret alone does not start a new build.</li>
+  <li>Re-run passes the same values again. Re-run with changes lets you change them in the Run dialog.</li>
+</ul>
+
+<h2>Up the chain: dep</h2>
+<p>A build can read what the dependency builds of its own chain used. <code>%dep.&lt;ID&gt;.&lt;name&gt;%</code> is the value used by the dependency build of that build configuration, the reused one or the one started for the chain. Any build of the chain below can be named, not only direct dependencies.</p>
+<table>
+  <thead><tr><th>Reference</th><th>Value</th></tr></thead>
+  <tbody>
+    <tr><td><code>%dep.Game_Win64Shipping.build.number%</code></td><td>The build number.</td></tr>
+    <tr><td><code>%dep.Game_Win64Shipping.build.id%</code></td><td>The build id.</td></tr>
+    <tr><td><code>%dep.Game_Win64Shipping.build.vcs.number%</code></td><td>The changelist or commit.</td></tr>
+    <tr><td><code>%dep.Game_Win64Shipping.build.result%</code></td><td>SUCCESS, FAILURE and so on.</td></tr>
+    <tr><td><code>%dep.Game_Win64Shipping.platform%</code></td><td>Any parameter of that build, also one the chain sent it.</td></tr>
+    <tr><td><code>%dep.Game_Win64Shipping.STEAM_BUILD_ID%</code></td><td>An output a step of that build published.</td></tr>
+  </tbody>
+</table>
+<p>A reference that names no dependency or no value stays as written, and the build log says so once. A secret is never written into a script. A value that someone who may not configure the build configuration typed is not written into a script either, as for the build's own parameters.</p>
+<p>Shell and Batch steps also get environment variables <code>DEP_&lt;ID&gt;_&lt;NAME&gt;</code>: the ID and the name in capitals, dots as underscores. For example <code>DEP_GAME_WIN64SHIPPING_BUILD_NUMBER</code> and <code>DEP_GAME_WIN64SHIPPING_PLATFORM</code>. Only names that fit an environment variable are given, and no secrets.</p>
+
+<h2>Where you see it</h2>
+<ul>
+  <li><strong>Run dialog, Dependencies tab.</strong> Each dependency lists the values it will get and where each came from. Type over a value for this run, or use <strong>Add a value for a dependency</strong> to pick the dependency and the parameter. Problems show before you run.</li>
+  <li><strong>Parameters of a build configuration.</strong> A name that starts with <code>reverse.dep.</code> shows who receives it, and the name field suggests IDs and parameters.</li>
+  <li><strong>Parameters of a dependency build.</strong> A value that came from another build says <em>Set by Release build #57</em>, with a link.</li>
+  <li><strong>Build Chains.</strong> Each box lists the values it received.</li>
+  <li><strong>Queue.</strong> A waiting dependency says <em>Started for Release build #57 with platform=PS5</em>.</li>
+  <li><strong>Build log.</strong> The build that sends values has one line for each dependency. Secrets are masked.</li>
+</ul>
+
+<h2>From the API</h2>
+<pre><code>curl -X POST "http://buildspawn/job/Game/job/Release/buildWithParameters?reverse.dep.Game_Win64Shipping.platform=PS5"</code></pre>
+<p>This works for a build configuration with dependencies even when it has no parameters of its own. If two dependents ask for different values, the answer is <code>409</code> with the text of the problem.</p>
+
+<h2>Things to know</h2>
+<ul>
+  <li>A <strong>Pipeline</strong> job can be a member of a chain: the dependencies page and the chain planner work for every kind of job. It receives the values as its parameters (<code>params.NAME</code>) and the <code>DEP_&lt;ID&gt;_&lt;NAME&gt;</code> variables in its environment. <code>%dep.&hellip;%</code> references are read in the fields and scripts of build steps, not inside Pipeline code.</li>
+  <li>A <strong>personal build</strong> of the top build sends and reads values like any other build. A personal build of a dependency is never reused by a chain: the chain builds its own.</li>
+  <li>A <strong>composite</strong> build receives values, sends them on to its own dependencies and reads <code>%dep.&hellip;%</code> in the same way.</li>
+  <li>A <strong>Matrix</strong> block reads <code>%dep.&hellip;%</code> and <code>DEP_&hellip;</code> in the steps of every combination, on this machine and on separate machines.</li>
+  <li><code>%build.number%</code> in a value a build sends is that build&rsquo;s real number. The number is taken when the chain is planned and the build gets exactly it. If the sending build never runs (cancelled, or reused), the number is left unused, so a gap can show.</li>
+</ul>
+</main>
+</body>
+</html>

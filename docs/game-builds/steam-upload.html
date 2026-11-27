@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Steam upload · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="game-builds/steam-upload">
+<main class="doc">
+<h1>Steam upload</h1>
+<p class="lead">Upload your game's files to Steam as depots, and optionally set the new build live on a beta branch.</p>
+
+<h2>When to use it</h2>
+<p>Use it at the end of a game build, after the files you want to ship are on the agent. It runs SteamCMD with the <a href="steam-account.html">Steam build account</a>, writes the Steam build scripts for you from the form (or runs your own), and gives later steps the <code>BUILD_ID</code>.</p>
+
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Make sure the agent has SteamCMD. Add <a href="install-steamcmd.html">Install SteamCMD</a> before this step if not.</li>
+  <li>Open the build configuration and go to <strong>Settings › Build steps › Add build step › Steam upload</strong>.</li>
+  <li>Under <strong>Connection</strong>, choose the <strong>Steam build account</strong>. The card shows the account, its <strong>Steam Guard</strong> mode and the SteamCMD found.</li>
+  <li>Under <strong>App and depots</strong>, keep <strong>Scripts</strong> on <strong>Generate</strong>. Type the <strong>App ID</strong>, the <strong>Content root</strong> and add one row for each depot.</li>
+  <li>Under <strong>Branch and release</strong>, type the beta branch in <strong>Set live on branch</strong>, or leave it empty to upload only.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/game-builds/steam-upload.png" alt="The Steam upload step with the Connection, App and depots, and Branch and release cards"><figcaption>The Steam upload step.</figcaption></figure>
+<p>The <strong>Scripts</strong> card at the end of the form shows the generated app build and depot scripts, so you can check them before you run. They hold no secret.</p>
+
+<h2>Every field</h2>
+<h3>Connection</h3>
+<table>
+  <tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr>
+  <tr><td><strong>Steam build account</strong></td><td>The credential to sign in with. Required.</td><td>None</td><td><code>steam-build</code></td></tr>
+  <tr><td>Account, Steam Guard, SteamCMD (read only)</td><td>Show the user name, the Steam Guard mode (stored session, machine login or generated codes) and where SteamCMD was found.</td><td></td><td></td></tr>
+  <tr><td><strong>SteamCMD program</strong></td><td>Full path of SteamCMD. Leave empty to use the one the agent reported.</td><td>Found on the agent</td><td><code>D:\tools\steamcmd\steamcmd.exe</code></td></tr>
+</table>
+
+<h3>App and depots</h3>
+<table>
+  <tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr>
+  <tr><td><strong>Scripts</strong></td><td><strong>Generate</strong> writes the Steam scripts from this form. <strong>Own VDF files</strong> runs scripts you keep in the workspace.</td><td>Generate</td><td>Generate</td></tr>
+  <tr><td><strong>App ID</strong></td><td>The number of your app on Steam. Must be a number.</td><td>None</td><td><code>1000480</code></td></tr>
+  <tr><td><strong>Content root</strong></td><td>Folder with the files to upload, relative to the workspace.</td><td><code>.</code></td><td><code>Builds/Win64</code></td></tr>
+  <tr><td><strong>Depots</strong></td><td>One row per depot. At least one. See the next table.</td><td>One empty row</td><td></td></tr>
+  <tr><td><strong>App build script</strong> (own mode)</td><td>Path of your own app build script in the workspace. Buildspawn runs a copy with the description, the branch and the preview switch written in. Your file is never changed. The depot scripts it names are used as they are.</td><td>None</td><td><code>steam/app_build_1000480.vdf</code></td></tr>
+</table>
+<p>Each depot row has:</p>
+<table>
+  <tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr>
+  <tr><td><strong>Depot ID</strong></td><td>The depot number. Must be a number. A depot listed twice is uploaded once.</td><td>None</td><td><code>1000481</code></td></tr>
+  <tr><td><strong>Name for the log</strong></td><td>A label for the build log only.</td><td>Empty</td><td><code>Windows</code></td></tr>
+  <tr><td><strong>Files to include › File mapping</strong></td><td>Rows that choose files. Wildcards <code>*</code> and <code>?</code> are allowed. Each row has <strong>Local path</strong>, <strong>Depot path</strong> (a dot means the depot root) and <strong>Include subfolders</strong>. A depot with no row uploads nothing, and the step warns.</td><td>None</td><td>Local <code>*</code>, depot <code>.</code>, subfolders on</td></tr>
+  <tr><td><strong>Leave out (one pattern per line)</strong></td><td>Files to skip.</td><td>Empty</td><td><code>*.pdb</code></td></tr>
+  <tr><td><strong>Install script</strong></td><td>A file Steam runs on the player's machine at install, for example for redistributables.</td><td>Empty</td><td><code>redist\install.vdf</code></td></tr>
+  <tr><td><strong>Content root of this depot</strong></td><td>Overrides the app's content root for this depot.</td><td>Same as the app</td><td><code>Builds/Win64</code></td></tr>
+  <tr><td><strong>File properties</strong></td><td>Rows of <strong>File</strong> and <strong>Kind</strong>: <strong>Player configuration</strong> (the player may change the file) or <strong>Versioned configuration</strong> (Steam keeps the player's changes between versions).</td><td>None; kind defaults to Player configuration</td><td><code>settings.ini</code></td></tr>
+</table>
+
+<h3>Branch and release</h3>
+<table>
+  <tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr>
+  <tr><td><strong>Set live on branch</strong></td><td>Beta branch to set the build live on as part of the upload. Empty means upload only. <code>default</code> and <code>public</code> are refused. The branch must exist in Steamworks.</td><td>Empty (upload only)</td><td><code>nightly</code></td></tr>
+  <tr><td><strong>Build description</strong></td><td>Text shown in the build list in Steamworks. Quotes and line breaks are removed. You can use parameters.</td><td>Empty</td><td><code>%build.number% CL%build.vcs.number%</code></td></tr>
+  <tr><td><strong>Preview build</strong></td><td>Writes the logs and the file list, uploads nothing. Steam gives no build ID.</td><td>Off</td><td>Off</td></tr>
+  <tr><td><strong>Upload to a local content server</strong></td><td>Sends the build to a local content server instead of Steam. Shows <strong>Folder of the content server</strong>. The branch named <code>local</code> must exist in Steamworks and have a password, and players need the content server address in their Steam setup.</td><td>Off</td><td><code>D:\htdocs</code></td></tr>
+</table>
+
+<h3>Options</h3>
+<table>
+  <tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr>
+  <tr><td><strong>Build output folder</strong></td><td>Where SteamCMD keeps its chunk cache and logs. By default a folder per app on the agent, outside the workspace, so a clean workspace does not lose the cache.</td><td>On the agent, outside the workspace</td><td><code>E:\steam-output</code></td></tr>
+  <tr><td><strong>Stop after (minutes)</strong></td><td>Stops the whole SteamCMD process tree after this time.</td><td><code>120</code></td><td><code>240</code></td></tr>
+  <tr><td><strong>Keep the chunk cache</strong></td><td>Later uploads send only what changed and are much faster.</td><td>On</td><td>On</td></tr>
+  <tr><td><strong>Save the SteamCMD logs as build artifacts</strong></td><td>Saves the folder <code>steam-logs</code>, also when the step fails.</td><td>On</td><td>On</td></tr>
+  <tr><td><strong>Fail the build on warnings</strong></td><td>Fails when, for example, a file mapping matches no file.</td><td>Off</td><td>On</td></tr>
+  <tr><td><strong>Try again on network errors (tries)</strong></td><td>How many times to try. Only network failures are tried again, never a failed login.</td><td><code>1</code></td><td><code>3</code></td></tr>
+  <tr><td><strong>Wait between tries (seconds)</strong></td><td>Pause before the next try.</td><td><code>30</code></td><td><code>60</code></td></tr>
+  <tr><td><strong>Wrap these files with the Steam DRM wrapper first</strong></td><td>Rows of <strong>Program to wrap</strong>, <strong>Where the wrapped file goes</strong> (empty replaces the program) and <strong>Level</strong>. It runs in the same sign-in, before the upload. See <a href="steam-drm-wrap.html">Steam: DRM wrap</a> for the levels.</td><td>None</td><td><code>Builds\Win64\Skyforge.exe</code></td></tr>
+  <tr><td><strong>Hands on to later steps</strong></td><td>The values the step sets: <code>BUILD_ID</code>, <code>APP_ID</code>, <code>LIVE_BRANCH</code> and <code>LOG_FOLDER</code>.</td><td>Not editable</td><td></td></tr>
+</table>
+
+<h2>A worked example</h2>
+<p>Skyforge is app <code>1000480</code> with one Windows depot <code>1000481</code>. The Unity step wrote the player to <code>Builds/Win64</code>.</p>
+<table>
+  <tr><th>Field</th><th>Value</th></tr>
+  <tr><td>Steam build account</td><td><code>steam-build</code></td></tr>
+  <tr><td>App ID</td><td><code>1000480</code></td></tr>
+  <tr><td>Content root</td><td><code>Builds/Win64</code></td></tr>
+  <tr><td>Depot 1000481, name</td><td><code>Windows</code></td></tr>
+  <tr><td>File mapping</td><td>Local path <code>*</code>, Depot path <code>.</code>, Include subfolders on</td></tr>
+  <tr><td>Leave out</td><td><code>*.pdb</code></td></tr>
+  <tr><td>Set live on branch</td><td><code>nightly</code></td></tr>
+  <tr><td>Build description</td><td><code>%build.number% CL%build.vcs.number%</code></td></tr>
+</table>
+
+<h2>What you see when it runs</h2>
+<pre class="no-copy"><code>[Step 4/5] Steam upload
+Steam: account build_ci (credential steam-build, stored session), app 1000480, 1 depots
+Steam: wrote app_build.vdf and 1 depot scripts (deleted at the end)
+...SteamCMD output, passwords hidden...
+Steam: Step output BUILD_ID = 15870342
+Steam: set live on branch nightly (from the upload)
+Steam: logs saved to steam-logs (3 files)</code></pre>
+<ul>
+  <li>The logs are under <strong>Artifacts</strong> as <code>steam-logs</code>.</li>
+  <li>With <strong>Preview build</strong>, the log says <em>Preview build: nothing was uploaded and Steam gave no build ID.</em></li>
+  <li>If another build is using the same account on the same agent, the step says <em>Waiting for another Steam upload with the same build account</em>. Uploads with one account on one agent run one after the other.</li>
+</ul>
+<figure class="shot"><img src="../../assets/shots/game-builds/steam-console.png" alt="The console of a Steam upload with the Upload to Steam block opened, ending with the BUILD_ID line"><figcaption>The console of a Steam upload, with BUILD_ID.</figcaption></figure>
+
+<h2>Problems and fixes</h2>
+<table>
+  <tr><th>Message</th><th>What to do</th></tr>
+  <tr><td>SteamCMD was not found on the agent</td><td>Add <strong>Install SteamCMD</strong> before this step, or fill in <strong>SteamCMD program</strong>.</td></tr>
+  <tr><td>Steam asked for a Steam Guard code. Sign in again on the credential</td><td>The stored session ran out. Sign in again on the <a href="steam-account.html">credential</a>. The login is not tried again, to protect the account.</td></tr>
+  <tr><td>Steam refused the password for the account</td><td>Update the password on the credential.</td></tr>
+  <tr><td>Steam refused the build</td><td>Check that the account may publish the app, and that the content root and local paths hold files.</td></tr>
+  <tr><td>Check the App ID …</td><td>Check the App ID, that your Steamworks setup is published and that the account may use the app.</td></tr>
+  <tr><td>SteamCMD could not reach Steam</td><td>Check the network or proxy on the agent. Set <strong>tries</strong> above 1 to retry.</td></tr>
+  <tr><td>The branch … cannot be set live by a build. Nothing was uploaded.</td><td>You typed <code>default</code> or <code>public</code>. Use a beta branch, or set the default branch live in Steamworks.</td></tr>
+  <tr><td>Branch … does not exist for app …</td><td>Create the branch on the Builds page in Steamworks.</td></tr>
+  <tr><td>The person who started this build may not set a branch live</td><td>Give that person <strong>Steam / Set branch live</strong> on the build configuration.</td></tr>
+  <tr><td>Depot …, the local path … matches no file</td><td>A warning. Fix the local path or the content root. Turn on <strong>Fail the build on warnings</strong> to stop on it.</td></tr>
+  <tr><td>The App ID … differs from the AppID … in your script</td><td>Own mode only. The script is used as it is.</td></tr>
+  <tr><td>Steam did not report a BuildID</td><td>Open the saved logs. Valve gives no list of exit codes, so Buildspawn reads the log text.</td></tr>
+  <tr><td>The upload ran longer than … minutes</td><td>Raise <strong>Stop after (minutes)</strong>. A first upload of a big game is slow. Keep the chunk cache on.</td></tr>
+  <tr><td>Only … MB are free for the build output</td><td>Free some disk space, or move the <strong>Build output folder</strong>.</td></tr>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="steam-overview.html">Steam upload: overview</a></li>
+  <li><a href="steam-account.html">Steam build account</a></li>
+  <li><a href="steam-check-build.html">Steam: check build</a> and <a href="steam-set-live.html">Steam: set branch live</a></li>
+  <li><a href="../how-to/game-unity-perforce-steam.html">Build Unity from Perforce and upload to a Steam branch</a></li>
+</ul>
+</main>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Build Features · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/bc-build-features">
+<main class="doc">
+<h1>Build Features</h1>
+<p class="lead">Setup and reporting around the build steps: timestamps, clean workspace, secrets, test reports, notifications and more.</p>
+<h2>When to use it</h2>
+<p>Use it for settings that act on the whole build, not on one step. A feature that is off stays saved but does not run. The top list shows the features this build configuration uses. <strong>Available</strong> lists the rest.</p>
+<figure class="shot">
+  <img src="../../assets/shots/projects/bc-build-features.png" alt="The Build Features tab of Windows Build with the Available list">
+  <figcaption>The Build Features tab.</figcaption>
+</figure>
+<figure class="shot">
+  <img src="../../assets/shots/projects/bc-build-features-picker.png" alt="The Add build feature picker">
+  <figcaption>The Add build feature picker.</figcaption>
+</figure>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings</strong>. Then click <strong>Build Features</strong>.</li>
+  <li>Click <strong>Add build feature</strong>, or click <strong>Set up</strong> on a card under <strong>Available</strong>.</li>
+  <li>Fill in the form of the feature and click <strong>Save</strong>.</li>
+  <li>Use the <strong>On</strong> switch on a feature to turn it off without deleting it.</li>
+  <li>This page saves each change at once.</li>
+</ol>
+<h2>Every field</h2>
+<p>The picker lists these features. Each has its own page.</p><table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Timestamps in the build log</td><td>Shows the time in front of every line of the build log.</td><td>-</td><td><a href="feature-timestamps.html">Page</a></td></tr>
+    <tr><td>Delete the workspace before the build</td><td>Empties the workspace before the sources are fetched.</td><td>-</td><td><a href="feature-delete-workspace.html">Page</a></td></tr>
+    <tr><td>Bind credentials to variables</td><td>Makes stored secrets available to the steps as variables.</td><td>-</td><td><a href="feature-credential-bindings.html">Page</a></td></tr>
+    <tr><td>Parallel tests</td><td>Splits the tests into batches that run at the same time.</td><td>-</td><td><a href="feature-parallel-tests.html">Page</a></td></tr>
+    <tr><td>XML report processing</td><td>Reads test report files (JUnit format) and shows the results.</td><td>-</td><td><a href="feature-xml-report.html">Page</a></td></tr>
+    <tr><td>Commit status publisher</td><td>Reports the build result to Helix Swarm, GitHub, GitLab, Bitbucket Cloud or Gitea.</td><td>-</td><td><a href="feature-commit-status.html">Page</a></td></tr>
+    <tr><td>Notifications</td><td>Sends an email when a build finishes or changes result.</td><td>-</td><td><a href="feature-notifications.html">Page</a></td></tr>
+    <tr><td>VCS labeling</td><td>Labels the built Perforce revision.</td><td>-</td><td><a href="feature-vcs-labeling.html">Page</a></td></tr>
+    <tr><td>Unity build settings</td><td>Activates and returns a Unity license around the Unity steps, and sets the asset cache server.</td><td>-</td><td><a href="feature-unity.html">Page</a></td></tr>
+    <tr><td>Other build setup</td><td>Features that wrap a build, each with its own settings: <a href="feature-ssh-before.html">SSH before the build</a>, <a href="feature-ssh-after.html">SSH after the build</a>, <a href="feature-project-properties.html">Project Properties</a>.</td><td>-</td><td>-</td></tr>
+    <tr><td>Documentation</td><td>Links on the Documentation tab.</td><td>-</td><td><a href="feature-documentation.html">Page</a></td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p><strong>Windows Build</strong> uses <strong>Timestamps in the build log</strong>, <strong>Bind credentials to variables</strong> for the store token, and <strong>Notifications</strong> to the release team. The build time limit is set under <a href="bc-failure-conditions.html">Failure Conditions</a>.</p><h2>What you see when it runs</h2>
+<p>The list shows a one-line summary for each feature, for example <em>Email to release-team@studio.example when a build fails and when it is fixed</em>. A feature with a problem shows what is missing.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>A feature is greyed out or missing</td><td>The build configuration cannot hold it, or the plugin behind it is not installed.</td></tr>
+    <tr><td>An inherited feature</td><td>A project passes it down. Use <strong>Override</strong>, <strong>Disable in this job</strong> or <strong>Reset</strong>.</td></tr>
+    <tr><td>Post-build actions are not here</td><td>They are on <a href="bc-post-build-actions.html">Post-build Actions</a>. Notifications, XML report processing and VCS labeling show in both places.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="settings-homes.html">Settings homes</a></li>
+  <li><a href="bc-failure-conditions.html">Failure conditions</a></li>
+  <li><a href="bc-post-build-actions.html">Post-build actions</a></li>
+</ul>
+</main>
+</body>
+</html>

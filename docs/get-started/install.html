@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Install the server · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="get-started/install">
+<main class="doc">
+<h1>Install the server</h1>
+<p class="lead">Choose the download for your system and get the server running.</p>
+
+<h2 id="before">Before you start</h2>
+<p>Get the files from the <a href="https://github.com/creativewild/buildspawn/releases/tag/v1.9.3">Buildspawn 1.9.3 release page</a>. Every download includes Java 21 (Eclipse Temurin 21.0.13.1). You don't need to install Java or anything else.</p>
+<ul>
+  <li><strong>Systems:</strong> Windows x64, Linux x64 and ARM (any glibc Linux, not Alpine), and macOS on Apple silicon or Intel.</li>
+  <li><strong>Web port:</strong> 8080 by default. You can change it in the settings at any time.</li>
+  <li><strong>Memory:</strong> on Windows you set the Java memory in the app. On Linux and macOS the default is a quarter of the computer's memory, between 2 GB and 16 GB.</li>
+  <li><strong>Disk:</strong> about 620 MB for the program, plus room for build history and artifacts in the data folder.</li>
+</ul>
+<p>Buildspawn keeps everything it needs in one <strong>data folder</strong>, also called the home: jobs, build history and settings. Back it up, and keep it when you upgrade.</p>
+<div class="callout tip"><p>Each download has a <code>.sha256</code> file next to it. Use it to check that the download is complete before you install.</p></div>
+
+<h2 id="downloads">Downloads</h2>
+<p>Pick one file for your system. All files are for version 1.9.3 (build 2.589-buildspawn.21).</p>
+<table>
+  <thead><tr><th>System</th><th>File</th><th>Size</th><th>What it is</th></tr></thead>
+  <tbody>
+    <tr><td>Windows</td><td><code>buildspawn-2.589-buildspawn.21-setup.exe</code></td><td>513 MB</td><td>Setup: installs to Program Files, adds Start menu shortcuts and can install the Windows service</td></tr>
+    <tr><td>Windows</td><td><code>buildspawn-2.589-buildspawn.21-windows-x64.zip</code></td><td>513 MB</td><td>Portable: unzip and run; everything stays in the folder</td></tr>
+    <tr><td>Linux x64</td><td><code>buildspawn-2.589-buildspawn.21-linux-x64.tar.gz</code></td><td>516 MB</td><td>Portable folder for any glibc Linux</td></tr>
+    <tr><td>Linux ARM</td><td><code>buildspawn-2.589-buildspawn.21-linux-aarch64.tar.gz</code></td><td>515 MB</td><td>The same for ARM servers</td></tr>
+    <tr><td>Debian, Ubuntu</td><td><code>buildspawn_2.589-buildspawn.21_amd64.deb</code></td><td>517 MB</td><td>Package: installs to <code>/opt/buildspawn</code> and starts the service</td></tr>
+    <tr><td>RHEL, Rocky, Fedora</td><td><code>buildspawn-2.589-buildspawn.21.x86_64.rpm</code></td><td>517 MB</td><td>The same as an rpm</td></tr>
+    <tr><td>macOS Apple silicon</td><td><code>buildspawn-2.589-buildspawn.21-macos-aarch64.tar.gz</code></td><td>512 MB</td><td>Portable folder (M1 and later)</td></tr>
+    <tr><td>macOS Intel</td><td><code>buildspawn-2.589-buildspawn.21-macos-x64.tar.gz</code></td><td>506 MB</td><td>Portable folder (Intel Macs)</td></tr>
+    <tr><td>Any system with Java</td><td><code>buildspawn-2.589-buildspawn.21.war</code></td><td>463 MB</td><td>The server alone, for people who run their own Java</td></tr>
+  </tbody>
+</table>
+
+<h2 id="windows">Windows app and setup</h2>
+<p>Setup is the easiest way to install Buildspawn on a Windows server or build machine.</p>
+<ol class="steps">
+  <li>Run <code>buildspawn-2.589-buildspawn.21-setup.exe</code>.</li>
+  <li>Follow the steps. Setup installs the program to <code>C:\Program Files\Buildspawn</code>, adds Start menu shortcuts and an entry in Apps &amp; features.</li>
+  <li>Choose whether to install the <strong>Windows service</strong>. The service starts with Windows and restarts Buildspawn if it stops. You can also install it later.</li>
+  <li>Open <strong>Buildspawn</strong> from the Start menu. This is the Windows app: it starts and stops the server and shows its log. See <a href="windows-app.html">The Windows app</a>.</li>
+  <li>Open <code>http://localhost:8080/</code> in your browser and sign in. See <a href="first-start.html">First start and sign-in</a>.</li>
+</ol>
+<p>With setup, the settings file is <code>C:\ProgramData\Buildspawn\buildspawn.cfg</code>. Data and logs are in <code>C:\ProgramData\Buildspawn</code>.</p>
+<p>Setup also puts the program's <code>bin</code> folder on the PATH, so you can type <code>buildspawn</code> in any new Windows Terminal to open the <a href="terminal-program.html">terminal program</a>.</p>
+
+<h3>Upgrade and remove</h3>
+<ul>
+  <li><strong>Upgrade:</strong> run the newer setup. It stops the service, replaces the program files, keeps your settings and data, and starts the service again.</li>
+  <li><strong>Remove:</strong> use Apps &amp; features, or "Uninstall Buildspawn" in the Start menu. It asks before it deletes data. The default keeps it.</li>
+</ul>
+
+<h3>Silent install</h3>
+<p>To install without questions, for example from a script:</p>
+<pre><code>buildspawn-2.589-buildspawn.21-setup.exe /S /D=D:\Buildspawn /DATA=D:\BuildspawnData /PORT=8080 /SERVICE=1</code></pre>
+<p><code>/D</code> is the program folder, <code>/DATA</code> the data folder, <code>/PORT</code> the web port and <code>/SERVICE</code> 1 or 0 to install the service or not. Run <code>setup.exe /?</code> to list every switch.</p>
+
+<h2 id="portable">Portable zip</h2>
+<p>The zip needs no installation and no administrator rights. It is good for a try-out, or for a server you want to keep in one folder.</p>
+<ol class="steps">
+  <li>Unzip <code>buildspawn-2.589-buildspawn.21-windows-x64.zip</code>, for example to <code>D:\Buildspawn</code>.</li>
+  <li>Open <code>Buildspawn.exe</code> in that folder and click <strong>Start</strong>.</li>
+  <li>Open <code>http://localhost:8080/</code> in your browser.</li>
+</ol>
+<p>The settings (<code>buildspawn.cfg</code>), the data and the logs stay next to <code>Buildspawn.exe</code>. A file named <code>portable</code> in the folder tells Buildspawn to work this way.</p>
+<div class="callout note"><p>The zip does not add <code>bin</code> to the PATH. In the program folder, type <code>.\bin\buildspawn.exe</code>, not just <code>buildspawn</code>: Windows doesn't tell upper and lower case apart, so plain <code>buildspawn</code> there opens <code>Buildspawn.exe</code>, the app.</p></div>
+
+<h2 id="linux">Linux</h2>
+<p>The tar.gz is a portable folder. Unpack it and start the terminal program:</p>
+<pre><code>tar -xzf buildspawn-2.589-buildspawn.21-linux-x64.tar.gz
+cd buildspawn-2.589-buildspawn.21-linux-x64
+bin/buildspawn</code></pre>
+<p>On a first run this opens the launch flow. It asks for the home folder, the port and memory, and how to run:</p>
+<ul>
+  <li><strong>Service:</strong> runs under systemd, starts at boot and restarts after a crash.</li>
+  <li><strong>Portable:</strong> runs in this terminal and stops when you close it.</li>
+</ul>
+<p>Then open <code>http://&lt;this machine&gt;:8080/</code>. In the live monitor, press <kbd>b</kbd> to open it when the machine has a desktop.</p>
+
+<h3>As a systemd service</h3>
+<p>Choose Service in the launch flow, or run:</p>
+<pre><code>sudo bin/buildspawn install-service</code></pre>
+<p>This creates a system user <code>buildspawn</code> with no login, writes <code>/etc/systemd/system/buildspawn.service</code>, enables it at boot and starts it now.</p>
+<ul>
+  <li>Put the folder somewhere the <code>buildspawn</code> user can read, such as <code>/opt/buildspawn</code>. A folder inside your home directory usually isn't readable by it, and install-service checks this.</li>
+  <li>Read the log with <code>journalctl -u buildspawn -f</code>, or in view 5 of the monitor.</li>
+  <li>Remove the service with <code>sudo bin/buildspawn uninstall-service</code>. It keeps the data, the logs and the settings.</li>
+  <li>Builds run as the <code>buildspawn</code> user, so the tools and files they need must be readable by that user.</li>
+</ul>
+<p>In this folder, the settings file is <code>buildspawn.conf</code>, the home is <code>data/</code> and the logs are in <code>logs/</code>.</p>
+<div class="callout warning"><p>Install <code>fontconfig</code> and a font, or the charts in the web interface can't be drawn.</p></div>
+
+<h2 id="packages">Debian, Ubuntu and RHEL packages</h2>
+<p>The packages are for Linux x86-64. They install to <code>/opt/buildspawn</code>, put <code>buildspawn</code> on the PATH, and enable and start the service right away.</p>
+<p>Debian and Ubuntu:</p>
+<pre><code>sudo apt install ./buildspawn_2.589-buildspawn.21_amd64.deb</code></pre>
+<p>RHEL, Rocky and Fedora:</p>
+<pre><code>sudo dnf install ./buildspawn-2.589-buildspawn.21.x86_64.rpm</code></pre>
+<p>There is nothing to start. Open the monitor, or get the first-login password:</p>
+<pre><code>buildspawn
+sudo buildspawn admin-password</code></pre>
+<table>
+  <thead><tr><th>What</th><th>Where</th></tr></thead>
+  <tbody>
+    <tr><td>Program</td><td><code>/opt/buildspawn</code></td></tr>
+    <tr><td>Settings</td><td><code>/etc/default/buildspawn</code> (deb) or <code>/etc/sysconfig/buildspawn</code> (rpm)</td></tr>
+    <tr><td>Home (jobs, builds)</td><td><code>/var/lib/buildspawn</code></td></tr>
+    <tr><td>Logs</td><td><code>/var/log/buildspawn</code> and <code>journalctl -u buildspawn</code></td></tr>
+  </tbody>
+</table>
+<p>Start, stop and restart with <code>sudo buildspawn start|stop|restart</code>, or with <code>systemctl</code>. To upgrade, install the newer package over the old one. Your settings and home are kept.</p>
+
+<h2 id="macos">macOS</h2>
+<p>The macOS package isn't signed by Apple, so macOS blocks it after a browser download. Clear the block once, in Terminal, before the first start (the second line below). On an Intel Mac, use the <code>macos-x64</code> file.</p>
+<pre><code>tar -xzf buildspawn-2.589-buildspawn.21-macos-aarch64.tar.gz
+xattr -dr com.apple.quarantine buildspawn-2.589-buildspawn.21-macos-aarch64
+cd buildspawn-2.589-buildspawn.21-macos-aarch64
+bin/buildspawn</code></pre>
+<ol class="steps">
+  <li>The launch flow opens.</li>
+  <li>Pick <strong>Service</strong> to start Buildspawn whenever you log in (a LaunchAgent; no <code>sudo</code>), or <strong>Portable</strong> to run it in this window.</li>
+  <li>Open <code>http://&lt;this Mac&gt;:8080/</code>, or press <kbd>b</kbd> in the monitor.</li>
+</ol>
+<ul>
+  <li>The service runs as you, so builds can use your Xcode, keychain and tools. It runs while you are logged in. For a build Mac that must come back after a restart, turn on automatic login.</li>
+  <li>The first start may ask to accept incoming network connections. Allow it.</li>
+  <li>The log is <code>logs/buildspawn.log</code>, or view 5 of the monitor.</li>
+  <li>If you move the folder, run <code>bin/buildspawn install-service</code> again.</li>
+</ul>
+
+<h2 id="war">The server alone (.war)</h2>
+<p>If you already run Java 21 and want to manage it yourself, use <code>buildspawn-2.589-buildspawn.21.war</code>. It holds the whole server, with every bundled plugin, but no launcher, service or Java.</p>
+<pre><code>java -jar buildspawn-2.589-buildspawn.21.war --httpPort=8080</code></pre>
+<p>Started like this, the server keeps its home in a folder in your user profile, and you choose the Java memory and options yourself. The other downloads set the home, the port, the memory and the recommended Java options for you, so use them unless you have a reason not to.</p>
+
+<h2>Check the download</h2>
+<p>Each file has a <code>.sha256</code> file next to it. It holds the file's fingerprint. Compare it with the fingerprint of your copy.</p>
+<pre><code># Windows, PowerShell
+Get-FileHash .uildspawn-2.589-buildspawn.21-setup.exe -Algorithm SHA256
+
+# Linux
+sha256sum -c buildspawn-2.589-buildspawn.21-linux-x64.tar.gz.sha256
+
+# macOS
+shasum -a 256 -c buildspawn-2.589-buildspawn.21-macos-aarch64.tar.gz.sha256</code></pre>
+<p>If the two fingerprints differ, download the file again.</p>
+
+<h2>Upgrade from an older version</h2>
+<p>Install 1.9.3 over 1.8, 1.9, 1.9.1 or 1.9.2. Your settings, build configurations, history and permissions stay as they are. Use the same kind of download as before: run the newer setup, or unpack the newer folder and point it at the same data folder, or install the newer package over the old one. Back up the data folder first. See <a href="../administration/backups.html">Backups and upgrades</a>.</p>
+<p>Agents from 1.9 on receive the server's trusted certificates. Download the agent again from <strong>Agents &rsaquo; Install agents</strong> to update an older one. See <a href="../agents/install-agent.html">Install an agent</a>.</p>
+
+<h2 id="next">Next</h2>
+<p>When the server runs, go to <a href="first-start.html">First start and sign-in</a> to create the first administrator.</p>
+
+</main>
+</body>
+</html>

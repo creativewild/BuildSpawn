@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Global connections and Vault · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="administration/global-connections">
+<main class="doc">
+<h1>Global connections and Vault</h1>
+<p class="lead">Connections set on the root project are shared by every project. Set up a service once, such as HashiCorp Vault or a Perforce server, and every build configuration can use it.</p>
+
+<p>The <strong>root project</strong> sits above all your projects. What you set there is passed down to every project and build configuration on the server. To open it, click <strong>Settings › Root project</strong>, or <strong>Root project</strong> in any breadcrumb.</p>
+<p>The root project's <strong>Build settings</strong> tab has a menu on the left:</p>
+<table>
+  <thead><tr><th>Item</th><th>What it holds</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Build settings</strong></td><td>Build steps, parameters, post-build actions and build wrappers that every build configuration on the server gets.</td></tr>
+    <tr><td><strong>Templates</strong></td><td>Templates every project can use. See <a href="../projects/templates.html">Templates</a>.</td></tr>
+    <tr><td><strong>Connections</strong></td><td>Connections to outside services, such as HashiCorp Vault.</td></tr>
+    <tr><td><strong>Perforce roots</strong></td><td>Perforce server connections that many build configurations reuse.</td></tr>
+    <tr><td><strong>Credentials</strong></td><td>User names, passwords, keys and tokens that builds and connections use.</td></tr>
+  </tbody>
+</table>
+
+<h2>Global connections</h2>
+<p>A <strong>connection</strong> is a link to an outside service, with its address and sign-in details. Every build configuration in the project where it is defined, and in all projects below, can pick it by its <strong>connection ID</strong>. A connection on the root project is therefore global.</p>
+<figure class="shot">
+  <img src="../../assets/shots/administration/connections.png" alt="The Connections page of the root project with an Add connection button, an empty list and a note that secrets are stored encrypted">
+  <figcaption>Root project › Build settings › Connections.</figcaption>
+</figure>
+<ul>
+  <li>Connections from a parent project show in the list of a child project too, but you change them where they are defined.</li>
+  <li>Secrets in a connection are stored encrypted and never shown again.</li>
+  <li>To change a connection you need permission to configure the project that holds it.</li>
+</ul>
+
+<h2>Vault</h2>
+<p><strong>HashiCorp Vault</strong> keeps secrets such as signing keys, console SDK passwords and store tokens in one safe place. With a Vault connection, a build reads the secret from Vault at the moment it runs. The secret is never saved in Buildspawn.</p>
+
+<h3>Add a Vault connection</h3>
+<ol class="steps">
+  <li>Open <strong>Root project › Build settings › Connections</strong> and click <strong>Add connection</strong>.</li>
+  <li>For <strong>Connection type</strong>, choose <strong>HashiCorp Vault</strong>.</li>
+  <li>Type a <strong>Display name</strong>, for example <code>Studio Vault</code>. Buildspawn makes the <strong>Connection ID</strong> from it. Jobs refer to the connection by this ID, so don't change it later.</li>
+  <li>Type the <strong>Vault URL</strong>, for example <code>https://vault.example.com:8200</code>.</li>
+  <li>If you use Vault Enterprise namespaces, type the <strong>Vault namespace</strong>. Otherwise leave it empty.</li>
+  <li>Choose how Buildspawn signs in to Vault under <strong>Authentication</strong> (see the table below) and fill in its fields.</li>
+  <li>Click <strong>Test connection</strong>. When the test passes, click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/administration/vault-connection.png" alt="The Add connection dialog with Connection type HashiCorp Vault, fields for display name, connection ID, Vault URL and namespace, and AppRole selected under Authentication with endpoint path and role ID fields">
+  <figcaption>Add a HashiCorp Vault connection.</figcaption>
+</figure>
+
+<table>
+  <thead><tr><th>Authentication</th><th>Fields</th><th>Use it when</th></tr></thead>
+  <tbody>
+    <tr><td><strong>AppRole</strong></td><td><strong>Endpoint path</strong> (where AppRole is mounted in Vault, <code>approle</code> by default), <strong>Role ID</strong> and <strong>Secret ID</strong>.</td><td>The usual choice for a server. Your Vault administrator gives you the role ID and secret ID.</td></tr>
+    <tr><td><strong>LDAP</strong></td><td><strong>Endpoint path</strong> (where LDAP is mounted in Vault), <strong>User name</strong> and <strong>Password</strong>.</td><td>Your Vault signs in with your company directory.</td></tr>
+    <tr><td><strong>GCP IAM</strong></td><td><strong>Role</strong>, an optional <strong>Service account</strong>, the <strong>Credentials</strong> (the agent's own identity from the metadata server, or a pasted service account key in JSON) and the <strong>Endpoint path</strong> (<code>gcp</code> by default).</td><td>Your agents run on Google Cloud. Each agent then signs in with its own Google identity.</td></tr>
+  </tbody>
+</table>
+<p>The secret ID and passwords are stored encrypted and never shown again.</p>
+
+<h3>Use a Vault secret in a build</h3>
+<p>Once the connection exists, a build configuration reads secrets through a parameter that points into Vault. How to add one is in <a href="../parameters/secrets.html">Secrets and Vault references</a>.</p>
+
+<h2 id="perforce-roots">Perforce roots</h2>
+<p>A <strong>Perforce root</strong> is a connection to a Helix Core server with a workspace mapping, defined once and reused by many build configurations. Editing a root changes every build configuration that uses it.</p>
+<figure class="shot">
+  <img src="../../assets/shots/administration/perforce-roots.png" alt="The Perforce roots page with the roots Skyforge main and Skyforge release line, their client mappings, the credential p4-studio and how many build configurations use each, with Edit, Duplicate and Delete buttons">
+  <figcaption>Settings › Perforce roots. The <strong>Used in</strong> column shows how many build configurations use each root.</figcaption>
+</figure>
+<ol class="steps">
+  <li>Open <strong>Settings › Perforce roots</strong> and click <strong>Create root</strong>.</li>
+  <li>Give it a name, pick the server credential, and set the workspace mapping or stream.</li>
+  <li>Click <strong>Save</strong>. The root can now be picked in any build configuration's Version control settings.</li>
+</ol>
+<p>The full Perforce setup is in <a href="../version-control/perforce.html">Perforce</a>. The <strong>Helix Swarm</strong> button sets up the code review server.</p>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="management-pages.html#root-project">Management pages › Root project</a></li>
+  <li><a href="management-pages.html#credentials">Credentials</a> and <a href="management-pages.html#credential-providers">Credential Providers</a></li>
+  <li><a href="system-settings.html#perforce-operations">Perforce operations</a> rules on the System page</li>
+  <li><a href="settings-overview.html">Settings overview</a></li>
+</ul>
+
+<h2>Tips</h2>
+<ul>
+  <li>Put a connection on the lowest project that needs it. A connection on the root project is visible to everybody who can configure any project.</li>
+  <li>Use one Vault connection per Vault server, and limit what it can read with Vault's own policies.</li>
+  <li>Before you delete a Perforce root, check <strong>Used in</strong>. Build configurations that use it stop working.</li>
+</ul>
+</main>
+</body>
+</html>

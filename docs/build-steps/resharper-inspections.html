@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inspections (ReSharper) · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/resharper-inspections">
+<main class="doc">
+<h1>Inspections (ReSharper)</h1>
+<p class="lead">Runs the <code>jb inspectcode</code> command line tool on a solution and lists the issues on the build, as <a href="code-inspections.html">Code Inspections</a> does. The tool is not part of Buildspawn.</p>
+
+<h2>When to use it</h2>
+<p>Use it for C# solutions, including Unity and Unreal Engine C# code, when you have the ReSharper command line tools on the agent.</p>
+
+<h2>How to set it up</h2>
+
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>. Type <code>Inspections (ReSharper)</code> in <strong>Filter step types</strong> if you like, then click the <strong>Inspections (ReSharper)</strong> tile (group <strong>Code quality and coverage</strong>).</li>
+  <li>Type a <strong>Step name</strong>, for example <code>Inspect code</code>.</li>
+  <li>Fill in the fields described below.</li>
+  <li>Optional: set <strong>Execute step</strong>, <strong>Conditions</strong> and <strong>Retry on failure</strong>. See <a href="step-list.html">The steps list and the step editor</a>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<figure class="shot small">
+  <img src="../../assets/shots/build-steps/resharper-inspections.png" alt="The fields of the Inspections (ReSharper) step in the step editor">
+  <figcaption>The fields of the Inspections (ReSharper) step, as the step editor shows them.</figcaption>
+</figure>
+
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Solution</strong></td><td>The solution (<code>.sln</code>) or project file to inspect, relative to the working directory.</td><td>Empty (required)</td><td><code>Game.sln</code></td></tr>
+    <tr><td><strong>Lowest severity</strong></td><td>Passed as <code>--severity</code>. Issues below it are not reported. Choices: Tool default, Information, Hint, Suggestion, Warning, Error.</td><td>Tool default</td><td>Warning</td></tr>
+    <tr><td><strong>InspectCode platform</strong></td><td>Passed as <code>--x86</code> or <code>--x64</code>. <strong>Automatic</strong> passes nothing.</td><td>Automatic</td><td>x64</td></tr>
+    <tr><td><strong>Do not build</strong></td><td>Passed as <code>--no-build</code>. Use it when an earlier step already built the solution.</td><td>Off</td><td>On</td></tr>
+    <tr><td><strong>Arguments</strong></td><td>One argument per line, for example <code>--properties:Configuration=Release</code>.</td><td>Empty</td><td><code>--properties:Configuration=Release</code></td></tr>
+    <tr><td><strong>Limit</strong></td><td>Optional. The step is worse when it finds more issues than this number. Empty means no limit.</td><td>Empty</td><td><code>0</code></td></tr>
+    <tr><td><strong>When over the limit</strong></td><td><strong>The build turns unstable</strong> or <strong>The step fails</strong>.</td><td>The build turns unstable</td><td>The step fails</td></tr>
+    <tr><td><strong>Working directory, Environment variables, Test reports, Run step within container</strong></td><td>The same in every runner. See <a href="common-step-fields.html">Fields every runner has</a>.</td><td></td><td></td></tr>
+  </tbody>
+</table>
+
+
+<h2>A worked example</h2>
+<p>Inspect the game solution after the build. Step name <code>Inspect code</code>, <strong>Solution</strong> <code>Game.sln</code>, <strong>Lowest severity</strong> <code>Warning</code>, tick <strong>Do not build</strong>.</p>
+
+<h2>What you see when it runs</h2>
+<p>The console shows <code>$ jb inspectcode Game.sln --severity=WARNING --no-build …</code>. The issues are listed on the <strong>Code Inspections</strong> page of the build.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong><em>The jb command was not found on this agent</em></strong></td><td>Install the <code>jb</code> command with <code>inspectcode</code> or put <code>jb</code> on the <code>PATH</code>.</td></tr>
+    <tr><td><strong><em>The … step has no solution to inspect</em></strong></td><td>Fill in <strong>Solution</strong>.</td></tr>
+    <tr><td><strong><em>The solution must be a file name</em></strong></td><td>A name that starts with a dash or holds a line break is refused.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="code-inspections.html">Code Inspections</a></li>
+  <li><a href="resharper-duplicates.html">Duplicates (ReSharper)</a></li>
+  <li><a href="runners.html">Runners</a></li>
+  <li><a href="common-step-fields.html">Fields every runner has</a></li>
+</ul>
+</main>
+</body>
+</html>

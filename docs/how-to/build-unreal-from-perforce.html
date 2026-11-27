@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Build an Unreal Engine game from Perforce · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/build-unreal-from-perforce">
+<main class="doc">
+<h1>Build an Unreal Engine game from Perforce</h1>
+<p class="lead">Sync your game from a Perforce depot, then compile, cook and package it for Windows with one Unreal Engine step.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>A <strong>project</strong> to hold the build configuration, for example <strong>Game</strong>. See <a href="../projects/projects.html">Projects</a>.</li>
+  <li>A <strong>Perforce connection</strong>: the server address and a build user with its password or ticket. If nobody has added one yet, you add it in step 4.</li>
+  <li>The <strong>depot path</strong> of your game, for example <code>//depot/skyforge/...</code>, and the name of its <code>.uproject</code> file.</li>
+  <li>A <strong>Windows agent with Unreal Engine installed</strong>, from the Epic launcher or built from source. Buildspawn looks for engines when the agent connects. Open the agent and click the <strong>Unreal Engines</strong> tab to see what it found.</li>
+</ul>
+<figure class="shot">
+  <img src="../../assets/shots/how-to/build-unreal-from-perforce-6.png" alt="The Unreal Engines tab of the agent win-build-01: a Detected engines card that says no Unreal Engine was found, with a Detect again button, and a BuildGraph card listing UNREAL_BUILDGRAPH_AGENT_TYPE and UNREAL_BUILDGRAPH_SHARED_DIR">
+  <figcaption>The agent's Unreal Engines tab. This demo agent has no engine; yours should list one.</figcaption>
+</figure>
+
+<h2>Steps</h2>
+<h3>Create the build configuration</h3>
+<ol class="steps">
+  <li>Open your project and click <strong>New Item</strong>.</li>
+  <li>Type a name, for example <code>Windows Build</code>, choose <strong>Freestyle project</strong> and click <strong>OK</strong>. The build configuration opens on its <strong>Settings</strong> tab.</li>
+</ol>
+
+<h3>Connect it to Perforce</h3>
+<ol class="steps">
+  <li>Click <strong>Version Control</strong> and choose <strong>Perforce Software</strong>.</li>
+  <li>Under <strong>P4 Credentials</strong>, pick your studio's connection, for example <strong>Studio Helix Core (buildbot)</strong>. If there is none, click <strong>Add</strong> and fill in the server (<code>ssl:perforce.studio.example:1666</code>), the user and the password or ticket.</li>
+  <li>Set <strong>Workspace behaviour</strong> to <strong>Manual (custom view)</strong>.</li>
+  <li>In <strong>Workspace name</strong>, type a name for the Perforce workspace that ends with the agent's name, for example <code>skyforge-ue-win64-${NODE_NAME}</code>. Each agent then gets its own workspace.</li>
+  <li>In <strong>View Mappings</strong>, map the depot into that workspace:
+<pre><code>//depot/skyforge/... //skyforge-ue-win64-${NODE_NAME}/...</code></pre></li>
+  <li>Under <strong>Populate options</strong>, choose <strong>Auto cleanup and sync</strong>. It syncs only what changed and removes files that should not be there, such as old build output.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/how-to/build-unreal-from-perforce-1.png" alt="The Version Control settings of HT1 Unreal Windows Build: Perforce Software chosen, P4 Credentials set to Studio Helix Core (buildbot), Workspace behaviour Manual (custom view), Character Set none and Workspace name skyforge-ue-win64-${NODE_NAME}">
+  <figcaption>The Perforce connection and a workspace name per agent.</figcaption>
+</figure>
+<div class="callout tip"><p>If your depot uses streams, choose <strong>Streams</strong> as the workspace behaviour and type the stream, for example <code>//skyforge/main</code>. Buildspawn writes the view for you. See <a href="../version-control/perforce.html">Perforce</a>.</p></div>
+
+<h3>Add the Unreal Engine step</h3>
+<ol class="steps">
+  <li>Click <strong>Build Steps</strong>, then <strong>Add build step</strong>.</li>
+  <li>Type <code>Unreal</code> in <strong>Filter step types</strong> and click the <strong>Unreal Engine</strong> tile.</li>
+  <li>In <strong>Step name</strong>, type <code>Build, cook and package</code>.</li>
+  <li>Leave <strong>Engine detection mode</strong> on <strong>Automatic</strong> and type the engine version in <strong>Identifier</strong>, for example <code>5.4</code>. The step then runs only on agents that have that engine. For an engine in a folder of your own, choose <strong>Manual</strong> and fill in <strong>Root dir</strong> instead.</li>
+  <li>Leave <strong>Command</strong> on <strong>BuildCookRun</strong>.</li>
+  <li>In <strong>Project</strong>, type the path of the <code>.uproject</code> file in the workspace, for example <code>Skyforge.uproject</code>. After a first build, <strong>Detect projects</strong> finds it for you.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/how-to/build-unreal-from-perforce-3.png" alt="Edit build step for HT1 Unreal Windows Build: Runner type Unreal Engine, Step name Build, cook and package, Step ID build_cook_and_package, Engine detection mode Automatic, Identifier 5.4, Command BuildCookRun, Project Skyforge.uproject and a Detect projects button">
+  <figcaption>The engine and the project.</figcaption>
+</figure>
+<ol class="steps" start="7">
+  <li>Leave <strong>Build configuration</strong> on <strong>Standalone game</strong>.</li>
+  <li>Under <strong>Target configurations</strong>, tick <strong>Development</strong>. Under <strong>Target platforms</strong>, tick <strong>Win64</strong>. To build more than one, tick more boxes; the field joins them with <code>+</code>.</li>
+  <li>Keep <strong>Cook</strong>, <strong>Stage</strong>, <strong>Package</strong> and <strong>Archive</strong> ticked. Open <strong>Advanced</strong> and set the <strong>Archive directory</strong> to <code>Output</code>.</li>
+  <li>Leave <strong>Additional arguments</strong> as they are. They make the engine run without windows or prompts on a build machine.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/how-to/build-unreal-from-perforce-4.png" alt="The lower part of the Unreal Engine step: Build configuration Standalone game, Target configurations Development with Development ticked, Target platforms Win64 with Win64 ticked, Cook, Stage, Package and Archive ticked, and Additional arguments -utf8output -buildmachine -unattended -noP4 -nosplash -stdout -NoCodeSign">
+  <figcaption>What to build and which stages to run.</figcaption>
+</figure>
+
+<h3>Keep the package and run it</h3>
+<ol class="steps" start="12">
+  <li>Open <strong>More › Post-build Actions</strong>, add <strong>Archive the artifacts</strong> and type <code>Output/**</code> in <strong>Files to archive</strong>. Click <strong>Save</strong>.</li>
+  <li>Click <strong>Run</strong>.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/how-to/build-unreal-from-perforce-2.png" alt="The Build Steps page of HT1 Unreal Windows Build with one step: Build, cook and package, runner Unreal Engine, summary BuildCookRun Skyforge.uproject, run if all previous steps finished successfully, enabled">
+  <figcaption>The finished build configuration: one Unreal Engine step.</figcaption>
+</figure>
+
+<h2>Check it worked</h2>
+<ul>
+  <li>The build log starts with the Perforce sync into <code>skyforge-ue-win64-</code> plus the agent's name, then <strong>[Step 1/1] Build, cook and package</strong>.</li>
+  <li>Errors and warnings from the engine are picked out of the log for you. See <a href="../build-results/build-console.html">The build console</a>.</li>
+  <li>The <strong>Changes</strong> tab of the build lists the changelists since the last build.</li>
+  <li>The package is under <strong>Artifacts</strong> on the build page.</li>
+</ul>
+<div class="callout note"><p>The demo server used for this guide has no Unreal Engine on its agents, so the screenshots stop at the settings and at the queue below. On a machine with the engine, the same settings run the full build.</p></div>
+
+<h2>Troubleshooting</h2>
+<h3>The build waits in the queue</h3>
+<p>Open <strong>Queue</strong> and read the <strong>Wait reason</strong>. <em>has no Unreal Engine that matches '5.4'</em> means no online agent reported that engine. Check the agent's <strong>Unreal Engines</strong> tab and click <strong>Detect again</strong> after you install the engine, or change the <strong>Identifier</strong> to a version the agent has.</p>
+<figure class="shot">
+  <img src="../../assets/shots/how-to/build-unreal-from-perforce-5.png" alt="The Build Queue page: How-to » HT1 Unreal Windows Build waits with the reason that each Windows agent has no Unreal Engine that matches 5.4, and that the other agents do not have the label win64">
+  <figcaption>The wait reason names each agent and why it can't take the build.</figcaption>
+</figure>
+<h3>Two agents fight over one workspace</h3>
+<p>A Perforce workspace belongs to one machine. If the <strong>Workspace name</strong> has no <code>${NODE_NAME}</code>, two agents use the same workspace and sync files they don't have. Put <code>${NODE_NAME}</code> in both the name and the right side of the view.</p>
+<h3>The step can't find the project</h3>
+<p>The <strong>Project</strong> path is relative to the workspace. If the game is in a subfolder of the depot, include it, for example <code>Games/Skyforge/Skyforge.uproject</code>. Click <strong>Detect projects</strong> to list the <code>.uproject</code> files of the last workspace.</p>
+<h3>The sync fails with a password error</h3>
+<p>The connection's password or ticket is wrong or expired. Buildspawn shows the problem on the build configuration page and in its settings. Update the connection on the <strong>Credentials</strong> page where it was added: the project's, or the server's under <strong>Settings</strong>.</p>
+
+<h2>Next steps</h2>
+<div class="cards">
+  <a class="card" href="build-every-submit.html"><h3>Build every Perforce submit</h3><p>Start this build by itself when someone submits.</p></a>
+  <a class="card" href="check-shelf-before-submit.html"><h3>Test a shelved change</h3><p>Build a shelf before it reaches the depot.</p></a>
+  <a class="card" href="../game-builds/unreal.html"><h3>Unreal Engine step</h3><p>Every field and command, such as BuildGraph and automation tests.</p></a>
+  <a class="card" href="../version-control/perforce.html"><h3>Perforce</h3><p>Streams, shelves, shared roots and the workbench tabs.</p></a>
+</div>
+</main>
+</body>
+</html>

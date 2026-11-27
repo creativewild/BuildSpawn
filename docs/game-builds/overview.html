@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Game builds and stores · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="game-builds/overview">
+<main class="doc">
+<h1>Game builds and stores</h1>
+<p class="lead">Build your game with Unity or Unreal Engine, then send it to Steam or the Epic Games Store, all from one build configuration.</p>
+
+<h2>When to use it</h2>
+<p>Use these steps for a game pipeline: get the code from <a href="../version-control/perforce.html">Perforce</a> or <a href="../version-control/git.html">Git</a>, build with the engine, then upload the result to a store and put it on a branch.</p>
+
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Set the <a href="../version-control/overview.html">version control</a> of the build configuration.</li>
+  <li>Add a build step for your engine: <a href="unity.html">Unity</a> or <a href="unreal.html">Unreal Engine</a>.</li>
+  <li>Add the store steps you need. Each store has an install step, an upload step and some extra steps. Add the store credential first.</li>
+  <li>Click <strong>Save</strong> and <strong>Run</strong>.</li>
+</ol>
+
+<h2>The pages</h2>
+<h3>Engines</h3>
+<div class="cards">
+  <a class="card" href="unity.html"><h3>Unity step</h3><p>Batch-mode builds, targets and the Editor tool.</p></a>
+  <a class="card" href="unity-license.html"><h3>Unity build settings</h3><p>Unity account and serial.</p></a>
+  <a class="card" href="unreal.html"><h3>Unreal Engine step</h3><p>BuildCookRun, BuildGraph, tests.</p></a>
+  <a class="card" href="ugs-badge.html"><h3>UGS metadata badge</h3><p>Post a result badge to the metadata server.</p></a>
+</div>
+<h3>Steam</h3>
+<div class="cards">
+  <a class="card" href="steam-overview.html"><h3>Steam overview</h3><p>How the pieces fit.</p></a>
+  <a class="card" href="steam-account.html"><h3>Steam build account</h3><p>The credential and Steam Guard.</p></a>
+  <a class="card" href="install-steamcmd.html"><h3>Install SteamCMD</h3><p>Get the Steam upload tool.</p></a>
+  <a class="card" href="steam-upload.html"><h3>Steam upload</h3><p>Depots, branch, description.</p></a>
+  <a class="card" href="steam-drm-wrap.html"><h3>Steam: DRM wrap</h3><p>Wrap the game executable.</p></a>
+  <a class="card" href="steam-check-build.html"><h3>Steam: check build</h3><p>Check a build after upload.</p></a>
+  <a class="card" href="steam-set-live.html"><h3>Steam: set branch live</h3><p>Put a build on a branch.</p></a>
+  <a class="card" href="steam-workshop.html"><h3>Steam: workshop item</h3><p>Publish a workshop item.</p></a>
+</div>
+<h3>Epic Games Store</h3>
+<div class="cards">
+  <a class="card" href="epic-overview.html"><h3>Epic overview</h3><p>How the eight steps fit.</p></a>
+  <a class="card" href="epic-credentials.html"><h3>Epic credential and tool setup</h3><p>Credential and tool folder.</p></a>
+  <a class="card" href="install-buildpatch-tool.html"><h3>Install BuildPatch Tool</h3><p>Get the upload tool.</p></a>
+  <a class="card" href="epic-upload.html"><h3>Epic Games Store upload</h3><p>Upload a binary.</p></a>
+  <a class="card" href="epic-optimise.html"><h3>Epic: optimise patch</h3><p>Make smaller patches.</p></a>
+  <a class="card" href="epic-label.html"><h3>Epic: label binary</h3><p>Put a label on a build.</p></a>
+  <a class="card" href="epic-inspect.html"><h3>Epic: inspect binaries</h3><p>List and compare.</p></a>
+  <a class="card" href="epic-download.html"><h3>Epic: download binary</h3><p>Get a build back.</p></a>
+  <a class="card" href="epic-copy.html"><h3>Epic: copy binary</h3><p>Copy to another label.</p></a>
+  <a class="card" href="epic-delete.html"><h3>Epic: delete binary</h3><p>Remove an old build.</p></a>
+</div>
+
+<h2>A worked example</h2>
+<p>Skyforge builds a Unity game from Perforce on a Windows agent, then uploads it to Steam. See <a href="../how-to/game-unity-perforce-steam.html">Build Unity from Perforce and upload to a Steam branch</a>. For the Epic Games Store, see <a href="../how-to/game-publish-epic.html">Publish a build to the Epic Games Store</a>.</p>
+
+<h2>What you see when it runs</h2>
+<p>Each step is a block in the build log. Upload steps print the files sent and the build ID the store gave. Secrets are hidden in the log.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>You see</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>The build waits in the queue</td><td>No agent has the engine or the tool. Open the queue and read the wait reason.</td></tr>
+    <tr><td>An upload step fails on sign-in</td><td>Check the store credential on its page.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../how-to/build-unreal-from-perforce.html">Build an Unreal Engine game from Perforce</a>, <a href="../how-to/build-unity-from-git.html">Build a Unity project from Git</a></li>
+</ul>
+</main>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parameter with a value type · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="parameters/param-typed">
+<main class="doc">
+<h1>Parameter with a value type</h1>
+<p class="lead">The parameter you create with Add parameter: one name, one kind, and a value type that decides what people can enter.</p>
+
+<h2>When to use it</h2>
+<p>Use it for every new parameter. Text, Checkbox, Password, Select and Remote cover the old String, Boolean, Password and Choice parameters, and add rules, labels and values fetched from a vault.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Parameters</strong>.</li>
+  <li>Click <strong>Add parameter</strong>.</li>
+  <li>Type the <strong>Name</strong> and choose the <strong>Kind</strong>.</li>
+  <li>Choose the <strong>Value type</strong>: <strong>Text</strong>, <strong>Checkbox</strong>, <strong>Password</strong>, <strong>Select</strong> or <strong>Remote</strong>. The fields below change with it.</li>
+  <li>Fill in the value and the rules. Optional: open <strong>Customize the run dialog</strong>.</li>
+  <li>Click <strong>Save</strong>. The Parameters tab saves as you work, so there is no other Save button.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+<thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>Name</td><td>The name, without a prefix. Unique in the build configuration.</td><td>Empty</td><td><code>BUILD_TARGET</code></td></tr><tr><td>Kind</td><td>Configuration, Environment variable (<code>env.</code>) or System property (<code>system.</code>). See <a href="parameters.html#kinds">The three kinds</a>.</td><td>Configuration parameter</td><td>Environment variable (env.)</td></tr><tr><td>Value type</td><td>What people can enter. <strong>Remote</strong> is offered only when a remote source, such as HashiCorp Vault, is installed.</td><td>Text</td><td>Select</td></tr><tr><td>Value</td><td>The default value (not for Remote). For Select it is the item that starts selected; blank starts with the first item, or with nothing ticked when multiple is allowed. For Checkbox it must be the checked or unchecked value; empty means unchecked.</td><td>Empty</td><td><code>Shipping</code></td></tr><tr><td>Show allowed value: Any, Not empty, Regex</td><td>Text only. <strong>Any</strong> accepts all text. <strong>Not empty</strong> refuses an empty value. <strong>Regex</strong> needs the whole value to match your pattern.</td><td>Any</td><td>Regex <code>\d+\.\d+\.\d+</code></td></tr><tr><td>Message when it does not match</td><td>Text shown when a value fails the Regex rule.</td><td>Empty</td><td>Use a version like 1.4.0</td></tr><tr><td>Checked value / Unchecked value</td><td>Checkbox only: what the parameter is when the box is on or off.</td><td><code>true</code> / empty</td><td><code>-clean</code> / empty</td></tr><tr><td>Allow multiple</td><td>Select only: people may tick several items.</td><td>Off</td><td>On</td></tr><tr><td>Value separator</td><td>Select with Allow multiple: goes between the ticked values.</td><td>A comma</td><td><code>;</code></td></tr><tr><td>Items</td><td>Select only: one per line, as <code>label =&gt; value</code> or just <code>value</code>.</td><td>Empty</td><td><code>Debug build =&gt; Debug</code></td></tr><tr><td>Source, Test query</td><td>Remote only: where the value is fetched when the build starts, and a button to check the query. The value found is never shown.</td><td>-</td><td>HashiCorp Vault</td></tr><tr><td>Customize the run dialog</td><td>Opens <strong>Display</strong>, <strong>Description</strong>, <strong>Label</strong> and <strong>Read-only</strong>. See <a href="param-prompt.html">Asked parameters</a>.</td><td>Closed</td><td>-</td></tr>
+</tbody>
+</table>
+
+<h2>A worked example</h2>
+<p>The Windows Build asks for the build type. Add a parameter named <code>CONFIG</code>, kind <strong>Configuration parameter</strong>, value type <strong>Select</strong>, items <code>Development</code>, <code>Shipping</code>, <code>Debug build =&gt; Debug</code>. A step then runs:</p><pre><code>powershell -File Build\ci.ps1 -Stage compile -Config %CONFIG%</code></pre>
+<h2>What you see when it runs</h2>
+<p>The Parameters tab lists the row with its kind and <em>Asked when the build runs</em>. In the <a href="../running-builds/run-dialog.html">Run dialog</a> people see a list. A value that breaks the rules is refused, so the build does not start.</p>
+<h2>Problems and fixes</h2>
+<table>
+<thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+<tbody>
+<tr><td>The name is refused</td><td>Names are unique in a build configuration.</td></tr><tr><td>The Regex message appears in the Run dialog</td><td>The value did not match the whole pattern. You do not need anchors: the whole value must match.</td></tr><tr><td>Remote is missing from Value type</td><td>No remote source is installed on this server. See <a href="secrets.html#vault">Vault</a>.</td></tr>
+</tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="parameters.html">Parameters</a></li>
+  <li><a href="param-references.html">Parameter references</a></li>
+  <li><a href="../running-builds/run-dialog.html">The Run dialog</a></li>
+  <li><a href="param-string.html">String</a>, <a href="param-boolean.html">Boolean</a>, <a href="param-choice.html">Choice</a>, <a href="param-password.html">Password</a></li>
+</ul>
+</main>
+</body>
+</html>

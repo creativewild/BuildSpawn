@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Configured build step · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/configured-build-step">
+<main class="doc">
+<h1>Configured build step</h1>
+<p class="lead">The Configured build step is the wrapper around the steps you edit on the Build Steps page. It holds what is the same for every runner: name, ID, on/off switch, when it runs, conditions, retry, outputs and where it runs.</p>
+<h2>When to use it</h2>
+<p>You never add this step yourself. Buildspawn wraps a runner in it when the step has any setting that differs from the plain default, such as a name, a condition or a retry. You meet it in settings files and in the API, where a step appears as a <em>Configured build step</em> that holds the real runner. Knowing this helps you read those files.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Steps</strong>.</li>
+  <li>Click <strong>Edit</strong> on a step, or add a new one.</li>
+  <li>Change any field in the table below and click <strong>Save</strong>. Buildspawn wraps the runner if it needs to.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Step name</strong></td><td>Shown in the list, on the build page and in the console.</td><td>The runner name</td><td><code>Package for Steam</code></td></tr>
+    <tr><td><strong>Step ID</strong></td><td>Fixed after creation. Used in <code>BUILD_STEP_STATUS_&lt;ID&gt;</code>.</td><td>Made from the name</td><td><code>package_steam</code></td></tr>
+    <tr><td><strong>Enabled</strong></td><td>A disabled step stays in the list and does not run.</td><td>On</td><td>Off</td></tr>
+    <tr><td><strong>Execute step</strong></td><td>The execution policy. Five choices; see <a href="step-list.html">The steps list</a>.</td><td>If all previous steps finished successfully</td><td>Only if build status is failed</td></tr>
+    <tr><td><strong>Conditions</strong></td><td>All must be true for the step to run.</td><td>None</td><td><code>PLATFORM</code> matches regex <code>Win.*</code></td></tr>
+    <tr><td><strong>Retry on failure, Wait between attempts, Only for exit codes</strong></td><td>Try a failed step again. See <a href="resume-and-retry.html">Resume and retry</a>.</td><td>0 tries</td><td>2 tries, 30 seconds</td></tr>
+    <tr><td><strong>Outputs</strong></td><td>Values the step declares. A step that ends without setting one fails.</td><td>None</td><td><code>version</code></td></tr>
+    <tr><td><strong>Run on, Passes on, Fallback after, Files sent back</strong></td><td>Run the step on another machine. See <a href="parallel-blocks.html">Parallel blocks and overrides</a>.</td><td>Same machine as before</td><td>A pool or label</td></tr>
+    <tr><td><strong>Environment variables</strong></td><td>Set for this step only, over the build configuration's own.</td><td>None</td><td><code>CONFIG=Shipping</code></td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p>You add a <strong>Command Line</strong> step named <code>Collect crash dumps</code> and set it to run <em>Only if build status is failed</em>. It is now a Configured build step with the Command Line runner inside. A step left at all defaults stays a plain runner, so older settings keep working.</p>
+<h2>What you see when it runs</h2>
+<p>The console block is titled <code>[Step 3/5] Collect crash dumps (Command Line)</code>: the step name, then the runner. The runner's own output is inside the block.</p>
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong>A step in a settings file looks different from the page</strong></td><td>The file shows the wrapper and the runner inside it. The page shows both as one step.</td></tr>
+    <tr><td><strong>A step shows no name</strong></td><td>The runner name is used, for example <em>Command Line</em>. Give the step a name.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="step-list.html">The steps list and the step editor</a></li>
+  <li><a href="shared-steps.html">Steps shared from a project or template</a></li>
+  <li><a href="../reference/settings-files.html">Settings files</a></li>
+</ul>
+</main>
+</body>
+</html>

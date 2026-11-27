@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Run steps in parallel on several agents · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/run-steps-in-parallel">
+<main class="doc">
+<h1>Run steps in parallel on several agents</h1>
+<p class="lead">Cut build time by running independent work, such as a content cook and a shader compile, on two agents at the same time.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>You can edit the build configuration (its <strong>Settings</strong> tab).</li>
+  <li>At least two agents can run this build configuration. They must be in a pool that serves its project (see <a href="../agents/pools.html">Pools</a>).</li>
+  <li>The steps you run side by side don't need each other's output.</li>
+</ul>
+
+<h2>Steps</h2>
+<ol class="steps">
+  <li>Open the build configuration, click the <strong>Settings</strong> tab, then <strong>Build Steps</strong>.</li>
+  <li>Click <strong>Add Parallel block</strong>. A block named <strong>Parallel</strong> with two empty sides is added. Drag it to where it should run, for example after a <strong>Prepare</strong> step.</li>
+  <li>Give the block a clear name, for example <code>Cook and shaders</code>.</li>
+  <li>Under <strong>How the sides run</strong>, choose <strong>Separate machines</strong>. Each side then runs as a side build on its own agent.</li>
+  <li>Under <strong>If one side fails</strong>, keep <strong>Let the others finish</strong>, or choose <strong>Stop the others</strong> to save agent time.</li>
+  <li>Name the first side, for example <code>Cook Win64</code>, and click <strong>Add step</strong> in its header to add its steps.</li>
+  <li>Set the side's <strong>Run on</strong>: <strong>A specific agent</strong>, <strong>A pool or label</strong>, or <strong>Any matching machine</strong>. Here it is the agent <code>win-build-01</code>.</li>
+  <li>In <strong>Files sent back</strong>, add a rule for the files that later steps need, for example <code>Saved/Cooked/**</code>.</li>
+  <li>Set up the second side the same way, for example <code>Compile shaders</code> on <code>win-build-02</code>, sending back <code>Saved/Shaders/**</code>. Click <strong>Add side</strong> if you need more sides.</li>
+  <li>Under <strong>After the block</strong>, leave <strong>Fallback after</strong> at <code>10</code> minutes unless your agents are often busy for longer.</li>
+  <li>Save, then click <strong>Run</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/how-to/run-steps-in-parallel-1.png" alt="Build Steps of HT2 Parallel Cook: step 1 Prepare, step 2 a Parallel block named Cook and shaders set to Separate machines and Let the others finish, side 1 Cook Win64 on win-build-01 sending back Saved/Cooked/**, side 2 Compile shaders on win-build-02 sending back Saved/Shaders/**, and step 3 Package"><figcaption>A Parallel block with two sides, each on its own agent.</figcaption></figure>
+
+<h2>Check it worked</h2>
+<ol class="steps">
+  <li>Open the running build. Under <strong>Build steps</strong>, the block shows <strong>Running</strong> and the steps after it show <strong>Waiting</strong>.</li>
+  <li>Open <strong>Agents</strong>. Both agents show <strong>Building</strong>, with the same build configuration under <strong>Current build</strong>.</li>
+  <li>When the build ends, open <strong>Console Output</strong> and click <strong>Expand all</strong>. The block has one section per side, with the agent it ran on and its time, then a line for each set of files copied back.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/how-to/run-steps-in-parallel-3.png" alt="Build #1 of HT2 Parallel Cook while running: Prepare succeeded, Cook and shaders running, Package waiting"><figcaption>The main build waits while its sides run.</figcaption></figure>
+<figure class="shot"><img src="../../assets/shots/how-to/run-steps-in-parallel-4.png" alt="The Agents page: win-build-01 and win-build-02 are both Building How-to » HT2 Parallel Cook at the same time"><figcaption>Both sides run at once, on two agents.</figcaption></figure>
+<figure class="shot"><img src="../../assets/shots/how-to/run-steps-in-parallel-5.png" alt="Console Output after Expand all: the Cook and shaders block holds a Cook Win64 section that passed in 27 sec on win-build-01 and a Compile shaders section that passed in 22 sec on win-build-02, then lines that copy the files each side sent back"><figcaption>Each side has its own section in the console.</figcaption></figure>
+
+<h2>When the sides are the same steps for many platforms</h2>
+<p>If every side runs the same steps with a different value, such as <code>platform</code> &times; <code>config</code>, use a <strong>Matrix</strong> block instead. You write the steps once, give the values, and every combination runs as its own side with <code>%platform%</code> and <code>%config%</code>. You can exclude combinations, choose where each runs, set how many run at once and pick a combination to try first. The build page then shows a grid of the results with a <strong>Re-run</strong> for each combination. See <a href="../running-builds/side-builds.html">Side builds</a>.</p>
+
+<h2>Troubleshooting</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>A side waits and never starts.</td><td>The agent in <strong>Run on</strong> is busy, offline, or not in a pool that serves this project. Open the queue to read the reason. Pick a pool instead of one agent, or add the project to the agent's pool.</td></tr>
+    <tr><td>The step after the block can't find a file.</td><td>Add a <strong>Files sent back</strong> rule on the side that makes the file. Only files that match a rule come back.</td></tr>
+    <tr><td>A side fails on its second run only.</td><td>Side builds reuse their agent's workspace. Make scripts safe to run twice, for example create a folder only when it is missing.</td></tr>
+    <tr><td>The build goes on on another agent after the block.</td><td>The first agent was not free again within <strong>Fallback after</strong>. Raise the minutes, or tick <strong>Never fall back</strong>.</td></tr>
+  </tbody>
+</table>
+
+<h2>Next steps</h2>
+<ul>
+  <li><a href="../running-builds/side-builds.html">Side builds</a>: how they look in the queue and on the build page.</li>
+  <li><a href="../build-steps/parallel-blocks.html">Parallel blocks and overrides</a>: every option, including <strong>This machine</strong> mode and per-step <strong>Run on</strong>.</li>
+  <li><a href="../running-builds/parallel-and-composite.html">Parallel tests and composite builds</a>.</li>
+  <li><a href="set-up-console-pool.html">Create a pool for console devkits</a>.</li>
+</ul>
+</main>
+</body>
+</html>

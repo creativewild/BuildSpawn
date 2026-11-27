@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Steam: set branch live · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="game-builds/steam-set-live">
+<main class="doc">
+<h1>Steam: set branch live</h1>
+<p class="lead">Set an uploaded build live on a Steam beta branch, after your tests have passed.</p>
+
+<h2>When to use it</h2>
+<p>Use it when you do not want to publish at upload time. Upload with <a href="steam-upload.html">Steam upload</a> and leave <strong>Set live on branch</strong> empty, run your tests, and then use this step. It needs no SteamCMD. It calls Steam's Web API with your Web API key.</p>
+
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Add a <strong>Secret text</strong> credential that holds your publisher Steam Web API key.</li>
+  <li>Open the build configuration and go to <strong>Settings › Build steps › Add build step › Steam: set branch live</strong>.</li>
+  <li>Choose the <strong>Steam Web API key</strong>.</li>
+  <li>Type the <strong>App ID</strong> and the <strong>Branch</strong>. Leave <strong>Build ID</strong> on <code>%BUILD_ID%</code>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/game-builds/steam-set-live.png" alt="The Steam: set branch live step form with App ID, Build ID and Branch"><figcaption>The Steam: set branch live step.</figcaption></figure>
+
+<h2>Every field</h2>
+<table>
+  <tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr>
+  <tr><td><strong>Steam Web API key</strong></td><td>A Secret text credential. It is sent from Buildspawn, not from a shell, and shown as <code>********</code> in the log.</td><td>None</td><td><code>steam-web-key</code></td></tr>
+  <tr><td><strong>App ID</strong></td><td>Your app number.</td><td>None</td><td><code>1000480</code></td></tr>
+  <tr><td><strong>Build ID</strong></td><td>The build to set live. Must be a number.</td><td><code>%BUILD_ID%</code></td><td><code>%BUILD_ID%</code></td></tr>
+  <tr><td><strong>Branch</strong></td><td>The beta branch. Required. <code>default</code> and <code>public</code> are refused, and the form tells you so.</td><td>None</td><td><code>nightly</code></td></tr>
+  <tr><td><strong>Description</strong></td><td>Optional text for the build in Steamworks.</td><td>Empty</td><td><code>Passed smoke tests</code></td></tr>
+  <tr><td><strong>Call Steam from the server</strong></td><td>Off: the call is made from the agent of the build. On: from the Buildspawn server.</td><td>Off</td><td>Off</td></tr>
+  <tr><td><strong>Hands on to later steps</strong></td><td><code>LIVE_BUILD_ID</code>: the build that is live on the branch.</td><td>Not editable</td><td></td></tr>
+</table>
+<div class="callout warning"><p>Steam can ask the account holder to confirm a change on the Steam Mobile app. The step then stops with a message and fails. It never waits for a phone. The default branch is never set live by a build.</p></div>
+
+<h2>Who may use it</h2>
+<p>Both adding this step and running a build that sets a branch live need <strong>Steam / Set branch live</strong> on the build configuration. See the <a href="steam-overview.html">overview</a>.</p>
+
+<h2>A worked example</h2>
+<p>A nightly job uploads build <code>15870342</code>, runs automated tests, then runs this step with branch <code>nightly</code> and the description <code>Passed smoke tests</code>. Testers who opted into <code>nightly</code> in Steam get the build.</p>
+
+<h2>What you see when it runs</h2>
+<ul>
+  <li>A line with the app, build and branch and the key as <code>********</code>, then <em>answered …</em>.</li>
+  <li><code>LIVE_BUILD_ID</code> is set for later steps.</li>
+</ul>
+
+<h2>Problems and fixes</h2>
+<table>
+  <tr><th>Message</th><th>What to do</th></tr>
+  <tr><td>The branch … cannot be set live by a build. Set it live on the Builds page in Steamworks.</td><td>You used <code>default</code> or <code>public</code>. Use a beta branch.</td></tr>
+  <tr><td>Steam wants the account holder to confirm this change in the Steam Mobile app</td><td>A job cannot confirm it. Set the build live on the Builds page in Steamworks, or confirm on the phone and run the step again.</td></tr>
+  <tr><td>The person who started this build may not set a branch live on Steam</td><td>Give that person <strong>Steam / Set branch live</strong>. Nothing was sent to Steam.</td></tr>
+  <tr><td>The branch is missing / The build ID … is missing or is not a number</td><td>Fill in the field, and make sure the upload step set <code>BUILD_ID</code>.</td></tr>
+  <tr><td>Steam answered …: …</td><td>Steam refused the call. Check the key, the App ID and that the branch exists.</td></tr>
+  <tr><td>Steam did not answer</td><td>The network call failed. Check that the agent (or the server) can reach Steam.</td></tr>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="steam-upload.html">Steam upload</a></li>
+  <li><a href="steam-check-build.html">Steam: check build</a></li>
+  <li><a href="steam-overview.html">Steam upload: overview</a></li>
+</ul>
+</main>
+</body>
+</html>

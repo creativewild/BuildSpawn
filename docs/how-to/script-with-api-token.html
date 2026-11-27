@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Start builds from a script · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/script-with-api-token">
+<main class="doc">
+<h1>Start builds from a script</h1>
+<p class="lead">Make an API token, then start a build with parameters from curl or PowerShell, wait for it and read its result.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>You have the Build permission on the build configuration, for example through the Developer role.</li>
+  <li>You know the build configuration's address. Open it in the browser and copy the address, for example <code>http://buildserver:8080/job/How-to/job/HT3%20Scripted%20build/</code>. Each project adds a <code>job/&lt;name&gt;/</code> part, and spaces become <code>%20</code>.</li>
+  <li>You know its parameter names. They are listed on the build configuration's <strong>Settings › Parameters</strong>, and in the <strong>Run</strong> dialog. The examples use <code>PLATFORM</code> and <code>CONFIG</code>.</li>
+  <li>curl comes with Windows 10 and later, macOS and most Linux systems. In Windows PowerShell 5.1, type <code>curl.exe</code>, because plain <code>curl</code> is a different command there.</li>
+</ul>
+
+<h2>Steps</h2>
+<h3>Make a token</h3>
+<ol class="steps">
+  <li>Click your initial at the right of the top bar and choose <strong>Security</strong>.</li>
+  <li>Under <strong>API Token</strong>, in <strong>Add new token</strong>, type a <strong>Name</strong> that says where the token is used, for example <code>ht3-script</code>.</li>
+  <li>Choose an <strong>Expiration</strong>, for example <strong>90 Days</strong>, and click <strong>Generate</strong>.</li>
+  <li>Copy the token and store it somewhere safe, such as a password manager or a secret in the tool that runs your script. Then click <strong>Done</strong>. You can't see the token again.</li>
+  <li>Put it in an environment variable for your script, for example <code>BUILDSPAWN_API_TOKEN</code>. Never write it in a script that is checked in.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/how-to/script-with-api-token-1.png" alt="The Security page of the user docs: the Password section, then API Token with the Current token(s) table listing docs-d-build-scripts and ht3-script (This token does not expire, created 13 min ago, last used 1 min 14 sec ago), each with a pencil and a red bin; below it Add new token with a Name box, Expiration set to 30 Days and a Generate button">
+  <figcaption>The token <code>ht3-script</code> in the token table. <strong>Last used</strong> shows when a script last signed in with it.</figcaption>
+</figure>
+
+<h3>Start a build with curl</h3>
+<ol class="steps">
+  <li>Send a POST to <code>buildWithParameters</code>, with your user name and the token, and one <code>--data-urlencode</code> per parameter:
+<pre><code>curl -i -X POST -u "docs:$BUILDSPAWN_API_TOKEN" \
+  "http://buildserver:8080/job/How-to/job/HT3%20Scripted%20build/buildWithParameters" \
+  --data-urlencode "PLATFORM=PS5" \
+  --data-urlencode "CONFIG=Shipping"</code></pre>
+  </li>
+  <li>Check the answer. <code>201 Created</code> means the build is in the queue. The <code>Location</code> line is the queue item's address:
+<pre class="terminal" data-title="bash">HTTP/1.1 <span class="t-green">201 Created</span>
+Location: http://buildserver:8080/queue/item/54/</pre>
+  </li>
+</ol>
+<p>Parameters you leave out get their default values. A build configuration without parameters uses <code>/build</code> instead of <code>/buildWithParameters</code>.</p>
+
+<h3>Start a build and wait for the result</h3>
+<p>This bash script starts the build, follows the queue item to the build number and waits until the build ends. Its exit code is 0 only when the build passed, so another tool can act on it.</p>
+<pre><code>#!/bin/bash
+# Start a build with parameters, wait for it and print its result.
+SERVER="http://buildserver:8080"
+JOB="job/How-to/job/HT3%20Scripted%20build"
+AUTH="docs:$BUILDSPAWN_API_TOKEN"
+
+# 1. Start the build. The answer's Location header is the queue item.
+QUEUE=$(curl -s -i -X POST -u "$AUTH" "$SERVER/$JOB/buildWithParameters" \
+  --data-urlencode "PLATFORM=Win64" --data-urlencode "CONFIG=Shipping" \
+  | tr -d '\r' | sed -n 's/^Location: //p')
+echo "Queued: $QUEUE"
+
+# 2. Wait until the queue item has a build number.
+until BUILD=$(curl -sg -u "$AUTH" "${QUEUE}api/json?tree=executable[url]" \
+  | grep -o '"url":"[^"]*"' | cut -d'"' -f4) &amp;&amp; [ -n "$BUILD" ]; do sleep 2; done
+echo "Build:  $BUILD"
+
+# 3. Wait until the build has a result.
+until RESULT=$(curl -s -u "$AUTH" "${BUILD}api/json?tree=result" \
+  | grep -o '"result":"[A-Z]*"' | cut -d'"' -f4) &amp;&amp; [ -n "$RESULT" ]; do sleep 5; done
+echo "Result: $RESULT"
+[ "$RESULT" = "SUCCESS" ]</code></pre>
+<pre class="terminal" data-title="bash">$ ./start-build.sh
+Queued: http://buildserver:8080/queue/item/59/
+Build:  http://buildserver:8080/job/How-to/job/HT3%20Scripted%20build/3/
+Result: <span class="t-green">SUCCESS</span></pre>
+<div class="callout note"><p>The <code>-g</code> option stops curl from reading the square brackets in <code>tree=executable[url]</code> as a pattern of its own.</p></div>
+
+<h3>Do the same in PowerShell</h3>
+<pre><code># Start a build with parameters, wait for it and print its result.
+$server  = "http://buildserver:8080"
+$job     = "job/How-to/job/HT3%20Scripted%20build"
+$pair    = "docs:$env:BUILDSPAWN_API_TOKEN"
+$auth    = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($pair))
+$headers = @{ Authorization = "Basic $auth" }
+
+# 1. Start the build. The answer's Location header is the queue item.
+$response = Invoke-WebRequest -Method Post -Headers $headers -UseBasicParsing `
+  -Uri "$server/$job/buildWithParameters" `
+  -Body @{ PLATFORM = "XboxSeries"; CONFIG = "Development" }
+$queue = $response.Headers.Location
+"Queued: $queue"
+
+# 2. Wait until the queue item has a build number.
+do {
+  Start-Sleep -Seconds 2
+  $item = Invoke-RestMethod -Headers $headers -Uri "${queue}api/json"
+} until ($item.executable)
+$build = $item.executable.url
+"Build:  $build"
+
+# 3. Wait until the build has a result.
+do {
+  Start-Sleep -Seconds 5
+  $result = (Invoke-RestMethod -Headers $headers -Uri "${build}api/json?tree=result").result
+} until ($result)
+"Result: $result"
+if ($result -ne "SUCCESS") { exit 1 }</code></pre>
+<pre class="terminal" data-title="PowerShell">PS&gt; .\start-build.ps1
+Queued: http://buildserver:8080/queue/item/60/
+Build:  http://buildserver:8080/job/How-to/job/HT3%20Scripted%20build/4/
+Result: <span class="t-green">SUCCESS</span></pre>
+<p>The script works in Windows PowerShell 5.1 and in PowerShell 7.</p>
+
+<h2>Check it worked</h2>
+<figure class="shot">
+  <img src="../../assets/shots/how-to/script-with-api-token-2.png" alt="The Parameters tab of build #1 of HT3 Scripted build, Success, started by user docs on ht3-win-agent: PLATFORM is PS5 (Platform to build) and CONFIG is Shipping (Development or Shipping)">
+  <figcaption>The build started by the curl example, with the values the script sent.</figcaption>
+</figure>
+<ul>
+  <li>The build appears in the build configuration's <strong>History</strong>, started by the token's user.</li>
+  <li>Its <strong>Parameters</strong> tab shows the values your script sent.</li>
+  <li>On your <strong>Security</strong> page, the token's <strong>Last used</strong> time has changed.</li>
+</ul>
+
+<h2>Troubleshooting</h2>
+<table>
+  <thead><tr><th>Answer</th><th>What it means</th></tr></thead>
+  <tbody>
+    <tr><td><code>401 Unauthorized</code></td><td>The user name or token is wrong, or the token was revoked or has expired. Make a new token.</td></tr>
+    <tr><td><code>403 Forbidden</code></td><td>The token works, but its user can't run this build configuration. Give the user the Developer role on the project. See <a href="give-team-access.html">Give a team access to its projects</a>.</td></tr>
+    <tr><td><code>404 Not Found</code></td><td>The address is wrong. Check each <code>job/&lt;name&gt;/</code> part and that spaces are written as <code>%20</code>. A user who can't see the project also gets 404.</td></tr>
+    <tr><td><code>400</code> or <code>405</code></td><td>You used <code>/build</code> on a build configuration with parameters, or a GET instead of a POST. Use POST and <code>/buildWithParameters</code>.</td></tr>
+  </tbody>
+</table>
+
+<h2>Next steps</h2>
+<ul>
+  <li><a href="../reference/api-tokens.html">API tokens</a>: renaming, revoking and expiry.</li>
+  <li><a href="../parameters/parameters.html">Parameters</a>: the kinds of parameters and their defaults.</li>
+  <li><a href="monitor-from-terminal.html">Watch the server from a terminal</a> with the same token.</li>
+  <li><a href="use-a-secret.html">Use a secret in a build</a>, to keep tokens out of scripts.</li>
+</ul>
+</main>
+</body>
+</html>

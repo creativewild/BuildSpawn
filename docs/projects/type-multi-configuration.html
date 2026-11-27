@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Multi-configuration project · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/type-multi-configuration">
+<main class="doc">
+<h1>Multi-configuration project</h1>
+<p class="lead">One project that runs the same steps for every combination of values, such as each platform and each build type. It is no longer offered for new items.</p>
+<h2>When to use it</h2>
+<p>New work should use the Matrix mode of <a href="../build-steps/matrix-mode.html">Parallel blocks</a> instead. You write the steps once, give the values, and every combination runs as its own side. A Multi-configuration project that already exists keeps working: you can open, build, configure and copy it.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the existing Multi-configuration project and click <strong>Settings</strong>.</li>
+  <li>Under <strong>Configuration Matrix</strong> add or change the axes.</li>
+  <li>Set the <strong>Combination Filter</strong> and the <strong>Execution Strategy</strong> if needed. Click <strong>Save</strong>.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Axes</td><td>The values to combine: user-defined values, label expressions, agents or JDKs. Every combination is one configuration.</td><td>None</td><td><code>PLATFORM</code>: Win64, PS5</td></tr>
+    <tr><td>Combination Filter</td><td>An expression that removes combinations you do not want.</td><td>Off</td><td><code>!(PLATFORM=="PS5" &amp;&amp; CONFIG=="Debug")</code></td></tr>
+    <tr><td>Execution Strategy</td><td>How the configurations run: all at once, or sequentially; touchstone builds first.</td><td>Classic</td><td>-</td></tr>
+    <tr><td>Use custom child workspace</td><td>Override the workspace folder of each configuration.</td><td>Off</td><td>-</td></tr>
+    <tr><td>Display Name</td><td>A name shown instead of the name.</td><td>Empty</td><td>-</td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p>An old <strong>Tools/Asset Pipeline</strong> is a Multi-configuration project with the axes <code>PLATFORM</code> and <code>CONFIG</code>. The studio leaves it as it is and builds new tools with a Matrix block.</p><h2>What you see when it runs</h2>
+<p>The project page shows a grid of the configurations with their latest result. Each cell links to its build.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>I cannot create one</td><td>The type is hidden. Use a build configuration with a Matrix block in a Parallel block.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="item-types.html">Item types</a></li>
+  <li><a href="../build-steps/matrix-mode.html">Matrix mode</a></li>
+  <li><a href="../build-steps/parallel-blocks.html">Parallel blocks</a></li>
+</ul>
+</main>
+</body>
+</html>

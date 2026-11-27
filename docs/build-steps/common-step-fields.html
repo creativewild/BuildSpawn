@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fields every runner has · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/common-step-fields">
+<main class="doc">
+<h1>Fields every runner has</h1>
+<p class="lead">Most runners end with the same fields: working directory, environment variables, test reports, container settings and, for script runners, how stderr is shown. They work the same in every runner.</p>
+<h2>When to use it</h2>
+<p>Read this page once. Each runner page then only lists what is special about it, and points here for these fields.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Steps</strong>.</li>
+  <li>Add a step or click <strong>Edit</strong> on one. Scroll to the end of the runner's fields.</li>
+  <li>Fill in the fields below and click <strong>Save</strong>.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Working directory</strong></td><td>Relative to the workspace. Empty means the workspace itself. It is created if missing. Inside a container it must be inside the workspace.</td><td>Empty</td><td><code>Build/Tools</code></td></tr>
+    <tr><td><strong>Environment variables</strong></td><td>One <code>NAME=value</code> per line. They are stored in plain text in the build configuration: use a password parameter for a secret. A line that is not <code>NAME=value</code> fails the step.</td><td>Empty</td><td><code>UE_BUILD_TARGET=Game</code></td></tr>
+    <tr><td><strong>Test reports</strong></td><td>JUnit XML files, as an Ant pattern relative to the workspace. They are recorded as test results, also when the step fails.</td><td>Empty</td><td><code>reports/*.xml</code></td></tr>
+    <tr><td><strong>Run step within container</strong></td><td>The step runs in a new container from this image, with the workspace mounted, and the build continues on the agent. The agent then needs Docker, not the tool. Empty runs the step on the agent. Parameters, the variables above and what the build adds go in; the agent's own variables and <code>PATH</code> stay out.</td><td>Empty</td><td><code>alpine:3.20</code></td></tr>
+    <tr><td><strong>Image platform (More options)</strong></td><td><strong>Any</strong> takes what Docker on the agent runs. <strong>Linux</strong> or <strong>Windows</strong> asks for that kind of image. On a Windows agent a Linux image sees the workspace at <code>/workspace</code>. A Windows image is refused on Linux and macOS agents.</td><td>Any</td><td>Linux</td></tr>
+    <tr><td><strong>Pull policy (More options)</strong></td><td><strong>If missing on the agent</strong>, <strong>Always</strong> or <strong>Never</strong>.</td><td>If missing on the agent</td><td>Always</td></tr>
+    <tr><td><strong>Force pull on each run (More options)</strong></td><td>Pulls the image on each run, whatever the pull policy says.</td><td>Off</td><td>On for a moving tag such as <code>latest</code></td></tr>
+    <tr><td><strong>Additional run arguments (More options)</strong></td><td>One argument per line, such as <code>--network=host</code>. They go to <code>docker run</code> as given and nothing checks them. Anyone with Configure on the build configuration chooses them. Do not put a secret here.</td><td>Empty</td><td><code>--memory=4g</code></td></tr>
+    <tr><td><strong>Format stderr output as</strong></td><td>Command Line and PowerShell only. Lines written to stderr show in orange (<strong>Warning</strong>) or red (<strong>Error</strong>) in the log. The text itself is not changed.</td><td>Plain, as in the log today</td><td>Warning</td></tr>
+    <tr><td><strong>Fail the step when anything is written to stderr</strong></td><td>Command Line and PowerShell only. Off: the exit code alone decides. Many tools print progress to stderr and still succeed.</td><td>Off</td><td>On for a strict script</td></tr>
+  </tbody>
+</table>
+
+<p>Docker, Docker Compose and Xcode Project have no container settings: they use the tool of the agent itself.</p>
+<h2>Use build parameters in script text</h2>
+<p>In the script of Command Line, PowerShell, Python, Node.js, Kotlin Script and C# Script steps, write <code>%name%</code> to use a build parameter. Secrets are never written into script text. Read them from the environment instead. See <a href="script-editor.html">The script editor</a>.</p>
+<h2>A worked example</h2>
+<p>A Python step that runs the asset checker in the <code>Tools</code> folder and records its JUnit XML:</p><table>
+  <thead><tr><th>Field</th><th>Value</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Working directory</strong></td><td><code>Tools</code></td></tr>
+    <tr><td><strong>Environment variables</strong></td><td><code>ASSET_ROOT=Content</code></td></tr>
+    <tr><td><strong>Test reports</strong></td><td><code>reports/*.xml</code></td></tr>
+    <tr><td><strong>Run step within container</strong></td><td><code>python:3.12</code></td></tr>
+  </tbody>
+</table>
+<h2>What you see when it runs</h2>
+<p>The console prints the command that was started, after a <code>$</code>, then its output. With a container image, a line says that the step runs in the container. When test reports match, the build gets a <strong>Tests</strong> tab, and a failed test makes the step <em>unstable</em>.</p>
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong><em>This step needs a workspace and the build has none</em></strong></td><td>Run the build on an agent that has a workspace.</td></tr>
+    <tr><td><strong><em>Line N of the environment variables is not NAME=value</em></strong></td><td>Fix the line. One <code>NAME=value</code> per line.</td></tr>
+    <tr><td><strong><em>This step runs in a container and docker could not be started on this agent</em></strong></td><td>Install Docker on the agent, or clear <strong>Run step within container</strong>.</td></tr>
+    <tr><td><strong><em>Docker on this agent did not answer</em></strong></td><td>Start the Docker service on the agent.</td></tr>
+    <tr><td><strong><em>A Windows image runs only on a Windows agent</em></strong></td><td>Run the step on a Windows agent or choose another image platform.</td></tr>
+    <tr><td><strong><em>The image name is empty</em></strong></td><td>Check the parameter the image name comes from.</td></tr>
+    <tr><td><strong><em>The workspace … is on a network share / holds a colon</em></strong></td><td>Docker cannot mount it. Use a local workspace folder.</td></tr>
+    <tr><td><strong><em>Test reports not recorded: JUnit test reporting is not installed</em></strong></td><td>Ask an administrator to turn JUnit test reporting on.</td></tr>
+    <tr><td><strong>Exit code 125 from a container step</strong></td><td>Docker itself failed to run the container. Read the line above it in the log.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="runners.html">Runners</a></li>
+  <li><a href="step-list.html">The steps list and the step editor</a></li>
+  <li><a href="script-editor.html">The script editor</a></li>
+  <li><a href="../parameters/secrets.html">Secrets</a></li>
+  <li><a href="../how-to/steps-run-in-docker-container.html">Run steps in a Docker container</a></li>
+</ul>
+</main>
+</body>
+</html>

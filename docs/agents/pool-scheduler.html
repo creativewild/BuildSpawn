@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Pool Scheduler · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="agents/pool-scheduler">
+<main class="doc">
+<h1>The Pool Scheduler</h1>
+<p class="lead">The Pool Scheduler moves agents between pools for you: by hand on a board, at set times, or by itself when urgent builds are waiting. Use it to lend idle Windows machines to console builds at night, or to clear the queue before a release.</p>
+
+<p>Open <strong>Agents</strong> and click the <strong>Pools</strong> tab. The scheduler has five tabs: <strong>Overview</strong>, <strong>Board</strong>, <strong>Scheduled moves</strong>, <strong>Priority rules</strong> and <strong>Settings</strong>.</p>
+<div class="callout note"><p>Everyone who can see agents can look at the scheduler. Changing it needs the <strong>Administer</strong> permission.</p></div>
+
+<h2>Overview</h2>
+<figure class="shot">
+  <img src="../../assets/shots/agents/scheduler-overview.png" alt="The Pool Scheduler Overview: the state and time zone, Pause and Create pool; cards for Waiting builds, Borrowed agents, Moves today and Next scheduled move; Capacity per pool for every pool; and Recent moves">
+  <figcaption>The Overview tab: capacity per pool, recent moves and borrowed agents.</figcaption>
+</figure>
+<ul>
+  <li>The strip at the top says whether the scheduler is <strong>Running</strong> or <strong>Paused</strong>, and the time zone it uses.</li>
+  <li>The cards count <strong>Waiting builds</strong>, <strong>Borrowed agents</strong> (agents outside their home pool now), <strong>Moves today</strong> and the <strong>Next scheduled move</strong>.</li>
+  <li><strong>Capacity per pool</strong> shows, for each pool, its ready, busy and offline agents, the builds waiting for it, borrowed agents, its weight and its status. <em>Short of 1</em> means builds wait and the pool has no free agent.</li>
+  <li><strong>Recent moves</strong> is the activity log, newest first.</li>
+</ul>
+
+<h2>Move agents on the board</h2>
+<figure class="shot">
+  <img src="../../assets/shots/agents/scheduler-board.png" alt="The Board tab: a search box, filter chips, Clean work folder first and Move selected; a column for every pool with its agent cards; offline agents are dimmed">
+  <figcaption>The Board: one column per pool. Locked agents can't be moved now.</figcaption>
+</figure>
+<ol class="steps">
+  <li>Open the <strong>Board</strong> tab.</li>
+  <li>Drag an agent card to another pool's column. Or tick several cards and click <strong>Move selected</strong>.</li>
+  <li>Tick <strong>Clean work folder first</strong> if the agent should wipe its work folders before it takes builds in the new pool.</li>
+  <li>A message confirms the move. Click <strong>Undo</strong> within 10 seconds to put the agent back.</li>
+</ol>
+<p>Busy, offline and personal agents are locked (a lock icon on the card). A busy agent can be moved once its build ends. Use the chips (All, Ready, Busy, Offline, Borrowed, Personal) and the search box to find agents on a big farm.</p>
+<div class="callout tip"><p>You can also move a single agent from the <a href="agents-page.html#the-row-menu">Agents page</a> row menu. That move has Undo too.</p></div>
+
+<h2>Scheduled moves</h2>
+<p>A scheduled move puts an agent in another pool at a set time, on chosen days. For example, lend a Windows machine to the Consoles pool every weekday evening, and take it back in the morning.</p>
+<figure class="shot">
+  <img src="../../assets/shots/agents/scheduler-moves.png" alt="The Scheduled moves tab: the rules with agent, from pool, to pool, time, days, Clean first, an On switch and the last run; buttons Run due rules now and Add scheduled move">
+  <figcaption>A scheduled move that sends win-build-02 to the Consoles pool at 20:00.</figcaption>
+</figure>
+<ol class="steps">
+  <li>Open <strong>Scheduled moves</strong> and click <strong>Add scheduled move</strong>.</li>
+  <li>Pick the <strong>Agent</strong>. Personal agents are not listed.</li>
+  <li>Pick <strong>From pool</strong> (or <strong>Any pool</strong>, to move it from wherever it is) and <strong>To pool</strong>.</li>
+  <li>Set the <strong>Time</strong>, in the scheduler's time zone.</li>
+  <li>Click the <strong>Days</strong>, or use a quick pick: Every day, Mon–Fri or Weekend.</li>
+  <li>Tick <strong>Clean work folder first</strong> if needed.</li>
+  <li>Tick <strong>Move it back at</strong> and enter a time to add the return move as a second rule, on the same days.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/agents/scheduler-add-move.png" alt="The Add scheduled move dialog: Agent, From pool, To pool, Time, Days, Quick pick, Clean work folder first, Move it back at, an On switch, Cancel and Save">
+  <figcaption>The Add scheduled move dialog.</figcaption>
+</figure>
+<p>How scheduled moves behave:</p>
+<ul>
+  <li>A rule runs once, at its minute.</li>
+  <li>If the agent is busy then, it moves as soon as its build ends, up to 2 hours late. After that the move is skipped and logged.</li>
+  <li>Offline agents are skipped.</li>
+  <li>The <strong>On</strong> switch turns a rule off without deleting it. The pencil edits it; <strong>⋯</strong> deletes it.</li>
+  <li><strong>Run due rules now</strong> runs every move that is due right away, even while the scheduler is paused.</li>
+</ul>
+
+<h2>Priority rules and weights</h2>
+<p>Priority rules borrow <strong>idle</strong> agents from other pools while matching builds wait, and give them back when they are idle again.</p>
+<figure class="shot">
+  <img src="../../assets/shots/agents/scheduler-rules.png" alt="The Priority rules tab: Automatic balancing switched on, the priority rules with parameter, value, priority, target pool and max agents, the Borrowed agents list, and Pool weights">
+  <figcaption>A priority rule and the pool weights.</figcaption>
+</figure>
+<h3>Add a rule</h3>
+<ol class="steps">
+  <li>Open <strong>Priority rules</strong> and click <strong>Add priority rule</strong>.</li>
+  <li>Give it a <strong>Name</strong>, for example <code>Release builds first</code>.</li>
+  <li>Enter the <strong>Parameter</strong> and <strong>Value</strong> to match on the waiting build, for example <code>system.pool.priority</code> = <code>high</code>. Names can use the <code>env.</code> and <code>system.</code> prefixes, as in build parameters; without a prefix it is a configuration parameter. An empty value matches <code>true</code>, <code>1</code>, <code>yes</code> or <code>on</code>.</li>
+  <li>Set the <strong>Priority</strong> (higher is served first), the <strong>Target pool</strong> that gets the agents, and <strong>Max agents</strong> (how many agents this rule may have borrowed at once).</li>
+  <li>Tick <strong>Clean work folder first</strong> if needed, and click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/agents/scheduler-add-rule.png" alt="The Add priority rule dialog: Name, Parameter, Value, Priority, Target pool, Max agents, Clean work folder first and On">
+  <figcaption>The Add priority rule dialog.</figcaption>
+</figure>
+<p>Then start a build with that parameter, for example from the <a href="../running-builds/run-dialog.html">Run dialog</a> with <code>system.pool.priority</code> set to <code>high</code>.</p>
+
+<h3>How balancing works</h3>
+<ul>
+  <li><strong>Automatic balancing</strong> must be on. The scheduler checks every minute and whenever the queue changes.</li>
+  <li>For each waiting build, the matching rule with the highest priority wins.</li>
+  <li>Agents are borrowed only from pools with a <strong>lower weight</strong> than the target pool. A pool of equal or higher weight never gives agents.</li>
+  <li>Busy, offline and personal agents, and agents on the never-move list, are never borrowed.</li>
+  <li>With <strong>Return borrowed agents when idle</strong> on, a borrowed agent goes back to its home pool once it is idle and no matching build waits.</li>
+</ul>
+<h3>Pool weights</h3>
+<p>Each pool has a weight, 100 by default. Higher weight is served first. Change the numbers under <strong>Pool weights</strong> and click <strong>Save weights</strong>. In the example above, Consoles (200) may borrow from every other pool, while Linux (50) can lend to every other pool but borrows from none.</p>
+<p><strong>Borrowed agents</strong> lists each borrowed agent with its home pool, the rule that borrowed it and since when. Borrowed agents keep their home pool: editing a pool doesn't undo a borrow.</p>
+
+<h2>Pause</h2>
+<p>Click <strong>Pause</strong> in the scheduler strip to stop all automatic work, for example during a release or maintenance.</p>
+<ul>
+  <li>Scheduled moves and balancing stop. Borrowed agents stay where they are.</li>
+  <li>Moves by hand on the board still work.</li>
+  <li>The strip shows <strong>Paused</strong>, who paused it and when.</li>
+  <li>Click <strong>Resume</strong> to start again.</li>
+</ul>
+
+<h2>Settings</h2>
+<ul>
+  <li><strong>Time zone</strong> for all scheduled moves.</li>
+  <li><strong>Return borrowed agents when idle</strong>.</li>
+  <li><strong>Clean on manual drag</strong>: the default for <em>Clean work folder first</em> on the board.</li>
+  <li><strong>Never move</strong>: agents that balancing must never borrow. Scheduled and hand moves still move them.</li>
+</ul>
+<p>Personal agents (see <a href="personal-agents.html">Personal agents</a>) are always left out: they are never moved, not even by hand. The <strong>Settings</strong> tab lists the personal agents that exist now.</p>
+<p>The time zone's summer time rules apply: days and times follow summer time.</p>
+
+<h2>Activity</h2>
+<p>Every move is logged: by hand, by a scheduled move, by a rule, or a return when idle. The log shows the time, the agent, from and to, and who or what moved it, with a note when a move waited or was skipped (for example "skipped: agent busy, will move when free"). See <strong>Recent moves</strong> on the Overview tab. The last 200 moves are kept.</p>
+
+<h2>On each pool page</h2>
+<p>The pool page has an <strong>Automation</strong> card for that pool: its weight, whether balancing is on, the pools it can borrow from and lend to, the scheduled moves and priority rules that touch it, and the agents borrowed into it or lent out. See <a href="pools.html">Pools</a>.</p>
+
+<h2>Tips</h2>
+<ul>
+  <li>Pair a night move with <strong>Move it back at</strong>, so the agent is home before people arrive.</li>
+  <li>Keep <strong>Max agents</strong> small at first, and watch the activity log for a few days.</li>
+  <li>Give console pools a high weight and general Windows pools a lower one, so devkit builds borrow Windows machines, not the other way round.</li>
+</ul>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="pools.html">Pools</a></li>
+  <li><a href="agent-labels-requirements.html">Labels and agent requirements</a></li>
+  <li><a href="../how-to/night-pool-schedule.html">Move agents to another pool every evening</a></li>
+  <li><a href="../how-to/borrow-agents-for-release.html">Give release builds priority on agents</a></li>
+</ul>
+</main>
+</body>
+</html>

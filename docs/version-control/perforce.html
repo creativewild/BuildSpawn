@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Perforce · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="version-control/perforce">
+<main class="doc">
+<h1>Perforce</h1>
+<p class="lead">Build from Perforce depots, streams and shelves, and browse changes, shelves and reviews without leaving Buildspawn.</p>
+
+<h2>When to use it</h2>
+<p>Perforce (Helix Core) support is built in. Use it when your game lives in a Perforce depot. A build configuration with Perforce syncs a workspace on the agent, lists the changelists since the last build, and gets extra tabs for shelves, pending changes, the depot and reviews. This page is the map: each part has its own page.</p>
+
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Add a <a href="perforce-connections.html">connection</a>: the server, the user and a password or ticket.</li>
+  <li>Define a <a href="perforce-roots.html">Perforce root</a> once, on the project. Choose a stream or write <a href="perforce-view-mappings.html">View Mappings</a>.</li>
+  <li>Open the build configuration, go to <strong>Settings › Version Control</strong>, choose <strong>Perforce root</strong> and pick the root. (For a workspace that only one build configuration uses, choose <strong>Perforce Software</strong>.)</li>
+  <li>Add a <a href="perforce-polling.html">trigger</a> so a submit starts a build.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/version-control/p4-root.png" alt="The Version Control settings of the Windows Build: Perforce Software selected, the P4 credential Studio Helix Core (buildbot), Workspace behaviour Manual (custom view) and the workspace name skyforge-win64-${NODE_NAME}">
+  <figcaption>A build configuration that uses Perforce Software with a manual workspace named after the agent it runs on.</figcaption>
+</figure>
+<div class="callout tip"><p>Put <code>${NODE_NAME}</code> in the workspace name so each agent gets its own workspace. Two agents must never share one.</p></div>
+
+<h2>The parts</h2>
+<div class="cards">
+  <a class="card" href="perforce-connections.html"><h3>Connections</h3><p>Password and ticket credentials, SSL trust, administrator connections.</p></a>
+  <a class="card" href="perforce-roots.html"><h3>Perforce roots</h3><p>Shared connection and workspace, every field, checkout rules.</p></a>
+  <a class="card" href="perforce-software.html"><h3>Perforce Software</h3><p>Workspace types, populate options and polling filters.</p></a>
+  <a class="card" href="perforce-view-mappings.html"><h3>View Mappings</h3><p>The table editor, quick add and preview.</p></a>
+  <a class="card" href="perforce-streams.html"><h3>Streams</h3><p>One stream or many feature branches.</p></a>
+  <a class="card" href="perforce-shelves.html"><h3>Shelves and personal builds</h3><p>Test a shelf before submit; Swarm reviews.</p></a>
+  <a class="card" href="perforce-polling.html"><h3>Polling and triggers</h3><p>Poll, Perforce trigger, refresh interval.</p></a>
+  <a class="card" href="perforce-variables.html"><h3>Perforce variables</h3><p>P4_PORT, P4_USER, P4_CLIENT, P4_TICKET and the changelist in the build name.</p></a>
+  <a class="card" href="perforce-operations.html"><h3>Perforce operations</h3><p>Build step: sync, clean, submit, copy and more.</p></a>
+  <a class="card" href="perforce-root-unshelve.html"><h3>Perforce root: unshelve</h3><p>Build step for roots.</p></a>
+  <a class="card" href="perforce-unshelve.html"><h3>Perforce: Unshelve</h3><p>Build step for Perforce Software.</p></a>
+  <a class="card" href="several-roots.html"><h3>Several roots</h3><p>Perforce and Git in one build.</p></a>
+</div>
+
+<h2>The workbench pages</h2>
+<p>A build configuration with Perforce gets tabs to work with the depot from the browser. Some are under <strong>More</strong>.</p>
+<figure class="shot">
+  <img src="../../assets/shots/version-control/shelves.png" alt="The Shelves tab of the Windows Build with the Shelved and Pending (not shelved) switch, a User filter and the columns Change, Description, User, Workspace, Files, Date and Personal build. The table is empty because nobody has shelved files in this view">
+  <figcaption>The Shelves tab lists the shelved changelists in the build configuration's view.</figcaption>
+</figure>
+<table>
+  <thead><tr><th>Tab</th><th>What it shows</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Change Log</strong> and <strong>Submitted changes</strong></td><td>Submitted changelists with their files and diffs, and the first build that contains each one.</td></tr>
+    <tr><td><strong>Pending Changes</strong></td><td>Changelists people are still working on. <strong>Mine</strong> shows only yours.</td></tr>
+    <tr><td><strong>Shelves</strong></td><td>Shelved changelists, ready to build, filtered by user.</td></tr>
+    <tr><td><strong>Depot</strong></td><td>A depot browser: folders, file history, compare, diff, annotate, time-lapse, the revision graph, labels and branches.</td></tr>
+    <tr><td><strong>Labels</strong></td><td>Perforce labels, and branches.</td></tr>
+    <tr><td><strong>Perforce Jobs</strong></td><td>Perforce jobs and the changelists linked to them.</td></tr>
+    <tr><td><strong>Build Review</strong></td><td>Start a build for a Swarm review.</td></tr>
+    <tr><td><strong>Perforce connection</strong></td><td>The server and user in use, with a connection check.</td></tr>
+  </tbody>
+</table>
+<p>These pages open at once. Their Perforce data fills in a moment later with a spinner. Lists are kept and refreshed in the background, so they show <em>Updated N ago</em> with a <strong>Refresh</strong> button. If the server cannot be reached, you get a message with <strong>Retry</strong> instead of a page that hangs.</p>
+
+<h2>Run a build at a revision, or from an empty workspace</h2>
+<ul>
+  <li>In the <a href="../running-builds/run-dialog.html">Run dialog</a>, a revision tab builds at a chosen changelist or label. The build page says which one it was built at. <strong>Latest</strong> syncs to the newest changelist, as a regular build does.</li>
+  <li>The build configuration action to enforce a clean checkout makes the next build start with an empty workspace and check everything out again.</li>
+</ul>
+
+<h2>More Perforce features</h2>
+<ul>
+  <li><strong>VCS labeling</strong> (a build feature, <em>Label in Perforce</em>): creates an automatic Perforce label on what the build synced. You set the label name (variables work), a description, whether an existing label may be moved, which branches are labelled (<code>+:name</code> / <code>-:name</code>, <code>&lt;default&gt;</code> is the root's own stream), the root to label when there are several, and who gets an email if labeling fails. A failure shows a warning and does not change the build result. Personal builds are not labelled.</li>
+  <li><strong>Workspace cleanup:</strong> remove the workspace after each build, remove inactive workspaces, or delete workspaces with a preview. Workspaces of deleted build configurations are removed for you.</li>
+  <li><strong>Problems outside the build</strong>, such as a wrong password, show on the build configuration page and in its settings.</li>
+  <li><strong>Changelist in the build name:</strong> see <a href="perforce-variables.html">Perforce variables</a>.</li>
+</ul>
+
+<h2>A worked example</h2>
+<p>The Skyforge studio keeps the game in Perforce on stream <code>//skyforge/main</code>. An administrator adds the <code>buildbot</code> credential, then a root <strong>Skyforge Main</strong> on the <strong>Game</strong> project with <strong>Auto Clean</strong> sync. <strong>Windows Build</strong> and <strong>Linux Server Build</strong> use the root, and a shelve trigger tests shelves marked <code>#buildspawn</code>.</p>
+
+<h2>What you see when it runs</h2>
+<ul>
+  <li>The log starts with the sync into the workspace named after the agent.</li>
+  <li>The build page shows the changelist. <strong>Changes</strong> lists the changelists since the last build.</li>
+  <li>The build configuration gets the tabs above.</li>
+</ul>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>You see</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>Password or ticket error</td><td>Update the credential. See <a href="perforce-connections.html">Perforce connections</a>.</td></tr>
+    <tr><td>Two agents share one workspace</td><td>Put <code>${NODE_NAME}</code> in the workspace name.</td></tr>
+    <tr><td>Tabs say the server cannot be reached</td><td>Click <strong>Retry</strong>, and check the connection on the <strong>Perforce connection</strong> tab.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="overview.html">Version control overview</a></li>
+  <li><a href="../how-to/game-clean-workspace.html">Clean a Perforce workspace</a>, <a href="../how-to/game-copy-stream.html">Copy a stream</a>, <a href="../how-to/check-shelf-before-submit.html">Test a shelved change before you submit</a>, <a href="../how-to/game-p4-ticket-script.html">Use P4 commands with the P4 ticket</a></li>
+</ul>
+</main>
+</body>
+</html>

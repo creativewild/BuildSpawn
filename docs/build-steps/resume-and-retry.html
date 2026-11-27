@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Resume and retry · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/resume-and-retry">
+<main class="doc">
+<h1>Resume and retry</h1>
+<p class="lead">Pick up a failed build where it stopped, or try a step again. A two-hour cook should not run again because the packaging step failed.</p>
+
+<h2>Resume a build</h2>
+<p><strong>Resume</strong> starts a new build that skips the steps that already passed. It runs on the same agent, in the same workspace, and does not fetch the sources again: the revision and the parameters are copied from the failed build.</p>
+<figure class="shot">
+  <img src="../../assets/shots/build-steps/resume-button.png" alt="Build #1 of Content Cook, failed. The header has a Resume from step 2 button. The Build steps list shows Sync content succeeded and Cook content failed with its own Resume from step 2 button. A Resume from here card on the right lists checks: the agent is online, the workspace exists, no other build used it since">
+  <figcaption>A failed build with <strong>Resume from step 2</strong>. The card on the right checks that the build can resume.</figcaption>
+</figure>
+<ol class="steps">
+  <li>Open the failed build.</li>
+  <li>Look at the <strong>Resume from here</strong> card. It checks that:
+    <ul>
+      <li>the agent is online;</li>
+      <li>the workspace still exists;</li>
+      <li>no other build has used the workspace since.</li>
+    </ul>
+  </li>
+  <li>Click <strong>Resume from step N</strong> in the header, on the failed step, or <strong>Resume from here</strong> in the card. By default it starts at the failed step; you can start at any earlier step too.</li>
+  <li>The new build appears in the queue and runs only the remaining steps.</li>
+</ol>
+<p>On the resumed build, the steps that were skipped show as <strong>Done earlier</strong>, with a link to the build that ran them.</p>
+<div class="callout note"><p>If a check fails, for example because another build used the workspace, Resume is refused. Use <strong>Re-run</strong> instead: it builds the same sources from the start. See <a href="../running-builds/rerun.html">Re-run and Re-run with changes</a>.</p></div>
+<div class="callout note"><p>Resume needs the <strong>Build</strong> permission, the same as Re-run. It works for build configurations with build steps. A build with a <a href="parallel-blocks.html">Parallel block</a> reuses the sides that passed and resumes the side that failed on its own machine.</p></div>
+
+<h2>Retry a step</h2>
+<p>Some failures are flaky: a network share drops, a device kit times out, a tool crashes. <strong>Retry on failure</strong> runs a step again before the build gives up.</p>
+<ol class="steps">
+  <li>Open the step from <strong>Settings › Build Steps</strong>.</li>
+  <li>Scroll to <strong>Execution</strong>.</li>
+  <li>Set <strong>Retry on failure</strong> to the number of extra tries, from 0 to 10.</li>
+  <li>Set <strong>Wait between attempts</strong> in seconds. The agent keeps the workspace while it waits.</li>
+  <li>Optional: list exit codes under <strong>Only for exit codes</strong>. Then the step retries only for those codes.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot small">
+  <img src="../../assets/shots/build-steps/step-execution.png" alt="The retry settings of a step: Retry on failure 0 times, Wait between attempts 0 seconds, and Only for exit codes, optional">
+  <figcaption>Retry settings in the step's Execution section.</figcaption>
+</figure>
+<div class="callout tip"><p>List the codes of a crash, such as <code>-1</code> or <code>3221225477</code>, so that a crash retries while a real compile error (exit code 1) fails at once. Codes are compared as signed 32-bit numbers, so <code>3221225477</code> and <code>-1073741819</code> are the same.</p></div>
+
+<h3>When a step runs</h3>
+<p>The same <strong>Execution</strong> section sets when a step runs at all, with <strong>Execute step</strong>:</p>
+<ul>
+  <li><strong>If all previous steps finished successfully</strong> (the default);</li>
+  <li><strong>Only if build status is successful</strong>;</li>
+  <li><strong>Even if some of the previous steps failed</strong>;</li>
+  <li><strong>Always, even if build stop command was issued</strong>, for clean-up steps;</li>
+  <li><strong>Only if build status is failed</strong>, for steps that collect crash dumps or send alerts.</li>
+</ul>
+<p>Add <strong>Conditions</strong> to run a step only when a parameter equals, contains or matches a value, for example only when <code>CONFIG</code> equals <code>Shipping</code>.</p>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="step-list.html">The steps list and the step editor</a></li>
+  <li><a href="step-statuses.html">Step statuses and BUILD_STEP_STATUS</a></li>
+  <li><a href="../how-to/steps-retry-flaky-step.html">Retry a flaky step</a></li>
+  <li><a href="../how-to/rerun-from-failed-step.html">Re-run from the failed step</a></li>
+  <li><a href="../running-builds/rerun.html">Re-run and Re-run with changes</a></li>
+</ul>
+</main>
+</body>
+</html>

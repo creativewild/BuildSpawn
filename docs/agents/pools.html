@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pools · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="agents/pools">
+<main class="doc">
+<h1>Pools</h1>
+<p class="lead">A pool is a group of agents that serves a set of projects. Pools keep console builds on devkits, Windows builds on Windows machines, and so on. Each pool can have its own icon and colour.</p>
+
+<h2>How pools work</h2>
+<ul>
+  <li>Every agent belongs to exactly one pool.</li>
+  <li>A pool has a list of <strong>projects</strong>. Its agents run builds only of those projects.</li>
+  <li>The <strong>Default</strong> pool is special: its agents run every build configuration that is not assigned to a pool.</li>
+  <li>A build of a project that belongs to a pool waits in the queue until an agent of that pool is free.</li>
+  <li>You can assign a single build configuration or a whole project to a pool. A build configuration in an assigned project can use the pool. A build configuration that is assigned to pools can run only on agents of those pools.</li>
+  <li>A pool does not replace labels. A build needs an agent that is in a pool its project may use <strong>and</strong> that meets its label expression and requirements (see <a href="agent-labels-requirements.html">Labels and agent requirements</a>).</li>
+  <li>A new agent that you create with <strong>New Node</strong>, or that an administrator approves, joins the pool you pick, or the Default pool.</li>
+  <li>Personal machines (see <a href="personal-agents.html">Personal agents</a>) are never moved by pools or the scheduler.</li>
+</ul>
+
+<h2>Create a pool</h2>
+<ol class="steps">
+  <li>Open <strong>Agents</strong> and click the <strong>Pools</strong> tab.</li>
+  <li>Click <strong>Create pool</strong>.</li>
+  <li>Type a name, for example <code>Consoles</code>.</li>
+  <li>Choose an icon and a colour (see below).</li>
+  <li>Add the projects whose builds the pool should run, and the agents that belong to it.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<p>To change a pool later, click its name in the side panel or on the Pools tab. The pool page has the same settings, plus an <strong>Automation</strong> card from the <a href="pool-scheduler.html">Pool Scheduler</a> and <strong>Delete pool</strong> at the bottom. Renaming or deleting a pool also updates the scheduler's moves and rules.</p>
+
+<h2>Icons and colours</h2>
+<figure class="shot">
+  <img src="../../assets/shots/agents/pool-page.png" alt="The Edit pool page of the Consoles pool: the Name field, and under Icon and colour a grid of icons Server, Windows, Linux, Docker, Apple, Console, PlayStation (selected), Xbox, Nintendo Switch, Steam, Android, iOS, GPU and Custom, and an Icon colour picker set to Custom #7B5CD6">
+  <figcaption>The Consoles pool with the PlayStation icon and a purple colour.</figcaption>
+</figure>
+<p>An icon shows at a glance what runs in a pool.</p>
+<ol class="steps">
+  <li>On the pool page, find <strong>Icon and colour</strong>.</li>
+  <li>Pick an <strong>Icon</strong>: Server, Windows, Linux, Docker, Apple, Console, PlayStation, Xbox, Nintendo Switch, Steam, Android, iOS or GPU. <strong>Custom…</strong> lets you pick any icon from the built-in icon library.</li>
+  <li>Pick an <strong>Icon colour</strong> from the list, or choose <strong>Custom</strong> and enter any colour. Without a choice, the theme's colour is used.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<p>Without an icon, the pool keeps the plain server icon. The icon and colour appear everywhere the pool does:</p>
+<ul>
+  <li>the side panel of the Agents pages;</li>
+  <li>the Agent column of the agent list;</li>
+  <li>the Pools tab and the Pool Scheduler board;</li>
+  <li>the pool page;</li>
+  <li>the <strong>Move to pool</strong> dialog.</li>
+</ul>
+
+<h2>The sidebar</h2>
+<figure class="shot small">
+  <img src="../../assets/shots/agents/pools-sidebar.png" alt="The Agents side panel: Search by name, POOLS with an offline count and an edit pencil, Overview, and the pools with their agent counts">
+  <figcaption>The side panel with every pool opened.</figcaption>
+</figure>
+<p>On every Agents page, the panel on the left lists your pools.</p>
+<ul>
+  <li><strong>Overview</strong> opens the agent list.</li>
+  <li>Click a pool's name to open its page. Click the arrow before it to show its agents.</li>
+  <li>Each agent shows its state: green when idle, a busy count such as <strong>1/2</strong> (busy executors of all executors) while it builds, and red, greyed out, when offline.</li>
+  <li>A red number beside a pool counts its offline agents. The number at the top, beside <strong>POOLS</strong>, counts all offline agents.</li>
+  <li><strong>Search by name</strong> filters pools and agents.</li>
+  <li>The pencil beside <strong>POOLS</strong> and the <strong>+</strong> at the top help you manage pools and agents.</li>
+</ul>
+
+<h2>Move an agent to another pool</h2>
+<p>There are three ways:</p>
+<ul>
+  <li>On the Agents page, open the row menu <strong>⋯</strong> and choose <strong>Move to pool…</strong>. See <a href="agents-page.html#the-row-menu">The Agents page</a>.</li>
+  <li>On the agent's own page, under <strong>Agent pool</strong>, click <strong>Move to pool…</strong>.</li>
+  <li>On the Pool Scheduler board, drag the agent to another pool. See <a href="pool-scheduler.html">The Pool Scheduler</a>.</li>
+</ul>
+<p>To move agents automatically, at set times or when builds wait, use the <a href="pool-scheduler.html">Pool Scheduler</a>.</p>
+
+<h2>Delete a pool</h2>
+<p>On the pool page click <strong>Delete pool</strong>, or use the <strong>⋯</strong> menu of the pool on the Pools tab. Buildspawn asks <em>Delete pool NAME?</em> and explains: <em>Its agents move to the Default pool and its projects can then run on any agent of the Default pool.</em> The Default pool cannot be deleted, renamed or given a name that is already used. Names must not be empty.</p>
+
+<h2>Borrowed agents</h2>
+<p>An agent that the Pool Scheduler has lent to another pool is shown as <em>borrowed</em> with the pool it came from and the rule that borrowed it. It is not saved as a member of the pool it is in now, so saving the pool does not undo the loan (see <a href="pool-scheduler.html">The Pool Scheduler</a>).</p>
+
+<h2>Why a build waits</h2>
+<p>The queue and the <strong>Compatible Agents</strong> tab of a build configuration name the pool of every agent that was left out, for example <em>Not in a pool assigned to this project (pool: Windows)</em>.</p>
+
+<h2>Tips</h2>
+<ul>
+  <li>Name pools after what they build, such as <code>Consoles</code> or <code>Linux servers</code>, not after rooms or people.</li>
+  <li>Give each platform pool its brand icon. It makes the agent list much easier to scan.</li>
+  <li>Keep at least one agent in the Default pool, so build configurations without a pool can still run.</li>
+</ul>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="pool-scheduler.html">The Pool Scheduler</a></li>
+  <li><a href="agent-settings.html">Agent settings</a></li>
+  <li><a href="../how-to/set-up-console-pool.html">Create a pool for console devkits</a></li>
+</ul>
+</main>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Run dialog · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="running-builds/run-dialog">
+<main class="doc">
+<h1>The Run dialog</h1>
+<p class="lead">Start a build by hand and choose its options: the agent, the parameters, the changes and the shelves to build.</p>
+
+<h2>Run, or Run custom build</h2>
+<p>The <strong>Run</strong> button on a build configuration starts a build at once with the default values. A message says <em>Build scheduled</em>, and the build joins the queue. If the build configuration depends on other builds, <strong>Run</strong> starts the whole chain.</p>
+<p>When you want something different for one build, use the Run dialog. Its title is <strong>Run custom build</strong>.</p>
+<ol class="steps">
+  <li>Open the build configuration, for example <em>Game / Windows Build</em>.</li>
+  <li>Click the small button with the sliders, right beside <strong>Run</strong>. Its tooltip says <em>Run custom build</em>.</li>
+  <li>Choose your options on the tabs.</li>
+  <li>Click <strong>Run Build</strong>. Click <strong>Cancel</strong>, or press <kbd>Esc</kbd>, to close without starting anything. Clicking outside the dialog does not close it.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/running-builds/run-dialog-general.png" alt="The Run custom build dialog on its General tab, with Agent, Personal build, Put the build to the queue top, Delete all files and Comment">
+  <figcaption>The Run custom build dialog, on the General tab. The other tabs fill in while you look.</figcaption>
+</figure>
+<div class="callout note"><p>If a parameter's display is set to <em>Prompt</em>, the main button is called <strong>Run&hellip;</strong> and opens this dialog every time. See <a href="../parameters/parameters.html">Parameters</a>.</p></div>
+
+<h2>The tabs</h2>
+<table>
+  <tr><th>Tab</th><th>When you see it</th></tr>
+  <tr><td><strong>General</strong></td><td>Always.</td></tr>
+  <tr><td><strong>Dependencies</strong></td><td>When the build configuration depends on other builds. The number is how many.</td></tr>
+  <tr><td><strong>Parameters</strong></td><td>When the build configuration has parameters people may set. The number is how many.</td></tr>
+  <tr><td><strong>Changes</strong> and <strong>Shelved changes</strong></td><td>When the build configuration has a Perforce root. They load in the background and show their counts when ready.</td></tr>
+</table>
+
+<h2>General: every option</h2>
+<table>
+  <tr><th>Option</th><th>What it does</th><th>Default</th></tr>
+  <tr><td><strong>Agent</strong></td><td>Which machine runs the build. See the list below.</td><td><code>&lt;default: any compatible agent&gt;</code></td></tr>
+  <tr><td><strong>Personal build</strong></td><td>Marks the build as personal: only you and administrators see it, and it never changes the status of the build configuration. See <a href="personal-builds.html">Personal builds and shelves</a>. It is always on when you pick <em>My machine</em>.</td><td>Off</td></tr>
+  <tr><td><strong>Put the build to the queue top</strong></td><td>The build goes ahead of the builds already waiting. See <a href="queue.html">The queue</a>.</td><td>Off</td></tr>
+  <tr><td><strong>Delete all files in the checkout directory before the build</strong></td><td>A clean checkout: the agent deletes the old files and gets all the code again. Use it when a build fails because of leftover files. A <a href="resume.html">resumed build</a> never does this, because it continues in the workspace as it was.</td><td>Off</td></tr>
+  <tr><td><strong>Comment</strong></td><td>Why you run this build, for example <code>Release candidate for QA</code>. It is shown on the build page and in the build list.</td><td>Empty</td></tr>
+</table>
+<h3>The Agent list</h3>
+<table>
+  <tr><th>Choice</th><th>What happens</th></tr>
+  <tr><td><code>&lt;default: any compatible agent&gt;</code></td><td>Buildspawn picks a free agent that fits the build configuration's requirements. A note under the list tells you the label the build configuration runs on, or that it can run on any agent that is not reserved for other build configurations.</td></tr>
+  <tr><td><strong>Run on all enabled compatible agents (N)</strong></td><td>Starts one build on every enabled agent that can run it. Use it to try a change on every machine type. It is greyed out when no compatible agent is connected.</td></tr>
+  <tr><td><strong>My machine &middot; name</strong></td><td>One of your own computers. Only you see this choice. See <a href="personal-builds.html">Personal builds and shelves</a>.</td></tr>
+  <tr><td>An agent name, under <strong>Compatible agents</strong></td><td>Runs the build on that agent. Each line shows the agent, whether it can start now (for example <em>Can start now (2 idle)</em>) and its pool.</td></tr>
+  <tr><td>An agent under <strong>Incompatible agents</strong></td><td>Greyed out. The line says why it cannot run the build, for example <em>Not in a pool assigned to this project</em>.</td></tr>
+</table>
+<p>The link <strong>Compatible Agents</strong> under the list opens a page that explains which agents can run this build configuration and why.</p>
+<p>A <strong>Pipeline</strong> picks its agents in its own script, so the Agent list is greyed out and the clean-checkout box is off. Use <code>deleteDir()</code> or <code>cleanWs()</code> in the script instead.</p>
+
+<h2>Dependencies</h2>
+<p>This tab is for build configurations that depend on others (snapshot dependencies). Under <strong>Rebuild snapshot dependencies</strong> choose one:</p>
+<table>
+  <tr><th>Choice</th><th>What happens</th></tr>
+  <tr><td><strong>Default: reuse suitable builds</strong></td><td>Each dependency is rebuilt only when it has no suitable build.</td></tr>
+  <tr><td><strong>Rebuild failed and incomplete dependencies</strong></td><td>Successful builds are reused. Dependencies whose last build failed or did not finish are built again.</td></tr>
+  <tr><td><strong>Rebuild all dependencies</strong></td><td>Every dependency in the chain is built again.</td></tr>
+</table>
+<p>Below that, <strong>This build configuration depends on N build configurations</strong> lists them with their last build. Each one shows the values it will get from this build and where each value came from. The values start from the configuration. You can change one for this run only. See <a href="../parameters/build-chains.html">Passing parameters in a build chain</a>.</p>
+
+<h2>Parameters</h2>
+<p>The Parameters tab lists the parameters people can set when the build runs. Each field follows the parameter's value type: a text box, a checkbox, a list or a password.</p>
+<ul>
+  <li><strong>Reset</strong> beside a field puts the default value back.</li>
+  <li>A password shows <em>Concealed</em>. Click <strong>Change Password</strong> to give a different one for this build. Nobody sees the stored value.</li>
+  <li>Hidden parameters are not shown, and read-only ones cannot be changed.</li>
+  <li>A value that breaks a parameter's rule, for example an empty field that must not be empty, is refused before the build starts. The dialog opens on this tab and says why.</li>
+</ul>
+<div class="callout note"><p>If you may not configure the build configuration, you may not change values that end up in script text, and you cannot change Vault parameters. The dialog refuses the change and tells you why.</p></div>
+<p>The values you enter are on the build's Parameters tab afterwards. See <a href="../how-to/run-build-with-different-parameters.html">Run a build with different parameters</a>.</p>
+
+<h2>Changes and Shelved changes</h2>
+<p>These tabs come from the Perforce plugin.</p>
+<table>
+  <tr><th>Option</th><th>What it does</th></tr>
+  <tr><td><strong>Changes &rsaquo; Latest</strong></td><td>Syncs to the newest changelist of the view, as a regular build does.</td></tr>
+  <tr><td><strong>Changes &rsaquo; Changelist</strong></td><td>Pick a submitted changelist from the list (search by number, user or description), for example an older one. The build page says which one it was built at.</td></tr>
+  <tr><td><strong>Changes &rsaquo; Label</strong></td><td>Sync to a Perforce label. It is greyed out when the Perforce server has no labels.</td></tr>
+  <tr><td><strong>Shelved changes &rsaquo; Shelved changelist IDs</strong></td><td>One or several shelves, separated by commas, for example <code>16, 17</code>. Tick them in the list, or type the numbers. Empty means a regular build. The build becomes a personal build.</td></tr>
+  <tr><td><strong>Run personal build</strong> / <strong>Run on my machine</strong></td><td>Buttons on the Shelved changes tab. See <a href="personal-builds.html">Personal builds and shelves</a>.</td></tr>
+</table>
+<p>If a tab cannot load, for example because the Perforce server does not answer, it says so and offers <strong>Try again</strong>. The rest of the dialog still works. Git roots have no tab here: to build another commit of a Git root, use <a href="rerun.html">Re-run with changes</a> on an earlier build.</p>
+
+<h2>What you see when it runs</h2>
+<ul>
+  <li>A message says <em>Build scheduled</em>. The build appears in <strong>Queue</strong>, then on the build configuration's History tab.</li>
+  <li>The build's <strong>Summary</strong> shows your comment, the agent it ran on and the parameter values that were used. The Cause line says <em>Started by user</em> and your name.</li>
+  <li>With <em>Run on all enabled compatible agents</em> you get one build for each agent.</li>
+</ul>
+
+<h2>Problems and fixes</h2>
+<table>
+  <tr><th>Problem</th><th>What to do</th></tr>
+  <tr><td>The dialog refuses an agent: <em>incompatible</em>.</td><td>Open <strong>Compatible Agents</strong> and read why. Usually the agent is in another pool or misses a requirement.</td></tr>
+  <tr><td>My machine says the build will stop before it starts.</td><td>The build configuration uses a credential that is not allowed on personal machines. Ask an administrator to allow it.</td></tr>
+  <tr><td>A parameter value is refused.</td><td>The Parameters tab opens with the reason under the field. Fix the value or press <strong>Reset</strong>.</td></tr>
+  <tr><td>The Perforce tabs show <em>Try again</em>.</td><td>The Perforce server did not answer in time. Click <strong>Try again</strong>. See <a href="../version-control/perforce.html">Perforce</a>.</td></tr>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="rerun.html">Re-run a build</a>: the same dialog filled in from a finished build.</li>
+  <li><a href="queue.html">The queue</a></li>
+  <li><a href="triggers.html">Triggers</a>: builds that start on their own.</li>
+</ul>
+
+</main>
+</body>
+</html>

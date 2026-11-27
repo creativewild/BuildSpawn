@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Perforce roots · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="version-control/perforce-roots">
+<main class="doc">
+<h1>Perforce roots</h1>
+<p class="lead">A Perforce root is a Perforce connection plus a workspace definition, set up once and shared by many build configurations.</p>
+
+<h2>When to use it</h2>
+<p>Use a Perforce root when several build configurations sync the same depot or stream. You define the server, user, stream or view and sync options in one place. A change to the root reaches every build configuration that uses it. For a build configuration that needs its own workspace settings, use <a href="perforce-software.html">Perforce Software</a> instead.</p>
+<p>Roots live on the global list or on a <strong>project</strong>. A root on a project is seen by the build configurations in that project and the projects below it. A build configuration sees the roots of its projects, nearest first, then the global ones. If two roots have the same ID, the nearer one wins.</p>
+
+<h2>How to set it up</h2>
+<h3>Create a root</h3>
+<ol class="steps">
+  <li>Open the project, then click <strong>Perforce roots</strong>. For a root every build configuration may use, open <strong>Manage Buildspawn › Perforce roots</strong>.</li>
+  <li>Click <strong>Create root</strong>.</li>
+  <li>Fill in the form (every field is listed below).</li>
+  <li>Click <strong>Test connection</strong> to check that Buildspawn can sign in and see the stream or client.</li>
+  <li>Click <strong>Create root</strong>.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/version-control/perforce-roots.png" alt="The Perforce roots tab of the Game project with a Create root button, two roots defined in the project (Skyforge stream and Skyforge code and content) and two inherited read-only roots">
+  <figcaption>The Perforce roots tab of a project. Roots from higher up are listed as read-only.</figcaption>
+</figure>
+<h3>Use a root in a build configuration</h3>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Version Control</strong>.</li>
+  <li>Choose <strong>Perforce root</strong>.</li>
+  <li>Pick the root in <strong>Perforce root</strong>. The line under the picker shows what the root checks out and the workspace name for this build configuration.</li>
+  <li>Optionally fill in <strong>Checkout rules</strong>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/version-control/perforce-roots-config.png" alt="The Version Control tab with Perforce root chosen and the root Skyforge stream selected"><figcaption>Version Control with Perforce root chosen.</figcaption></figure>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Perforce root</strong></td><td>Roots of this build configuration's projects, nearest first, then the global ones.</td></tr>
+    <tr><td><strong>Polling</strong></td><td>Shown when polling was skipped because a Perforce trigger is active on the root (see <a href="perforce-polling.html">Polling and triggers</a>).</td></tr>
+    <tr><td><strong>Checkout rules</strong></td><td>One rule per line: <code>+:path</code> includes, <code>-:path</code> excludes, <code>path=&gt;dir</code> and <code>.=&gt;dir</code> put files into a folder. Paths are relative to the workspace side of the root's mapping and name directories. The most specific rule wins. Without a <code>+:</code> rule everything else is included. On a stream only <code>+:.</code> and <code>+:.=&gt;dir</code> work, unless the root has <strong>Create non-stream workspace</strong>. Excluded paths are not synced, do not start polling and do not show in changes.</td></tr>
+  </tbody>
+</table>
+
+<h2>Every field of a root</h2>
+<h3>Name and scope</h3>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Root name</strong></td><td>Unique in this scope. Shown in the picker.</td><td><code>Skyforge Main</code></td></tr>
+    <tr><td><strong>Root ID</strong></td><td>Build configurations refer to the root by this ID. Letters, digits, <code>_</code>, <code>.</code> and <code>-</code>, starting with a letter or digit. It is offered from the name. After the root is made, <strong>Change ID</strong> renames it and updates the build configurations that use it. Their next build starts from an empty workspace once.</td><td><code>skyforge-main</code></td></tr>
+    <tr><td><strong>Description</strong></td><td>Optional text.</td><td>Main line of the game</td></tr>
+    <tr><td><strong>Belongs to</strong></td><td>Shows where the root is defined and who sees it.</td><td></td></tr>
+  </tbody>
+</table>
+<h3>Connection</h3>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Credential</strong></td><td>A Perforce password or ticket credential. The port and user come from it. The password never leaves it. See <a href="perforce-connections.html">Perforce connections</a>.</td></tr>
+    <tr><td><strong>Test connection</strong></td><td>Checks the credential, mode, stream and client you typed.</td></tr>
+  </tbody>
+</table>
+<h3>What to check out</h3>
+<p>Choose one of three cards.</p>
+<table>
+  <thead><tr><th>Card</th><th>Field</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td rowspan="3"><strong>Stream</strong>: work on a stream; the mapping comes from the stream</td><td><strong>Stream</strong></td><td>An existing stream, such as <code>//skyforge/main</code>. It may use parameters: <code>//skyforge/${BRANCH}</code>.</td></tr>
+    <tr><td><strong>Enable feature branches</strong> and <strong>Branch streams</strong></td><td>One stream per line. <code>*</code> is a wildcard, <code>-:</code> leaves a stream out, and the last matching line decides. Each stream gets its own builds and workspace. See <a href="perforce-streams.html">Streams</a>.</td></tr>
+    <tr><td><strong>Create non-stream workspace</strong></td><td>Allows every checkout rule, but the build cannot submit to the stream.</td></tr>
+    <tr><td><strong>Client</strong>: use an existing client as it is</td><td><strong>Client name</strong></td><td>An existing client. Only its mapping is used. Builds run in the build configuration's own client, so the client's name is ignored. Example: <code>build-${NODE_NAME}</code>.</td></tr>
+    <tr><td rowspan="2"><strong>Client mapping</strong>: write the depot to workspace lines here</td><td><strong>Client mapping</strong></td><td>Depot to workspace lines in the <a href="perforce-view-mappings.html">View Mappings</a> editor. Use <code>//${P4_CLIENT}/</code> in place of a client name.</td></tr>
+    <tr><td><strong>ChangeView</strong></td><td>Limits paths to a revision or label, such as <code>//depot/lib/...@1234</code>. Other revisions of those paths are not watched.</td></tr>
+  </tbody>
+</table>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Label or changelist to sync</strong></td><td>Checks out this label or change. Empty means the latest change. Builds record what they synced in <code>P4ROOT_&lt;ID&gt;_CHANGELIST</code>.</td></tr>
+  </tbody>
+</table>
+<h3>Sync and cleanup</h3>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th></tr></thead>
+  <tbody>
+    <tr><td><strong>How to sync</strong></td><td><strong>Incremental p4 sync</strong> transfers only what changed and leaves stray files. <strong>Auto Clean: reconcile, remove stray files, then p4 sync</strong> and <strong>Run p4 clean before p4 sync</strong> do the same reconcile first, which restores changed files and removes stray ones. <strong>Force: empty the workspace, then p4 sync -f</strong> starts clean every time. <strong>Skip the have list update (p4 sync -p)</strong> transfers all files and the server keeps no have list.</td><td>Incremental</td></tr>
+    <tr><td><strong>Workspace options</strong> (switches)</td><td><strong>Make all files writable</strong> (<code>allwrite</code>), <strong>Overwrite writable files</strong> (<code>clobber</code>), <strong>Compress data on transfer</strong>, <strong>Lock the workspace to its owner</strong>, <strong>Keep file times from the depot</strong> (<code>modtime</code>), <strong>Remove empty folders on sync</strong> (<code>rmdir</code>). <strong>Show as p4 text</strong> shows the options line.</td><td>New roots: clobber, rmdir on; the rest off</td></tr>
+    <tr><td><strong>When submitting</strong></td><td>What to do with files that are open but unchanged: <strong>Submit all</strong>, <strong>Revert unchanged</strong>, <strong>Leave unchanged open</strong>.</td><td>Revert unchanged</td></tr>
+    <tr><td><strong>Line endings</strong></td><td><strong>Local</strong> (the agent's own), <strong>Unix</strong>, <strong>Windows</strong>, <strong>Mac</strong>, <strong>Shared</strong>.</td><td>Local</td></tr>
+    <tr><td><strong>Remove the workspace after each build</strong></td><td>Deletes the Perforce client and the workspace folder when the build ends, so the next build checks out clean. Only clients Buildspawn made. A client with shelved files stays.</td><td>Off</td></tr>
+    <tr><td><strong>Remove inactive workspaces</strong></td><td>Removes workspaces Buildspawn made for this root after they were inactive for the days below, checked every 6 hours. Other clients are never touched.</td><td>Off</td></tr>
+    <tr><td><strong>Inactive for</strong></td><td>The number of days. Empty means 7.</td><td>7</td></tr>
+  </tbody>
+</table>
+<h3>Advanced settings</h3>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Charset</strong></td><td>Use <code>none</code> unless the server is in Unicode mode. Type to search.</td><td><code>none</code></td></tr>
+    <tr><td><strong>P4Host</strong></td><td>Pins the client to this host name. Builds connect as that host.</td><td></td></tr>
+    <tr><td><strong>Extra sync options</strong></td><td>Added to <code>p4 sync</code>: <code>-q -f -p -k -n --parallel=threads=N</code>. Others are refused.</td><td><code>-q --parallel=threads=4</code></td></tr>
+    <tr><td><strong>Minimum polling interval</strong></td><td>At least this many seconds between two polls of a build configuration on this root, kept across restarts. Empty means no limit.</td><td><code>60</code></td></tr>
+    <tr><td><strong>Workspace name</strong></td><td>Shown for information. Each build configuration gets its own client named <code>buildspawn-${NODE_NAME}-${JOB_NAME}-${EXECUTOR_NUMBER}</code>, so two build configurations on a root never share one. In a project the name also holds a hash of the full name.</td><td></td></tr>
+  </tbody>
+</table>
+<p>The summary beside the form shows the connection, workspace name, where the root is visible and which build configurations use it.</p>
+
+<h2>Other actions on a root</h2>
+<table>
+  <thead><tr><th>Button</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Duplicate</strong></td><td>Makes a copy to change.</td></tr>
+    <tr><td><strong>Delete Perforce workspaces...</strong></td><td>Lists the workspaces Buildspawn recorded for the root and removes the ones you choose. Removing one reverts its opened files and deletes its pending changelists, which needs an Administrator Access connection. Shelved work is never deleted.</td></tr>
+    <tr><td><strong>Administrator Access</strong></td><td>Opens the <a href="perforce-connections.html">connections</a> page where administrator connections are defined.</td></tr>
+    <tr><td><strong>Delete root</strong></td><td>Refused while a build configuration uses the root. The message lists them. Move them to another root first.</td></tr>
+  </tbody>
+</table>
+<p>The <strong>Used in</strong> list of the root shows which build configurations use it. Saving a root changes all of them, starting with their next build.</p>
+
+<h2>A worked example</h2>
+<p>The Skyforge studio has one Unreal Engine game on stream <code>//skyforge/main</code>. On the <strong>Game</strong> project, create a root:</p>
+<table>
+  <tbody>
+    <tr><td><strong>Root name</strong></td><td>Skyforge Main</td></tr>
+    <tr><td><strong>Credential</strong></td><td>Studio Helix Core (buildbot)</td></tr>
+    <tr><td><strong>What to check out</strong></td><td>Stream: <code>//skyforge/main</code></td></tr>
+    <tr><td><strong>How to sync</strong></td><td>Auto Clean</td></tr>
+    <tr><td><strong>Extra sync options</strong></td><td><code>-q --parallel=threads=8</code></td></tr>
+  </tbody>
+</table>
+<p>Then <strong>Windows Build</strong>, <strong>Linux Server Build</strong> and <strong>Unit Tests</strong> each choose <strong>Perforce root › Skyforge Main</strong>. Each builds in its own workspace.</p>
+
+<h2>What you see when it runs</h2>
+<p>The build log starts with the sync into the build configuration's workspace. The build page shows the changelist. The build configuration gets the Perforce tabs described on the <a href="perforce.html">Perforce</a> page.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>You see</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><em>The root was not saved</em> with a list of problems</td><td>Read each line. A stream that does not exist and a bad credential are the common ones.</td></tr>
+    <tr><td><em>Not deleted. It is used in ...</em></td><td>Move those build configurations to another root first.</td></tr>
+    <tr><td>After renaming the ID, a Pipeline still fails</td><td>Buildspawn rewrites a Pipeline's script. A script that builds the ID at run time cannot be found. Change it by hand.</td></tr>
+    <tr><td>The credential is not usable</td><td>The credential must be visible where the root is defined: on the same project or above it.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="perforce.html">Perforce</a>, <a href="perforce-connections.html">Perforce connections</a>, <a href="perforce-streams.html">Streams</a>, <a href="perforce-view-mappings.html">View Mappings</a></li>
+  <li><a href="perforce-polling.html">Polling and triggers</a>, <a href="several-roots.html">Several roots</a></li>
+</ul>
+</main>
+</body>
+</html>

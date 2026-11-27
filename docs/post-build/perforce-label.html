@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Label in Perforce (VCS labeling) · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="post-build/perforce-label">
+<main class="doc">
+<h1>Label in Perforce (VCS labeling)</h1>
+<p class="lead">Puts a label on the Perforce revision that the build used.</p>
+<h2>When to use it</h2>
+<p>It is the same setting as the build feature <a href="../projects/feature-vcs-labeling.html">VCS labeling</a>; all fields are described there. Use it to find the exact files of a build later.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration, click <strong>Settings</strong>, then <strong>Post-build Actions</strong>. Click <strong>Add post-build action</strong> and choose <strong>Label in Perforce (VCS labeling)</strong>.</li>
+  <li>Set the <strong>Label pattern</strong> and <strong>Label builds</strong>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Perforce root</td><td>Which root to label when there are several.</td><td>The only root</td><td><code>Main</code></td></tr>
+    <tr><td>Label pattern</td><td>The label name. Build variables may be used.</td><td><code>build-${BUILD_NUMBER}</code></td><td><code>skyforge-${BUILD_NUMBER}</code></td></tr>
+    <tr><td>Label builds</td><td>Successful builds only, or every build.</td><td>Successful builds only</td><td>Successful</td></tr>
+    <tr><td>Branch filter</td><td>Rules <code>+:name</code> and <code>-:name</code>, one per line.</td><td>Empty</td><td><code>+:main</code></td></tr>
+    <tr><td>Label description</td><td>Description text for the label.</td><td>Empty</td><td><code>Skyforge build ${BUILD_NUMBER}</code></td></tr>
+    <tr><td>Move a label Buildspawn created</td><td>Allow moving a label that Buildspawn made.</td><td>Off</td><td>Off</td></tr>
+    <tr><td>Email on failure</td><td>Who to tell when labelling fails.</td><td>Empty</td><td><code>p4-admin@studio.example</code></td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p>Each good <strong>Windows Build</strong> gets the label <code>skyforge-142</code>. The artists sync that label to see the build's files.</p><h2>What you see when it runs</h2>
+<p>The label shows on the Perforce <strong>Labels</strong> tab.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>The label already exists</td><td>Put the build number in the pattern.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="overview.html">After the build: overview</a></li>
+  <li><a href="../projects/bc-post-build-actions.html">Post-build actions tab</a></li>
+  <li><a href="../projects/feature-vcs-labeling.html">VCS labeling</a></li>
+  <li><a href="perforce-label-build.html">Perforce: Label build</a></li>
+</ul>
+</main>
+</body>
+</html>

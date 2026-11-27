@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FxCop · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/fxcop">
+<main class="doc">
+<h1>FxCop</h1>
+<p class="lead">Runs <code>FxCopCmd</code> on assemblies or an FxCop project and lists the issues on the build. It runs on Windows agents only, and the tool is not part of Buildspawn.</p>
+
+<h2>When to use it</h2>
+<p>Use it to check compiled .NET assemblies against code rules, for example your gameplay library before release.</p>
+
+<h2>How to set it up</h2>
+
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>. Type <code>FxCop</code> in <strong>Filter step types</strong> if you like, then click the <strong>FxCop</strong> tile (group <strong>Code quality and coverage</strong>).</li>
+  <li>Type a <strong>Step name</strong>, for example <code>FxCop</code>.</li>
+  <li>Fill in the fields described below.</li>
+  <li>Optional: set <strong>Execute step</strong>, <strong>Conditions</strong> and <strong>Retry on failure</strong>. See <a href="step-list.html">The steps list and the step editor</a>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<figure class="shot small">
+  <img src="../../assets/shots/build-steps/fxcop.png" alt="The fields of the FxCop step in the step editor">
+  <figcaption>The fields of the FxCop step, as the step editor shows them.</figcaption>
+</figure>
+
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>FxCop detection</strong></td><td><strong>Autodetect installation</strong> runs <code>FxCopCmd</code> from the agent's <code>PATH</code> and the build configuration asks for an agent that has it. <strong>Specify installation root</strong> names the folder.</td><td>Autodetect installation</td><td>Specify installation root</td></tr>
+    <tr><td><strong>Installation root</strong></td><td>The folder that holds <code>FxCopCmd.exe</code>. Shows for <strong>Specify installation root</strong>.</td><td>Empty</td><td><code>C:\Program Files (x86)\Microsoft Fxcop 10.0</code></td></tr>
+    <tr><td><strong>Assemblies</strong></td><td>One assembly, folder or wildcard per line, relative to the working directory. Each is passed as <code>/file:</code>. Give assemblies, a project file, or both.</td><td>Empty</td><td><code>bin/Release/Game.Core.dll</code></td></tr>
+    <tr><td><strong>FxCop project file</strong></td><td>Passed as <code>/project:</code>.</td><td>Empty</td><td><code>Rules/Game.FxCop</code></td></tr>
+    <tr><td><strong>Ignore generated code</strong></td><td>Passed as <code>/ignoregeneratedcode</code>.</td><td>Off</td><td>On</td></tr>
+    <tr><td><strong>Report XSLT file</strong></td><td>Passed as <code>/outXsl:</code>. The XML report stays XML, with a reference to the file, and its issues are listed on the build.</td><td>Empty</td><td><code>Rules/report.xsl</code></td></tr>
+    <tr><td><strong>Additional FxCopCmd options</strong></td><td>One option per line, for example <code>/dictionary:CustomDictionary.xml</code>.</td><td>Empty</td><td><code>/dictionary:Words.xml</code></td></tr>
+    <tr><td><strong>Fail on analysis errors</strong></td><td>On: any exit code other than 0 fails the step. Off: analysis errors and rule exceptions (codes 1 and 2) are tolerated and the issues are still listed.</td><td>On</td><td>On</td></tr>
+    <tr><td><strong>Limit</strong></td><td>Optional. The step is worse when it finds more issues than this number. Empty means no limit.</td><td>Empty</td><td><code>0</code></td></tr>
+    <tr><td><strong>When over the limit</strong></td><td><strong>The build turns unstable</strong> or <strong>The step fails</strong>.</td><td>The build turns unstable</td><td>The step fails</td></tr>
+    <tr><td><strong>Working directory, Environment variables, Test reports, Run step within container</strong></td><td>The same in every runner. See <a href="common-step-fields.html">Fields every runner has</a>.</td><td></td><td></td></tr>
+  </tbody>
+</table>
+
+
+<h2>A worked example</h2>
+<p>Check the core library. Step name <code>FxCop</code>, <strong>Assemblies</strong> <code>bin/Release/Game.Core.dll</code>, tick <strong>Ignore generated code</strong>, <strong>Limit</strong> <code>0</code>, <strong>When over the limit</strong> <strong>The build turns unstable</strong>.</p>
+
+<h2>What you see when it runs</h2>
+<p>The console shows the <code>FxCopCmd</code> command. The build page lists the issues on its <strong>Code Inspections</strong> page: how many issues, errors, warnings and notes, in how many files. Over the limit, the build turns unstable or the step fails.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong><em>The FxCop step runs on Windows agents only</em></strong></td><td>Run it on a Windows agent.</td></tr>
+    <tr><td><strong><em>The FxCopCmd command was not found on this agent</em></strong></td><td>Install FxCop, put <code>FxCopCmd</code> on the <code>PATH</code>, or give the installation root.</td></tr>
+    <tr><td><strong><em>The FxCop step has no assemblies and no project file</em></strong></td><td>Fill in <strong>Assemblies</strong> or <strong>FxCop project file</strong>.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="code-inspections.html">Code Inspections</a></li>
+  <li><a href="resharper-inspections.html">Inspections (ReSharper)</a></li>
+  <li><a href="runners.html">Runners</a></li>
+  <li><a href="common-step-fields.html">Fields every runner has</a></li>
+</ul>
+</main>
+</body>
+</html>

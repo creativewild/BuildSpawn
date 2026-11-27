@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Running the server · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="administration/running-the-server">
+<main class="doc">
+<h1>Running the server</h1>
+<p class="lead">The short guide to choosing a download, starting the server for the first time, and knowing where its port, memory, logs and data are.</p>
+
+<h2>Pick a package</h2>
+<table>
+  <thead><tr><th>Your computer</th><th>Download</th><th>Details</th></tr></thead>
+  <tbody>
+    <tr><td>Windows, a build server that stays on</td><td><code>buildspawn-&lt;version&gt;-setup.exe</code>: installs the program and, if you want, the Windows service</td><td><a href="windows-launcher.html">The Windows app</a></td></tr>
+    <tr><td>Windows, a try-out or a USB stick</td><td>The portable <code>.zip</code>: unpack and open <code>Buildspawn.exe</code></td><td><a href="windows-launcher.html">The Windows app</a></td></tr>
+    <tr><td>Debian or Ubuntu</td><td>The <code>.deb</code> package</td><td><a href="linux-macos-install.html">Install on Linux and macOS</a></td></tr>
+    <tr><td>RHEL, Rocky or Fedora</td><td>The <code>.rpm</code> package</td><td><a href="linux-macos-install.html">Install on Linux and macOS</a></td></tr>
+    <tr><td>Any other Linux, or a folder of your choice</td><td>The Linux <code>tar.gz</code> (x64 or aarch64)</td><td><a href="linux-macos-install.html">Install on Linux and macOS</a></td></tr>
+    <tr><td>A Mac</td><td>The macOS <code>tar.gz</code> (Apple silicon or Intel)</td><td><a href="linux-macos-install.html">Install on Linux and macOS</a></td></tr>
+    <tr><td>Your own Java, or a container</td><td>The <code>.war</code> file</td><td><a href="backups.html">Backups and upgrades</a></td></tr>
+  </tbody>
+</table>
+<p>Every package except the war includes its own Java. There is a start page in the download folder, <code>START-buildspawn-&lt;version&gt;.html</code>, that shows the steps for each system.</p>
+
+<h2>First start</h2>
+<ol class="steps">
+  <li>Install and start as described for your system. On Windows, open the app and press <strong>Start</strong> on <strong>Run here</strong>, or install the service. On Linux and macOS run <code>buildspawn</code> (or <code>bin/buildspawn</code>), which opens the launch flow.</li>
+  <li>Open <code>http://localhost:8080/</code> in a browser. From another computer use the server's name or address instead of <code>localhost</code>.</li>
+  <li>A setup page asks for the <strong>initial admin password</strong>. Get it as described below and type it in.</li>
+  <li>Follow the setup page. See <a href="../get-started/first-start.html">Your first start</a>.</li>
+</ol>
+
+<h3>The initial admin password</h3>
+<p>On a new data folder the server makes a one-time password for the user <code>admin</code>. It is written to <code>secrets\initialAdminPassword</code> inside the data folder, and deleted when you finish the setup page.</p>
+<table>
+  <thead><tr><th>Where you run Buildspawn</th><th>How to read it</th></tr></thead>
+  <tbody>
+    <tr><td>Windows app</td><td>The <strong>Run here</strong> tab shows it under <strong>First start: initial admin password</strong>, with <strong>Copy</strong>.</td></tr>
+    <tr><td>Terminal program</td><td>The launch flow shows it (<kbd>v</kbd> shows, <kbd>c</kbd> copies). Later run <code>buildspawn admin-password</code> (add <code>--copy</code> to use the clipboard). On a Linux package use <code>sudo</code>.</td></tr>
+    <tr><td>Any system</td><td>Open the file in the data folder.</td></tr>
+  </tbody>
+</table>
+
+<h2>Ports</h2>
+<table>
+  <thead><tr><th>Port</th><th>Use</th></tr></thead>
+  <tbody>
+    <tr><td><strong>8080</strong> (default)</td><td>The web page, the API and the agents. Change it in the settings file (<code>port</code> on Windows, <code>BUILDSPAWN_PORT</code> on Linux and macOS), in the Windows app's <strong>Settings</strong> tab, or with <code>buildspawn set port=...</code>.</td></tr>
+  </tbody>
+</table>
+<p>The server listens on all network interfaces by default in the settings file. The launch flow suggests <em>This PC only</em> for a try-out. Agents and other people need <em>all</em>. On Windows the setup and the launch flow can add a firewall rule named <em>Buildspawn</em> for the port. On Linux and macOS, open the port yourself.</p>
+
+<h2>Arguments</h2>
+<p>Extra arguments go in the <code>arguments</code> setting (<code>BUILDSPAWN_ARGUMENTS</code> on Linux and macOS), or in <strong>Extra arguments</strong> in the Windows app. They are added to the command that starts the server. Two you may need:</p>
+<table>
+  <thead><tr><th>Argument</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>--sessionTimeout=480</code></td><td>How long a signed-in browser stays active without use, in minutes. 480 is eight hours.</td></tr>
+    <tr><td><code>--prefix=/buildspawn</code></td><td>Serves Buildspawn under a path, for example <code>http://server:8080/buildspawn/</code>. Use it when a reverse proxy publishes the server below a path. Set the same path in the proxy.</td></tr>
+  </tbody>
+</table>
+<p>Restart the server after a change.</p>
+
+<h2>Memory</h2>
+<p>The <code>memory</code> setting is the Java heap, used as both the starting and the largest size. When it is empty (Linux, macOS) or not changed (Windows) the server takes a quarter of the computer's memory, between 2 GB and 16 GB. Builds run in their own processes, so they do not use this memory. Raise it when the server is slow with many projects or long histories. Change it in the Windows app's <strong>Settings</strong> tab, the launch flow, or <code>buildspawn set memory=8g --apply</code>. See <a href="../reference/settings-files.html">Settings files</a> for the Java options.</p>
+
+<h2>Where the logs are</h2>
+<table>
+  <thead><tr><th>System</th><th>Server log</th><th>Memory log and heap dumps</th></tr></thead>
+  <tbody>
+    <tr><td>Windows, installed</td><td><code>C:\ProgramData\Buildspawn\logs\buildspawn.log</code></td><td>The same folder</td></tr>
+    <tr><td>Windows, portable</td><td><code>logs\buildspawn.log</code></td><td><code>logs\</code></td></tr>
+    <tr><td>Linux packages</td><td>The journal: <code>journalctl -u buildspawn -f</code></td><td><code>/var/log/buildspawn</code></td></tr>
+    <tr><td>Linux and macOS folder</td><td>The terminal, or <code>logs/buildspawn.log</code> for a background start or a macOS service; the journal for a Linux service</td><td><code>logs/</code></td></tr>
+  </tbody>
+</table>
+<p>The terminal program's <strong>Logs</strong> view and <code>buildspawn logs</code> show them.</p>
+
+<h2>One data folder, one server</h2>
+<ul>
+  <li>The data folder is the <strong>home</strong>. It holds everything you made. Back it up.</li>
+  <li>Run the server either as the service or by hand on one home, never both. The server keeps a lock file, <code>buildspawn.pid</code>, in the home, and the app and terminal program refuse to start a second one.</li>
+  <li><strong>Upgrade rule:</strong> install the new version over or next to the old one and point it at the same home. Take a backup first. Do not run an older version on a home that a newer version has opened. Go back by restoring the backup.</li>
+</ul>
+
+<h2>Pages in this section</h2>
+<div class="cards">
+  <a class="card" href="windows-launcher.html"><h3>The Windows app</h3><p>Run here, Settings, the service, certificates, setup switches.</p></a>
+  <a class="card" href="linux-macos-install.html"><h3>Install on Linux and macOS</h3><p>Packages, folders, systemd and the Mac LaunchAgent.</p></a>
+  <a class="card" href="server-terminal.html"><h3>The server terminal program</h3><p>Launch flow, live monitor and text commands.</p></a>
+  <a class="card" href="backups.html"><h3>Backups and upgrades</h3><p>What to copy and how to upgrade each package.</p></a>
+  <a class="card" href="../reference/settings-files.html"><h3>Settings files</h3><p>Every key and every path.</p></a>
+  <a class="card" href="trusted-certificates.html"><h3>Trusted certificates</h3><p>Company root certificates for Java.</p></a>
+</div>
+<p>Next, look at <a href="settings-overview.html">Settings overview</a>, <a href="system-settings.html">System settings</a> and <a href="security-settings.html">Security settings</a> in the web interface.</p>
+</main>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Make a tab for your team · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/projects-team-view">
+<main class="doc">
+<h1>Make a tab that shows only your team's build configurations</h1>
+<p class="lead">Add a view to the Projects page so the build team sees its own builds first, without the noise of everything else.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>You need the permission to create views. If you do not see a <strong>+</strong> at the end of the tab bar, ask an administrator.</li>
+  <li>Name your build configurations with a team prefix, for example <code>Engine-Win64</code> and <code>Engine-PS5</code>. A pattern is then easy to write. See <a href="../projects/views.html">Views</a> for every field.</li>
+</ul>
+
+<h2>Steps</h2>
+<ol class="steps">
+  <li>Open the Projects page. Under the page title, click <strong>+</strong> at the end of the tab bar.</li>
+  <li>Type the <strong>Name</strong> <code>Engine team</code>. Under <strong>Type</strong> choose <strong>List View</strong>. Click <strong>Create</strong>.</li>
+  <li>Type a <strong>Description</strong>, for example <code>Builds owned by the engine team.</code></li>
+  <li>Under <strong>Jobs</strong> tick <strong>Recurse in subfolders</strong>, so builds inside projects are found too.</li>
+  <li>Tick <strong>Use a pattern instead</strong>. In <strong>Pattern</strong> type <code>(.*/)?Engine-.*</code>. This matches every build configuration whose name starts with <code>Engine-</code>, at the top or in any project.</li>
+  <li>Under <strong>Filters</strong> click <strong>Add Build Configuration Filter</strong> and choose <strong>Status Filter</strong>. Pick <strong>Enabled build configurations only</strong>, so old paused ones stay out.</li>
+  <li>Under <strong>Columns</strong>, check the list. Add <strong>Last Failure</strong> if the team wants to see when a build last broke.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<h2>What you see</h2>
+<p>The new tab <strong>Engine team</strong> appears next to <strong>All</strong>. Open it: the table lists only the build configurations that match. The <strong>Summary</strong> on <strong>Edit View</strong> says how many items it shows now, for example <em>Shows 6 items.</em></p>
+
+<h2>Make it the first tab people see</h2>
+<p>An administrator can open <strong>Settings › System</strong> and choose <strong>Default view</strong> <code>Engine team</code>. Everyone then lands on that tab. Or keep a private tab in <a href="../projects/views.html#my-views">My Views</a>.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>The tab is empty.</td><td>The pattern must match the whole name. Check the prefix and the path, and end the pattern with <code>.*</code>.</td></tr>
+    <tr><td>A new <code>Engine-</code> build is missing.</td><td>The pattern finds new builds by name. If you ticked builds by hand instead, tick the new one.</td></tr>
+    <tr><td>You want to delete the tab.</td><td>Open it, click <strong>⋯</strong> and choose <strong>Delete View</strong>. The build configurations stay.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../projects/views.html">Views</a></li>
+  <li><a href="../projects/projects.html">Projects</a></li>
+  <li><a href="projects-organise-game.html">Organise projects for a game</a></li>
+</ul>
+</main>
+</body>
+</html>

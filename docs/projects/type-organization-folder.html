@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Organization Folder · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/type-organization-folder">
+<main class="doc">
+<h1>Organization Folder</h1>
+<p class="lead">An Organization Folder scans an account or organization of a code host and makes a Multibranch Pipeline for each repository it finds. It is no longer offered for new items.</p>
+<h2>When to use it</h2>
+<p>It can no longer be created by hand on the New Item page. One that already exists keeps working. Make a <a href="type-multibranch.html">Multibranch Pipeline</a> for each repository instead.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the existing Organization Folder and click <strong>Settings</strong>.</li>
+  <li>Under <strong>Projects</strong> change the <strong>Repository Sources</strong> and the <strong>Project Recognizers</strong>.</li>
+  <li>Set the <strong>Property strategy</strong> and the <strong>Build strategies</strong>. Click <strong>Save</strong>.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Repository Sources</td><td>Which accounts or organizations to scan.</td><td>None</td><td>-</td></tr>
+    <tr><td>Project Recognizers</td><td>What counts as a project in a repository, for example a pipeline script file.</td><td>Pipeline script file</td><td>-</td></tr>
+    <tr><td>Property strategy</td><td>Properties for the branch projects.</td><td>All branches get the same properties</td><td>-</td></tr>
+    <tr><td>Build strategies</td><td>By default everything except tags is built. Adding a strategy turns the defaults off.</td><td>Empty</td><td>-</td></tr>
+    <tr><td>Child scan triggers, health metrics and orphaned items</td><td>Settings passed down to the repositories. See <a href="folder-settings.html">Project settings</a>.</td><td>-</td><td>-</td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p>An old <strong>Platform</strong> project scans one account and has a Multibranch Pipeline for each repository. The studio keeps it and makes new ones by hand.</p><h2>What you see when it runs</h2>
+<p>The folder lists the repositories it found. A scan log shows what changed.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>I cannot create one</td><td>The type is hidden.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="item-types.html">Item types</a></li>
+  <li><a href="type-multibranch.html">Multibranch Pipeline</a></li>
+  <li><a href="folder-settings.html">Project settings</a></li>
+</ul>
+</main>
+</body>
+</html>

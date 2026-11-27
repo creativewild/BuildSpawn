@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Organise your build log with blocks · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/group-build-output">
+<main class="doc">
+<h1>Organise your build log with blocks</h1>
+<p class="lead">Make your scripts print <code>::group::</code> lines, so a long build log turns into named blocks you can open and close, with their own times, warnings and errors.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>You can edit a build configuration: you need the Project administrator role, or the Configure permission, on its project.</li>
+  <li>The build configuration has a build step that runs a script, for example a <strong>PowerShell</strong> or <strong>Command Line</strong> step. See <a href="../build-steps/runners.html">Runners</a>.</li>
+  <li>You know how to open the build console. See <a href="../build-results/build-console.html">The build console</a>.</li>
+</ul>
+
+<h2>The lines you can print</h2>
+<p>Your script only has to write these lines to its output. Each one must start the line (spaces before it are fine).</p>
+<table>
+  <thead><tr><th>Line</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>::group::Name</code></td><td>Starts a block called <em>Name</em>. Blocks can sit inside blocks.</td></tr>
+    <tr><td><code>::group::Name::Details</code></td><td>Starts a block and shows <em>Details</em> in grey after the name, for example <code>::group::Textures::1,204 files</code>.</td></tr>
+    <tr><td><code>::endgroup::</code></td><td>Ends the innermost open block.</td></tr>
+    <tr><td><code>::endgroup::FAILURE</code></td><td>Ends the block and marks how it ended: <code>SUCCESS</code>, <code>UNSTABLE</code>, <code>FAILURE</code>, <code>ABORTED</code> or <code>SKIPPED</code>.</td></tr>
+    <tr><td><code>::warning::Text</code></td><td>Writes <em>Text</em> as a warning: a yellow line that counts in the warnings counter.</td></tr>
+    <tr><td><code>::error::Text</code></td><td>Writes <em>Text</em> as an error: a red line that counts in the errors counter.</td></tr>
+  </tbody>
+</table>
+
+<h2>Steps</h2>
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings</strong>, then <strong>Build Steps</strong>.</li>
+  <li>Click the step that runs your script to open it. To start from scratch, click <strong>Add build step</strong> and pick <strong>PowerShell</strong> or <strong>Command Line</strong>.</li>
+  <li>In the script, print <code>::group::</code> before each long task and <code>::endgroup::</code> after it. Use the example for your shell below.</li>
+  <li>Where your script finds a problem, print <code>::warning::</code> or <code>::error::</code> with a short message.</li>
+  <li>Click <strong>Save</strong>.</li>
+  <li>Click <strong>Run</strong> to start a build, then open it and click the <strong>Console Output</strong> tab.</li>
+  <li>Click <strong>Expand all</strong> to open every block at once.</li>
+</ol>
+
+<h3>PowerShell</h3>
+<p>For a <strong>PowerShell</strong> step, or a <code>.ps1</code> file the step runs:</p>
+<pre><code>Write-Output "::group::Compile game::Win64 Development"
+foreach ($module in 'Core', 'Renderer', 'Audio', 'Gameplay', 'UI') {
+    Write-Output "Compiling module $module"
+}
+Write-Output "::endgroup::"
+
+Write-Output "::group::Cook content"
+Write-Output "::group::Textures::1,204 files"
+Write-Output "::warning::Texture T_Rock_D.png is larger than 4K"
+Write-Output "::endgroup::"
+Write-Output "::group::Maps::3 maps"
+foreach ($map in 'Frontend', 'Harbour', 'Mountains') {
+    Write-Output "Cooking map $map"
+}
+Write-Output "::endgroup::"
+Write-Output "::endgroup::"</code></pre>
+<div class="callout tip"><p>Use <code>Write-Output</code> or <code>Write-Host</code>. Inside a <code>foreach</code> whose result you store in a variable, use <code>Write-Host</code>, because <code>Write-Output</code> would go into the variable instead of the log.</p></div>
+
+<h3>Batch (Command Line step on Windows)</h3>
+<pre><code>@echo off
+echo ::group::Package build
+echo Writing Skyforge-Win64.zip
+echo ::endgroup::
+
+echo ::group::Check package::symbols and size
+echo ::warning::Debug symbols are missing for Audio.dll
+echo ::endgroup::SUCCESS</code></pre>
+<p>Write <code>echo ::group::...</code> with no quotes. In batch, <code>echo</code> prints the quotes too, so the line would start with <code>"</code> and not count as a marker. Start the script with <code>@echo off</code>, so the commands themselves are not printed as well.</p>
+
+<h3>Bash (Command Line step on Linux or macOS)</h3>
+<pre><code>#!/bin/bash
+set -e
+echo "::group::Build server::Linux Development"
+make -j"$(nproc)" server
+echo "::endgroup::"
+
+echo "::group::Run tests"
+if ! ./run-tests.sh; then
+  echo "::error::Server tests failed"
+  echo "::endgroup::FAILURE"
+  exit 1
+fi
+echo "::endgroup::"</code></pre>
+<p>Python, Node.js and any other tool work the same way: print the lines to standard output.</p>
+
+<h3>A block that ends in failure</h3>
+<p>Mark the block before you stop the script, so its header shows a red cross and it opens by itself:</p>
+<pre><code>Write-Output "::group::Upload to the build share"
+if (-not (Test-Path \\fileserver\builds)) {
+    Write-Output "::error::Cannot reach \\fileserver\builds"
+    Write-Output "::endgroup::FAILURE"
+    exit 1
+}
+Write-Output "::endgroup::"</code></pre>
+
+<h2>Check it worked</h2>
+<figure class="shot">
+  <img src="../../assets/shots/how-to/group-build-output-1.png" alt="The Console Output tab of build #1 of HT3 Log blocks with Expand all used: the step Build game holds a block Compile game with the detail Win64 Development and five Compiling module lines, and a block Cook content with nested blocks Textures (1,204 files) and Maps (3 maps); the warning line Texture T_Rock_D.png is larger than 4K has a yellow band; the toolbar shows 0 errors and 2 warnings">
+  <figcaption>The PowerShell example above, in the console. Each block has a tick, its details, a warning count and how long it took.</figcaption>
+</figure>
+<ul>
+  <li>Your blocks appear inside the step's block, with the names you printed. Blocks inside blocks are indented.</li>
+  <li>Each block header shows a time on the right, so you can see which part was slow.</li>
+  <li>Your warnings have a yellow band and count in the <strong>warnings</strong> counter in the toolbar. Errors have a red band and count in <strong>errors</strong>.</li>
+  <li>The <code>::group::</code> marker text itself is not in the log. Click <strong>View as plain text</strong>: the plain log shows the block names, so it still reads well.</li>
+</ul>
+
+<h2>Troubleshooting</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>The line <code>::group::Name</code> shows as plain text.</td><td>Something comes before <code>::</code> on the line, such as a prefix your tool adds, or quotes in a batch <code>echo</code>. The marker must start the line.</td></tr>
+    <tr><td>Everything after one block is inside it.</td><td>A <code>::endgroup::</code> is missing, often because the script stopped early. Print <code>::endgroup::FAILURE</code> before every <code>exit</code> inside a block.</td></tr>
+    <tr><td>PowerShell lines are missing from the log.</td><td>They went into a variable. Use <code>Write-Host</code> inside loops whose output you keep.</td></tr>
+    <tr><td>A block shows a red cross but the step passed.</td><td>You ended it with <code>::endgroup::FAILURE</code>. The block status is only a label; the step result comes from the exit code.</td></tr>
+  </tbody>
+</table>
+
+<h2>Next steps</h2>
+<ul>
+  <li><a href="find-why-build-failed.html">Find out why a build failed</a>: use your blocks and errors to get to the problem fast.</li>
+  <li><a href="../build-results/build-console.html">The build console</a>: times, filters, search and line links.</li>
+  <li><a href="../reference/service-messages.html">Service messages</a>: set parameters and report statistics from a script with <code>##buildspawn</code> lines.</li>
+</ul>
+</main>
+</body>
+</html>

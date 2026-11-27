@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Version Control · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/bc-version-control">
+<main class="doc">
+<h1>Version Control</h1>
+<p class="lead">Where a build configuration gets its sources: Git, Perforce, a Perforce root that a project shares, or several roots.</p>
+<h2>When to use it</h2>
+<p>Use this tab to say where the sources are. The page is titled <strong>Source Code Management</strong>. The card <strong>Checkout options</strong> below the form is described in <a href="bc-workspace-options.html">Workspace options</a>. The number beside the tab counts the roots when there are several. The details of each choice are in the Version control section.</p>
+<figure class="shot">
+  <img src="../../assets/shots/projects/bc-version-control.png" alt="The Version Control tab of Windows Build: the choices None, Git, Perforce Software, Perforce root and Several roots, with the Perforce form below">
+  <figcaption>The Version Control tab. A red dot on the tab means a root has a problem.</figcaption>
+</figure>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings</strong>. Then click <strong>Version Control</strong>.</li>
+  <li>Click a card: <strong>None</strong>, <strong>Git</strong>, <strong>Perforce Software</strong>, <strong>Perforce root</strong> or <strong>Several roots</strong>.</li>
+  <li>Fill in the form that opens under the cards (see <a href="../version-control/git.html">Git</a> and <a href="../version-control/perforce.html">Perforce</a>).</li>
+  <li>With <strong>Several roots</strong> each root is a card with its own checkout folder and its own polling switch. Use the arrows to change their order.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>None</td><td>The build configuration fetches no sources. Use it for builds that only run scripts.</td><td>None</td><td>-</td></tr>
+    <tr><td>Git</td><td>A Git repository, with its credential and branches.</td><td>-</td><td><code>https://git.studio.example/skyforge/launcher.git</code></td></tr>
+    <tr><td>Perforce Software</td><td>A Perforce server with its own workspace in this build configuration: <strong>P4 Credentials</strong>, <strong>Workspace behaviour</strong> (Manual, Spec File, Static, Streams or Template), <strong>Workspace name</strong> and <strong>Workspace options</strong>.</td><td>-</td><td>Workspace name <code>skyforge-win64-${NODE_NAME}</code></td></tr>
+    <tr><td>Perforce root</td><td>A root that a project shares (see <a href="../version-control/perforce-roots.html">Perforce roots</a>). Server, credential and workspace come from the root.</td><td>-</td><td><code>Main</code></td></tr>
+    <tr><td>Several roots</td><td>More than one root, Git or Perforce, each with a checkout folder and a polling switch.</td><td>-</td><td>Perforce <code>game</code> and Git <code>scripts</code></td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p><strong>Windows Build</strong> uses <strong>Perforce Software</strong> with the credential <em>Studio Helix Core (buildbot)</em>, a manual workspace view of the <code>//Skyforge/Main</code> stream and the workspace name <code>skyforge-win64-${NODE_NAME}</code>. Each agent fills in its own name.</p><h2>What you see when it runs</h2>
+<p>The build log starts with the checkout of each root in order. The build page lists the changes of every root. A <strong>Perforce connection</strong> tab appears next to this tab when the build configuration uses Perforce.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>A red dot on the tab</td><td>A root has a problem, for example no connection. Open the tab to see what.</td></tr>
+    <tr><td>Files land in the wrong folder</td><td>Set the checkout folder of each root when there are several.</td></tr>
+    <tr><td>The workspace name shows Unknown client</td><td>A name with variables such as <code>${NODE_NAME}</code> is filled in for each agent when the build runs. The page says so.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="settings-homes.html">Settings homes</a></li>
+  <li><a href="../version-control/overview.html">Version control overview</a></li>
+  <li><a href="../version-control/several-roots.html">Several roots</a></li>
+  <li><a href="../version-control/git.html">Git</a></li>
+  <li><a href="../version-control/perforce.html">Perforce</a></li>
+</ul>
+</main>
+</body>
+</html>

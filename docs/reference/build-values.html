@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Build values · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="reference/build-values">
+<main class="doc">
+<h1>Build values</h1>
+<p class="lead">Every value a build step can read: references like %build.number% and the environment variables every step gets.</p>
+
+<h2>When to use this page</h2>
+<p>Use it when you wonder what a step can read. Write a <code>%…%</code> reference in a runner field or a script, or read an environment variable in the process.</p>
+<h2>How to use a value</h2>
+<ol class="steps">
+  <li>In a runner field or a script of Command Line, PowerShell, Python, Node.js, Kotlin Script and C# Script steps, type the reference, for example <code>%build.number%</code>.</li>
+  <li>In a Shell or Batch step, or in any program, read the environment variable (see the second table).</li>
+  <li>See <a href="../parameters/param-references.html">Parameter references</a> for the rules.</li>
+</ol>
+<h2>References</h2>
+<table>
+<thead><tr><th>Reference</th><th>What it holds</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td><code>%build.number%</code>, <code>%build.counter%</code></td><td>The build number. Not the display name, which a format can fill with parameter values.</td><td><code>212</code></td></tr><tr><td><code>%build.vcs.number%</code></td><td>The changelist or commit. With several roots: <code>%build.vcs.number.&lt;id&gt;%</code> for each.</td><td><code>48213</code></td></tr><tr><td><code>%build.branch%</code></td><td>The branch or stream without its prefix, of the first root that records one.</td><td><code>release/1.4</code></td></tr><tr><td><code>%build.branch.isDefault%</code></td><td><code>true</code> when the branch is the root's default branch.</td><td><code>false</code></td></tr><tr><td><code>%build.vcs.branch.&lt;id&gt;%</code></td><td>The full branch of a root.</td><td><code>refs/heads/main</code></td></tr><tr><td><code>%build.changedFiles.file%</code></td><td>The path of a text file that lists the changed files (a name and a status, ADDED, REMOVED or CHANGED).</td><td><code>C:\...\changedFiles.txt</code></td></tr><tr><td><code>%build.checkoutDir%</code></td><td>The checkout folder on the agent.</td><td><code>D:\agent\ws\Game</code></td></tr><tr><td><code>%build.is.personal%</code></td><td><code>true</code> in a personal build; not set otherwise.</td><td><code>true</code></td></tr><tr><td><code>%build.triggeredBy.username%</code></td><td>The user ID of whoever started the build. For a build another build started, the user who started the first one, when known. Empty for a schedule or a version control trigger.</td><td><code>dana.k</code></td></tr><tr><td><code>%vcsroot.url%</code>, <code>%vcsroot.branch%</code>, <code>%vcsroot.name%</code>, <code>%vcsroot.type%</code></td><td>Properties of the root, with one root. Names that look like secrets are left out, and <code>user:password@</code> is cut from addresses. With several roots: <code>%vcsroot.&lt;id&gt;.url%</code>.</td><td><code>//depot/game/main</code></td></tr><tr><td><code>%agent.…%</code></td><td>The agent the step runs on. See <a href="../parameters/param-agent.html">Agent parameters</a>.</td><td><code>%agent.name%</code></td></tr><tr><td><code>%tool.&lt;id&gt;%</code></td><td>The path of the tool on this agent.</td><td><code>C:\Tools\msbuild</code></td></tr><tr><td><code>%dep.&lt;ID&gt;.build.number%</code>, <code>.build.id</code>, <code>.build.vcs.number</code>, <code>.build.result</code>, <code>.&lt;name&gt;</code></td><td>What the dependency build of this chain used or produced. See <a href="../parameters/build-chains.html">Build chains</a>.</td><td><code>%dep.Game_Cook.build.result%</code></td></tr><tr><td><code>%NAME%</code>, <code>%env.NAME%</code>, <code>%system.name%</code></td><td>Your own parameters.</td><td><code>%CONFIG%</code></td></tr>
+</tbody>
+</table>
+<h2>Environment variables of every step</h2>
+<table>
+<thead><tr><th>Variable</th><th>What it holds</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>BUILD_NUMBER</td><td>The build number.</td><td><code>212</code></td></tr><tr><td>BUILD_ID</td><td>The build ID.</td><td><code>212</code></td></tr><tr><td>BUILD_DISPLAY_NAME</td><td>The build name shown on its page, which a <code>buildNumber</code> message can change.</td><td><code>1.4.212-CL48213</code></td></tr><tr><td>BUILD_URL</td><td>The address of the build page. Set when the server address is known.</td><td><code>http://buildspawn/job/Game/job/Win/212/</code></td></tr><tr><td>JOB_NAME</td><td>The full name of the build configuration, with its projects.</td><td><code>Game/Windows Build</code></td></tr><tr><td>JOB_BASE_NAME</td><td>The short name.</td><td><code>Windows Build</code></td></tr><tr><td>JOB_URL</td><td>The address of the build configuration.</td><td>-</td></tr><tr><td>WORKSPACE</td><td>The checkout folder on the agent.</td><td><code>D:\agent\ws\Game</code></td></tr><tr><td>WORKSPACE_TMP</td><td>A temporary folder next to the workspace.</td><td>-</td></tr><tr><td>NODE_NAME</td><td>The name of the agent.</td><td><code>win-build-01</code></td></tr><tr><td>NODE_LABELS</td><td>The labels of the agent.</td><td><code>windows unreal</code></td></tr><tr><td>EXECUTOR_NUMBER</td><td>The number of the executor of the agent.</td><td><code>0</code></td></tr><tr><td>CI</td><td>Always <code>true</code>.</td><td><code>true</code></td></tr><tr><td>BUILD_VCS_NUMBER</td><td>The changelist or commit, with one root.</td><td><code>48213</code></td></tr><tr><td>BUILD_VCS_NUMBER_&lt;id&gt;</td><td>The same for each root, with the id written with underscores.</td><td>-</td></tr><tr><td>BUILD_IS_PERSONAL</td><td><code>true</code> in a personal build.</td><td><code>true</code></td></tr><tr><td>BUILDSPAWN_TRIGGERED_BY</td><td>Who started the build.</td><td><code>dana.k</code></td></tr><tr><td>P4_PORT, P4_USER, P4_CLIENT, P4_TICKET</td><td>In a build with a Perforce root: its server, user, workspace and a login ticket.</td><td>-</td></tr>
+</tbody>
+</table>
+<p>Your <code>env.</code> parameters and the values that <code>setParameter</code> set with an <code>env.</code> name are environment variables too. The Perforce variables and the values of version control are described in <a href="../version-control/vcs-parameters.html">Version control parameters</a>.</p>
+<h2>A worked example</h2>
+<pre><code>Write-Host "Build %build.number% of changelist %build.vcs.number% on $env:NODE_NAME"
+Write-Host "Started by $env:BUILDSPAWN_TRIGGERED_BY"</code></pre>
+<h2>What you see when it runs</h2>
+<pre class="terminal" data-title="build console">Build 212 of changelist 48213 on win-build-01
+Started by dana.k</pre>
+<h2>Problems and fixes</h2>
+<table>
+<thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+<tbody>
+<tr><td>A reference stays as written</td><td>The value is not known in this build. A <code>%build.vcs.number%</code> needs a version control root that has synced. A <code>%dep.…%</code> needs that dependency in the chain.</td></tr><tr><td><code>%build.triggeredBy.username%</code> is empty</td><td>A schedule or a version control trigger started the build, and no user is behind it.</td></tr><tr><td>A Shell step does not see a <code>%name%</code> reference replaced</td><td>Shell and Batch steps replace only build parameters and values earlier steps set. Read the rest from the environment.</td></tr>
+</tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../parameters/param-references.html">Parameter references</a></li>
+  <li><a href="service-messages.html">Service messages</a></li>
+  <li><a href="../version-control/vcs-parameters.html">Version control parameters</a></li>
+  <li><a href="../parameters/parameters.html">Parameters</a></li>
+</ul>
+</main>
+</body>
+</html>

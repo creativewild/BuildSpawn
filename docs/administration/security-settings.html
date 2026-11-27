@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Security settings · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="administration/security-settings">
+<main class="doc">
+<h1>Security settings</h1>
+<p class="lead">One page, <strong>Settings › Security</strong>, holds the sign-in, permission, agent and protection settings of the whole server.</p>
+
+<h2>When to use it</h2>
+<p>Open it when you set up the server, when you change how people sign in, and when you want to tighten the server (API tokens, Git hooks, content policy). You need <strong>Administer</strong> to change it. People with <strong>System read</strong> can look at it but not save.</p>
+
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Click <strong>Settings</strong> in the top bar, then <strong>Security</strong>.</li>
+  <li>Use the list of sections on the left (<em>Jump to section</em>) to move down the page.</li>
+  <li>Change the settings you need (below).</li>
+  <li>Click <strong>Save</strong>, or <strong>Apply</strong> to stay on the page. The bar with both buttons stays at the bottom of the window.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/administration/security-page.png" alt="The top of the Security page with the list of sections on the left, Authentication, Security Realm, Authorization and the Summary card">
+  <figcaption>The top of Settings › Security, with the list of sections on the left.</figcaption>
+</figure>
+<p>The card <strong>Summary</strong> on the right says in one line who can sign in and what decides what they may do. For example: <em>Users of the built-in user list of this server sign in; Project-based security decides what they may do.</em> It names the realm and the strategy.</p>
+
+<h2>Every section</h2>
+<h3>Authentication</h3>
+<table>
+  <tr><th>Field</th><th>What it does</th><th>Default</th></tr>
+  <tr><td><strong>Disable “Keep me signed in”</strong></td><td>Removes the checkbox from the sign-in page. Everyone signs in again when the browser session ends.</td><td>Off</td></tr>
+</table>
+
+<h3>Security Realm</h3>
+<p>Where users come from. The fields depend on the choice. See <a href="security-realms.html">Security realms</a>, <a href="entra-id.html">Entra ID sign-in</a> and <a href="saml.html">SAML sign-in</a>. With Buildspawn’s own user database you also see <strong>Allow users to sign up</strong> and <strong>Password Complexity Rule</strong>.</p>
+
+<h3>Authorization</h3>
+<p>What people may do. The permission cards and the strategies are explained on <a href="authorization.html">Authorization</a>.</p>
+
+<h3>Markup Formatter</h3>
+<table>
+  <tr><th>Field</th><th>What it does</th><th>Default</th></tr>
+  <tr><td><strong>Markup Formatter</strong></td><td>Decides how descriptions of projects, build configurations, views, builds and users are shown. <strong>Plain text</strong> shows them as written, with line breaks kept. <strong>Safe HTML</strong> allows a safe set of HTML tags.</td><td>Plain text</td></tr>
+</table>
+<div class="callout warning"><p>Descriptions can be set by people you do not expect: any signed-in user can set their own, and build steps can set a build’s description. A formatter that shows HTML as it is would allow <em>cross-site scripting</em> (a page that runs someone’s script in your browser). Keep <strong>Plain text</strong> unless you trust everyone who can write descriptions.</p></div>
+
+<h3>Agents</h3>
+<table>
+  <tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr>
+  <tr><td><strong>TCP port for inbound agents</strong></td><td>The port that agents which connect <em>to</em> the server use. <strong>Disable</strong> turns it off, which is best if you use no inbound agents. <strong>Random</strong> lets the server choose a port at start, which never clashes with other programs. <strong>Fixed</strong> takes a port number, so you can open exactly that port in your firewall.</td><td>Disable</td><td>Fixed, <code>50000</code></td></tr>
+</table>
+<p>If the server was started with a system property that sets the port, the field is replaced by a line like <em>enforced to 50000 on startup through system property.</em> See <a href="../agents/agent-settings.html">Agent settings</a> for the agent protocols.</p>
+
+<h3>Git notifyCommit access tokens</h3>
+<p>Tokens that protect the address Git servers call to tell Buildspawn about a new commit (<code>notifyCommit</code>). Every such call must carry a valid token in the <code>token</code> query parameter.</p>
+<table>
+  <tr><th>Part</th><th>What it does</th></tr>
+  <tr><td><strong>Current access tokens</strong></td><td>The list. It says <em>There are no access tokens yet.</em> when empty. <strong>Revoke</strong> removes one.</td></tr>
+  <tr><td><strong>Generate</strong></td><td>Makes a new token from a name. It is shown only once, so copy it. <strong>Cancel</strong> closes the box.</td></tr>
+</table>
+
+<h3>Roles</h3>
+<p>A note that explains how the <strong>Roles</strong> tab relates to the permission cards, with a link <strong>Open the roles of Root</strong>. See <a href="roles.html">Roles</a>.</p>
+
+<h3>Prism syntax highlighting</h3>
+<table>
+  <tr><th>Field</th><th>What it does</th><th>Default</th></tr>
+  <tr><td><strong>Permitted Source Code Directories</strong></td><td>Some tools copy source files next to build results (coverage, warnings) so the page can show them. Files outside the build’s workspace are hidden unless their folder is listed here. Give an <strong>Absolute path of permitted directory</strong> on the agent, and click <strong>Add</strong>. <strong>Delete</strong> removes a row.</td><td>Empty</td></tr>
+  <tr><td><strong>Show source code only to people with the Workspace permission</strong></td><td>Only people who may browse a workspace can see these source files.</td><td>Off</td></tr>
+</table>
+
+<h3>Personal machines</h3>
+<table>
+  <tr><th>Field</th><th>What it does</th><th>Default</th></tr>
+  <tr><td><strong>Allow personal machines</strong></td><td>People can connect their own computer and run their own builds on it. Who may add one is set by the <strong>UsePersonal</strong> permission under <strong>Agent</strong>.</td><td>Off</td></tr>
+  <tr><td><strong>Offline machine: cancel waiting builds after … minutes</strong></td><td>A build waits for its owner’s machine only. After this time it is cancelled, and says why.</td><td>30</td></tr>
+</table>
+<p>See <a href="../agents/personal-agents.html">Personal agents</a>.</p>
+
+<h3>Git Hooks</h3>
+<table>
+  <tr><th>Field</th><th>What it does</th><th>Default</th></tr>
+  <tr><td><strong>Allow on Controller</strong> (<em>Allow git hooks to run on the Buildspawn controller</em>)</td><td>Git hooks are scripts that Git runs on events like a checkout. Leave this off. A hook that a build step or a mistake placed in a repository on the server would run with the server’s rights.</td><td>Off</td></tr>
+  <tr><td><strong>Allow on Agents</strong> (<em>Allow git hooks to run on Buildspawn agents</em>)</td><td>The same for agents. Most repositories need no hooks. Leave it off.</td><td>Off</td></tr>
+</table>
+
+<h3>Hidden security warnings</h3>
+<table>
+  <tr><th>Field</th><th>What it does</th></tr>
+  <tr><td><strong>Security warnings</strong></td><td>A list of the warnings, published by the update sites, that apply to what you have installed. Ticked warnings (the default) are shown in the plugin pages and in a notice. Untick a warning to hide it, for example when you checked that it does not apply to you. You cannot hide all warnings about one component at once.</td></tr>
+</table>
+
+<h3>API Token</h3>
+<table>
+  <tr><th>Field</th><th>What it does</th><th>Default</th></tr>
+  <tr><td><strong>Generate a legacy API token for each newly created user (Not recommended)</strong></td><td>Makes an old-style token, with no expiry, for every new user. People should make normal tokens on their own page instead.</td><td>Off</td></tr>
+  <tr><td><strong>Allow users to manually create a legacy API token (Not recommended)</strong></td><td>Lets a user make an old-style token if they have none. Turn it off to keep only the new kind.</td><td>Off</td></tr>
+  <tr><td><strong>Enable API Token usage statistics</strong></td><td>Keeps the date of the last use and a use count for each token, so people can see which tokens are unused and revoke them. The data stays on the server.</td><td>On</td></tr>
+</table>
+<p>See <a href="../reference/api-tokens.html">API tokens</a>.</p>
+
+<h3>Content Security Policy</h3>
+<p>A content security policy is a header that tells the browser which scripts and styles a page may load. It stops injected scripts from running.</p>
+<table>
+  <tr><th>Field</th><th>What it does</th><th>Default</th></tr>
+  <tr><td><strong>Enforce Content Security Policy</strong></td><td>When ticked, the server sends <code>Content-Security-Policy</code>, and browsers block what the policy forbids. When not ticked, it sends <code>Content-Security-Policy-Report-Only</code>: browsers only report problems and block nothing.</td><td>Off</td></tr>
+  <tr><td><strong>Advanced</strong></td><td>More rules, when some are available.</td><td>—</td></tr>
+</table>
+<p>If a system property or a development mode controls the header, the section shows a message about it and no checkbox.</p>
+
+<h3>Git Host Key Verification Configuration</h3>
+<table>
+  <tr><th>Field</th><th>What it does</th><th>Default</th></tr>
+  <tr><td><strong>Host Key Verification Strategy</strong></td><td>How Git checks the key of an SSH server it connects to.
+    <br><strong>Known hosts file</strong>: checks against the <code>known_hosts</code> file.
+    <br><strong>Accept first connection</strong>: adds a new host’s key the first time and refuses a changed key afterwards. On agents that are created fresh each time, this is like no check.
+    <br><strong>Manually provided keys</strong>: checks against a list of keys you enter here.
+    <br><strong>No verification</strong>: does not check. Not recommended.</td><td>Known hosts file</td></tr>
+</table>
+
+<h3>Sandbox Configuration</h3>
+<table>
+  <tr><th>Field</th><th>What it does</th><th>Default</th></tr>
+  <tr><td><strong>Force the use of the sandbox globally in the system</strong></td><td>Hides the option <em>Use Groovy Sandbox</em> from people who are not administrators, so all Groovy scripts must run in the sandbox. Use it in a tightly controlled server, where arbitrary code is never approved.</td><td>Off</td></tr>
+</table>
+
+<h3>Sections that appear only sometimes</h3>
+<table>
+  <tr><th>Section</th><th>When it appears</th><th>What it does</th></tr>
+  <tr><td><strong>CSRF Protection</strong></td><td>Only if a system property turned the protection off, or another crumb issuer is installed.</td><td>CSRF (cross-site request forgery) is an attack where another web page makes your browser send a request to the server as you. With protection on, every change request must carry a one-time value (a <em>crumb</em>). It is on by default. If it was turned off, the section says so and calls that setting unsupported.</td></tr>
+  <tr><td><strong>Access Control for Builds</strong></td><td>Only if a plugin supplies a build authenticator.</td><td>Lets you choose which user builds run as.</td></tr>
+</table>
+
+<h2>Other security pages</h2>
+<table>
+  <tr><th>Page</th><th>What it does</th></tr>
+  <tr><td><strong>Settings › Users</strong>, <strong>Groups</strong>, <strong>Roles</strong></td><td>See <a href="users.html">Users and groups</a> and <a href="roles.html">Roles</a>.</td></tr>
+  <tr><td><strong>Settings › Trusted certificates</strong></td><td>See <a href="trusted-certificates.html">Trusted certificates</a>.</td></tr>
+  <tr><td><strong>Settings › In-process Script Approval</strong> (<code>/manage/scriptApproval/</code>)</td><td>Groovy scripts, method signatures and classpath entries that run outside the sandbox wait here until an administrator approves them. The page has sections <strong>Scripts</strong>, <strong>Signatures</strong> (with <em>already approved</em> lists) and <strong>Classpath entries</strong>, each with a button to clear earlier approvals. Be careful with remote addresses and workspace files in a classpath, because they can change without notice.</td></tr>
+  <tr><td><strong>Settings › miniOrange SAML SSO</strong></td><td>See <a href="saml.html">SAML sign-in</a>.</td></tr>
+  <tr><td><strong>Settings › System</strong></td><td>Other protective settings, such as the resource root URL and the filters for environment variables, are on <a href="system-settings.html">System settings</a>.</td></tr>
+</table>
+
+<h2>A worked example</h2>
+<p>An administrator hardens a new server. She sets <strong>TCP port for inbound agents</strong> to <strong>Fixed</strong> <code>50000</code> and opens that port to the agent network. She leaves both <strong>Git Hooks</strong> switches off, turns off the two legacy API token options, ticks <strong>Enforce Content Security Policy</strong>, and keeps <strong>Markup Formatter</strong> on <strong>Plain text</strong>. Then she clicks <strong>Save</strong>.</p>
+
+<h2>What you see when it runs</h2>
+<ul>
+  <li>The page reloads with a short confirmation and the <strong>Summary</strong> card up to date.</li>
+  <li>Agents that connect inbound use the port you set.</li>
+  <li>With the policy enforced, a browser console may show blocked requests from custom page scripts. If a plugin page breaks, untick it and look at the reports first.</li>
+</ul>
+
+<h2>Problems and fixes</h2>
+<table>
+  <tr><th>Problem</th><th>What to do</th></tr>
+  <tr><td>You cannot save: the buttons are missing.</td><td>You only have <strong>System read</strong>. Ask an administrator.</td></tr>
+  <tr><td>Agents cannot connect after you disabled the port.</td><td>Inbound agents need a port. Choose <strong>Fixed</strong> or <strong>Random</strong>, or use agents that the server connects to.</td></tr>
+  <tr><td>A plugin page looks broken after you enforced the policy.</td><td>Switch to reporting only (untick) and read the browser’s reports to find what is blocked.</td></tr>
+  <tr><td>A webhook from your Git server returns an error.</td><td>It needs a valid token in the <code>token</code> parameter. Generate one under <strong>Git notifyCommit access tokens</strong>.</td></tr>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="security-realms.html">Security realms</a></li>
+  <li><a href="authorization.html">Authorization</a></li>
+  <li><a href="roles.html">Roles</a></li>
+  <li><a href="trusted-certificates.html">Trusted certificates</a></li>
+  <li><a href="settings-overview.html">Settings overview</a></li>
+  <li><a href="system-settings.html">System settings</a></li>
+</ul>
+</main>
+</body>
+</html>

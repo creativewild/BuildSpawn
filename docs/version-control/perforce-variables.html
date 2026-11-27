@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Perforce variables · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="version-control/perforce-variables">
+<main class="doc">
+<h1>Perforce variables</h1>
+<p class="lead">Every build with a Perforce checkout gets variables for the server, user, workspace, changelist and a login ticket, so your scripts can talk to Perforce.</p>
+
+<h2>When to use it</h2>
+<p>Use them in a script step that runs <code>p4</code> commands, to stamp the changelist into a package, or to name a build after its code. You do not define them. Buildspawn fills them in when the build starts. For the full list of version control values, see <a href="vcs-parameters.html">Version control parameters</a>.</p>
+
+<h2>The variables</h2>
+<table>
+  <thead><tr><th>Variable</th><th>What it holds</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><code>P4_PORT</code></td><td>The Perforce server connection.</td><td><code>ssl:perforce.studio.example:1666</code></td></tr>
+    <tr><td><code>P4_USER</code></td><td>The Perforce user of the connection.</td><td><code>buildbot</code></td></tr>
+    <tr><td><code>P4_CLIENT</code></td><td>The name of the workspace of this build.</td><td><code>buildspawn-win-build-01-Game-Windows-Build-0</code></td></tr>
+    <tr><td><code>P4_ROOT</code></td><td>The folder of the workspace on the agent.</td><td><code>C:\ws\skyforge</code></td></tr>
+    <tr><td><code>P4_CHANGELIST</code></td><td>The last changelist in the synced workspace. If none is found, the latest changelist on the server.</td><td><code>48512</code></td></tr>
+    <tr><td><code>P4_TICKET</code></td><td>A valid login ticket for the connection. Shown only if the connection could log in, and only when <strong>Hide TICKET</strong> is off (see below).</td><td></td></tr>
+    <tr><td><code>P4_REVIEW</code>, <code>P4_REVIEW_TYPE</code></td><td>The Swarm review number and its type, <code>shelved</code> or <code>committed</code>, for a build of a review.</td><td><code>1024</code>, <code>shelved</code></td></tr>
+    <tr><td><code>P4_STREAM_AT_CHANGE</code></td><td>The <em>Stream at change</em> value of a stream workspace.</td><td></td></tr>
+    <tr><td><code>P4_INCREMENTAL</code></td><td>With the <em>Polling per change</em> filter: set it to <code>false</code> to build all changelists, not only the oldest.</td><td></td></tr>
+  </tbody>
+</table>
+<h3>Variables of a Perforce root</h3>
+<p>With a <a href="perforce-roots.html">Perforce root</a>, a build also gets variables named after the root. Replace <code>&lt;ID&gt;</code> by the root ID in capitals, with letters other than A to Z and 0 to 9 turned into <code>_</code>. A root <code>skyforge-main</code> becomes <code>SKYFORGE_MAIN</code>.</p>
+<table>
+  <thead><tr><th>Variable</th><th>What it holds</th></tr></thead>
+  <tbody>
+    <tr><td><code>P4ROOT_&lt;ID&gt;_PORT</code>, <code>P4ROOT_&lt;ID&gt;_USER</code></td><td>The server and user of the root.</td></tr>
+    <tr><td><code>P4ROOT_&lt;ID&gt;_CLIENT</code></td><td>The workspace of this build.</td></tr>
+    <tr><td><code>P4ROOT_&lt;ID&gt;_CHANGELIST</code></td><td>The changelist that was synced.</td></tr>
+    <tr><td><code>P4ROOT_&lt;ID&gt;_STREAM</code></td><td>The stream of this build.</td></tr>
+  </tbody>
+</table>
+<p>The first root of the build configuration also sets <code>P4PORT</code>, <code>P4USER</code> and <code>P4CLIENT</code> (no underscore), the names the <code>p4</code> program reads. A plain <code>p4 changes</code> in a script then works without options. These never hold a password or ticket. With <a href="several-roots.html">several roots</a>, each variable also exists with the root number at the end, such as <code>P4_CHANGELIST_2</code>.</p>
+
+<h2>Hide the ticket</h2>
+<p>In the system settings, the Perforce section <strong>P4: Secure P4_TICKET</strong> has the switch <strong>Hide TICKET</strong>. Off (the default) puts <code>P4_TICKET</code> into the environment of every build step. On removes it. Turn it on if people who can edit build steps should not be able to read the ticket. The value is a secret: scripts must not print it. See <a href="../how-to/game-p4-ticket-script.html">Use P4 commands in a script with the P4 ticket</a>.</p>
+
+<h2>The changelist in the build name</h2>
+<p>A build is numbered before the checkout, so the number format on <strong>Settings › General</strong> cannot hold the changelist. Name the build from a step instead. Print a <code>buildNumber</code> message:</p>
+<pre><code>echo ##buildspawn[buildNumber '1.4.%build.counter%-CL%build.vcs.number%']</code></pre>
+<p>In a PowerShell step write:</p>
+<pre><code>Write-Host "##buildspawn[buildNumber '1.4.%build.counter%-CL$env:P4_CHANGELIST']"</code></pre>
+<p>The last name printed wins. See <a href="../reference/service-messages.html#buildNumber">Service messages</a>.</p>
+
+<h2>A worked example</h2>
+<p>A Skyforge packaging script writes the changelist into the version file and names the build:</p>
+<pre><code>Set-Content Config\Version.txt "CL $env:P4_CHANGELIST"
+Write-Host "##buildspawn[buildNumber '2.3.%build.counter%-CL$env:P4_CHANGELIST']"</code></pre>
+
+<h2>What you see when it runs</h2>
+<p>On the build page, the build is called <code>2.3.57-CL48512</code>. The <strong>Parameters</strong> list shows <code>P4_CHANGELIST</code> and the other values, but not the ticket.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>You see</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><code>P4_TICKET</code> is empty</td><td>Check that <strong>Hide TICKET</strong> is off and that the credential can log in.</td></tr>
+    <tr><td><code>P4_CHANGELIST</code> is empty</td><td>The step ran before a checkout, or the build configuration has no Perforce version control.</td></tr>
+    <tr><td>A plain <code>p4</code> asks for a password</td><td>The standard variables carry no password. Log in with the ticket: <code>p4 -P %P4_TICKET% ...</code>.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="vcs-parameters.html">Version control parameters</a>, <a href="perforce-connections.html">Perforce connections</a></li>
+</ul>
+</main>
+</body>
+</html>

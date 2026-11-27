@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stop a build · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="running-builds/stop-a-build">
+<main class="doc">
+<h1>Stop a build</h1>
+<p class="lead">Stop a build that runs, or take a build out of the queue before it starts.</p>
+
+<h2>When to use it</h2>
+<p>Stop a build when you started it by mistake, when a newer change makes it useless, or when it hangs. A stopped build ends with the result <strong>Aborted</strong>. It keeps its log and what it did so far.</p>
+
+<h2>Stop a running build</h2>
+<ol class="steps">
+  <li>Open the running build. Click its number in the <strong>History</strong> tab, or in the <strong>Queue</strong> and <strong>Agents</strong> pages.</li>
+  <li>Click <strong>Stop</strong> in the header. It replaces <strong>Re-run</strong> while the build runs. You need the permission to cancel builds of this build configuration.</li>
+  <li>The build ends with the result <em>Aborted</em>.</li>
+</ol>
+<p>You can also stop a build from the <strong>Agents</strong> page. Expand an agent's row and click the stop button beside the build it runs. In the <a href="../get-started/terminal-program.html">terminal program</a>, select the build in the Builds view and press <kbd>x</kbd>. That needs an API token.</p>
+
+<figure class="shot"><img src="../../assets/shots/running-builds/job-running.png" alt="The page of Shader Warmup with a build running: the Building badge, the history with a progress bar and a stop button on the row"><figcaption>A running build on the build configuration page. The red button on the row stops it.</figcaption></figure>
+<h2>What happens to the steps</h2>
+<ul>
+  <li>The step that runs is stopped.</li>
+  <li>The steps after it do not run, except steps set to <em>Always, even if build stop command was issued</em>. Use that for clean-up steps. See <a href="../build-steps/resume-and-retry.html">Resume and retry</a>.</li>
+  <li>For a build with a <a href="parallel-and-composite.html">Parallel block</a>, the log says <em>The build was stopped: stopping its side builds</em>. Each side build stops too, with <em>Stopped with ...</em>.</li>
+  <li>For a parent of <strong>Parallel tests</strong>, stopping the parent stops its batches.</li>
+  <li>A stopped build can be resumed or re-run. See <a href="resume.html">Resume a build</a>.</li>
+</ul>
+
+<h2>Take a build out of the queue</h2>
+<ol class="steps">
+  <li>Open <strong>Queue</strong> in the top bar.</li>
+  <li>Click the <strong>&hellip;</strong> menu of the row and choose <strong>Cancel</strong>.</li>
+  <li>Confirm <em>Cancel the queued build of ...?</em></li>
+</ol>
+<p>A build that waits for a personal machine that stays offline is cancelled for you after the time an administrator set, and its page says <em>Cancelled: your machine 'name' was offline for N min</em>. See <a href="personal-builds.html">Personal builds and shelves</a>.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <tr><th>Problem</th><th>What to do</th></tr>
+  <tr><td>There is no Stop button.</td><td>The build is finished, or you may not cancel builds of this build configuration. Ask a project administrator.</td></tr>
+  <tr><td>The build does not stop at once.</td><td>The tool a step started may need a moment to end. A step set to run always still runs after the stop.</td></tr>
+  <tr><td>The agent is gone and the build still shows as running.</td><td>Open the <strong>Agents</strong> page, check the agent, and stop the build from its row.</td></tr>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="queue.html">The queue</a></li>
+  <li><a href="resume.html">Resume a build</a></li>
+  <li><a href="../build-results/build-page.html">The build page</a></li>
+</ul>
+
+</main>
+</body>
+</html>

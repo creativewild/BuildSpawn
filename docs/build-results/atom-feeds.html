@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atom feeds · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-results/atom-feeds">
+<main class="doc">
+<h1>Atom feeds</h1>
+<p class="lead">An Atom feed is a web address that lists the newest builds. Add it to a feed reader or a chat app, and you hear about a failed build without opening Buildspawn.</p>
+
+<h2>When to use it</h2>
+<p>Use a feed when a team channel or a reader should show build results: for example every failed build of the whole server, or the changes that went into one build configuration.</p>
+
+<h2>Where the feeds are</h2>
+<p>The feed links sit at the bottom of the <a href="project-directory.html">Projects page</a> (the directory), and at the bottom of the <strong>History</strong> tab of a build configuration. They are links, so you can copy the address with a right click.</p>
+<table>
+  <tr><th>Link</th><th>Address</th><th>What it lists</th></tr>
+  <tr><td><strong>Atom feed for all</strong></td><td><code>/rssAll</code></td><td>Every build of the projects in the page, or of the build configuration.</td></tr>
+  <tr><td><strong>Atom feed for failures</strong></td><td><code>/rssFailed</code></td><td>Only failed builds.</td></tr>
+  <tr><td><strong>Atom feed for just latest builds</strong></td><td><code>/rssLatest</code></td><td>Only the newest build of each build configuration. On the Projects page.</td></tr>
+  <tr><td>Changes feed</td><td><code>/job/&hellip;/rssChangelog</code></td><td>The changes that went into the builds of one build configuration.</td></tr>
+</table>
+<p>Add the path to the server address, or to the address of a build configuration. For example, the failed builds of the whole server: <code>http://build-server:8080/rssFailed</code>. For one build configuration: <code>http://build-server:8080/job/Game/job/Windows%20Build/rssFailed</code>. Add <code>?flavor=rss20</code> to get the same feed as RSS 2.0, for readers that do not know Atom.</p>
+
+<h2>Use a feed</h2>
+<ol class="steps">
+  <li>Open the <strong>Projects</strong> page, or the <strong>History</strong> tab of a build configuration.</li>
+  <li>Right click <strong>Atom feed for failures</strong> and copy the link address.</li>
+  <li>Paste it into your feed reader or chat app.</li>
+  <li>If the reader asks for a user name and password, use your user name and an <strong>API token</strong> instead of your password. Create a token under <strong>Account</strong> in your account menu. See <a href="../reference/api-tokens.html">API tokens</a>.</li>
+</ol>
+
+<h2>What you see</h2>
+<p>Each entry is one build. Its title holds the project, the build configuration, the build number and the result, for example <em>Game &raquo; Windows Build #7 (stable)</em>. The entry links to the build page. A feed only lists what its user may see, so the same address shows different builds to different users. Personal builds of other people are never listed.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <tr><th>Problem</th><th>What to do</th></tr>
+  <tr><td>The reader says it needs a sign-in.</td><td>The server needs sign-in. Give the reader your user name and an API token.</td></tr>
+  <tr><td>The feed is empty.</td><td>The server has no builds that match, or you may not see them. An empty failures feed is good news.</td></tr>
+  <tr><td>The links are missing.</td><td>Feeds are on the Projects page and on the History tab of a build configuration, not on the build page.</td></tr>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="project-directory.html">The project directory</a></li>
+  <li><a href="history.html">History</a></li>
+  <li><a href="../reference/api-tokens.html">API tokens</a></li>
+</ul>
+
+</main>
+</body>
+</html>

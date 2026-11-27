@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>User settings · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="administration/user-settings">
+<main class="doc">
+<h1>User settings</h1>
+<p class="lead">Every person has their own settings page for their name, password, API tokens, theme, time zone and more.</p>
+
+<h2>When to use it</h2>
+<p>Use it to set up your own account, or to help someone else (an administrator can open any user’s settings from <strong>Settings › Users</strong>). The settings belong to one person and do not change anything for other people.</p>
+
+<h2>How to open it</h2>
+<ol class="steps">
+  <li>Click your initial (the round button) at the right of the top bar.</li>
+  <li>Choose one of the pages: <strong>Account</strong>, <strong>Security</strong>, <strong>Appearance</strong> or <strong>Preferences</strong>. Your profile page (your name) has <strong>My machines</strong> too.</li>
+  <li>Change what you need and click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/administration/user-account.png" alt="The Account page of a user with General, Credentials, Email, Notification URL and Time zone"><figcaption>A user's Account page.</figcaption></figure>
+<table>
+  <tr><th>Page</th><th>What it holds</th></tr>
+  <tr><td><strong>Account</strong></td><td>Full name, description, credentials, e-mail, notification URL, Perforce e-mail, SAML attributes, time zone.</td></tr>
+  <tr><td><strong>Security</strong></td><td>Password, API tokens, session termination.</td></tr>
+  <tr><td><strong>Appearance</strong></td><td>Theme, console links, console line times.</td></tr>
+  <tr><td><strong>Preferences</strong></td><td>Start view and search.</td></tr>
+  <tr><td><strong>Feature preview</strong></td><td>Switches for trial features. The page is hidden when no trial feature exists.</td></tr>
+  <tr><td><strong>My machines</strong></td><td>Your own computers that can run your builds. See <a href="../agents/personal-agents.html">Personal agents</a>.</td></tr>
+</table>
+
+<h2>Every setting</h2>
+<h3>Account</h3>
+<table>
+  <tr><th>Setting</th><th>What it does</th><th>Default</th><th>Example</th></tr>
+  <tr><td><strong>Full name</strong></td><td>How other people see you. Use your real name, so people recognise you instead of your ID.</td><td>The user ID</td><td>Dana Kim</td></tr>
+  <tr><td><strong>Description</strong></td><td>A short text on your profile page, with a <strong>Preview</strong>. It follows the markup formatter on <a href="security-settings.html">Security settings</a>.</td><td>Empty</td><td>Build engineer, Unreal and Perforce</td></tr>
+  <tr><td><strong>Credentials</strong></td><td>Credentials that only you can use. They are not available to anyone else. The section opens your own credentials store.</td><td>None</td><td>A personal Perforce password</td></tr>
+  <tr><td><strong>Email</strong></td><td>Where build e-mails for you are sent.</td><td>Empty</td><td><code>dana.k@studio.example</code></td></tr>
+  <tr><td><strong>Notification URL</strong></td><td>Chooses which page the links in notifications and in other tools open: the default page, or another provider’s page.</td><td>Default</td><td>Default</td></tr>
+  <tr><td><strong>Perforce User Property</strong> › <strong>P4 Email</strong></td><td>The e-mail address from your Perforce user. It is read-only: it is defined in the Perforce user spec.</td><td>From Perforce</td><td>—</td></tr>
+  <tr><td><strong>Saml Custom Attributes</strong></td><td>Extra values your company’s sign-in sent about you, shown as <em>label : value</em>. Read-only. They are set up on <a href="saml.html">SAML sign-in</a>. Shown only for SAML users.</td><td>None</td><td>Department : Art</td></tr>
+  <tr><td><strong>Time zone</strong></td><td>The zone used to show dates and times to you, instead of the server’s zone.</td><td>The server’s zone</td><td>Europe/Lisbon</td></tr>
+</table>
+
+<h3>Security</h3>
+<table>
+  <tr><th>Setting</th><th>What it does</th></tr>
+  <tr><td><strong>Password</strong> and <strong>Confirm Password</strong></td><td>Change your password. Leave both boxes as they are to keep it. Only for people of Buildspawn’s own user database. The password rule from <a href="security-realms.html">Security realms</a> applies.</td></tr>
+  <tr><td><strong>API Token</strong></td><td>Tokens that let scripts and tools sign in as you. <strong>Add new token</strong> takes a <strong>Name</strong> and an <strong>Expiration</strong> (7, 30, 60, 90 days, <strong>Custom</strong> or <strong>No Expiration</strong>). <strong>Current token(s)</strong> shows name, expiry, created and last used. The full guide is <a href="../reference/api-tokens.html">API tokens</a>.</td></tr>
+  <tr><td><strong>Session Termination</strong></td><td>The button <strong>Terminate All Sessions</strong> signs you out of every browser and device, and asks you to sign in again. It confirms first, and then says <em>Operation success. All sessions were terminated.</em> Use it when a computer is lost.</td></tr>
+  <tr><td><strong>At a glance</strong></td><td>A side card: number of API tokens, last use and whether a password is set.</td></tr>
+</table>
+
+<h3>Appearance</h3>
+<table>
+  <tr><th>Setting</th><th>What it does</th><th>Default</th></tr>
+  <tr><td><strong>Themes</strong></td><td>How pages look for you: <strong>Default</strong> (light), <strong>Dark</strong>, or <strong>Dark (System)</strong>, which follows your computer’s setting. Your choice wins over the administrator’s default. See <a href="appearance.html">Appearance and themes</a>.</td><td>The administrator’s choice</td></tr>
+  <tr><td><strong>Console URL Provider</strong></td><td>Which page opens for build console links. Views listed higher win over those below. Use <strong>Add</strong> to add a provider and <strong>Delete</strong> to remove one. Your list is used instead of the one the administrator set.</td><td>Default, then Pipeline Graph View</td></tr>
+  <tr><td><strong>Console line times</strong> › <strong>Line times</strong></td><td>How the console output times each line: <strong>Time of day</strong>, <strong>Time since the build started</strong> or <strong>Off</strong>. The <em>Time</em> control of the console page changes it too.</td><td>The administrator’s choice</td></tr>
+</table>
+
+<h3>Preferences</h3>
+<table>
+  <tr><th>Setting</th><th>What it does</th><th>Default</th></tr>
+  <tr><td><strong>Default Views Tab Bar</strong> › <strong>My Views</strong> › <strong>Default View</strong></td><td>The view you see first on the dashboard, and the view selected when you open your private views.</td><td>The server’s default view</td></tr>
+  <tr><td><strong>Setting for search</strong></td><td>How the search box matches names. <strong>Ignore upper and lower case</strong>: typing <em>build</em> also finds <em>Build</em> and <em>BUILD</em>.</td><td>On</td></tr>
+</table>
+
+<h3>Feature preview</h3>
+<p>A table with <strong>Feature</strong>, <strong>Description</strong> and <strong>Value</strong>. Each row is a feature you can switch on for yourself only. With no trial feature, the page says <em>No feature previews are available at the moment</em>.</p>
+
+<h3>Picture from Entra ID</h3>
+<p>When people sign in with Entra ID, Buildspawn keeps their Microsoft profile photo and uses it as their picture. There is no form for it. See <a href="entra-id.html">Entra ID sign-in</a>.</p>
+
+<h3>My machines</h3>
+<p>Your profile has a page <strong>My machines</strong> with <strong>Your own computers. Only you can run builds on them.</strong> Add a machine with the steps <em>Machine name</em> and <em>System</em>, <em>Download</em> and <em>Your secret</em>. An administrator must allow personal machines, and give you the <strong>UsePersonal</strong> permission. See <a href="../agents/personal-agents.html">Personal agents</a>.</p>
+
+<h2>A worked example</h2>
+<p>Dana works in Lisbon. On <strong>Account</strong> she sets <strong>Time zone</strong> to <code>Europe/Lisbon</code>, so build times show in her local time. On <strong>Appearance</strong> she chooses <strong>Dark (System)</strong> and sets <strong>Line times</strong> to <strong>Time since the build started</strong>. On <strong>Security</strong> she makes a token called <code>terminal on studio-pc</code> that expires in 90 days.</p>
+
+<h2>What you see when it runs</h2>
+<ul>
+  <li>After <strong>Save</strong>, pages show your time zone, theme and console times at once.</li>
+  <li>Your name and picture appear in the user menu, on builds you started, and in lists.</li>
+</ul>
+
+<h2>Problems and fixes</h2>
+<table>
+  <tr><th>Problem</th><th>What to do</th></tr>
+  <tr><td>There is no <strong>Password</strong> box.</td><td>You sign in with Entra ID or SAML. Change your password at your company.</td></tr>
+  <tr><td>Times are wrong by some hours.</td><td>Set your <strong>Time zone</strong> on <strong>Account</strong>.</td></tr>
+  <tr><td>The theme does not change.</td><td>Click <strong>Save</strong>. If the administrator forced a theme, the setting may be hidden.</td></tr>
+  <tr><td>The API token is shown only once.</td><td>Copy it when it appears. If you lose it, revoke it and make a new one.</td></tr>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../reference/api-tokens.html">API tokens</a></li>
+  <li><a href="appearance.html">Appearance and themes</a></li>
+  <li><a href="users.html">Users and groups</a></li>
+  <li><a href="../agents/personal-agents.html">Personal agents</a></li>
+</ul>
+</main>
+</body>
+</html>

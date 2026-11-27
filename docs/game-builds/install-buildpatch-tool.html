@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Install BuildPatch Tool · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="game-builds/install-buildpatch-tool">
+<main class="doc">
+<h1>Install BuildPatch Tool</h1>
+<p class="lead">Put Epic's BuildPatch Tool on an agent, or check that it is there, so the Epic steps can run.</p>
+
+<h2>When to use it</h2>
+<p>Use it as the first step of a build that publishes to Epic, when you are not sure the agent has the BuildPatch Tool, or to keep the tool up to date. If you install the tool by hand on each agent, you do not need this step.</p>
+<div class="callout note"><p>Epic gives the BuildPatch Tool ZIP only to people who sign in to the Developer Portal (Artifacts and Binaries, Download build patch tool). Buildspawn does not sign in for you. Download the ZIP once and upload it to Buildspawn, or put it on a web address or share you control.</p></div>
+
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration, then <strong>Settings › Build steps › Add build step</strong>.</li>
+  <li>Type <code>BuildPatch</code> in <strong>Filter step types</strong> and click <strong>Install BuildPatch Tool</strong>.</li>
+  <li>Choose where the tool comes from (see the table below) and fill in the fields that appear.</li>
+  <li>Leave <strong>Update when a newer package is available</strong> and <strong>Check that the tool starts</strong> ticked.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/game-builds/install-buildpatch-tool-step.png" alt="The Install BuildPatch Tool step with the three source cards From Buildspawn, From a web address or share and Already on the agent"><figcaption>The Install BuildPatch Tool step.</figcaption></figure>
+
+<h2>Every field</h2>
+<p>Choose one of three cards under <strong>Install BuildPatch Tool</strong>.</p>
+<table>
+<thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>From Buildspawn</td><td>Uses the ZIP an administrator uploaded once. Buildspawn sends it to the agent over its own connection.</td><td>Chosen</td><td>-</td></tr>
+<tr><td>Package</td><td>Shown for <em>From Buildspawn</em>. Which uploaded package to use. The list holds the uploaded packages.</td><td>Empty (a package for the agent's system)</td><td><code>BuildPatchTool-win.zip</code></td></tr>
+<tr><td>From a web address or share</td><td>The agent fetches the ZIP itself from an address you run, or from a shared folder.</td><td>Not chosen</td><td>-</td></tr>
+<tr><td>Address or folder</td><td>The web address or share that holds the ZIP.</td><td>Empty</td><td><code>https://tools.studio.example/BuildPatchTool-win.zip</code></td></tr>
+<tr><td>SHA-256</td><td>The checksum of the ZIP. When it is set and the file does not match, the step fails.</td><td>Empty (not checked)</td><td><code>9f2c4e7a...</code> (the full 64 characters)</td></tr>
+<tr><td>Already on the agent</td><td>A folder on the agent already holds the tool. The step only checks it.</td><td>Not chosen</td><td>-</td></tr>
+<tr><td>Folder on the agent</td><td>That folder.</td><td>Empty</td><td><code>D:/Tools/BuildPatchTool</code></td></tr>
+<tr><td>Install into</td><td>Where to unpack the tool, for the first two cards.</td><td>The <a href="epic-credentials.html#tool-folder">BuildPatch Tool folder</a> of the agent, else <code>tools/buildpatchtool</code> in the agent folder</td><td><code>D:/Tools/BuildPatchTool</code></td></tr>
+<tr><td>Update when a newer package is available</td><td>Installs a newer package next to the old one. The folder of the older version is kept.</td><td>On</td><td>On</td></tr>
+<tr><td>Check that the tool starts</td><td>Runs the tool once with <code>-help</code> to prove that it starts.</td><td>On</td><td>On</td></tr>
+</tbody>
+</table>
+
+<h2>A worked example</h2>
+<p>Your Windows agent <code>win-build-02</code> is new. An administrator already uploaded <code>BuildPatchTool-win.zip</code>, version 1.8.8, under <strong>Manage › Tools › BuildPatch Tool</strong>. Add <strong>Install BuildPatch Tool</strong> as the first step of <strong>Epic Publish</strong>, keep <strong>From Buildspawn</strong> and leave the other fields alone. The first run installs the tool. Later runs only check that it is there.</p>
+
+<h2>What you see when it runs</h2>
+<ol class="steps">
+  <li>The ZIP is sent to the agent (or fetched by it) and checked.</li>
+  <li>It is unpacked into a folder for the version.</li>
+  <li>On Linux and macOS the program is made executable.</li>
+  <li>The tool is started once with <code>-help</code>, if you asked for that.</li>
+  <li>The agent reports the path and the version as <code>buildpatchtool.path</code> and <code>buildpatchtool.version</code>.</li>
+</ol>
+<p>The log lines start with <em>Epic:</em>. The step hands on <code>${EPIC_BPT_PATH}</code> (the program) and <code>${EPIC_BPT_VERSION}</code> (its version). The BuildPatch Tool page under <strong>Manage › Tools</strong> then shows the agent as installed.</p>
+<figure class="shot"><img src="../../assets/shots/game-builds/buildpatchtool-page.png" alt="The BuildPatch Tool page with the Packages and Agents cards"><figcaption>The BuildPatch Tool page.</figcaption></figure>
+
+<h2>Problems and fixes</h2>
+<table>
+<thead><tr><th>Message</th><th>What to do</th></tr></thead>
+<tbody>
+<tr><td>The step names no package, or no package fits</td><td>Upload the ZIP under <strong>Manage › Tools › BuildPatch Tool</strong>, then choose it.</td></tr>
+<tr><td>The package ... is for Windows, but agent ... runs Linux</td><td>Upload a package for the agent's system, and say which system it is when you upload.</td></tr>
+<tr><td>The SHA-256 of the file does not match</td><td>The file changed or is damaged. Download it again and update the checksum.</td></tr>
+<tr><td>The package has no BuildPatch Tool program</td><td>The ZIP is the wrong one. The program must be named <code>BuildPatchTool.exe</code> on Windows, or <code>BuildPatchTool</code> or <code>BuildPatchTool.sh</code> on Linux and macOS.</td></tr>
+<tr><td>BuildPatch Tool was put on the agent but does not start</td><td>Run it by hand on the agent and read the error. A missing system library is the usual cause.</td></tr>
+</tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="epic-overview.html">Epic Games Store</a></li>
+  <li><a href="epic-upload.html">Epic Games Store upload</a></li>
+  <li><a href="epic-credentials.html">Epic Games Store credential</a></li>
+</ul>
+
+</main>
+</body>
+</html>

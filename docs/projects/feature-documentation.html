@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Documentation · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/feature-documentation">
+<main class="doc">
+<h1>Documentation</h1>
+<p class="lead">Adds links to the Documentation tab of the build configuration.</p>
+<h2>When to use it</h2>
+<p>Use it for the runbook, the release checklist or the SDK page. The full description is on <a href="documentation-links.html">Documentation links</a>.</p>
+<figure class="shot">
+  <img src="../../assets/shots/projects/feat-documentation.png" alt="The Documentation form">
+  <figcaption>The Documentation form.</figcaption>
+</figure>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration, click <strong>Settings</strong>, then <strong>Build Features</strong>. Click <strong>Add build feature</strong> and choose <strong>Documentation</strong>.</li>
+  <li>Give the section a <strong>Title</strong> and a one-line summary.</li>
+  <li>Add a link: label, address and short description.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Title</td><td>The heading of the section.</td><td>Empty</td><td><code>Windows build runbook</code></td></tr>
+    <tr><td>Summary</td><td>One line under the title.</td><td>Empty</td><td><code>Who owns it and what to do when it fails.</code></td></tr>
+    <tr><td>Link: label, address, description</td><td>The page to link. Only <code>http</code> and <code>https</code> addresses are accepted.</td><td>Empty</td><td><code>https://wiki.studio.example/skyforge-build</code></td></tr>
+    <tr><td>Show the project’s links on this build configuration</td><td>Show the links of the projects above, too.</td><td>On</td><td>On</td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p>The <strong>Windows Build</strong> shows a link to the studio wiki page <em>How the Windows build works</em>. People find it on the <strong>Documentation</strong> tab when a night build fails.</p><h2>What you see when it runs</h2>
+<p>The <strong>Documentation</strong> tab appears after <strong>Overview</strong> as soon as there is at least one link.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>No Documentation tab</td><td>The tab only shows when a link exists, and the feature must be on.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="bc-build-features.html">The Build Features tab</a></li>
+  <li><a href="documentation-links.html">Documentation links</a></li>
+</ul>
+</main>
+</body>
+</html>

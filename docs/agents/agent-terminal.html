@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent terminal program · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="agents/agent-terminal">
+<main class="doc">
+<h1>Agent terminal program</h1>
+<p class="lead">The agent terminal program, <code>buildspawn-agent-tui</code>, shows what an agent is doing in a console window. It works on Windows, Linux and macOS, over a remote shell too, and it lets you pause the agent, read logs, clean work folders and change settings.</p>
+
+<h2>When to use it</h2>
+<p>Use it on a build machine that you reach over SSH or remote desktop, on a machine with no desktop, or when you prefer the keyboard. On Windows it shows the same information as the <a href="windows-tray-app.html">tray app</a>. Like the tray app, it talks to the agent on the same machine, so it keeps working when the server cannot be reached.</p>
+
+<h2>How to set it up</h2>
+<p>It is already in every agent download, in the <code>bin</code> folder of the agent folder. Nothing to install.</p>
+<ol class="steps">
+  <li>Open a terminal on the agent machine. On a service machine, run it as the account that runs the agent, or as an administrator or with <code>sudo</code>, so that it may control the agent.</li>
+  <li>Go to the agent folder and start the program:
+<pre><code># Linux and macOS
+cd /opt/buildspawn-agent
+./bin/buildspawn-agent-tui
+
+# Windows
+cd C:\buildspawn-agent
+bin\buildspawn-agent-tui.exe</code></pre></li>
+  <li>Press <kbd>1</kbd> to <kbd>8</kbd> to change view. Press <kbd>?</kbd> for help and <kbd>q</kbd> to leave.</li>
+</ol>
+<div class="callout note"><p>Leaving the program does not stop the agent. The screen says <em>Terminal closed. The agent is still running. Run buildspawn-agent-tui to come back.</em></p></div>
+
+
+<h2>Options</h2>
+<table>
+  <thead><tr><th>Option</th><th>What it does</th><th>Default</th></tr></thead>
+  <tbody>
+    <tr><td><code>--home FOLDER</code></td><td>The agent folder to control.</td><td>The folder above the program's own <code>bin</code> folder.</td></tr>
+    <tr><td><code>--view N</code></td><td>Open on view 1 to 8.</td><td><code>1</code></td></tr>
+    <tr><td><code>--once</code></td><td>Draw one frame as plain text and exit. Good for scripts, logs and support tickets.</td><td>off</td></tr>
+    <tr><td><code>--cols N</code></td><td>With <code>--once</code>: the width of the frame.</td><td>The window width</td></tr>
+    <tr><td><code>--endpoint FILE</code></td><td>Path of the agent's local connection file.</td><td><code>&lt;work folder&gt;/control/endpoint.json</code></td></tr>
+    <tr><td><code>--version</code></td><td>Print the program version.</td><td></td></tr>
+  </tbody>
+</table>
+<p>The program needs a real terminal. With output sent to a file or a pipe, use <code>--once</code>.</p>
+<pre><code>buildspawn-agent-tui --once --view 3 --cols 100</code></pre>
+
+<h2>The keys</h2>
+<table>
+  <thead><tr><th>Key</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><kbd>1</kbd> to <kbd>8</kbd></td><td>Switch view.</td></tr>
+    <tr><td><kbd>p</kbd></td><td>Pause or resume. The running build finishes, and no new build starts while paused.</td></tr>
+    <tr><td><kbd>r</kbd></td><td>Reconnect to the server now. If the agent is not running, look for it again.</td></tr>
+    <tr><td><kbd>b</kbd></td><td>Open this agent's page in the browser.</td></tr>
+    <tr><td><kbd>?</kbd></td><td>Help with every key.</td></tr>
+    <tr><td><kbd>q</kbd></td><td>Quit this screen (the agent keeps running). Asks <strong>Quit</strong> or <strong>Stay</strong>.</td></tr>
+    <tr><td><kbd>Ctrl</kbd> + <kbd>C</kbd></td><td>Quit at once.</td></tr>
+    <tr><td><kbd>Esc</kbd></td><td>Close a dialog or cancel an edit.</td></tr>
+  </tbody>
+</table>
+<p>The screen looks again every 2 seconds. When the agent cannot be reached, the data is greyed out and marked <em>last known</em>.</p>
+
+<h2>The eight views</h2>
+
+<h3>1 Overview</h3>
+<ul>
+  <li><strong>Current build</strong>: job and number, step, elapsed time, a progress bar and the last log lines. <em>No build is running.</em> when idle.</li>
+  <li><strong>This machine</strong>: CPU, RAM and free disk of the work folder, with bars that turn yellow and red.</li>
+  <li>Agent version, Java version and <strong>Builds at a time</strong>.</li>
+  <li>On a personal machine: <strong>Personal agent</strong> and the owner.</li>
+</ul>
+
+<h3>2 Builds</h3>
+<p>The current build, <strong>Waiting for this agent (n)</strong> with the reason (not on a personal machine) and the recent builds with result, duration and time.</p>
+<table>
+  <tr><th>Key</th><th>What it does</th></tr>
+  <tr><td><kbd>↑</kbd> <kbd>↓</kbd></td><td>Pick a build.</td></tr>
+  <tr><td><kbd>Enter</kbd></td><td>Open the build's log in the browser.</td></tr>
+  <tr><td><kbd>x</kbd></td><td>Stop the running build, after you confirm.</td></tr>
+  <tr><td><kbd>s</kbd></td><td>Personal machines only: copy a share link for the selected build.</td></tr>
+</table>
+<p>On a personal machine the view says <em>Only your builds are shown. Other people can't see them unless you share a link.</em></p>
+
+<h3>3 Connection log</h3>
+<p>Every connect, disconnect and reconnect with the reason in plain words and a summary such as <em>3 drops today, longest offline 4 min</em>. <em>No events yet.</em> when empty.</p>
+
+<h3>4 Work folders</h3>
+<p>The size of each build configuration's folder, and the total. <kbd>c</kbd> cleans the selected folder and <kbd>a</kbd> cleans all of them, each after a confirmation. A folder that a build uses cannot be cleaned.</p>
+
+<h3>5 Service</h3>
+<p>Shows the service that keeps the agent running: a Windows service, <code>buildspawn-agent</code> with systemd on Linux, or <code>com.buildspawn.agent</code> with launchd on macOS. It shows whether it is installed, running, its start type and account. Keys: <kbd>s</kbd> start, <kbd>x</kbd> stop, <kbd>t</kbd> restart, <kbd>i</kbd> install, <kbd>u</kbd> remove. Each asks to confirm. Stop, restart and remove warn that <em>A running build will be stopped.</em> Install and remove run the scripts described in <a href="windows-service.html">Windows service</a>. If you lack rights, the screen says <em>Windows says access is denied.</em> or <em>Start this screen from a terminal opened as administrator.</em></p>
+
+<h3>6 Settings</h3>
+<table>
+  <thead><tr><th>Field</th><th>Key in <code>conf/buildspawn-agent.properties</code></th></tr></thead>
+  <tbody>
+    <tr><td>Server address</td><td><code>serverUrl</code></td></tr>
+    <tr><td>Agent name</td><td><code>name</code></td></tr>
+    <tr><td>Work folder</td><td><code>workDir</code></td></tr>
+    <tr><td>Java memory (for example <code>-Xmx8g</code>)</td><td><code>javaOptions</code></td></tr>
+    <tr><td>Proxy</td><td><code>proxy</code></td></tr>
+    <tr><td>Use WebSocket</td><td><code>webSocket</code></td></tr>
+  </tbody>
+</table>
+<p><kbd>↑</kbd> <kbd>↓</kbd> pick a field, <kbd>Enter</kbd> edits a text field, <kbd>Space</kbd> switches a yes/no field, <kbd>s</kbd> saves and <kbd>v</kbd> reverts. Save asks <strong>Restart now</strong>, <strong>Later</strong> or <strong>Cancel</strong>. The agent uses the new settings after a restart. When you change <code>javaOptions</code> and the agent runs as a service, the screen reminds you to run <code>install-service</code> again. The secret is kept as it is and never shown.</p>
+
+<h3>7 Agent log</h3>
+<p>The agent's own log. <kbd>l</kbd> cycles the level; <kbd>a</kbd> shows all lines, <kbd>w</kbd> warnings only and <kbd>e</kbd> errors only. <kbd>f</kbd> follows new lines. <kbd>↑</kbd> <kbd>↓</kbd> <kbd>PgUp</kbd> <kbd>PgDn</kbd> scroll.</p>
+
+<h3>8 Certificates</h3>
+<p>The certificates the agent trusts: <strong>from the server</strong> (read only) and <strong>added on this machine</strong>. Keys: <kbd>a</kbd> add a certificate file, <kbd>d</kbd> remove, <kbd>Enter</kbd> details with the SHA-256 fingerprint, <kbd>w</kbd> switch <em>also trust the Windows certificate store</em> (Windows only) and <kbd>t</kbd> restart the agent so that it uses the changes. See <a href="../administration/trusted-certificates.html">Trusted certificates</a>.</p>
+
+<h2>The certs command</h2>
+<p>For machines with no screen, change the certificates from the command line. The command works with the agent folder directly, so the agent need not be running.</p>
+<pre><code>buildspawn-agent-tui certs list
+buildspawn-agent-tui certs add company-root.pem
+buildspawn-agent-tui certs remove 3F:9A:21
+buildspawn-agent-tui certs windows-store on</code></pre>
+<table>
+  <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>certs list</code></td><td>Lists the certificates from the server and the ones added here, the Windows store setting, and whether the agent needs a restart.</td></tr>
+    <tr><td><code>certs add FILE</code></td><td>Adds the certificates in a <code>.pem</code>, <code>.crt</code>, <code>.cer</code>, <code>.der</code>, <code>.p7b</code> or <code>.p7c</code> file. <code>-</code> reads text from standard input. It shows each certificate first and asks. A private key is refused: only the public certificate is needed. Expired certificates are skipped.</td></tr>
+    <tr><td><code>certs remove FINGERPRINT-OR-NAME</code></td><td>Removes one certificate added here. The fingerprint may be just the start, with or without colons. Certificates from the server cannot be removed here.</td></tr>
+    <tr><td><code>certs windows-store on|off</code></td><td>Also trust what the Windows certificate store trusts. Windows only.</td></tr>
+  </tbody>
+</table>
+<table>
+  <thead><tr><th>Option</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>--yes</code></td><td>Do not ask.</td></tr>
+    <tr><td><code>--include-expired</code></td><td>With <code>add</code>: also add expired certificates.</td></tr>
+    <tr><td><code>--home FOLDER</code></td><td>The agent folder.</td></tr>
+  </tbody>
+</table>
+<p>Changes take effect when the agent starts again.</p>
+
+<h2>A worked example</h2>
+<p>A Linux build machine, <code>ubuntu-build-03</code>, sits in a rack and is reached over SSH. Builds on it fail with an out-of-disk error.</p>
+<ol class="steps">
+  <li>Log in over SSH and run <code>/opt/buildspawn-agent/bin/buildspawn-agent-tui</code>.</li>
+  <li>The Overview shows <strong>Disk free</strong> in red.</li>
+  <li>Press <kbd>p</kbd> to pause the agent, so no new build starts.</li>
+  <li>Press <kbd>4</kbd>. The biggest folder is <code>Game_Linux-Build</code>. Select it and press <kbd>c</kbd>, then confirm.</li>
+  <li>Press <kbd>p</kbd> again to resume.</li>
+</ol>
+
+<h2>What you see when it runs</h2>
+<ul>
+  <li>A title line with the agent's name, its connection state and the server address.</li>
+  <li>A tab line with the eight views. The open view is highlighted.</li>
+  <li>The body of the view, and at the bottom a line with the keys that work in that view.</li>
+  <li>Messages such as <em>Saved. Settings apply after a restart.</em> above the key line.</li>
+</ul>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><em>This needs a terminal.</em></td><td>You ran it with output sent to a file. Use <code>--once</code>.</td></tr>
+    <tr><td><em>The agent isn't running.</em></td><td>Start it (<code>run-agent</code>, or the service), then press <kbd>r</kbd>.</td></tr>
+    <tr><td><em>This agent runs as another account.</em></td><td>Start the program as an administrator, with <code>sudo</code>, or as the account that runs the agent.</td></tr>
+    <tr><td>No view 8 on an older agent.</td><td>The agent files are older than 1.9.2. See <a href="../how-to/admin-upgrade-agents.html">Upgrade agents</a>.</td></tr>
+    <tr><td><em>Make the window wider.</em> or <em>taller.</em></td><td>Enlarge the terminal window.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="windows-tray-app.html">Windows tray app</a></li>
+  <li><a href="windows-service.html">Windows service</a></li>
+  <li><a href="agent-connection.html">Connect an agent</a></li>
+  <li><a href="personal-agents.html">Personal agents</a></li>
+</ul>
+</main>
+</body>
+</html>

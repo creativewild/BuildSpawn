@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simple Build Tool · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/sbt">
+<main class="doc">
+<h1>Simple Build Tool</h1>
+<p class="lead">Runs <code>sbt</code> with commands and a version. Test reports under <code>target/test-reports</code> are recorded for you.</p>
+
+<h2>When to use it</h2>
+<p>Use it for Scala projects, such as a game-analytics job.</p>
+
+<h2>How to set it up</h2>
+
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>. Type <code>Simple Build Tool</code> in <strong>Filter step types</strong> if you like, then click the <strong>Simple Build Tool</strong> tile (group <strong>Build tools</strong>).</li>
+  <li>Type a <strong>Step name</strong>, for example <code>Test analytics</code>.</li>
+  <li>Fill in the fields described below.</li>
+  <li>Optional: set <strong>Execute step</strong>, <strong>Conditions</strong> and <strong>Retry on failure</strong>. See <a href="step-list.html">The steps list and the step editor</a>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<figure class="shot small">
+  <img src="../../assets/shots/build-steps/sbt.png" alt="The fields of the Simple Build Tool step in the step editor">
+  <figcaption>The fields of the Simple Build Tool step, as the step editor shows them.</figcaption>
+</figure>
+
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Commands</strong></td><td>One sbt command per line, such as <code>clean</code> and <code>test</code>. A command with spaces, like <code>testOnly MySpec</code>, stays one argument. Empty starts the interactive shell, which has no input here, so give at least one command.</td><td>Empty</td><td><code>clean</code> then <code>test</code></td></tr>
+    <tr><td><strong>sbt version</strong></td><td>Passed as <code>-sbt-version</code>. Empty uses the version the project sets.</td><td>Empty</td><td><code>1.10.0</code></td></tr>
+    <tr><td><strong>sbt home</strong></td><td>The folder of an sbt installation on the agent. The step runs <code>bin/sbt</code> in it. Empty uses <code>sbt</code> from the <code>PATH</code>.</td><td>Empty</td><td><code>C:\tools\sbt</code></td></tr>
+    <tr><td><strong>JDK home</strong></td><td>The folder of the JDK sbt runs on, set as <code>JAVA_HOME</code> for this step.</td><td>Empty</td><td><code>C:\jdk-21</code></td></tr>
+    <tr><td><strong>JVM parameters</strong></td><td>Options for the JVM, one per line, such as <code>-Xmx2G</code>. Each is passed to sbt as <code>-J</code> plus the option.</td><td>Empty</td><td><code>-Xmx2G</code></td></tr>
+    <tr><td><strong>Arguments</strong></td><td>Launcher arguments, one per line, placed before the commands.</td><td>Empty</td><td><code>-J-Xmx2G</code></td></tr>
+    <tr><td><strong>Record test reports</strong></td><td>Records the JUnit XML under <code>target/test-reports</code> of the working directory and its sub-projects, also when the build fails.</td><td>On</td><td>On</td></tr>
+    <tr><td><strong>Working directory, Environment variables, Test reports, Run step within container</strong></td><td>The same in every runner. See <a href="common-step-fields.html">Fields every runner has</a>.</td><td></td><td></td></tr>
+  </tbody>
+</table>
+
+
+<h2>A worked example</h2>
+<p>Run the tests of the analytics job. Step name <code>Test analytics</code>, <strong>Commands</strong> <code>clean</code> and <code>test</code> on two lines.</p>
+
+<h2>What you see when it runs</h2>
+<p>The console shows the <code>sbt</code> command and its output. Test results are listed on the build.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong><em>The sbt command was not found on this agent</em></strong></td><td>Install sbt or set <strong>sbt home</strong>.</td></tr>
+    <tr><td><strong>The step hangs</strong></td><td>sbt waits for input when no command is given. Always give at least one command.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="gradle.html">Gradle</a></li>
+  <li><a href="maven.html">Maven</a></li>
+  <li><a href="runners.html">Runners</a></li>
+  <li><a href="common-step-fields.html">Fields every runner has</a></li>
+</ul>
+</main>
+</body>
+</html>

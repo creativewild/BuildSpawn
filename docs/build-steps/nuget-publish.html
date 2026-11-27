@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NuGet Publish · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/nuget-publish">
+<main class="doc">
+<h1>NuGet Publish</h1>
+<p class="lead">Pushes packages to a NuGet feed with <code>nuget push</code>. The API key comes from a Secret text credential and is masked in the log.</p>
+
+<h2>When to use it</h2>
+<p>Use it after <a href="nuget-pack.html">NuGet Pack</a> to put your package on the studio feed.</p>
+
+<h2>How to set it up</h2>
+
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>. Type <code>NuGet Publish</code> in <strong>Filter step types</strong> if you like, then click the <strong>NuGet Publish</strong> tile (group <strong>Packages</strong>).</li>
+  <li>Type a <strong>Step name</strong>, for example <code>Publish framework</code>.</li>
+  <li>Fill in the fields described below.</li>
+  <li>Optional: set <strong>Execute step</strong>, <strong>Conditions</strong> and <strong>Retry on failure</strong>. See <a href="step-list.html">The steps list and the step editor</a>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<figure class="shot small">
+  <img src="../../assets/shots/build-steps/nuget-publish.png" alt="The fields of the NuGet Publish step in the step editor">
+  <figcaption>The fields of the NuGet Publish step, as the step editor shows them.</figcaption>
+</figure>
+
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Packages</strong></td><td>The package to push, or a pattern such as <code>out/*.nupkg</code>, relative to the working directory.</td><td>Empty (required)</td><td><code>out/*.nupkg</code></td></tr>
+    <tr><td><strong>Package source</strong></td><td>Passed as <code>-Source</code>, a feed URL. Empty uses the default source of nuget.</td><td>Empty</td><td><code>https://nuget.studio.example/v3/index.json</code></td></tr>
+    <tr><td><strong>API key</strong></td><td>A <strong>Secret text</strong> credential that holds the API key. It is read when the step runs, passed to nuget as one argument and masked in the log. It is never stored in the build configuration. Other processes on the agent can still see the argument while nuget runs.</td><td>None</td><td>The credential <code>nuget-feed-key</code></td></tr>
+    <tr><td><strong>NuGet tool</strong></td><td>Path of <code>nuget.exe</code>. Empty takes <code>nuget</code> from the <code>PATH</code>.</td><td>Empty</td><td><code>C:\tools\nuget.exe</code></td></tr>
+    <tr><td><strong>Arguments</strong></td><td>One argument per line, such as <code>-SkipDuplicate</code>. Do not put a key here: use the <strong>API key</strong> field.</td><td>Empty</td><td><code>-SkipDuplicate</code></td></tr>
+    <tr><td><strong>Working directory, Environment variables, Test reports, Run step within container</strong></td><td>The same in every runner. See <a href="common-step-fields.html">Fields every runner has</a>.</td><td></td><td></td></tr>
+  </tbody>
+</table>
+
+
+<h2>A worked example</h2>
+<p>Push the package that the earlier step made. Step name <code>Publish framework</code>, <strong>Packages</strong> <code>out/*.nupkg</code>, <strong>Package source</strong> the studio feed, <strong>API key</strong> the credential <code>nuget-feed-key</code>, <strong>Arguments</strong> <code>-SkipDuplicate</code>.</p>
+
+<h2>What you see when it runs</h2>
+<p>The console shows <code>$ nuget push out/Framework.1.4.57.nupkg -Source … -ApiKey ********</code>. The key is masked.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong><em>The API key credential … was not found, is not Secret text, or this build may not use it</em></strong></td><td>Create a <strong>Secret text</strong> credential and check that this project may use it. See <a href="../parameters/secrets.html">Secrets</a>.</td></tr>
+    <tr><td><strong><em>The NuGet Publish step has no packages to push</em></strong></td><td>Fill in <strong>Packages</strong>.</td></tr>
+    <tr><td><strong>A 409 Conflict from the feed</strong></td><td>The version exists already. Add <code>-SkipDuplicate</code> or raise the version.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="nuget-pack.html">NuGet Pack</a></li>
+  <li><a href="../parameters/secrets.html">Secrets</a></li>
+  <li><a href="../how-to/steps-pack-and-publish-nuget.html">Pack and publish a NuGet package</a></li>
+  <li><a href="runners.html">Runners</a></li>
+  <li><a href="common-step-fields.html">Fields every runner has</a></li>
+</ul>
+</main>
+</body>
+</html>

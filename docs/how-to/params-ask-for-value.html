@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ask for a value when a build starts · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/params-ask-for-value">
+<main class="doc">
+<h1>Ask for a value when a build starts</h1>
+<p class="lead">Make the Run button ask for a version before the build begins.</p>
+
+<h2>When to use this</h2>
+<p>Use it when a person must decide something for each build, such as the version to release.</p>
+<h2>Steps</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Parameters</strong>.</li>
+  <li>Click <strong>Add parameter</strong>. Name it <code>RELEASE_VERSION</code>, kind <strong>Configuration parameter</strong>, value type <strong>Text</strong>.</li>
+  <li>Click <strong>Show allowed value</strong>, choose <strong>Regex</strong> and type <code>\d+\.\d+\.\d+</code>. Type a message: <em>Use a version like 1.4.0</em>.</li>
+  <li>Click <strong>Customize the run dialog</strong>. Set <strong>Display</strong> to <strong>Prompt</strong>, <strong>Label</strong> to <em>Version to release</em>.</li>
+  <li>Click <strong>Save</strong>.</li>
+  <li>Click <strong>Run</strong> on the build configuration. The Run dialog opens. Type the version and click <strong>Run</strong>.</li>
+</ol>
+<h2>A worked example</h2>
+<p>A step uses it: <code>powershell -File Build\release.ps1 -Version %RELEASE_VERSION%</code>.</p>
+<h2>What you see when it runs</h2>
+<p>The Run dialog shows <em>Version to release</em>. A value like <code>abc</code> is refused with your message and the build does not start.</p>
+<h2>Problems and fixes</h2>
+<table>
+<thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+<tbody>
+<tr><td>A schedule starts the build with an empty value</td><td>Give a default value, or run the build only by hand.</td></tr>
+</tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../parameters/param-prompt.html">Asked parameters</a></li>
+  <li><a href="../parameters/param-typed.html">Parameter with a value type</a></li>
+</ul>
+</main>
+</body>
+</html>

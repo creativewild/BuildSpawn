@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>History · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-results/history">
+<main class="doc">
+<h1>History</h1>
+<p class="lead">History lists every build that ran, newest first, with a timeline that shows which agent ran what and when.</p>
+
+<figure class="shot">
+  <img src="../../assets/shots/build-results/history.png" alt="The Build History page: the Timeline by executor for the last 6 hours, the filters All, Failed, Running and Mine, and the list of builds with result, configuration, changes, start time, duration and agent">
+  <figcaption>The History page in the top bar.</figcaption>
+</figure>
+
+<h2>When to use it</h2>
+<p>Use History to answer "what ran last night?" or "which builds failed today?" across all projects. For the builds of one build configuration, use its own <strong>History</strong> tab (see below).</p>
+
+<h2>The History page</h2>
+<p>Click <strong>History</strong> in the top bar. The title line says how many builds the list holds and how many are in progress, for example <em>36 builds &middot; 0 in progress</em>. You see only the builds of projects you may see. Personal builds of other people are not listed.</p>
+<table>
+  <tr><th>Part</th><th>What it does</th></tr>
+  <tr><td><strong>Icon size</strong> S, M, L</td><td>Sets the size of the status icons: small, medium or large.</td></tr>
+  <tr><td><strong>Legend</strong></td><td>Explains the status icons and the health icons.</td></tr>
+  <tr><td><strong>Timeline</strong></td><td>The last 6 hours, one lane for each agent, with its number of executors. Each build is a bar from its start to its end, coloured by result: <em>Success</em>, <em>Failed</em>, <em>Unstable</em>, <em>Aborted</em> or <em>In progress</em>. Use it to see which agents are busy and where a night build waited.</td></tr>
+  <tr><td><strong>All</strong>, <strong>Failed</strong>, <strong>Running</strong>, <strong>Mine</strong></td><td>The result filter. <em>Failed</em> shows failed builds, <em>Running</em> builds in progress, and <em>Mine</em> builds you started. <em>No builds match.</em> says the filter has no result.</td></tr>
+</table>
+<h3>The columns</h3>
+<table>
+  <tr><th>Column</th><th>What it shows</th></tr>
+  <tr><td><strong>Build</strong></td><td>The build number or name. Click it to open the build page.</td></tr>
+  <tr><td><strong>Result</strong></td><td>The status, such as <em>Success</em> or <em>Failed</em>. A script's status text can show here. See <a href="build-name-and-status.html">The build name and status text</a>.</td></tr>
+  <tr><td><strong>Configuration</strong></td><td>The build configuration, with its project.</td></tr>
+  <tr><td><strong>Changes</strong></td><td>The newest change in the build, or <em>No changes</em>.</td></tr>
+  <tr><td><strong>Started (GMT)</strong></td><td>When it started. Click the heading to sort the other way.</td></tr>
+  <tr><td><strong>Duration</strong></td><td>How long it took.</td></tr>
+  <tr><td><strong>Agent</strong></td><td>The agent that ran it.</td></tr>
+  <tr><td>Console and <strong>Visual</strong> buttons</td><td>Open the console, or the build in the visual editor's run view.</td></tr>
+</table>
+
+<h2>The History tab of a build configuration</h2>
+<figure class="shot">
+  <img src="../../assets/shots/build-results/job-history.png" alt="The History tab of Windows Build with its list of seven builds, the Filter builds box, the All, Failed and Mine buttons, the Queue card, the Atom feed links and the Build time graph">
+  <figcaption>The History tab of one build configuration.</figcaption>
+</figure>
+<ul>
+  <li><strong>Filter builds</strong> narrows the list by what you type. <strong>All</strong>, <strong>Failed</strong> and <strong>Mine</strong> filter by result and by who started the build.</li>
+  <li>The columns are Build, Result, Changes, Started, Duration and Agent. Each row has a <strong>Visual</strong> button, and a <strong>&hellip;</strong> menu with <strong>Re-run</strong> and <strong>Re-run with changes&hellip;</strong>.</li>
+  <li>Side builds of Parallel blocks are nested under their main build and read <em>Side build of #N</em>.</li>
+  <li><strong>Newer builds</strong> and <strong>Older builds</strong> page through the list.</li>
+  <li>The <strong>Queue</strong> card below lists the build configuration's waiting builds and why they wait.</li>
+  <li><strong>Atom feed for all</strong> and <strong>Atom feed for failures</strong> are feeds for this build configuration. See <a href="atom-feeds.html">Atom feeds</a>.</li>
+  <li>The <strong>Build time graph</strong> draws how long each build took.</li>
+</ul>
+<p>The History tab is one of the five fixed first tabs of a build configuration. Pipelines have it too.</p>
+
+<h2>What you see in a row</h2>
+<p>A row for a failed build has a red result and the build number links to the build page, where you read <em>Decided by</em>. See <a href="../how-to/find-why-build-failed.html">Find out why a build failed</a>.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <tr><th>Problem</th><th>What to do</th></tr>
+  <tr><td>A build I started is missing.</td><td>Click <strong>Mine</strong>. If it is a personal build, it shows only for you and for administrators.</td></tr>
+  <tr><td>The timeline is empty.</td><td>It shows the last 6 hours only. Older builds are in the list.</td></tr>
+  <tr><td>The list is long.</td><td>Use <strong>Failed</strong> or <strong>Running</strong>, or open the build configuration's History tab.</td></tr>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="build-page.html">The build page</a></li>
+  <li><a href="statistics.html">The Statistics tab</a>: charts of the same builds.</li>
+  <li><a href="atom-feeds.html">Atom feeds</a></li>
+</ul>
+
+</main>
+</body>
+</html>

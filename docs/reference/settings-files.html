@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Settings files · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="reference/settings-files">
+<main class="doc">
+<h1>Settings files</h1>
+<p class="lead">One small text file holds how the server starts: its port, memory, folders and Java options.</p>
+
+<p>Windows uses <code>buildspawn.cfg</code>. Linux and macOS use <code>buildspawn.conf</code>. They hold the same settings with slightly different names. Everything else, such as projects, users and agents, lives in the home folder and is set in the web interface.</p>
+<p>You rarely need to open the file by hand. These all edit it for you and keep your comments:</p>
+<ul>
+  <li>the <strong>Settings</strong> tab of the Windows app (see <a href="../administration/windows-launcher.html">The Windows app</a>);</li>
+  <li>the <strong>Settings</strong> view (<kbd>7</kbd>) of the terminal program;</li>
+  <li><code>buildspawn set key=value</code> (see <a href="terminal-commands.html#commands-settings">Terminal program commands</a>; its key for the data folder is <code>home</code>).</li>
+</ul>
+<div class="callout warning"><p>Restart Buildspawn after you change the file. The server reads it only when it starts.</p></div>
+
+<h2 id="where">Where the file is</h2>
+<table>
+  <thead><tr><th>Download</th><th>Settings file</th><th>Home and logs by default</th></tr></thead>
+  <tbody>
+    <tr><td>Windows setup</td><td><code>C:\ProgramData\Buildspawn\buildspawn.cfg</code></td><td><code>C:\ProgramData\Buildspawn\data</code> and <code>\logs</code></td></tr>
+    <tr><td>Windows zip (portable)</td><td><code>buildspawn.cfg</code> next to <code>Buildspawn.exe</code></td><td><code>data</code> and <code>logs</code> in the same folder</td></tr>
+    <tr><td>Debian, Ubuntu package</td><td><code>/etc/default/buildspawn</code></td><td><code>/var/lib/buildspawn</code> and <code>/var/log/buildspawn</code></td></tr>
+    <tr><td>RHEL, Rocky, Fedora package</td><td><code>/etc/sysconfig/buildspawn</code></td><td><code>/var/lib/buildspawn</code> and <code>/var/log/buildspawn</code></td></tr>
+    <tr><td>Linux and macOS folders (tar.gz)</td><td><code>buildspawn.conf</code> in the folder</td><td><code>data/</code> and <code>logs/</code> in the same folder</td></tr>
+  </tbody>
+</table>
+<p>The Windows app, the Windows service and the terminal program all read the same file, so they never disagree. The last line of <code>buildspawn help</code> shows which file this copy uses, and <code>buildspawn check</code> prints the full Java command made from it.</p>
+
+<h2 id="cfg">buildspawn.cfg (Windows)</h2>
+<p>One <code>key=value</code> per line. Lines that start with <code>#</code> are comments.</p>
+<table>
+  <thead><tr><th>Key</th><th>Default</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>port</code></td><td><code>8080</code></td><td>The web port.</td></tr>
+    <tr><td><code>listen</code></td><td><code>all</code></td><td><code>all</code>: every network interface. <code>localhost</code>: this computer only.</td></tr>
+    <tr><td><code>memory</code></td><td>a quarter of the computer's memory, between <code>2g</code> and <code>16g</code></td><td>The Java heap, used as both the start and the largest size, for example <code>4g</code>.</td></tr>
+    <tr><td><code>java-options</code></td><td>the recommended set (below)</td><td>Extra Java options.</td></tr>
+    <tr><td><code>data</code></td><td>see <a href="#where">Where the file is</a></td><td>The home folder: projects, build history and settings.</td></tr>
+    <tr><td><code>logs</code></td><td>see <a href="#where">Where the file is</a></td><td><code>buildspawn.log</code>, <code>gc.log</code> and heap dumps.</td></tr>
+    <tr><td><code>arguments</code></td><td>empty</td><td>Extra Buildspawn arguments, for example <code>--sessionTimeout=480</code>.</td></tr>
+  </tbody>
+</table>
+<p>In <code>java-options</code>, <code>data</code> and <code>logs</code> you can use placeholders:</p>
+<table>
+  <thead><tr><th>Placeholder</th><th>Stands for</th></tr></thead>
+  <tbody>
+    <tr><td><code>{install}</code></td><td>The program folder</td></tr>
+    <tr><td><code>{data}</code></td><td>The home folder</td></tr>
+    <tr><td><code>{logs}</code></td><td>The logs folder</td></tr>
+  </tbody>
+</table>
+<p>An example:</p>
+<pre><code># Buildspawn settings
+port=8080
+listen=all
+memory=8g
+data={install}\data
+logs={install}\logs
+arguments=--sessionTimeout=480</code></pre>
+<p>Folders named in the Java options are created before Java starts. Keys that this version doesn't know are kept as they are.</p>
+<div class="callout note"><p>An installed copy keeps its file in <code>C:\ProgramData</code>, which only administrators can change. The Windows app asks for permission when you save.</p></div>
+
+<h2 id="conf">buildspawn.conf (Linux and macOS)</h2>
+<p>The file uses shell syntax: <code>KEY=value</code>, or <code>KEY="value with spaces"</code>. Lines that start with <code>#</code> are comments.</p>
+<table>
+  <thead><tr><th>Key</th><th>Default</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>BUILDSPAWN_PORT</code></td><td><code>8080</code></td><td>The web port.</td></tr>
+    <tr><td><code>BUILDSPAWN_LISTEN</code></td><td><code>all</code></td><td><code>all</code>: every network interface. <code>localhost</code>: this computer only.</td></tr>
+    <tr><td><code>BUILDSPAWN_MEMORY</code></td><td>empty</td><td>The Java heap, for example <code>4g</code>. Empty means a quarter of the computer's memory, between 2 GB and 16 GB.</td></tr>
+    <tr><td><code>BUILDSPAWN_HOME</code></td><td><code>"{install}/data"</code></td><td>The home folder: projects, build history and settings. The packages use <code>/var/lib/buildspawn</code>.</td></tr>
+    <tr><td><code>BUILDSPAWN_LOGS</code></td><td><code>"{install}/logs"</code></td><td><code>gc.log</code>, heap dumps, and <code>buildspawn.log</code> when the server runs in the background. The packages use <code>/var/log/buildspawn</code>.</td></tr>
+    <tr><td><code>BUILDSPAWN_JAVA_OPTIONS</code></td><td>the recommended set (below)</td><td>Java options.</td></tr>
+    <tr><td><code>BUILDSPAWN_ARGUMENTS</code></td><td>empty</td><td>Extra Buildspawn arguments, for example <code>--sessionTimeout=480</code>.</td></tr>
+  </tbody>
+</table>
+<p><code>{install}</code> is the program folder. In the Java options and arguments, <code>{home}</code> and <code>{logs}</code> stand for those folders.</p>
+<p>An example:</p>
+<pre><code># Buildspawn settings
+BUILDSPAWN_PORT=8080
+BUILDSPAWN_LISTEN=all
+BUILDSPAWN_MEMORY=8g
+BUILDSPAWN_HOME="/srv/buildspawn"
+BUILDSPAWN_LOGS="{install}/logs"
+BUILDSPAWN_ARGUMENTS=--sessionTimeout=480</code></pre>
+<ul>
+  <li>To use another file, set <code>BUILDSPAWN_CONFIG=/path/to/file</code> before you run <code>bin/buildspawn</code>.</li>
+  <li>With the Linux service, a home folder outside the default must belong to the <code>buildspawn</code> user: <code>sudo chown -R buildspawn:buildspawn /srv/buildspawn</code>.</li>
+  <li>Package upgrades keep this file.</li>
+</ul>
+
+<h2 id="java-options">The recommended Java options</h2>
+<p>A new settings file starts with this set. It is tuned for a build server that runs for weeks at a time.</p>
+<pre><code>-XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+UseStringDeduplication -XX:+ParallelRefProcEnabled --enable-native-access=ALL-UNNAMED -XX:+ExplicitGCInvokesConcurrent -XX:ReservedCodeCacheSize=512m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath={logs} -XX:+ExitOnOutOfMemoryError -Xlog:gc*:file={logs}/gc.log:time,uptime:filecount=10,filesize=50M -Djava.awt.headless=true</code></pre>
+<table>
+  <thead><tr><th>Option</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td><code>-XX:+UseG1GC</code>, <code>-XX:MaxGCPauseMillis=200</code></td><td>A memory cleaner with short pauses, so pages stay quick.</td></tr>
+    <tr><td><code>-XX:+UseStringDeduplication</code></td><td>Saves memory on repeated text, such as job and file names.</td></tr>
+    <tr><td><code>-XX:+ParallelRefProcEnabled</code>, <code>-XX:+ExplicitGCInvokesConcurrent</code></td><td>Keep memory clean-ups short.</td></tr>
+    <tr><td><code>--enable-native-access=ALL-UNNAMED</code></td><td>Lets the server use native system calls without a Java warning at start-up.</td></tr>
+    <tr><td><code>-XX:ReservedCodeCacheSize=512m</code></td><td>Room for compiled code, so the server stays fast after a long run.</td></tr>
+    <tr><td><code>-XX:+HeapDumpOnOutOfMemoryError</code>, <code>-XX:HeapDumpPath={logs}</code></td><td>Writes a memory dump to the logs folder if memory runs out, so you can find the cause.</td></tr>
+    <tr><td><code>-XX:+ExitOnOutOfMemoryError</code></td><td>Stops the server when memory runs out. The service then starts it again.</td></tr>
+    <tr><td><code>-Xlog:gc*:file={logs}/gc.log:...</code></td><td>Keeps a memory log, <code>gc.log</code>, in ten files of 50 MB at most.</td></tr>
+    <tr><td><code>-Djava.awt.headless=true</code></td><td>The server has no screen. Charts are drawn without one.</td></tr>
+  </tbody>
+</table>
+<div class="callout tip"><p>An existing settings file keeps its own options when you upgrade. To pick up the newest set on Windows, click <strong>Reset to recommended</strong> in the app's Settings tab. On Linux and macOS, add any missing option to <code>BUILDSPAWN_JAVA_OPTIONS</code> yourself, for example <code>--enable-native-access=ALL-UNNAMED</code>, which is new in 1.4.</p></div>
+
+<h2 id="macos">macOS</h2>
+<p>The macOS download is a folder, like the Linux tar.gz. It uses <code>buildspawn.conf</code> with the same keys as Linux, in the folder, and keeps <code>data/</code> and <code>logs/</code> next to it. Starting at login uses a LaunchAgent, <code>~/Library/LaunchAgents/io.github.creativewild.buildspawn.plist</code>, which runs <code>bin/buildspawn run</code> as you with this folder's settings file. Its output goes to <code>logs/buildspawn.log</code>. Presets are in <code>~/Library/Application Support/Buildspawn/presets.json</code>.</p>
+
+<h2 id="packages">The Linux packages</h2>
+<table>
+  <thead><tr><th>Path</th><th>What it is</th></tr></thead>
+  <tbody>
+    <tr><td><code>/opt/buildspawn</code></td><td>The program: <code>bin/buildspawn</code>, <code>app/buildspawn.war</code> and the bundled Java in <code>runtime/</code>.</td></tr>
+    <tr><td><code>/usr/bin/buildspawn</code></td><td>A link to <code>/opt/buildspawn/bin/buildspawn</code>.</td></tr>
+    <tr><td><code>/etc/default/buildspawn</code> or <code>/etc/sysconfig/buildspawn</code></td><td>The settings file (<code>.deb</code> and <code>.rpm</code>). Upgrades keep it.</td></tr>
+    <tr><td><code>/var/lib/buildspawn</code></td><td>The home.</td></tr>
+    <tr><td><code>/var/log/buildspawn</code></td><td><code>gc.log</code> and heap dumps. The service log is in the systemd journal: <code>journalctl -u buildspawn -f</code>.</td></tr>
+    <tr><td>The <code>buildspawn.service</code> unit</td><td>The systemd service, started and enabled by the package. A unit you make with <code>install-service</code> from a tar.gz folder is written to <code>/etc/systemd/system/buildspawn.service</code> and takes precedence. It runs <code>bin/buildspawn run</code> as the system user <code>buildspawn</code>, with <code>BUILDSPAWN_CONFIG</code> pointing at the settings file, and restarts it after a failure.</td></tr>
+  </tbody>
+</table>
+<p>See <a href="../administration/linux-macos-install.html">Install on Linux and macOS</a>.</p>
+
+<h2 id="portable">Portable markers on Windows</h2>
+<p>On Windows the app decides where the settings live from the program folder. If a file named <code>portable</code>, or a <code>buildspawn.cfg</code>, is next to <code>Buildspawn.exe</code>, the copy is portable and keeps settings, data and logs in that folder. Otherwise it is an installed copy and uses <code>C:\ProgramData\Buildspawn</code>. An older <code>buildspawn-service.cfg</code> is converted once into <code>buildspawn.cfg</code> (the old file is left as it was). <code>BUILDSPAWN_CONFIG</code> names a different settings file.</p>
+
+<h2 id="data-folder">Inside the data folder</h2>
+<p>The data folder (the <strong>home</strong>) is what you back up. You see these in it:</p>
+<table>
+  <thead><tr><th>Name</th><th>What it holds</th></tr></thead>
+  <tbody>
+    <tr><td><code>config.xml</code></td><td>The main server settings. Most pages of <strong>Settings</strong> save here or in a file next to it.</td></tr>
+    <tr><td>Other <code>*.xml</code> files next to it</td><td>One file per feature, for example <code>credentials.xml</code> (stored credentials), <code>nodeMonitors.xml</code>, the agent pools and the Perforce settings.</td></tr>
+    <tr><td><code>jobs\</code></td><td>One folder per project and build configuration: its <code>config.xml</code>, build history, artifacts and its workspace on the server.</td></tr>
+    <tr><td><code>users\</code></td><td>One folder per user, with their settings, API tokens and preferences such as the theme.</td></tr>
+    <tr><td><code>nodes\</code></td><td>One folder per agent: its settings.</td></tr>
+    <tr><td><code>secrets\</code></td><td>The keys that protect saved passwords and credentials. Keep it with the backup. On a new server it also holds <code>initialAdminPassword</code>: the one-time password of the user <code>admin</code>. The file is deleted when you finish the setup page.</td></tr>
+    <tr><td><code>secret.key</code> and related files</td><td>Server keys. Keep them with the backup.</td></tr>
+    <tr><td><code>trust\</code></td><td>The trusted certificates: <code>trust.properties</code> (the switches <code>windowsStore</code> and <code>sendToAgents</code>) and <code>added\</code> with one <code>.pem</code> and one <code>.properties</code> file per certificate, named by its SHA-256 fingerprint. It is kept on upgrades. See <a href="../administration/trusted-certificates.html">Trusted certificates</a>.</td></tr>
+    <tr><td><code>plugins\</code></td><td>The plugins in use.</td></tr>
+    <tr><td><code>war\</code></td><td>The unpacked web application. Made again at each start.</td></tr>
+    <tr><td><code>userContent\</code>, <code>updates\</code>, <code>fingerprints\</code>, <code>logs\</code></td><td>Files you share, update data, build fingerprints and server-side logs of the web application.</td></tr>
+    <tr><td><code>buildspawn.pid</code></td><td>A lock. It stops two servers from using the same home. It is removed when the server stops.</td></tr>
+  </tbody>
+</table>
+<p>The server log is separate from the home. <code>buildspawn.log</code> sits in the logs folder from the settings file when Buildspawn runs in the app, in the background or as a Windows service, together with <code>gc.log</code> and any heap dumps.</p>
+
+<h2 id="agent-files">Agent files</h2>
+<p>An agent has its own small files. They are not part of the server's backup.</p>
+<table>
+  <thead><tr><th>File or folder</th><th>What it is</th></tr></thead>
+  <tbody>
+    <tr><td><code>conf\buildspawn-agent.properties</code> (<code>conf/…</code> on Linux and macOS)</td><td>The agent's settings: <code>serverUrl</code> (required: the address of your server), <code>name</code> (default: the computer's name), <code>registrationToken</code> (if the administrator asks for one) and <code>workDir</code> (the work folder, default <code>work</code>). After an administrator authorizes the agent, its secret is written to the file, so keep it private. A line with <code>#</code> in front is off.</td></tr>
+    <tr><td>The work folder</td><td>Where builds check out and run. By default <code>work</code> next to the agent, or <code>.buildspawn-agent</code> in the user's home folder when the agent was started without a work folder.</td></tr>
+    <tr><td><code>&lt;work folder&gt;\trust\</code></td><td>The agent's trusted certificates: <code>trust.properties</code>, <code>added\</code> (added on this machine) and <code>from-server\</code> (sent by the server, replaced as a whole each time).</td></tr>
+  </tbody>
+</table>
+<p>See <a href="../agents/install-agent.html">Install an agent</a>, <a href="../agents/windows-tray-app.html">the agent tray app</a> and <a href="../agents/agent-terminal.html">the agent terminal program</a>.</p>
+
+<h2 id="tips">Tips</h2>
+<ul>
+  <li>Run <code>buildspawn check</code> after a change. It tries the Java options before you rely on them. In the Windows app, <strong>Check with Java</strong> does the same.</li>
+  <li>If the Windows service stops within seconds of starting, the reason is in the Windows Application event log (source <em>Buildspawn</em>) and in <code>logs\buildspawn.log</code>.</li>
+  <li>Keep <code>listen</code> on <code>localhost</code> while you try Buildspawn out. Switch to <code>all</code> when agents and other people need to reach it.</li>
+</ul>
+</main>
+</body>
+</html>

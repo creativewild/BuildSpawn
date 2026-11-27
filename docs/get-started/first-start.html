@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>First start and sign-in · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="get-started/first-start">
+<main class="doc">
+<h1>First start and sign-in</h1>
+<p class="lead">Open Buildspawn for the first time, create the admin user and sign in.</p>
+
+<h2>Open the server in your browser</h2>
+<p>When the server runs, open its address in a web browser. On the server itself that is:</p>
+<pre><code>http://localhost:8080/</code></pre>
+<p>From another computer, use the server's name or IP address instead of <code>localhost</code>, for example <code>http://build-server:8080/</code>.</p>
+<ul>
+  <li>In the <a href="terminal-program.html">terminal program</a>'s live monitor, press <kbd>b</kbd> to open the page.</li>
+  <li>In the <a href="windows-app.html">Windows app</a>, use the link shown on the <em>Run here</em> tab.</li>
+</ul>
+<div class="callout note"><p>8080 is the default port. If you chose another port during setup, use that one. You can change it later with <code>buildspawn set port=8090 --apply</code>.</p></div>
+
+<h2>Create the admin user</h2>
+<p>On the very first start the page asks for the <strong>initial admin password</strong>. It is a one-time password that proves you own the server.</p>
+<ol class="steps">
+  <li>Find the password. Any of these shows it:
+    <ul>
+      <li>the <em>Admin password</em> step of the terminal program's launch flow (<kbd>v</kbd> shows it, <kbd>c</kbd> copies it);</li>
+      <li>the command <code>buildspawn admin-password</code> (add <code>--copy</code> to put it on the clipboard; on the Linux packages, run it with <code>sudo</code>);</li>
+      <li>the file <code>secrets/initialAdminPassword</code> inside the server's home folder.</li>
+    </ul>
+  </li>
+  <li>Paste the password into the page and continue.</li>
+  <li>Create your own administrator account: user name, password, full name and e-mail address.</li>
+  <li>Confirm the server's address. Buildspawn uses it in links, for example in e-mails.</li>
+</ol>
+<p>When setup is done, the one-time password stops working and the file is removed. From now on you sign in with your own account.</p>
+<div class="callout tip"><p>Create more users under <strong>Settings › Users</strong>, and give them rights under <strong>Settings › Security</strong>. See <a href="../administration/users-and-permissions.html">Users, groups and permissions</a>.</p></div>
+
+<h2>Sign in</h2>
+<p>Next time you open Buildspawn, it shows the sign-in page: the logo on the left and the form on the right. It follows the theme you chose, or your system's light or dark setting when you have not chosen one.</p>
+<figure class="shot">
+  <img src="../../assets/shots/get-started/sign-in.png" alt="The sign-in page with the logo on the left, and Username, Password, a Keep me signed in box and the Sign in button">
+  <figcaption>The sign-in page.</figcaption>
+</figure>
+<ol class="steps">
+  <li>Type your <strong>Username</strong> and <strong>Password</strong>.</li>
+  <li>Tick <strong>Keep me signed in</strong> if you use your own computer, so you don't have to sign in every day.</li>
+  <li>Click <strong>Sign in</strong>. Buildspawn opens the Projects page.</li>
+</ol>
+<p>To sign out, open your account menu (the round button with your initial, top right) and choose <strong>Sign out</strong>.</p>
+<p>To change your password or create an API token for scripts, open the account menu and choose <strong>Security</strong>, or go to <code>http://&lt;server&gt;:8080/me/security</code>.</p>
+<div class="callout warning"><p>Keep the admin account for administration. Give everyday users their own accounts with fewer rights, so one shared password never unlocks everything.</p></div>
+<h2>What to do next</h2>
+<ol class="steps">
+  <li>Open <strong>Settings</strong> and check <strong>System</strong>. The server address you confirmed is used in links and e-mails. If you serve Buildspawn under a path such as <code>https://build.example.com/buildspawn/</code>, set the address to match and start the server with <code>--prefix=/buildspawn</code>.</li>
+  <li>If your company uses its own certificate authority, add its root under <strong>Settings &rsaquo; Security &rsaquo; Trusted certificates</strong>. The certificates are kept when you upgrade.</li>
+  <li>Add a build machine: <strong>Agents &rsaquo; Install agents</strong>. See <a href="../agents/install-agent.html">Install an agent</a>. For a first try you can use the built-in agent, which runs small builds on the server itself.</li>
+  <li>Create your first project and build configuration with <strong>New Item</strong>. See <a href="../projects/create-build-configuration.html">Create a build configuration</a>.</li>
+  <li>Press <strong>Run</strong> and watch the build. See <a href="../running-builds/run-dialog.html">The Run dialog</a> and <a href="../build-results/build-page.html">The build page</a>.</li>
+</ol>
+<div class="callout note"><p>User names may contain dots, for example <code>sam.lee</code>.</p></div>
+
+</main>
+</body>
+</html>

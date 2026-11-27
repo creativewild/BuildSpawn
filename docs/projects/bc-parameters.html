@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parameters · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/bc-parameters">
+<main class="doc">
+<h1>Parameters</h1>
+<p class="lead">Every value a build passes to its steps, in one table. This page explains how the tab works.</p>
+<h2>When to use it</h2>
+<p>Use it to define values that the build asks for or passes on. Parameters can come from the build configuration, a template or a project. The kinds and types have their own pages in the Parameters section.</p>
+<figure class="shot">
+  <img src="../../assets/shots/projects/bc-parameters.png" alt="The Parameters tab of Windows Build: a table of parameters">
+  <figcaption>The Parameters tab. Password values are always masked.</figcaption>
+</figure>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings</strong>. Then click <strong>Parameters</strong>.</li>
+  <li>Use the filters <strong>Configuration</strong>, <strong>Environment</strong> and <strong>System</strong> to find a parameter.</li>
+  <li>Click <strong>Add parameter</strong>. Type the name and choose the type.</li>
+  <li>Set the default value. Choose whether the build asks for it when it starts.</li>
+  <li>Save.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Configuration parameters</td><td>Read as <code>%NAME%</code> in steps. They are also in every step's environment.</td><td>-</td><td><code>PLATFORM</code></td></tr>
+    <tr><td>Environment variables (<code>env.NAME</code>)</td><td>Every step's process gets them.</td><td>-</td><td><code>env.BUILD_CONFIG</code></td></tr>
+    <tr><td>System properties (<code>system.NAME</code>)</td><td>Go to build tools.</td><td>-</td><td><code>system.version</code></td></tr>
+    <tr><td>Defined in</td><td>Whether the value is this build configuration's own or comes from a project or template.</td><td>-</td><td><em>Game</em></td></tr>
+    <tr><td>When it is set</td><td>Whether it is asked when the build runs, and its type: text, choice, boolean, password or file.</td><td>-</td><td>Asked, choice</td></tr>
+    <tr><td>Add parameter</td><td>Adds one. <strong>Edit</strong> on a row changes it.</td><td>-</td><td>-</td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p><strong>Windows Build</strong> has the parameter <code>PLATFORM</code> with the choices <code>Win64</code> and <code>Win32</code>, asked at run time, default <code>Win64</code>. The Unreal step uses <code>%PLATFORM%</code>.</p><h2>What you see when it runs</h2>
+<p>When you press <strong>Run</strong> the dialog asks for the asked parameters. The build page lists the values that were used. Passwords show as dots.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>A value is read-only</td><td>It comes from a project or template. Use <strong>Override</strong> to change it here only.</td></tr>
+    <tr><td>A password is empty in the step</td><td>Use a password or credentials parameter and read it as an environment variable.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="settings-homes.html">Settings homes</a></li>
+  <li><a href="../parameters/parameters.html">Parameters</a></li>
+  <li><a href="../parameters/param-references.html">Parameter references</a></li>
+  <li><a href="../parameters/secrets.html">Secrets</a></li>
+</ul>
+</main>
+</body>
+</html>

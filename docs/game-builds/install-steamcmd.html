@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Install SteamCMD · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="game-builds/install-steamcmd">
+<main class="doc">
+<h1>Install SteamCMD</h1>
+<p class="lead">Download Valve's SteamCMD tool onto the agent and run it once so it is ready for the Steam steps.</p>
+
+<h2>When to use it</h2>
+<p>Use it as the first Steam step on agents that are new or short-lived, such as container or cloud agents, or any agent where nobody installed SteamCMD by hand. If SteamCMD is already installed, the step says so and does nothing.</p>
+
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Build steps › Add build step</strong>.</li>
+  <li>Type <code>Steam</code> in <strong>Filter step types</strong> and click <strong>Install SteamCMD</strong>.</li>
+  <li>Type a <strong>Step name</strong>, for example <code>Install SteamCMD</code>.</li>
+  <li>Change the fields below only if you need to. The defaults suit most agents.</li>
+  <li>Click <strong>Save</strong>. Drag the step above your <strong>Steam upload</strong> step.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/game-builds/install-steamcmd.png" alt="The Install SteamCMD step form with the Install folder field"><figcaption>The Install SteamCMD step.</figcaption></figure>
+
+<h2>Every field</h2>
+<table>
+  <tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr>
+  <tr><td><strong>Install folder</strong></td><td>Where SteamCMD goes on the agent.</td><td><code>tools/steamcmd</code> in the folder of the agent</td><td><code>D:\tools\steamcmd</code></td></tr>
+  <tr><td><strong>Download again if it is already there</strong></td><td>Download even when SteamCMD is installed. SteamCMD updates itself at each start anyway.</td><td>Off</td><td>Off</td></tr>
+  <tr><td><strong>Download address</strong></td><td>Where to download the package. Use an internal mirror if your agents sit behind a proxy.</td><td>The address Valve gives for the system of the agent</td><td><code>https://mirror.studio.example/steamcmd.zip</code></td></tr>
+  <tr><td><strong>Stop after (minutes)</strong></td><td>Stops the step if it takes longer.</td><td><code>30</code></td><td><code>30</code></td></tr>
+  <tr><td><strong>Hands on to later steps</strong></td><td>Shows the two values the step sets: <code>${STEAMCMD_PATH}</code> and <code>${STEAMCMD_VERSION}</code>.</td><td>Not editable</td><td></td></tr>
+</table>
+<p>The form also has a <strong>What happens</strong> card. It says the step needs nothing installed, only an internet connection to Valve.</p>
+
+<h2>A worked example</h2>
+<p>Your studio builds on a fresh Windows cloud agent named <code>win-cloud-07</code>. Add <strong>Install SteamCMD</strong> with the defaults. It installs SteamCMD in <code>tools\steamcmd</code> under the agent folder. Your next step, <a href="steam-upload.html">Steam upload</a>, finds it there without a path.</p>
+
+<h2>What you see when it runs</h2>
+<ul>
+  <li>First run: a line that it is downloading the package to the folder, then that it runs SteamCMD once so it updates itself.</li>
+  <li>The step sets <code>STEAMCMD_PATH</code> and <code>STEAMCMD_VERSION</code>. Later steps read them as <code>%STEAMCMD_PATH%</code>.</li>
+  <li>Later runs: <em>SteamCMD is already installed, version …</em> and nothing is downloaded.</li>
+</ul>
+
+<h2>Problems and fixes</h2>
+<table>
+  <tr><th>Message</th><th>What to do</th></tr>
+  <tr><td>The download from … failed</td><td>The agent cannot reach Valve. Check its network or proxy, or set <strong>Download address</strong> to a mirror.</td></tr>
+  <tr><td>The package holds no SteamCMD program</td><td>The address is wrong. Use Valve's address for the agent's system.</td></tr>
+  <tr><td>SteamCMD was installed but did not report a version</td><td>Run SteamCMD once by hand on the agent to see why. On Linux it often needs 32-bit runtime libraries.</td></tr>
+  <tr><td>SteamCMD ended with the code …</td><td>Read the lines above it in the log.</td></tr>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="steam-overview.html">Steam upload: overview</a></li>
+  <li><a href="steam-upload.html">Steam upload</a></li>
+  <li><a href="../how-to/game-unity-perforce-steam.html">Build Unity from Perforce and upload to a Steam branch</a></li>
+</ul>
+</main>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Compare two builds · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/run-compare-two-builds">
+<main class="doc">
+<h1>Compare two builds</h1>
+<p class="lead">Find out what differs between a build that passed and a build that failed, or between last week's build and today's: the code, the values, the agent and the times.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>You can see the project: at least the Project viewer role.</li>
+  <li>You know the two builds. In this guide they are <em>Game / Windows Build</em> #2, which passed, and #3, which failed.</li>
+</ul>
+<p>Buildspawn has no single "compare" button. You compare the two build pages, which show the same cards in the same places. Open them in two browser windows side by side.</p>
+
+<h2>Steps</h2>
+<ol class="steps">
+  <li>Open the build configuration and click its <strong>History</strong> tab. Open build #2 in one window and build #3 in another.</li>
+  <li><strong>Info line.</strong> Under the title, compare the start time, how long it took, who started it, the agent and the changelist or commit. A different agent or a long gap in time often explains a difference.</li>
+  <li><strong>Summary.</strong> Compare <strong>Waited in queue</strong>, <strong>Executed on</strong>, <strong>Cause</strong> and <strong>Parameters</strong>. For the complete list, click the <strong>Parameters</strong> tab of both builds. A value that differs, such as <code>CONFIG</code>, is a cause to check first.</li>
+  <li><strong>Changes.</strong> Open the <strong>Changes</strong> tab of #3. It lists the changelists or commits that are new since #2. When the builds are not next to each other, open the build configuration's <strong>Change Log</strong> tab: it lists the changes of all builds in between.</li>
+  <li><strong>Steps.</strong> On the Overview tab, compare each step's duration in <strong>Build steps</strong>. A step that takes much longer in one build is a lead.</li>
+  <li><strong>Console.</strong> Open <strong>Console Output</strong> in both, switch the <strong>Time</strong> switch to <strong>Elapsed</strong>, and compare the blocks. Use <strong>Search in log</strong> for the same word in both, for example the name of a file.</li>
+  <li><strong>Tests.</strong> If the builds have a <strong>Test Result</strong> tab, compare the counts. The numbers in brackets show the change against the build before.</li>
+  <li><strong>Trend.</strong> Open the <strong>Statistics</strong> tab. Hover over the point of each build in the duration, queue time, test count and artifacts size charts to see both values in one place. Filter by <strong>Agent</strong> to see whether one machine is slower. See <a href="../build-results/statistics.html">The Statistics tab</a>.</li>
+</ol>
+
+<h2>A worked example</h2>
+<p>On the docs server, build #2 of <em>Windows Build</em> took 9 seconds and passed. Build #3 failed after 5.9 seconds.</p>
+<ul>
+  <li>Both ran on <code>win-build-01</code> with <code>CONFIG = Development</code>, so the machine and the parameters are not the cause.</li>
+  <li>The Overview of #3 says <em>Decided by: Failed: Step "Compile" exited with code 1</em>, and the console shows <code>error C2065: Game/Weather.cpp(88): 'StormIntensity': undeclared identifier</code>.</li>
+  <li>Suppose the Changes tab of #3 lists a changelist by a colleague that touched <code>Game/Weather.cpp</code>. That is the cause. If it says <em>No changes</em> instead, #3 built the same changelist as #2, and you look at the machine, the parameters and the time.</li>
+</ul>
+
+<h2>What you see</h2>
+<p>You can say what is different between the two builds: the code, the values, the machine or the time. If nothing differs, the failure is flaky: re-run the build and see. See <a href="rerun-from-failed-step.html">Re-run a failed build from the failing step</a>.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <tr><th>Problem</th><th>What to do</th></tr>
+  <tr><td>The Changes tab says <em>No changes</em>.</td><td>The build used the same changelist or commit as the build before it. Compare the agent, the parameters and the time instead.</td></tr>
+  <tr><td>An old build has no times in the console.</td><td>Builds from before version 1.1 have no per-line times.</td></tr>
+  <tr><td>I cannot open one of the builds.</td><td>It may be a personal build of someone else. Ask them to <a href="../running-builds/shared-builds.html">share it</a>.</td></tr>
+  <tr><td>A build is gone.</td><td>Clean-up rules deleted it. Pin the builds you want to keep with the pin button in the header.</td></tr>
+</table>
+
+<h2>Next steps</h2>
+<ul>
+  <li><a href="find-why-build-failed.html">Find out why a build failed</a></li>
+  <li><a href="../build-results/build-page.html">The build page</a></li>
+  <li><a href="../build-results/history.html">History</a></li>
+</ul>
+
+</main>
+</body>
+</html>

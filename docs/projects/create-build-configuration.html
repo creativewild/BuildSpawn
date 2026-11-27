@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Create a build configuration · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/create-build-configuration">
+<main class="doc">
+<h1>Create a build configuration</h1>
+<p class="lead">A build configuration says what to build, where and when. You create one inside a project, then fill in its settings one section at a time.</p>
+
+<p>A build configuration holds the version control roots to fetch, the build steps to run, the triggers that start it, the parameters it asks for, and the rules that decide if a build passed. Each build it runs keeps its own log, changes, artifacts and test results.</p>
+
+<h2>Create from scratch</h2>
+<ol class="steps">
+  <li>Open the project the build configuration belongs to, for example <strong>Game</strong>.</li>
+  <li>Click <strong>New Item</strong> in the page header.</li>
+  <li>Under <strong>Item name</strong>, type a name, for example <code>Switch Build</code>.</li>
+  <li>Under <strong>Type</strong>, click the card <strong>Build configuration</strong>. This is the build configuration with build steps, the visual editor and all the settings homes.</li>
+  <li>Click <strong>Create</strong>. The build configuration opens on its <strong>Settings</strong> tab.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/projects/new-item.png" alt="The New Item page inside the Game project: a name field and the item types Freestyle project, Build configuration template, Pipeline and Multi-configuration project">
+  <figcaption>The New Item page. The ID is made from the project ID and the name. <strong>Created in</strong> is where the new item goes.</figcaption>
+</figure>
+
+<h3>The other item types</h3>
+<p>The New Item page has one card for each type. Each type has its own page: see <a href="item-types.html">Item types</a>.</p>
+<table>
+  <thead><tr><th>Type</th><th>Use it for</th></tr></thead>
+  <tbody>
+    <tr><td>Build configuration</td><td>Steps that run one after another. Use this one in most cases. <a href="type-build-configuration.html">Page</a></td></tr>
+    <tr><td>Pipeline</td><td>A build written as a script file. Its steps show read-only on the Build Steps page; the visual editor can edit declarative Pipelines. <a href="type-pipeline.html">Page</a></td></tr>
+    <tr><td>Build configuration template</td><td>Steps and parameters that several build configurations share. <a href="type-template.html">Page</a></td></tr>
+    <tr><td>Project</td><td>A folder that groups build configurations and passes settings down. <a href="type-project.html">Page</a></td></tr>
+    <tr><td>Multibranch Pipeline</td><td>One Pipeline per branch of a repository, under <strong>More types</strong>. <a href="type-multibranch.html">Page</a></td></tr>
+  </tbody>
+</table>
+<p>Multi-configuration projects and Organization Folders are no longer offered for new items. Ones that already exist keep working.</p>
+
+<h2>Fill in the settings</h2>
+<p>A new build configuration does nothing until you give it steps. Work through the settings tabs from left to right:</p>
+<ol class="steps">
+  <li><strong>General:</strong> check the name, the <strong>Build configuration ID</strong> and pick an <strong>Icon</strong> for the platform it builds.</li>
+  <li><strong>Version Control:</strong> add the Git or Perforce roots to fetch. See <a href="../version-control/git.html">Git</a> and <a href="../version-control/perforce.html">Perforce</a>.</li>
+  <li><strong>Build Steps:</strong> click <strong>Add build step</strong> and pick a runner, for example <strong>Command Line</strong> or <strong>Unreal Engine</strong>. See <a href="../build-steps/runners.html">Runners</a>.</li>
+  <li><strong>Triggers:</strong> start builds on a new change or on a schedule. See <a href="../running-builds/triggers.html">Triggers</a>.</li>
+  <li><strong>Parameters:</strong> add values the build asks for or passes to its steps.</li>
+</ol>
+<p>Each of these is described on <a href="settings-homes.html">Settings homes</a> and has its own page: <a href="bc-general.html">General</a>, <a href="bc-version-control.html">Version Control</a>, <a href="bc-build-steps.html">Build Steps</a>, <a href="bc-triggers.html">Triggers</a> and <a href="bc-parameters.html">Parameters</a>. When you are done, click <strong>Run</strong> in the header to start the first build.</p>
+<div class="callout tip"><p>Prefer to draw it? Open <strong>Visual editor</strong> on the Settings tab and drag steps onto the canvas. The form and the visual editor edit the same settings. See <a href="../visual-editor/canvas.html">Canvas and palette</a>.</p></div>
+
+<h2>Copy an existing configuration</h2>
+<p>The fastest way to make a <em>PS5 Build</em> when you already have a <em>Windows Build</em> is to copy it.</p>
+<ol class="steps">
+  <li>Open the project where the copy should go and click <strong>New Item</strong>.</li>
+  <li>Type the new name.</li>
+  <li>Under <strong>Start from</strong> choose <strong>Copy of an existing item</strong>. In <strong>Copy from</strong>, start typing the name of the build configuration to copy and pick it from the list.</li>
+  <li>Under <strong>Settings of the copy</strong>, choose what happens to inherited settings:
+    <ul>
+      <li><strong>Keep inheriting</strong>: the copy uses the settings of the project it is created in. Pick this when the copy should follow its new project.</li>
+      <li><strong>Make inherited settings its own</strong>: the copy keeps running the same steps and parameters, whatever the project above holds. Pick this when you copy into another project and want the build to stay the same.</li>
+    </ul>
+  </li>
+  <li>Click <strong>Create</strong>, then change what differs, such as the platform in the steps.</li>
+</ol>
+<div class="callout note"><p>Overrides are copied either way. The copy gets a new ID, and it starts with no build history.</p></div>
+<div class="callout tip"><p>More on copies and templates: <a href="project-copy-settings.html">Copying settings</a>. If many build configurations share most of their steps, a <a href="templates.html">template</a> is better than copies: you change the template once and every build configuration follows.</p></div>
+</main>
+</body>
+</html>

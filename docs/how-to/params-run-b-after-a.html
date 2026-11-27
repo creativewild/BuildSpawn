@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Run B when A succeeds · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/params-run-b-after-a">
+<main class="doc">
+<h1>Run B when A succeeds</h1>
+<p class="lead">Start the Unit Tests build after the Linux Server Build succeeds.</p>
+
+<h2>When to use this</h2>
+<p>Use it when one build must follow another.</p>
+<h2>Steps</h2>
+<ol class="steps">
+  <li>Open the build configuration <code>Unit Tests</code> (this is B) and go to <strong>Settings › Triggers</strong>.</li>
+  <li>Click <strong>Add new trigger</strong>, then <strong>Add</strong> next to <strong>Finish Build Trigger</strong>.</li>
+  <li>In <strong>Build configurations to watch</strong> type <code>Game/Linux Server Build</code> (this is A).</li>
+  <li>Keep <strong>Stable</strong> so that only a good A starts B.</li>
+  <li>Click <strong>Save</strong>. If B must test exactly A's code, also add a snapshot dependency on A (<strong>Settings › Dependencies</strong>).</li>
+</ol>
+<h2>A worked example</h2>
+<p>Each stable Linux Server Build now starts Unit Tests. If B needs A's files, add an <a href="params-use-other-build-artifacts.html">artifact dependency</a>.</p>
+<h2>What you see when it runs</h2>
+<p>The Triggers page of B says <em>after Game/Linux Server Build finishes</em>. The log of A says it triggered B.</p>
+<h2>Problems and fixes</h2>
+<table>
+<thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+<tbody>
+<tr><td>B does not start</td><td>The result of A was worse than Stable, or the name is wrong.</td></tr>
+</tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../running-builds/trigger-finish-build.html">Finish Build trigger</a></li>
+  <li><a href="../parameters/dependencies.html">Dependencies</a></li>
+</ul>
+</main>
+</body>
+</html>

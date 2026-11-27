@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UGS metadata server badge · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="game-builds/ugs-badge">
+<main class="doc">
+<h1>UGS metadata server badge</h1>
+<p class="lead">A post-build action that shows the result of a build as a badge next to a changelist in UnrealGameSync (UGS).</p>
+
+<h2>When to use it</h2>
+<p>Use it when your team works with Unreal Engine and Perforce, and developers use UnrealGameSync to pick a good changelist to sync. A badge such as <em>Editor</em> or <em>Win64</em> shows next to each changelist: <em>Starting</em> while the build runs, then <em>Success</em>, <em>Failure</em> or <em>Skipped</em>. The <em>metadata server</em> is the small UGS service that stores these badges.</p>
+
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Post-build actions</strong>.</li>
+  <li>Click <strong>Add post-build action</strong> and choose <strong>UGS metadata server badge</strong>.</li>
+  <li>Fill in the <strong>Server URL</strong>, the <strong>Badge</strong> name and the <strong>Project</strong>.</li>
+  <li>Click <strong>Test connection</strong>. It says <em>Connected. The metadata server uses API version N.</em></li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/game-builds/ugs-badge.png" alt="The UGS metadata server badge post-build action with Server URL, Badge, Project and Credentials"><figcaption>The UGS metadata server badge action.</figcaption></figure>
+
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Server URL</strong></td><td>The metadata server. You can use build parameters in it.</td><td>Empty (required)</td><td><code>http://ugs.studio.example:3000</code></td></tr>
+    <tr><td><strong>Badge</strong></td><td>The badge name shown in UGS.</td><td>Empty (required)</td><td><code>Editor</code></td></tr>
+    <tr><td><strong>Project</strong></td><td>The depot path of the project folder, not the <code>.uproject</code> file.</td><td>Empty (required)</td><td><code>//UE5/Main/Games/Skyforge</code></td></tr>
+    <tr><td><strong>Credentials</strong></td><td>Optional. A Secret text credential sent as a bearer token. UGS metadata servers usually run in a closed network and need none.</td><td>None</td><td><code>ugs-token</code></td></tr>
+    <tr><td>Button <strong>Test connection</strong></td><td>Checks the server and the credentials.</td><td>-</td><td>-</td></tr>
+  </tbody>
+</table>
+
+<h2>A worked example</h2>
+<p>The <code>Windows Editor</code> build configuration syncs <code>//UE5/Main</code> from Perforce and builds the editor. The post-build action uses Server URL <code>http://ugs.studio.example:3000</code>, Badge <code>Editor</code> and Project <code>//UE5/Main/Games/Skyforge</code>. In UnrealGameSync, each changelist the build covers gets an <em>Editor</em> badge.</p>
+
+<h2>What you see when it runs</h2>
+<ul>
+  <li>When the build starts, the badge is set to <em>Starting</em>. The log says <em>Badge Editor set to Starting for change 15204.</em></li>
+  <li>When it ends, the badge becomes <em>Success</em> (the build is successful or unstable), <em>Failure</em>, or <em>Skipped</em> (the build was stopped).</li>
+  <li>The badge links back to the build page.</li>
+  <li>One badge is posted for each Perforce changelist the build used.</li>
+</ul>
+<p>For badges that come from a BuildGraph script, use <strong>Post badges</strong> on the <a href="unreal.html">Unreal Engine step</a> instead.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><em>This build has no Perforce change, so no badge is posted.</em></td><td>The badge only works for Perforce builds. Add a <a href="../version-control/perforce.html">Perforce root</a>.</td></tr>
+    <tr><td><em>The UGS badge needs a server URL, a badge name and a project.</em></td><td>Fill in all three fields.</td></tr>
+    <tr><td><em>Could not post the badge ...</em></td><td>Read the reason after it. Check the address with <strong>Test connection</strong>.</td></tr>
+    <tr><td><em>The credentials ... were not found.</em></td><td>Pick an existing credential, or clear the field.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<div class="cards">
+  <a class="card" href="unreal.html"><h3>Unreal Engine step</h3><p>BuildGraph badges and the other commands.</p></a>
+  <a class="card" href="../version-control/perforce.html"><h3>Perforce</h3><p>Roots and changelists.</p></a>
+</div>
+</main>
+</body>
+</html>

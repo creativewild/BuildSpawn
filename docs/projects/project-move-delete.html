@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rename, move and delete · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/project-move-delete">
+<main class="doc">
+<h1>Rename, move and delete</h1>
+<p class="lead">Change where an item lives, what it is called, or remove it. Each action has its own page with a clear summary of what will happen.</p>
+<h2>Rename</h2><ol class="steps">
+  <li>Open the item and click <strong>Rename</strong> in the page header.</li>
+  <li>Type the <strong>New Name</strong>. The page says: the name and the address change, and links to the old address stop working.</li>
+  <li>Click <strong>Rename</strong>.</li>
+</ol>
+<p>The ID does not change. The item keeps its place in the tree order.</p><h2>Move</h2><figure class="shot">
+  <img src="../../assets/shots/projects/move-page.png" alt="The Move page of Windows Build with the list of projects">
+  <figcaption>The Move page.</figcaption>
+</figure>
+<ol class="steps">
+  <li>Open the item and click <strong>Move</strong> (a tab for a build configuration, or the <strong>...</strong> menu for a project).</li>
+  <li>Under <strong>Move to</strong> choose the project.</li>
+  <li>Click <strong>Move</strong>. If the move can break something, the page lists it and offers <strong>Move anyway</strong>.</li>
+</ol>
+<table>
+  <thead><tr><th>Check</th><th>What it means</th></tr></thead>
+  <tbody>
+    <tr><td>A build of it is running</td><td>Refused. Stop it or wait, then move. Nothing is changed.</td></tr>
+    <tr><td>The destination is archived</td><td>Refused. Nothing in an archived project can run.</td></tr>
+    <tr><td>A template is in use</td><td>Refused. Detach the build configurations first.</td></tr>
+    <tr><td>It uses a template the destination cannot reach</td><td>Refused. Detach the template first.</td></tr>
+    <tr><td>It loses inherited settings</td><td>Warning: steps and parameters inherited from the old project stop applying, including the parameters named on the page.</td></tr>
+    <tr><td>A dependency changes</td><td>Warning: the dependency leads to another build configuration, or none, after the move.</td></tr>
+  </tbody>
+</table>
+<p>A move keeps builds, settings, ID and history. Links to the old address stop working. Use the ID address <code>/buildConfiguration/&lt;id&gt;</code> for links that must survive a move.</p><h2>Delete</h2><ol class="steps">
+  <li>Open the item, open the <strong>...</strong> menu and choose <strong>Delete</strong>.</li>
+  <li>Read what will be removed. For a project, type its name to confirm.</li>
+  <li>Click <strong>Delete</strong>.</li>
+</ol>
+<p>Deleting removes the item, its builds and its settings. For a project it removes everything inside. This cannot be undone. A template that is in use is detached first: each build configuration keeps a copy of the template's settings, and the confirmation says how many. To take something out of use without losing it, <a href="project-pause-archive.html">archive</a> it.</p><h2>Problems and fixes</h2><table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>Move says a build is running</td><td>Wait for it, or stop it.</td></tr>
+    <tr><td>I cannot delete a template</td><td>Delete detaches the build configurations. If you may not change one of them, nothing happens. Ask someone who may.</td></tr>
+    <tr><td>I need the old name back</td><td>Rename it again. The ID did not change.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="projects.html">Projects</a></li>
+  <li><a href="project-ids.html">IDs</a></li>
+  <li><a href="templates.html">Templates</a></li>
+  <li><a href="../how-to/projects-move-build-configuration.html">Move a build configuration</a></li>
+</ul>
+</main>
+</body>
+</html>

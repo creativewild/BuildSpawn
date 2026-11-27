@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tools · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="administration/tools">
+<main class="doc">
+<h1>Tools</h1>
+<p class="lead">Tell Buildspawn where to find the tools your builds use, such as Git, Maven, MSBuild or the Unity Editor, and let it copy them to your agents.</p>
+
+<p>A <strong>tool</strong> is a program a build step runs. You can use the copy that is already installed on each agent, or upload a version to the server once. Buildspawn then copies it to each agent the first time a build needs it. This way every agent builds with the same version.</p>
+
+<figure class="shot">
+  <img src="../../assets/shots/administration/tools.png" alt="The Tools page with an Install tool button, a Git section and a Maven section, each with Edit locations and Install version buttons and a table of versions">
+  <figcaption>Settings › Tools. Each tool type has its own section with its versions.</figcaption>
+</figure>
+
+<h2>What the Tools page shows</h2>
+<p>Open <strong>Settings › Tools</strong>. The page has one section for each tool type that is set up, for example <strong>Git</strong>, <strong>Maven</strong> and <strong>VSTest</strong>. Each section has a table:</p>
+<table>
+  <thead><tr><th>Column</th><th>What it shows</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Version</strong></td><td>The name of the version. <code>Default</code> is the one steps use when they don't pick one.</td></tr>
+    <tr><td><strong>Usages</strong></td><td>How many build steps use this version, or <em>Not used</em>.</td></tr>
+    <tr><td><strong>Default</strong></td><td>Marks the default version of this tool type.</td></tr>
+    <tr><td><strong>Source</strong></td><td><em>Found on agents</em> when the agents' own copy is used, or the archive you uploaded.</td></tr>
+    <tr><td><strong>Actions</strong></td><td><strong>Edit</strong> the version, or remove it.</td></tr>
+  </tbody>
+</table>
+<p>Further down:</p>
+<ul>
+  <li><strong>Custom tools</strong> holds your own tools, uploaded as archives. See <a href="#custom-tools">Custom tools</a>.</li>
+  <li><strong>More tool types</strong> lists the types with nothing set up yet, such as JDK, MSBuild, MSTest and Unity Editor. Click <strong>Set up</strong> to add one.</li>
+</ul>
+<p>The <strong>Jump to</strong> list on the right takes you to each section.</p>
+
+<h2>Add a tool</h2>
+<h3>Install a version from an archive</h3>
+<ol class="steps">
+  <li>Click <strong>Install tool</strong> at the top, or <strong>Install version</strong> in the tool's section.</li>
+  <li>Pick the <strong>Tool type</strong> and click <strong>Next</strong>. The list holds the types that are not installed yet; choose <strong>Custom archive</strong> to upload your own tool.</li>
+  <li>Click <strong>Choose file</strong> and pick a <code>.zip</code> or <code>.tar.gz</code> file with a <code>bin</code> folder inside.</li>
+  <li>Check the <strong>Version</strong>. Buildspawn reads it from the file name; change it if needed.</li>
+  <li>Tick <strong>Set as default</strong> if steps that pick <em>Default</em> should run this version.</li>
+  <li>Click <strong>Install</strong>.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/administration/tools-install.png" alt="The Install tool dialog with a Tool type list set to Git and Cancel and Next buttons">
+  <figcaption>The first step of Install tool: choose the type.</figcaption>
+</figure>
+
+<h3>Use the copy installed on the agents</h3>
+<p>If the tool is already installed on your agents, you don't need to upload it:</p>
+<ol class="steps">
+  <li>In the tool's section, click <strong>Edit locations</strong>.</li>
+  <li>Add a version, give it a name and type the folder where the tool lives on the agents, for example <code>C:\Program Files\Unity\Hub\Editor\2022.3.40f1</code>.</li>
+  <li>Click <strong>Save</strong> at the bottom of the page.</li>
+</ol>
+<div class="callout tip"><p>Some tool types have extra settings in their section. For example, Maven lets you pick the default <strong>settings provider</strong> and <strong>global settings provider</strong> that every Maven step uses.</p></div>
+
+<h3 id="custom-tools">Custom tools</h3>
+<p>For any other program, such as a console SDK tool or a shader compiler:</p>
+<ol class="steps">
+  <li>Pack it as <code>.zip</code>, <code>.tar</code> or <code>.tar.gz</code>. The file name becomes the tool ID and the folder name on the agents, so name it well, for example <code>shadercomp-2.4.zip</code>.</li>
+  <li>In <strong>Custom tools</strong>, click <strong>Upload archive</strong> and pick the file.</li>
+  <li>Use the tool in a step through its path, <code>%tool.&lt;id&gt;%</code>.</li>
+</ol>
+
+<h2>Install tools on agents</h2>
+<p>You never copy tools to agents by hand. This is what happens:</p>
+<ol class="steps">
+  <li>A build step picks a tool version, or uses <code>%tool.&lt;id&gt;%</code>.</li>
+  <li>The first time a build on an agent needs that version, Buildspawn copies it from the server to the agent.</li>
+  <li>The agent keeps the copy for the next builds, until you remove the version on the Tools page.</li>
+</ol>
+<p>Use the path in a script step like this:</p>
+<pre><code>"%tool.shadercomp-2.4%\bin\shadercomp.exe" --platform win64 Shaders\</code></pre>
+<div class="callout note"><p>The first build on a new agent takes longer, because it downloads the tool. Later builds use the copy on the agent.</p></div>
+
+<h2 id="tool-types">The tool types</h2>
+<p>Buildspawn has ten tool types. A tool type needs a <strong>Name</strong> that build steps pick, and the place where the program lives. Types that run on agents only store the location. The table says what each is for.</p>
+<table>
+  <thead><tr><th>Tool type</th><th>Used by</th><th>Fields</th></tr></thead>
+  <tbody>
+    <tr><td><a href="#custom-archive">Custom archive</a></td><td>Any step, through <code>%tool.&lt;id&gt;%</code></td><td>Uploaded archive</td></tr>
+    <tr><td><a href="#git">Git</a></td><td>Git version control, Git steps</td><td>Name, Path to Git executable</td></tr>
+    <tr><td><a href="#jdk">JDK</a></td><td>Java and Maven steps</td><td>Name, JAVA_HOME</td></tr>
+    <tr><td><a href="#jgit">JGit</a></td><td>Git version control without a Git program</td><td>None</td></tr>
+    <tr><td><a href="#jgit-apache">JGit with Apache HTTP client</a></td><td>Git over HTTP on Windows servers</td><td>None</td></tr>
+    <tr><td><a href="#msbuild">MSBuild</a></td><td><a href="../build-steps/msbuild.html">MSBuild step</a></td><td>Name, Path to MSBuild Installation, Default parameters</td></tr>
+    <tr><td><a href="#mstest">MSTest</a></td><td><a href="../build-steps/mstest.html">MSTest step</a></td><td>Name, Path to MSTest, Default parameters, Omit NoIsolation</td></tr>
+    <tr><td><a href="#maven">Maven</a></td><td><a href="../build-steps/maven.html">Maven step</a></td><td>Name, MAVEN_HOME, settings providers</td></tr>
+    <tr><td><a href="#unity-editor">Unity Editor</a></td><td><a href="../game-builds/unity.html">Unity step</a></td><td>Name, Installation directory</td></tr>
+    <tr><td><a href="#vstest">VSTest</a></td><td><a href="../build-steps/vstest.html">VSTest step</a></td><td>Name, Path to VSTest</td></tr>
+  </tbody>
+</table>
+<p>Which types you see depends on what is set up. Those with nothing yet are in <strong>More tool types</strong>.</p>
+
+<h2 id="installers">Automatic installers</h2>
+<p>A tool that lives on the agents can be installed by Buildspawn when a build first needs it. Tick <strong>Install automatically</strong> on the tool, then click <strong>Add Installer</strong>. Each installer says how to install the tool on an agent. For a tool that differs between systems, add several installers and give each a <strong>Label</strong>, so Buildspawn picks the one that fits the agent.</p>
+<table>
+  <thead><tr><th>Installer</th><th>Fields</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Extract *.zip/*.tar.gz</strong></td><td><strong>Label</strong>, <strong>Download URL for binary archive</strong>, <strong>Subdirectory of extracted archive</strong></td><td>Downloads a ZIP or GZip-compressed TAR from the address and unpacks it on the agent. Buildspawn compares the time stamp on the download server, so a newer file is installed again. The address only needs to be reachable from the Buildspawn server. Example: URL <code>https://downloads.apache.org/ant/binaries/apache-ant-1.10.12-bin.zip</code> with the subdirectory <code>apache-ant-1.10.12</code>.</td></tr>
+    <tr><td><strong>Run Shell Command</strong></td><td><strong>Label</strong>, <strong>Command</strong>, <strong>Tool Home</strong></td><td>Runs a shell command on the agent to install the tool. <strong>Tool Home</strong> is the folder the tool ends up in. Both are required.</td></tr>
+    <tr><td><strong>Run Batch Command</strong></td><td><strong>Label</strong>, <strong>Command</strong>, <strong>Tool Home</strong></td><td>The same for Windows agents.</td></tr>
+    <tr><td><strong>Install from Microsoft</strong> (MSBuild only)</td><td><strong>Label</strong>, <strong>Build Tools</strong> version</td><td>Downloads the chosen MSBuild Build Tools release from Microsoft.</td></tr>
+  </tbody>
+</table>
+<div class="callout note"><p>These installers fetch the tool for each agent separately. The server-hosted upload on the Tools page (see above) keeps one copy on the server and sends it to agents. Use that when agents cannot reach the internet.</p></div>
+
+<h2>Each tool</h2>
+
+<h3 id="custom-archive">Custom archive</h3>
+<p>Your own tool, packed as an archive. It is stored on the server and copied to agents on first use.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Choose file</strong></td><td>A <code>.zip</code>, <code>.tar</code> or <code>.tar.gz</code> file. The file name, without the extension, is the tool ID and the folder name on agents.</td><td>None</td><td><code>shadercomp-2.4.zip</code></td></tr>
+    <tr><td><strong>Tool id</strong></td><td>Shown in the table. Use it in steps as <code>%tool.shadercomp-2.4%</code>.</td><td>The file name</td><td><code>shadercomp-2.4</code></td></tr>
+  </tbody>
+</table>
+<p>Example in a script step: <code>%tool.shadercomp-2.4%\bin\shadercomp.exe --platform win64 Shaders\</code>. A Pipeline script gets the path with <code>tool name: 'shadercomp-2.4', type: 'customTool'</code>.</p>
+
+<h3 id="git">Git</h3>
+<p>The Git program. Version control steps and the Git settings use it. If you set nothing, Buildspawn looks for <code>git</code> on the agent's search path.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Name</strong></td><td>The name a build configuration picks in its <strong>Git executable</strong> field.</td><td><code>Default</code></td><td><code>Git for Windows</code></td></tr>
+    <tr><td><strong>Path to Git executable</strong></td><td>The full path to the program, or just <code>git</code>.</td><td><code>git</code></td><td><code>C:\Program Files\Git\bin\git.exe</code></td></tr>
+    <tr><td><strong>Install automatically</strong></td><td>Adds installers (see above).</td><td>Off</td><td>Off</td></tr>
+  </tbody>
+</table>
+<p><strong>Worked example, Git on Windows agents.</strong> Your Windows agents have Git for Windows in different places. Add a Git tool named <code>Default</code> with the path <code>git</code>, so each agent's search path wins. Then give the agent <code>build-win-04</code> its own location in its <a href="#tool-locations">Tool Locations</a>: <em>(Git) Default</em> with <code>D:\Tools\Git\bin\git.exe</code>. Every other agent keeps the default.</p>
+
+<h3 id="jdk">JDK</h3>
+<p>A Java development kit, for builds that need Java, such as Maven and Gradle projects.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Name</strong></td><td>The name steps pick.</td><td>None</td><td><code>jdk21</code></td></tr>
+    <tr><td><strong>JAVA_HOME</strong></td><td>The folder the JDK is installed in.</td><td>None</td><td><code>C:\Program Files\Eclipse Adoptium\jdk-21.0.4.7-hotspot</code></td></tr>
+    <tr><td><strong>Install automatically</strong></td><td>Adds installers.</td><td>Off</td><td>Off</td></tr>
+  </tbody>
+</table>
+
+<h3 id="jgit">JGit</h3>
+<p>A Git client written in Java. It needs no Git program on the agent. It supports a subset of the Git features and can use credentials chosen on the build configuration. It has no fields.</p>
+
+<h3 id="jgit-apache">JGit with Apache HTTP client</h3>
+<p>The same as JGit, but it uses the Apache HTTP client instead of the Java built-in one. Pick it when the default JGit does not use your credentials against a Windows server that asks for NTLM sign-in, such as an older Team Foundation Server. It has no fields.</p>
+
+<h3 id="msbuild">MSBuild</h3>
+<p>Microsoft's build program for .NET and C++ projects.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Name</strong></td><td>The name the MSBuild step picks.</td><td>None</td><td><code>MSBuild 17</code></td></tr>
+    <tr><td><strong>Path to MSBuild Installation</strong></td><td>The folder that holds <code>MSBuild.exe</code>.</td><td>None</td><td><code>C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin</code></td></tr>
+    <tr><td><strong>Default parameters</strong></td><td>Command line arguments added to every MSBuild step that uses this installation.</td><td>Empty</td><td><code>/m /nologo</code></td></tr>
+    <tr><td><strong>Install automatically</strong></td><td>Offers <strong>Install from Microsoft</strong> (see above).</td><td>Off</td><td>Off</td></tr>
+  </tbody>
+</table>
+
+<h3 id="mstest">MSTest</h3>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Name</strong></td><td>The name steps pick. Lets several versions live side by side.</td><td>None</td><td><code>MSTest 2019</code></td></tr>
+    <tr><td><strong>Path to MSTest</strong></td><td>The path to <code>mstest.exe</code>.</td><td><code>mstest.exe</code></td><td><code>C:\Program Files (x86)\Microsoft Visual Studio\2019\Common7\IDE\MSTest.exe</code></td></tr>
+    <tr><td><strong>Default parameters</strong></td><td>Arguments passed to every step that uses this installation.</td><td>Empty</td><td><code>/detail:errormessage</code></td></tr>
+    <tr><td><strong>Omit NoIsolation</strong></td><td>Leaves out the <code>/noisolation</code> flag. You usually want the flag when MSTest runs outside Visual Studio.</td><td>Off</td><td>Off</td></tr>
+  </tbody>
+</table>
+
+<h3 id="maven">Maven</h3>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Name</strong></td><td>The name steps pick.</td><td>None</td><td><code>maven-3.9</code></td></tr>
+    <tr><td><strong>MAVEN_HOME</strong></td><td>The folder Maven is installed in (for tools found on agents).</td><td>None</td><td><code>C:\Tools\apache-maven-3.9.11</code></td></tr>
+    <tr><td><strong>Default settings provider</strong></td><td>The <code>settings.xml</code> every Maven step uses unless it picks its own: the agent's own <code>$HOME/.m2/settings.xml</code>, or a settings file with a <strong>File path</strong> (relative to the workspace, or absolute; variables allowed).</td><td>The agent's default file</td><td><code>ci\settings.xml</code></td></tr>
+    <tr><td><strong>Default global settings provider</strong></td><td>The same for the global settings file.</td><td>The agent's default file</td><td><code>ci\global-settings.xml</code></td></tr>
+  </tbody>
+</table>
+<p>The Maven section also lets you install a version by download or upload and mark one as <strong>Default</strong>. Maven steps that pick <em>Default</em> then run that version.</p>
+
+<h3 id="unity-editor">Unity Editor</h3>
+<p>The Unity Editor program that the Unity step starts. Add one version per Unity release your studio uses, so a project can pick the exact version.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Name</strong></td><td>The name the Unity step picks in Manual mode.</td><td>None</td><td><code>Unity 2022.3.40f1</code></td></tr>
+    <tr><td><strong>Installation directory</strong></td><td>The folder that holds the Editor: <code>Editor\Unity.exe</code> on Windows, <code>Editor/Unity</code> on Linux, <code>Unity.app</code> on macOS. Buildspawn warns <em>No Unity Editor program was found in this folder</em> if it cannot see one.</td><td>None</td><td><code>C:\Program Files\Unity\Hub\Editor\2022.3.40f1</code></td></tr>
+    <tr><td><strong>Install automatically</strong></td><td>Installers, for example <strong>Extract *.zip/*.tar.gz</strong> for a <code>Unity-2022.3.40f1.zip</code> that you host yourself.</td><td>Off</td><td>Off</td></tr>
+  </tbody>
+</table>
+<p><strong>Worked example, a game studio.</strong> Skyforge builds with Unity 2022.3.40f1 on its Windows agents, and with 2023.2.20f1 for a prototype.</p>
+<ol class="steps">
+  <li>Open <strong>Settings › Tools</strong>. Under <strong>More tool types</strong> click <strong>Set up</strong> next to <strong>Unity Editor</strong>.</li>
+  <li>Click <strong>Edit locations</strong>, add a row named <code>Unity 2022.3.40f1</code> with the folder <code>C:\Program Files\Unity\Hub\Editor\2022.3.40f1</code>, then a second row named <code>Unity 2023.2.20f1</code>.</li>
+  <li>Click <strong>Save</strong>.</li>
+  <li>In the build configuration, add a <strong>Unity</strong> step in Manual mode and pick <code>Unity 2022.3.40f1</code>. See <a href="../game-builds/unity.html">Unity</a>.</li>
+  <li>For an agent that keeps Unity somewhere else, give it its own location under <a href="#tool-locations">Tool Locations</a>.</li>
+</ol>
+
+<h3 id="vstest">VSTest</h3>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Name</strong></td><td>The name steps pick.</td><td><code>Default</code></td><td><code>VSTest 2022</code></td></tr>
+    <tr><td><strong>Path to VSTest</strong></td><td>The path to <code>vstest.console.exe</code>.</td><td><code>vstest.console.exe</code></td><td><code>C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe</code></td></tr>
+  </tbody>
+</table>
+
+<h2 id="tool-locations">Tool Locations on agents</h2>
+<p>A tool set up here has one location for the whole server. An agent may keep the tool somewhere else, or on another drive. <strong>Tool Locations</strong> in the agent's settings tells that agent where its copy is. The tool then works with the same name on every agent.</p>
+<ol class="steps">
+  <li>Open the agent (<strong>Manage › Nodes</strong>, then the agent) and click <strong>Configure</strong>. For the built-in node, use <strong>Manage › System › Global properties</strong>.</li>
+  <li>Tick <strong>Tool Locations</strong> and click <strong>Add</strong>.</li>
+  <li>Pick the tool from the list. It shows as <em>(Git) Default</em>, <em>(JDK) jdk21</em>, <em>(Maven) maven-3.9</em> and so on.</li>
+  <li>Type the <strong>Home</strong> folder on that agent.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<p>Builds on that agent use the location. Other agents keep using the server's setting. The agent settings are described in <a href="../agents/agent-settings.html">Agent settings</a>.</p>
+
+<h2>What you see when it runs</h2>
+<ul>
+  <li>For a tool on the agent, the console shows the program started from the path you set. A wrong path ends the step with a message that the program cannot be found.</li>
+  <li>For an uploaded or automatically installed tool, the first build on an agent shows that the tool is being copied or unpacked. Later builds skip it.</li>
+  <li>The <strong>Usages</strong> column of the Tools page counts the steps that use each version.</li>
+</ul>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>A step says the tool cannot be found.</td><td>Check the folder on the agent. Add a <a href="#tool-locations">Tool Locations</a> row for that agent if its path is different.</td></tr>
+    <tr><td>A warning says the folder <em>is not a directory on the Buildspawn controller</em>.</td><td>The folder exists only on agents. The warning is harmless for tools found on agents.</td></tr>
+    <tr><td>Auto-install says the installer cannot be used on a node.</td><td>The installer's <strong>Label</strong> does not match the agent. Clear the label or add an installer for that agent's label.</td></tr>
+    <tr><td>The Unity step cannot start the Editor.</td><td>The <strong>Installation directory</strong> must be the version folder, not the <code>Editor</code> folder inside it.</td></tr>
+    <tr><td>You removed a version and a step now fails.</td><td>Check <strong>Usages</strong> before removing. Install the version again or pick another in the step.</td></tr>
+  </tbody>
+</table>
+
+<h2>Tips</h2>
+<ul>
+  <li>Keep the version in the archive's file name, for example <code>unity-2022.3.40f1.zip</code>. Buildspawn reads it from there.</li>
+  <li>To move every build configuration to a new version, install it and tick <strong>Set as default</strong>. Steps that pick a version by name stay on their version.</li>
+  <li>Check <strong>Usages</strong> before you remove a version. A step that uses a removed version fails.</li>
+  <li>Build steps are described in <a href="../build-steps/runners.html">Runners</a>.</li>
+  <li>All Settings pages are listed in the <a href="settings-overview.html">Settings overview</a>.</li>
+</ul>
+</main>
+</body>
+</html>

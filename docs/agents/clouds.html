@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clouds · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="agents/clouds">
+<main class="doc">
+<h1>Clouds</h1>
+<p class="lead">A cloud is a source of agents that Buildspawn creates when builds wait and removes when they are done, for example virtual machines or containers. The Clouds tab lists the clouds you have set up.</p>
+
+<h2>When to use it</h2>
+<p>Use a cloud when the load changes a lot, for example many builds on release day and none at night, and you would rather pay for machines only while they work. For machines that always exist, such as devkits and your own build PCs, use permanent agents (see <a href="install-agent.html">Install an agent</a>).</p>
+
+<h2>What this version includes</h2>
+<p>A cloud needs a <strong>cloud provider plug-in</strong>: a plug-in that knows how to create agents on one platform. The plug-ins that come with this version of Buildspawn do <strong>not</strong> include one, so the Clouds page starts empty. Add a cloud provider plug-in first. Then you can set up a cloud here.</p>
+<div class="callout note"><p>The Docker and Kubernetes plug-ins are examples of cloud providers. Check the plug-in list (see <a href="../administration/plugins.html">Plugins</a>) for what is available for your server.</p></div>
+
+<h2>How to open the page</h2>
+<ol class="steps">
+  <li>Click <strong>Agents</strong> in the top bar, then the <strong>Clouds</strong> tab.</li>
+  <li>Or open <strong>Settings › Clouds</strong>. Both open the same page. You need the permission to read system settings.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/agents/clouds.png" alt="The Clouds page with no cloud"><figcaption>The Clouds page when no cloud is set up.</figcaption></figure>
+
+<h2>The page without a cloud</h2>
+<p>The page says <em>There are no clouds configured</em> and <em>Buildspawn can provision agents on demand from a cloud. Install a plugin that provides a cloud implementation, like Docker or Kubernetes.</em></p>
+<table>
+  <thead><tr><th>Button</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>New cloud</strong></td><td>Greyed out (<em>Install a cloud plugin first</em>) until a provider plug-in is installed.</td></tr>
+    <tr><td><strong>Find cloud plugins</strong></td><td>Opens the plug-in manager at the cloud category.</td></tr>
+  </tbody>
+</table>
+
+<h2>How to add a cloud</h2>
+<p>After you have installed a cloud provider plug-in:</p>
+<ol class="steps">
+  <li>Open <strong>Agents › Clouds</strong> and click <strong>New cloud</strong>.</li>
+  <li>Type a <strong>Cloud name</strong>.</li>
+  <li>Pick the type of cloud (the provider's name), or <strong>Copy Existing Cloud</strong> and type the name of the cloud to copy.</li>
+  <li>Fill in the provider's own settings: the connection, the images or templates, and how many agents it may create. These fields come from the plug-in, so they differ for each provider.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<p>When there is more than one cloud, the table lists them in order, and <strong>clouds are tried in the order they appear in this table</strong> when a new agent is needed. Change the order, then click <strong>Save</strong>.</p>
+
+<h2>A cloud's own pages</h2>
+<table>
+  <thead><tr><th>Page</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Status</strong> (<em>Cloud NAME</em>)</td><td>The cloud's overview. The provider can add its own information, such as the agents it is creating.</td></tr>
+    <tr><td><strong>Configure</strong> (<em>Cloud NAME Configuration</em>)</td><td>Change the provider's settings.</td></tr>
+    <tr><td><strong>Delete Cloud</strong></td><td>Asks <em>Delete the cloud 'NAME'?</em> and removes it. It needs the permission to change system settings.</td></tr>
+  </tbody>
+</table>
+
+<h2>Clouds and the Agents page</h2>
+<ul>
+  <li>Agents that a cloud creates are shown like other agents. Their type is <code>cloud</code>: the parameter <code>agent.type</code> is <code>cloud</code> (see <a href="agent-labels-requirements.html">Labels and agent requirements</a>).</li>
+  <li>While the cloud is creating agents, the provider can add rows to the Agents list for them.</li>
+  <li>A cloud agent belongs to a pool like any other agent (see <a href="pools.html">Pools</a>).</li>
+</ul>
+
+<h2>A worked example</h2>
+<p>Your Linux builds mostly run during the day. A provider plug-in for your container platform is installed.</p>
+<ol class="steps">
+  <li>Open <strong>Agents › Clouds › New cloud</strong>. Name it <code>linux-containers</code> and choose the provider.</li>
+  <li>In the provider's settings, add a template with the label <code>linux docker</code> and a limit of 6 agents.</li>
+  <li>Save. A build that needs <code>linux &amp;&amp; docker</code> now makes the cloud create an agent when no other agent is free.</li>
+</ol>
+
+<h2>What you see when it runs</h2>
+<ul>
+  <li>A waiting build makes a new agent appear in the Agents list, offline at first and then idle when it has connected.</li>
+  <li>When the agent has been idle for the time the provider sets, the agent is removed.</li>
+</ul>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong>New cloud</strong> is greyed out.</td><td>No cloud provider plug-in is installed. Click <strong>Find cloud plugins</strong>.</td></tr>
+    <tr><td>Builds wait and no agent is created.</td><td>Check that a template of the cloud has the labels the build asks for, and that the cloud's limit is not reached.</td></tr>
+    <tr><td>You cannot see <strong>Clouds</strong>.</td><td>You lack permission to read system settings. Ask an administrator.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="agents-page.html">The Agents page</a></li>
+  <li><a href="pools.html">Pools</a></li>
+  <li><a href="../administration/plugins.html">Plugins</a></li>
+</ul>
+</main>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pack and publish a NuGet package · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/steps-pack-and-publish-nuget">
+<main class="doc">
+<h1>Pack and publish a NuGet package</h1>
+<p class="lead">Build a package of a shared game library and push it to the studio feed, with the API key kept secret.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>A <code>.nuspec</code> file, here <code>Packaging/Framework.nuspec</code>.</li>
+  <li>A feed address and an API key. Create a <strong>Secret text</strong> credential that holds the key, here <code>nuget-feed-key</code>. See <a href="../parameters/secrets.html">Secrets</a>.</li>
+  <li><code>nuget.exe</code> on the agent's <code>PATH</code>.</li>
+</ul>
+
+<h2>Steps</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Build Steps</strong>.</li>
+  <li>Add a <strong>NuGet Pack</strong> step named <code>Pack framework</code>. Set <strong>Specification</strong> to <code>Packaging/Framework.nuspec</code>, <strong>Output directory</strong> to <code>out</code> and <strong>Version</strong> to <code>1.4.%build.number%</code>.</li>
+  <li>Tick <strong>Keep the packages as build artifacts</strong> and <strong>Clean output directory</strong>.</li>
+  <li>Add a <strong>NuGet Publish</strong> step named <code>Publish framework</code>. Set <strong>Packages</strong> to <code>out/*.nupkg</code>.</li>
+  <li>Set <strong>Package source</strong> to your feed URL and pick the credential in <strong>API key</strong>.</li>
+  <li>Put <code>-SkipDuplicate</code> in <strong>Arguments</strong>.</li>
+  <li>Click <strong>Save</strong> and run the build.</li>
+</ol>
+
+<h2>Check it worked</h2>
+<p>The console shows the package created and then the push, with the key shown as <code>********</code>. The <code>.nupkg</code> file is under <strong>Artifacts</strong>.</p>
+
+<h2>Troubleshooting</h2>
+<ul>
+  <li><strong>The credential is not found.</strong> It must be <strong>Secret text</strong> and this project must be allowed to use it.</li>
+  <li><strong>The feed says the version exists.</strong> Raise the version or keep <code>-SkipDuplicate</code>.</li>
+  <li><strong>No package to push.</strong> Check that the pack step wrote to <code>out</code>.</li>
+</ul>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../build-steps/nuget-pack.html">NuGet Pack</a></li>
+  <li><a href="../build-steps/nuget-publish.html">NuGet Publish</a></li>
+  <li><a href="use-a-secret.html">Use a secret</a></li>
+</ul>
+</main>
+</body>
+</html>

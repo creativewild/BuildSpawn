@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The script editor · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/script-editor">
+<main class="doc">
+<h1>The script editor</h1>
+<p class="lead">Write step scripts with highlighting and parameter hints. The editor knows the build's parameters and warns you about mistakes before the build runs.</p>
+
+<p>The script editor is used in the <a href="command-line.html">Command Line</a>, <a href="powershell.html">PowerShell</a>, <a href="python.html">Python</a>, <a href="nodejs.html">Node.js</a>, <a href="kotlin-script.html">Kotlin Script</a> and <a href="csharp-script.html">C# Script</a> steps. The classic <a href="shell-script.html">Execute shell</a> and <a href="batch-file.html">Execute Windows batch command</a> steps have a plain code box and also fill in <code>%name%</code> build parameters.</p>
+
+<figure class="shot">
+  <img src="../../assets/shots/build-steps/script-editor.png" alt="A Command Line step with Run set to Custom script and the script editor showing three lines with %CONFIG% and %CLEAN% highlighted as parameters, the language Auto, Find and Full screen buttons, and No problems found below">
+  <figcaption>A Command Line script. Parameter references are highlighted.</figcaption>
+</figure>
+
+<h2>Edit a script</h2>
+<ol class="steps">
+  <li>Open the step from <strong>Settings › Build Steps</strong> with <strong>Edit</strong>, or add a new one.</li>
+  <li>For Command Line, set <strong>Run</strong> to <strong>Custom script</strong>.</li>
+  <li>Type the script in the editor. It has line numbers and colours for the language, in the light and the dark theme.</li>
+  <li>Click <strong>Save</strong>. The script is saved exactly as you typed it, with its indentation and last line break.</li>
+</ol>
+<p>The bar above the script has:</p>
+<ul>
+  <li>the <strong>language</strong>: for Command Line, choose <strong>Shell</strong>, <strong>Batch</strong> or <strong>Auto</strong> (decided by the agent the step runs on);</li>
+  <li><strong>Find</strong> (<kbd>Ctrl</kbd> + <kbd>F</kbd>) to search the script;</li>
+  <li><strong>Full screen</strong> for long scripts.</li>
+</ul>
+<p>The line below the script shows hints, for example an unknown parameter, an unclosed quote or a missing bracket, and the cursor position. When all is well it says <strong>No problems found</strong>.</p>
+<div class="callout note"><p>Hints are advice only. They never stop you from saving.</p></div>
+<div class="callout tip"><p>Use <code>echo ::group::Name</code> and <code>echo ::endgroup::</code> to make your own collapsible block in the build console, and <code>::warning::</code> or <code>::error::</code> to flag a line. See <a href="../build-results/build-console.html">The build console</a>.</p></div>
+
+<h2>Use %name% references</h2>
+<p>Write <code>%NAME%</code> in a script to use a build parameter. When the step runs, Buildspawn puts the value in its place. For example, with the parameter <code>CONFIG</code> set to <code>Shipping</code>:</p>
+<pre><code>Build/ci.ps1 -Stage compile -Config %CONFIG%</code></pre>
+<p>runs as <code>Build/ci.ps1 -Stage compile -Config Shipping</code>.</p>
+<ol class="steps">
+  <li>Type <kbd>%</kbd> in the editor. A list of the build's parameters opens.</li>
+  <li>Keep typing to narrow it, then press <kbd>Enter</kbd> to insert one.</li>
+</ol>
+<p>The list holds the build configuration's own parameters, inherited ones and the built-in ones, such as <code>%build.number%</code>, <code>%build.vcs.number%</code> and <code>%build.checkoutDir%</code>. See <a href="../parameters/parameters.html">Parameters</a> and <a href="../version-control/vcs-parameters.html">Version control parameters</a>.</p>
+
+<h3>Safeguards</h3>
+<ul>
+  <li><strong>Secrets are never written into a script.</strong> Password parameters show by name only in the list. Read them from the environment variable instead, for example <code>$env:STEAM_UPLOAD_KEY</code> in PowerShell.</li>
+  <li>A value changed in the Run dialog by someone without the Configure permission is refused.</li>
+  <li>Branch names and other values from version control are only put in when they hold safe characters.</li>
+</ul>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="command-line.html">Command Line</a></li>
+  <li><a href="powershell.html">PowerShell</a></li>
+  <li><a href="common-step-fields.html">Fields every runner has</a></li>
+  <li><a href="../parameters/secrets.html">Secrets</a></li>
+  <li><a href="../build-results/build-console.html">The build console</a></li>
+</ul>
+</main>
+</body>
+</html>

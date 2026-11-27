@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Create a build configuration from a template · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/projects-from-template">
+<main class="doc">
+<h1>Create a build configuration from a template</h1>
+<p class="lead">Make a new build configuration that shares its steps with a template, so a change to the template reaches all of them.</p>
+<p>The studio has a template <strong>Platform build</strong> with the compile, cook and package steps. It now needs a <strong>Switch Build</strong> that does the same for the Nintendo Switch.</p>
+<h2>Before you start</h2>
+<ul>
+  <li>A template in the project, or in a project above it. See <a href="../projects/templates.html">Templates</a>.</li>
+  <li>The <strong>Create</strong> permission on the project.</li>
+</ul>
+<h2>Steps</h2>
+<h3>Create it from the template</h3>
+<ol class="steps">
+  <li>Open the project and click <strong>New Item</strong>.</li>
+  <li>Type <code>Switch Build</code>. Check the ID.</li>
+  <li>Under <strong>Start from</strong> choose <strong>Template</strong>. The list shows the templates you can use here, with their number of steps and parameters.</li>
+  <li>Pick <strong>Platform build</strong>. Leave <strong>Keep linked to the template</strong> on, so later changes to the template reach this build. Clear it to copy the steps once.</li>
+  <li>Under <strong>Type</strong> choose <strong>Build configuration</strong> (the card says <em>linked to the template</em>). Click <strong>Create</strong>.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/projects/new-item.png" alt="The New Item page">
+  <figcaption>The New Item page. With Template chosen, the summary says what is created.</figcaption>
+</figure>
+<h3>Change what differs</h3>
+<ol class="steps">
+  <li>On <strong>Settings › Parameters</strong>, click <strong>Override</strong> on <code>PLATFORM</code> and type <code>Switch</code>.</li>
+  <li>On <strong>General</strong> choose the Nintendo Switch icon.</li>
+  <li>Add its own triggers and build features. Templates do not carry them.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<h2>Check it worked</h2>
+<ol class="steps">
+  <li>On <strong>Settings › Build Steps</strong>, the steps carry a chip with the template name.</li>
+  <li>Open <strong>More › Templates</strong>. It lists <strong>Platform build</strong>.</li>
+  <li>Open the template. <strong>Used by</strong> lists <strong>Switch Build</strong>.</li>
+  <li>Run it. The log shows the template steps with <code>PLATFORM</code> set to <code>Switch</code>.</li>
+</ol>
+<h2>Troubleshooting</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>Template is missing from Start from</td><td>No template is within reach. A build configuration can use the templates of its own project and the projects above.</td></tr>
+    <tr><td>I want to stop following the template</td><td>Detach it. The build configuration keeps a copy of the steps. See <a href="../projects/templates.html">Templates</a>.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../projects/templates.html">Templates</a></li>
+  <li><a href="../projects/project-copy-settings.html">Copying settings</a></li>
+  <li><a href="share-settings-with-a-project.html">Share settings with a whole project</a></li>
+</ul>
+</main>
+</body>
+</html>

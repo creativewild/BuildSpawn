@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Epic: label binary · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="game-builds/epic-label">
+<main class="doc">
+<h1>Epic: label binary</h1>
+<p class="lead">Put an uploaded binary live for Windows, Win32 or Mac, or take its label away.</p>
+
+<h2>When to use it</h2>
+<p>Use it after the upload, when the build should reach players. A label tells Epic which binary is <strong>Live</strong> or <strong>Archive</strong> for a platform. Epic deletes a binary with no label after about a week.</p>
+<div class="callout warning"><p>Setting the label <strong>Live</strong> needs the permission <strong>Epic Games Store / Set Live</strong> for the person who started the build.</p></div>
+<div class="callout note"><p>If the credential is set to <strong>Self-service</strong>, Epic gives the Live label itself when you assign a platform in the Developer Portal. This step then does nothing and never starts BuildPatch Tool. The form shows a note at the top. See <a href="epic-credentials.html">Epic Games Store credential</a>.</p></div>
+<div class="callout note"><p>Every Epic step runs the Epic <strong>BuildPatch Tool</strong> on the agent. The agent needs the tool: see <a href="install-buildpatch-tool.html">Install BuildPatch Tool</a>. A step that needs a newer tool than the agent has stops with a message that names the version the agent has.</p></div>
+
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration, then <strong>Settings › Build steps › Add build step</strong>.</li>
+  <li>Type <code>Epic</code> in <strong>Filter step types</strong> and click <strong>Epic: label binary</strong>.</li>
+  <li>Pick the credential.</li>
+  <li>Choose the <strong>Action</strong> and the <strong>Label</strong>, and tick the platforms.</li>
+  <li>Keep the <strong>Build version</strong> as the version of the upload step, or type another.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/game-builds/epic-label.png" alt="The Epic: label binary step with Action Label, Label Live and the platform switches"><figcaption>The Epic: label binary step.</figcaption></figure>
+
+<h2>Every field</h2>
+<h3>Connection</h3>
+<table>
+<thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>Epic Games Store credential</td><td>The credential that holds your BuildPatch Tool keys. The list shows the credentials you may use. The secret is never typed in the step, never written to a file and never shown in the log.</td><td>None. The step fails if you pick nothing.</td><td><code>Epic Store (Skyforge)</code></td></tr>
+<tr><td>Artifact ID</td><td>The Epic artifact to work on. Leave it empty to use the <strong>Default artifact ID</strong> of the credential.</td><td>Empty (the credential default)</td><td><code>0f2b8a6c9d1e4c37a5e8b1d6c2f94a70</code></td></tr>
+<tr><td>BuildPatch Tool program</td><td>The full path of the BuildPatch Tool program on the agent. Leave it empty to use the tool the agent reported.</td><td>Empty (the tool the agent reported)</td><td><code>D:/Tools/BuildPatchTool/BuildPatchTool.exe</code></td></tr>
+</tbody>
+</table>
+<h3>Epic: label binary</h3>
+<table>
+<thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>Action</td><td><strong>Label</strong> puts the label on. <strong>Unlabel</strong> takes it away.</td><td>Label</td><td>Label</td></tr>
+<tr><td>Build version</td><td>The binary to label. It must be uploaded first, or Epic rejects the call.</td><td><code>${EPIC_BUILD_VERSION}</code> (the version of the upload step)</td><td><code>1.4.57-Windows</code></td></tr>
+<tr><td>Label</td><td><strong>Live</strong> or <strong>Archive</strong>.</td><td>Live</td><td>Live</td></tr>
+<tr><td>Platforms</td><td>Tick <strong>Windows</strong>, <strong>Win32</strong> and <strong>Mac</strong>. The step makes one call to the tool for each platform. A binary that works on Windows and Win32 needs two labels. Epic offers no Linux label. At least one must be ticked.</td><td>Windows ticked</td><td>Windows</td></tr>
+<tr><td>Sandbox ID</td><td>The sandbox to label in.</td><td>Empty: the sandbox of the credential, else the public sandbox</td><td><code>a1b2c3...</code></td></tr>
+<tr><td>Fail instead of skipping</td><td>For a Self-service credential: the step fails, and does not just say so and continue.</td><td>Off</td><td>Off</td></tr>
+</tbody>
+</table>
+<h3>Options</h3>
+<table>
+<thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>Stop after (minutes)</td><td>The step is stopped after this time.</td><td>30</td><td><code>30</code></td></tr>
+<tr><td>Tries on network errors</td><td>How many times the step runs BuildPatch Tool when it fails because of a network problem. A wrong key or a missing permission is never tried again.</td><td>1</td><td><code>3</code></td></tr>
+<tr><td>Wait between tries (seconds)</td><td>The pause between two tries.</td><td>30</td><td><code>60</code></td></tr>
+<tr><td>Save the tool&rsquo;s logs with the build</td><td>Whether the logs BuildPatch Tool wrote on the agent are kept as build artifacts in <code>epic-logs</code>. Choices: <strong>Only when the step fails</strong>, <strong>Always</strong>, <strong>Never</strong>.</td><td>Only when the step fails</td><td><strong>Always</strong></td></tr>
+<tr><td>Fail the build on warnings</td><td>Fails the step when BuildPatch Tool gave warnings, for example when metadata could not be written. Without it, warnings only show in the log.</td><td>Off</td><td>On</td></tr>
+</tbody>
+</table>
+<h3>Hands on to later steps</h3>
+<table>
+<thead><tr><th>Name</th><th>What it holds</th></tr></thead>
+<tbody>
+<tr><td><code>EPIC_LABELLED</code></td><td><code>true</code> after a label, <code>false</code> after an unlabel or a skip.</td></tr>
+<tr><td><code>EPIC_LABEL_PLATFORMS</code></td><td>The platforms that were labelled, separated by commas. Empty when skipped.</td></tr>
+</tbody>
+</table>
+
+<h2>A worked example</h2>
+<p>After <strong>Epic Games Store upload</strong> and <strong>Epic: optimise patch</strong>, add <strong>Epic: label binary</strong>: <strong>Action</strong> Label, <strong>Label</strong> Live, <strong>Platforms</strong> Windows, <strong>Build version</strong> left as <code>${EPIC_BUILD_VERSION}</code>. To retire the old build, add a second step with <strong>Action</strong> Unlabel, <strong>Label</strong> Live and <strong>Build version</strong> <code>1.3.2-Windows</code>.</p>
+
+<h2>What you see when it runs</h2>
+<pre class="terminal" data-title="build log">Epic: credential Epic Store (Skyforge), product 8c1d5f, artifact 0f2b8a..., Publishing: Labels set by builds
+Epic: label Live for Windows, version 1.4.57-Windows
+Epic: Step output EPIC_LABELLED = true
+Epic: Step output EPIC_LABEL_PLATFORMS = Windows</pre>
+<p>With a Self-service credential you see instead: <em>Epic: credential ... is set to Self-service. BuildPatch Tool was not started.</em> and a line that tells you to assign the platform in the Developer Portal.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+<thead><tr><th>Message</th><th>What to do</th></tr></thead>
+<tbody>
+<tr><td>You may not set a binary live</td><td>Ask an administrator for <strong>Epic Games Store / Set Live</strong>.</td></tr>
+<tr><td>Tick at least one platform</td><td>Tick Windows, Win32 or Mac.</td></tr>
+<tr><td>Epic refused the label</td><td>If your organization uses self-service publishing, set <strong>Publishing</strong> to <strong>Self-service</strong> on the credential, and assign the platform in the Developer Portal: Artifacts and Binaries, your artifact, the menu on an active binary, Manage Platforms.</td></tr>
+<tr><td>The credential is set to Self-service: labels are set in the Developer Portal</td><td>You ticked <strong>Fail instead of skipping</strong>. Untick it, or use a credential set to <strong>Labels set by builds</strong>.</td></tr>
+</tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="epic-upload.html">Epic Games Store upload</a></li>
+  <li><a href="epic-optimise.html">Epic: optimise patch</a></li>
+  <li><a href="epic-credentials.html">Epic Games Store credential</a>: Publishing and permissions.</li>
+  <li><a href="../how-to/game-publish-epic.html">Publish a build to the Epic Games Store</a></li>
+</ul>
+
+</main>
+</body>
+</html>

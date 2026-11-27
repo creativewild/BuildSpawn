@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>.NET · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/dotnet">
+<main class="doc">
+<h1>.NET</h1>
+<p class="lead">Runs the <code>dotnet</code> command: build, test, publish, restore, run or your own command.</p>
+
+<h2>When to use it</h2>
+<p>Use it to build and test C# projects with the .NET SDK, such as your game's tools, a launcher or a Unity package with tests. For a Visual Studio <code>.sln</code> that needs full MSBuild, see <a href="msbuild.html">MSBuild</a>.</p>
+
+<h2>How to set it up</h2>
+
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>. Type <code>.NET</code> in <strong>Filter step types</strong> if you like, then click the <strong>.NET</strong> tile (group <strong>Build tools</strong>).</li>
+  <li>Type a <strong>Step name</strong>, for example <code>Test tools</code>.</li>
+  <li>Fill in the fields described below.</li>
+  <li>Optional: set <strong>Execute step</strong>, <strong>Conditions</strong> and <strong>Retry on failure</strong>. See <a href="step-list.html">The steps list and the step editor</a>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<figure class="shot small">
+  <img src="../../assets/shots/build-steps/dotnet.png" alt="The fields of the .NET step in the step editor">
+  <figcaption>The fields of the .NET step, as the step editor shows them.</figcaption>
+</figure>
+
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Command</strong></td><td><strong>build</strong>, <strong>test (results recorded)</strong>, <strong>publish</strong>, <strong>restore</strong>, <strong>run</strong> or <strong>Custom command</strong>.</td><td>build</td><td>test</td></tr>
+    <tr><td><strong>Custom command</strong></td><td>Used with Custom command only: the word after <code>dotnet</code>, such as <code>format</code> or <code>tool</code>.</td><td>Empty</td><td><code>format</code></td></tr>
+    <tr><td><strong>Project</strong></td><td>A project, solution or file. Empty lets <code>dotnet</code> look in the working directory. For <code>run</code> it follows <code>--project</code>.</td><td>Empty</td><td><code>Tools/BuildTools.sln</code></td></tr>
+    <tr><td><strong>Configuration</strong></td><td>Passed as <code>-c</code> to build, test, publish and run.</td><td>Empty</td><td><code>Release</code></td></tr>
+    <tr><td><strong>Required SDK</strong></td><td>The .NET SDK the agent must have, such as <code>8.0</code> (any 8.0.x) or <code>8.0.100</code>. The build configuration waits for an agent that listed it. Not passed to <code>dotnet</code>.</td><td>Empty</td><td><code>8.0</code></td></tr>
+    <tr><td><strong>Framework</strong></td><td>The target framework, passed as <code>-f</code> to build, test, publish and run.</td><td>Empty</td><td><code>net8.0</code></td></tr>
+    <tr><td><strong>Runtime</strong></td><td>The runtime identifier, passed as <code>-r</code> to build, test, publish, restore and run.</td><td>Empty</td><td><code>win-x64</code></td></tr>
+    <tr><td><strong>Output directory</strong></td><td>Passed as <code>-o</code> to build, test and publish.</td><td>Empty</td><td><code>out/tools</code></td></tr>
+    <tr><td><strong>Version suffix</strong></td><td>Passed as <code>--version-suffix</code> to build and publish.</td><td>Empty</td><td><code>rc.%build.number%</code></td></tr>
+    <tr><td><strong>Logging verbosity</strong></td><td>Passed as <code>-v</code> to every command except a custom one: quiet, minimal, normal, detailed, diagnostic.</td><td>Default</td><td>minimal</td></tr>
+    <tr><td><strong>Arguments</strong></td><td>One argument per line. Each line stays one argument, whatever it holds. Pass a secret through the environment.</td><td>Empty</td><td><code>--no-restore</code></td></tr>
+    <tr><td><strong>Working directory, Environment variables, Test reports, Run step within container</strong></td><td>The same in every runner. See <a href="common-step-fields.html">Fields every runner has</a>.</td><td></td><td></td></tr>
+  </tbody>
+</table>
+
+
+<h2>A worked example</h2>
+<p>Run the unit tests of the build tools. Step name <code>Test tools</code>, <strong>Command</strong> = <strong>test (results recorded)</strong>, <strong>Project</strong> <code>Tools/BuildTools.sln</code>, <strong>Configuration</strong> <code>Release</code>, <strong>Required SDK</strong> <code>8.0</code>.</p>
+
+<h2>What you see when it runs</h2>
+<p>The console shows <code>$ dotnet test Tools/BuildTools.sln -c Release</code> and the test output. The results of <code>dotnet test</code> are recorded: the build gets a <strong>Tests</strong> tab, and a failed test makes the step unstable.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong><em>The dotnet command was not found on this agent</em></strong></td><td>Install the .NET SDK there or put <code>dotnet</code> on the <code>PATH</code>.</td></tr>
+    <tr><td><strong><em>The .NET step has no custom command</em></strong></td><td>Fill in <strong>Custom command</strong>.</td></tr>
+    <tr><td><strong><em>… logging verbosity that dotnet does not know</em></strong></td><td>Use quiet, minimal, normal, detailed or diagnostic.</td></tr>
+    <tr><td><strong><em>The value for … must not start with a dash</em></strong></td><td>Remove the leading dash from that field.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="msbuild.html">MSBuild</a></li>
+  <li><a href="nunit.html">NUnit</a></li>
+  <li><a href="../how-to/steps-build-sln-with-msbuild.html">Build a .sln with MSBuild</a></li>
+  <li><a href="runners.html">Runners</a></li>
+  <li><a href="common-step-fields.html">Fields every runner has</a></li>
+</ul>
+</main>
+</body>
+</html>

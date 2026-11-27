@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Terminate a build if it is stuck · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/feature-build-timeout">
+<main class="doc">
+<h1>Terminate a build if it is stuck</h1>
+<p class="lead">Stops a build that runs too long or goes quiet. In Buildspawn this lives under Failure conditions.</p>
+<div class="callout note"><p>In the list of build features this is called <strong>Terminate a build if it's stuck</strong>.</p></div>
+<h2>When to use it</h2>
+<p>Use it for builds that can hang, such as a cook that waits for a window to close. You do not add it as a build feature. The time limits are in <a href="bc-failure-conditions.html">Failure conditions</a> under <strong>Build time</strong>.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration, click <strong>Settings</strong>, then <strong>Failure Conditions</strong>.</li>
+  <li>Under <strong>Build time</strong> choose how the limit is set: <strong>Fixed limit</strong>, <strong>Compared with earlier builds</strong> or <strong>No new log output</strong>.</li>
+  <li>Set the minutes, and choose the <strong>Result</strong> (Failed or Unstable). Click <strong>Save</strong>.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Fixed limit</td><td>Fail if the build runs longer than the number of minutes you give.</td><td>Off</td><td><code>90</code></td></tr>
+    <tr><td>Compared with earlier builds</td><td>Limit = the average of recent successful builds plus a margin in percent.</td><td>Off</td><td>Margin <code>150</code>%</td></tr>
+    <tr><td>No new log output</td><td>Fail when the log stays silent for the number of minutes you give.</td><td>Off</td><td><code>20</code></td></tr>
+    <tr><td>Result</td><td>What the build becomes when the limit is reached.</td><td>Failed</td><td>Failed</td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p>The <strong>PS5 Build</strong> normally takes 40 minutes. The studio picks <strong>Compared with earlier builds</strong> with a margin of 150%. A build that runs longer than about an hour is stopped and marked failed.</p><h2>What you see when it runs</h2>
+<p>The build is stopped. A line in the log says which limit was hit. Time in the queue is not counted. The limit is checked every 10 seconds, so a build can stop up to 10 seconds late.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>A timeout I set earlier shows on the Failure Conditions tab</td><td>It is shown there on purpose. Changing it there moves it into the failure conditions.</td></tr>
+    <tr><td>This limit uses a setting this card cannot show</td><td>It is kept as it is. It still works.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="bc-failure-conditions.html">Failure conditions</a></li>
+  <li><a href="bc-build-features.html">The Build Features tab</a></li>
+</ul>
+</main>
+</body>
+</html>

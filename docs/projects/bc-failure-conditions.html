@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Failure Conditions · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/bc-failure-conditions">
+<main class="doc">
+<h1>Failure Conditions</h1>
+<p class="lead">Says when a build counts as failed or unstable, besides the exit code of a step.</p>
+<h2>When to use it</h2>
+<p>Use it to catch problems that a step does not report: a build that takes too long, a log line such as an out-of-memory error, or a sudden drop in the number of tests. For each condition you choose the <strong>Result</strong>: Failed or Unstable. A result can only get worse, never better.</p>
+<figure class="shot">
+  <img src="../../assets/shots/projects/bc-failure-conditions.png" alt="The Failure Conditions tab of Windows Build">
+  <figcaption>The Failure Conditions tab.</figcaption>
+</figure>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings</strong>. Then click <strong>Failure Conditions</strong>.</li>
+  <li>Switch on the conditions you need and choose the <strong>Result</strong> of each.</li>
+  <li>Fill in the minutes, the percentages or the log rules.</li>
+  <li>Click <strong>Save</strong>. The card <strong>Summary</strong> says in words when a build fails.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Non-zero exit code</td><td>Fail the build if a build step exits with a non-zero code. The step policy still decides what runs after a failure. Does not apply to a Pipeline.</td><td>On, Failed</td><td>On</td></tr>
+    <tr><td>Build time: Fixed limit</td><td>Fail if the build runs longer than the number of minutes. Counted from the start of the first step; time in the queue is not counted.</td><td>Off</td><td><code>90</code> minutes</td></tr>
+    <tr><td>Build time: Compared with earlier builds</td><td>Limit = the average of recent successful builds plus a margin. Hanging build detection: three times the average, and at least 5 minutes over it.</td><td>Off</td><td>Margin <code>150</code>%</td></tr>
+    <tr><td>Build time: No new log output</td><td>Fail when the log stays silent for the number of minutes you give.</td><td>Off</td><td><code>20</code> minutes</td></tr>
+    <tr><td>Test failures</td><td>Fail the build if some tests failed. Off adds nothing: the step that reads the tests can still mark the build unstable.</td><td>Off</td><td>Unstable</td></tr>
+    <tr><td>Text in the build log</td><td>Add log condition: a text or pattern that matches, or does not match, a line in the log. Several rules are allowed. Add out-of-memory rule adds a ready-made rule.</td><td>None</td><td><code>Out of memory</code> fails</td></tr>
+    <tr><td>Metric change: Test count drops by more than</td><td>Compared with the last successful build. Percent. Empty is off.</td><td>Empty</td><td><code>10</code>%</td></tr>
+    <tr><td>Metric change: Artifact size drops by more than</td><td>Compared with the last successful build. Percent. Empty is off.</td><td>Empty</td><td><code>20</code>%</td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p>The <strong>PS5 Build</strong> uses <strong>Compared with earlier builds</strong> with a 150% margin, a log rule that fails the build on <code>LogOutOfMemory</code>, and <strong>Artifact size drops by more than</strong> <code>20</code>% as <strong>Unstable</strong>, to notice a package that lost content.</p><h2>What you see when it runs</h2>
+<p>When a limit is reached the build is stopped and marked as you set. A line in the log says which condition fired. The limits are checked every 10 seconds, so a build can stop up to 10 seconds late.</p><pre class="terminal" data-title="build log">Build stopped: it ran longer than 90 minutes (failure condition Build time)</pre>
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>The minutes are refused</td><td>Use a whole number of minutes in the allowed range.</td></tr>
+    <tr><td>A timeout shows that I did not add</td><td>It was set earlier as a build timeout. It is kept and shown here. Changing it here moves it into the failure conditions.</td></tr>
+    <tr><td>The Exit code line is missing</td><td>A Pipeline decides what a failed step does, so that condition does not apply.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="settings-homes.html">Settings homes</a></li>
+  <li><a href="feature-build-timeout.html">Terminate a build if it is stuck</a></li>
+  <li><a href="feature-xml-report.html">XML report processing</a></li>
+</ul>
+</main>
+</body>
+</html>

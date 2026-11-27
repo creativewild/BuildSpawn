@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Organise projects for a game · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/projects-organise-game">
+<main class="doc">
+<h1>Organise projects for a game</h1>
+<p class="lead">Set up a project tree for one game, with Main, Drops and Release, so each team finds its builds and shared settings sit in one place.</p>
+<p>The studio Skyforge makes one game. It has day-to-day builds from the Main stream, nightly builds that are given to testers (Drops), and release builds that go to the stores. Each group gets its own project inside the project <strong>Skyforge</strong>.</p>
+<h2>Before you start</h2>
+<ul>
+  <li>The <strong>Create</strong> permission on the place where the project goes.</li>
+  <li>A rough list of the build configurations you want.</li>
+</ul>
+<h2>Steps</h2>
+<h3>Make the game project</h3>
+<ol class="steps">
+  <li>Open the <strong>Projects</strong> page and click <strong>New Item</strong>.</li>
+  <li>Type <code>Skyforge</code>. The ID becomes <code>Skyforge</code>.</li>
+  <li>Under <strong>Type</strong> click <strong>Project</strong> and click <strong>Create</strong>.</li>
+  <li>On its <strong>Settings</strong> give it a description and an icon, then click <strong>Save</strong>.</li>
+</ol>
+<h3>Make the three projects inside</h3>
+<ol class="steps">
+  <li>Open <strong>Skyforge</strong> and click <strong>New Item</strong>. Type <code>Main</code>, choose <strong>Project</strong>, click <strong>Create</strong>.</li>
+  <li>Repeat for <code>Drops</code> and <code>Release</code>. Their IDs are <code>Skyforge_Main</code>, <code>Skyforge_Drops</code> and <code>Skyforge_Release</code>.</li>
+</ol>
+<h3>Put shared settings at the right level</h3>
+<ol class="steps">
+  <li>On <strong>Skyforge</strong> open <strong>Build settings</strong> and add what every build needs, for example the parameter <code>STUDIO_NAME</code>. See <a href="share-settings-with-a-project.html">Share settings with a whole project</a>.</li>
+  <li>On <strong>Skyforge</strong> open <strong>Perforce roots</strong> and add the root of the depot once. Every build configuration below can use it.</li>
+  <li>On <strong>Release</strong> open <strong>Credentials</strong> and add the store accounts. Only the release builds can use them.</li>
+  <li>Click <strong>Save</strong> on each page.</li>
+</ol>
+<h3>Add the build configurations</h3>
+<ol class="steps">
+  <li>Open <strong>Main</strong>, click <strong>New Item</strong>, and make <code>Windows Build</code> as a <strong>Build configuration</strong>.</li>
+  <li>For the other platforms use <strong>Start from</strong> <em>Copy of an existing item</em>, or a template. See <a href="projects-from-template.html">Create a build configuration from a template</a>.</li>
+  <li>Give each one its platform icon on <strong>General</strong>.</li>
+</ol>
+<h3>Order the tree</h3>
+<ol class="steps">
+  <li>Open <strong>Skyforge</strong> › <strong>Settings</strong>. In <strong>Order of items</strong> open the Reorder dialog.</li>
+  <li>Put <strong>Main</strong>, <strong>Drops</strong> and <strong>Release</strong> in that order. Add a separator if you want a heading. See <a href="../projects/project-tree-order.html">Tree order and separators</a>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<h2>Check it worked</h2>
+<ol class="steps">
+  <li>The project tree shows <strong>Skyforge</strong> with <strong>Main</strong>, <strong>Drops</strong> and <strong>Release</strong> in your order.</li>
+  <li>Open a build configuration in <strong>Main</strong>. Under <strong>Settings › Parameters</strong>, <code>STUDIO_NAME</code> shows as defined in <em>Skyforge</em>.</li>
+  <li>The dot after <strong>Skyforge</strong> shows the worst result inside it.</li>
+</ol>
+<h2>Troubleshooting</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>I cannot see Order of items</td><td>Only administrators can reorder the tree.</td></tr>
+    <tr><td>A build in Release does not see the store credentials</td><td>Credentials of <strong>Release</strong> work only for build configurations inside <strong>Release</strong>. Put the credential higher up only if all builds need it.</td></tr>
+    <tr><td>I want to move a build configuration between the three projects</td><td>See <a href="projects-move-build-configuration.html">Move a build configuration</a>.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../projects/projects.html">Projects</a></li>
+  <li><a href="../projects/project-tree-order.html">Tree order and separators</a></li>
+  <li><a href="../projects/project-ids.html">IDs and the parent-ID prefix</a></li>
+</ul>
+</main>
+</body>
+</html>

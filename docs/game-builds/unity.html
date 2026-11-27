@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unity step · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="game-builds/unity">
+<main class="doc">
+<h1>Unity step</h1>
+<p class="lead">Build, test or run a method of a Unity project with the Unity Editor in batch mode, and read the Unity log in clear blocks.</p>
+
+<h2>When to use it</h2>
+<p>Use the Unity step when your game is a Unity project and you want Buildspawn to make a player (a Windows, Linux, Mac, Android or console build), run the project's tests, or run one of your own build methods. The step finds the Unity Editor on the agent for you. <em>Batch mode</em> means the Editor runs without windows, so it works on a build machine.</p>
+
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Build steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>, type <code>Unity</code> in <strong>Filter step types</strong> and click the <strong>Unity</strong> tile.</li>
+  <li>Give the step a name, for example <code>Build Windows player</code>.</li>
+  <li>Under <strong>Unity project</strong>, type the <strong>Project path</strong> if the project is not at the top of the workspace.</li>
+  <li>Say what to run: an <strong>Execute method</strong> (your own build method), a <strong>Standalone player</strong> with a <strong>Player output path</strong>, a <strong>Build profile</strong>, or <strong>Run tests from the project</strong>.</li>
+  <li>Under <strong>Unity installation</strong>, leave <strong>Detection mode</strong> on <strong>Auto</strong> and type the <strong>Unity version</strong>, or choose <strong>Manual</strong> and name the folder.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/game-builds/unity-step.png" alt="The Unity step form with the sections Unity project, Unity tests, Unity installation and Unity log and arguments"><figcaption>The Unity step.</figcaption></figure>
+
+<div class="callout note"><p>The settings every step has (step name, working directory, environment variables, when the step runs, and so on) are the same for all steps. They are explained on <a href="../build-steps/runners.html">Runners</a>.</p></div>
+
+<h2>Every field</h2>
+<h3>Unity project</h3>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Project path</strong></td><td>The Unity project folder, relative to the working directory. Passed to Unity as <code>-projectPath</code>.</td><td>Empty: the working directory</td><td><code>Mobile</code></td></tr>
+    <tr><td><strong>Execute method</strong></td><td>A static method to run once the project is loaded. Passed as <code>-executeMethod</code>. The class must be in an <code>Editor</code> folder. The box suggests the static methods found in <code>Assets/Editor</code> of the last workspace.</td><td>Empty</td><td><code>BuildScript.BuildWindows</code></td></tr>
+    <tr><td><strong>Build profile</strong></td><td>The project path of a Unity Build Profile asset. Passed as <code>-activeBuildProfile</code>, and used instead of <strong>Build target</strong>. Needs Unity 6 (6000.x) or later. The path must end in <code>.asset</code>. Before the build, a first quiet run loads the project with the profile.</td><td>Empty</td><td><code>Assets/Settings/Build Profiles/Android-Release.asset</code></td></tr>
+    <tr><td><strong>Build target</strong></td><td>The active build target before the project loads. Passed as <code>-buildTarget</code>. Not used when a build profile is set. The box suggests the names Unity knows: Android, EmbeddedLinux, GameCoreXboxOne, GameCoreXboxSeries, iOS, Linux64, LinuxHeadlessSimulation, OSXUniversal, PS4, PS5, QNX, Standalone, StandaloneLinux64, StandaloneOSX, StandaloneWindows, StandaloneWindows64, Switch, tvOS, WebGL, WindowsStoreApps and XboxOne.</td><td>Empty</td><td><code>StandaloneWindows64</code></td></tr>
+    <tr><td><strong>Standalone player</strong></td><td>Builds a player with the matching switch, for example <code>-buildWindows64Player</code>. Choices: Linux 32-bit, Linux 64-bit, Linux 32-bit and 64-bit, Mac OSX 32-bit, Mac OSX 64-bit, Mac OSX 32-bit and 64-bit, Windows 32-bit, Windows 64-bit. Needs a <strong>Player output path</strong>.</td><td>Select (none)</td><td>Windows 64-bit</td></tr>
+    <tr><td><strong>Player output path</strong></td><td>Where the player is written. A relative path starts at the working directory. With a build profile, it is passed to <code>-build</code>.</td><td>Empty</td><td><code>Builds/Win64/Skyforge.exe</code></td></tr>
+    <tr><td><strong>Editor options</strong></td><td>Three switches. <strong>Do not initialize the graphics device</strong> passes <code>-nographics</code>. <strong>Do not display the error dialog when a standalone player crashes</strong> passes <code>-silent-crashes</code>. <strong>Do not quit the Unity Editor after other commands have finished</strong> leaves out <code>-quit</code>, so the step runs until your project's code quits the Editor.</td><td>All off</td><td>First one on</td></tr>
+  </tbody>
+</table>
+
+<h3>Unity tests</h3>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Run tests from the project</strong></td><td>Runs the Unity Test Framework. Passed as <code>-runEditorTests</code>, or as <code>-runTests</code> with the platform below. <code>-quit</code> is left out. The results are converted and recorded as test results of the build.</td><td>Off</td><td>On</td></tr>
+    <tr><td><strong>Test platform</strong></td><td><strong>Default</strong> runs the Editor tests. <strong>Edit mode</strong> and <strong>Play mode</strong> run that mode. <strong>All modes in sequence</strong> runs Edit mode and then Play mode as two Unity runs.</td><td>Default</td><td>Play mode</td></tr>
+    <tr><td><strong>Test categories</strong></td><td>One category per line, or separated by commas or semicolons. Passed as <code>-editorTestsCategories</code>.</td><td>Empty</td><td><code>Smoke</code></td></tr>
+    <tr><td><strong>Test names</strong></td><td>One test name per line, or separated by commas or semicolons. Passed as <code>-editorTestsFilter</code>.</td><td>Empty</td><td><code>Skyforge.Tests.SaveGame</code></td></tr>
+  </tbody>
+</table>
+
+<h3>Unity installation</h3>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Detection mode</strong></td><td><strong>Auto</strong> picks an Editor the agent found (see the agent's Unity tab below). <strong>Manual</strong> uses the folder or the tool you name.</td><td>Auto, or Manual when a folder is set</td><td>Auto</td></tr>
+    <tr><td><strong>Unity version</strong></td><td>Auto mode. The version the step needs. A short version takes the highest installed one that starts with it, so <code>2022.3</code> matches <code>2022.3.10f1</code>. Empty takes the version in <code>ProjectSettings/ProjectVersion.txt</code> if it is installed, and otherwise the latest one on the agent. The step only runs on agents that have a matching Editor.</td><td>Empty</td><td><code>6000.0</code></td></tr>
+    <tr><td><strong>Unity Editor tool</strong></td><td>Manual mode. A Unity Editor from <strong>Settings › Tools</strong> (see below). It takes the place of the folder. Shown only when at least one Editor tool exists.</td><td>None</td><td><code>Unity 2022.3.10</code></td></tr>
+    <tr><td><strong>Unity folder</strong></td><td>Manual mode. The folder that holds the Editor.</td><td>Empty</td><td><code>C:\Program Files\Unity\Hub\Editor\2022.3.10f1</code></td></tr>
+  </tbody>
+</table>
+
+<h3>Unity log and arguments</h3>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Command line arguments</strong></td><td>One argument per line, added after the ones above. A <code>-logFile</code> or <code>-cleanedLogFile</code> here replaces the log setting of the step. Other processes on the agent can see arguments, so pass a secret through the environment.</td><td>Empty</td><td><code>-define:CI_BUILD</code></td></tr>
+    <tr><td><strong>Line statuses file</strong></td><td>An XML file in the working directory that sets the status of log lines and replaces the default rules. The root is <code>lines</code>. Each <code>line</code> has a <code>level</code> (<code>warning</code>, <code>error</code> or <code>normal</code>) and a <code>message</code>, a regular expression searched in the log line.</td><td>Empty</td><td><code>ci/unity-lines.xml</code></td></tr>
+    <tr><td><strong>Custom log path</strong></td><td>A file for the Unity log. It is emptied first and read while Unity runs. Empty logs to the console where Unity can, and to a temporary file otherwise.</td><td>Empty</td><td><code>Logs/unity-build.log</code></td></tr>
+    <tr><td><strong>Logging verbosity</strong></td><td><strong>Normal</strong> passes <code>-logFile</code>. <strong>Minimal</strong> passes <code>-cleanedLogFile</code>, which leaves out stack traces of messages.</td><td>Default (normal)</td><td>Minimal</td></tr>
+  </tbody>
+</table>
+<p>Example of a line statuses file:</p>
+<pre><code>&lt;lines&gt;
+  &lt;line level="warning" message="Shader .* is not supported"/&gt;
+  &lt;line level="error" message="Build failed: .*"/&gt;
+&lt;/lines&gt;</code></pre>
+
+<h2>The Unity Editor tool</h2>
+<p>If agents do not have Unity in a standard place, add the Editor as a tool. Open <strong>Settings › Tools</strong>, find <strong>Unity Editor</strong>, click <strong>Add</strong> and give it a name. Set its home to the Unity folder (it holds <code>Editor/Unity.exe</code>, <code>Editor/Unity</code> or <code>Unity.app</code>). It can also be installed from a zip on each agent. In the step, set <strong>Detection mode</strong> to <strong>Manual</strong> and choose the tool in <strong>Unity Editor tool</strong>.</p>
+<figure class="shot"><img src="../../assets/shots/game-builds/unity-tools.png" alt="The Tools page with the Unity Editor row and its Set up button"><figcaption>The Unity Editor row of the Tools page.</figcaption></figure>
+
+<h2>The agent's Unity tab</h2>
+<p>Open <strong>Agents</strong>, open an agent and click <strong>Unity</strong>. It lists the Editors the agent found when it connected: a parameter name such as <code>unity.path.6000.5.1</code>, the <strong>Version</strong>, <strong>Found by</strong> and <strong>Path</strong>. Click <strong>Check again</strong> after you install a new Editor. The agent looks in this order:</p>
+<ol>
+  <li>The folders in the <code>UNITY_HOME</code> environment variable, each one an Editor installation.</li>
+  <li>The folders in <code>UNITY_HINT_PATH</code>, searched for <code>Unity*</code> folders and <code>Unity/Hub/Editor/*</code>.</li>
+  <li>Folders on the <code>PATH</code> that end in the Editor folder.</li>
+  <li>Unity Hub: its list of Editors and its secondary install folder.</li>
+  <li>The usual folders: <code>/Applications</code> on macOS, <code>/opt</code> and the home folder on Linux, Program Files on Windows.</li>
+</ol>
+<div class="callout warning"><p>The agent must run as the user that installed Unity Hub. If it runs as another user, it does not see the Hub's list. Set <code>UNITY_HOME</code> or <code>UNITY_HINT_PATH</code> in that case.</p></div>
+<p>When <strong>Unity version</strong> is set in Auto mode, the build waits for an agent whose Unity tab lists a matching Editor. The queue shows the reason.</p>
+<figure class="shot"><img src="../../assets/shots/game-builds/unity-agent-tab.png" alt="The Unity tab of an agent with one Editor found and the list of places the agent looks"><figcaption>The Unity tab of an agent.</figcaption></figure>
+
+<h2>A worked example</h2>
+<p>Skyforge is a Unity game. Its build script <code>Assets/Editor/BuildScript.cs</code> has a method <code>BuildWindows</code> that calls <code>BuildPipeline.BuildPlayer</code>. The studio's Windows agents have Unity 6000.0 from Unity Hub.</p>
+<table>
+  <thead><tr><th>Field</th><th>Value</th></tr></thead>
+  <tbody>
+    <tr><td>Step name</td><td><code>Build Windows player</code></td></tr>
+    <tr><td>Project path</td><td><code>Mobile</code></td></tr>
+    <tr><td>Execute method</td><td><code>BuildScript.BuildWindows</code></td></tr>
+    <tr><td>Build target</td><td><code>StandaloneWindows64</code></td></tr>
+    <tr><td>Do not initialize the graphics device</td><td>On</td></tr>
+    <tr><td>Detection mode / Unity version</td><td>Auto / <code>6000.0</code></td></tr>
+    <tr><td>Logging verbosity</td><td>Minimal</td></tr>
+  </tbody>
+</table>
+<p>Add a step before it with <strong>Run tests from the project</strong> on and <strong>Test platform</strong> set to <strong>Edit mode</strong>, so a failing test stops the build early.</p>
+
+<h2>What you see when it runs</h2>
+<ul>
+  <li>The log starts with a line such as <em>Unity 6000.0.23f1 found at C:\Program Files\Unity\Hub\Editor\6000.0.23f1</em>.</li>
+  <li>The Unity log is split into named blocks you can fold: Command line arguments, Package Manager, Script compilation, Refresh, Update, Lightmap, Prepare Build, Build Report, Player statistics and more.</li>
+  <li>Compiler warnings (<code>warning CS...</code>) are marked as warnings. Compiler errors (<code>error CS...</code>), <em>Scripts have compiler errors</em>, <em>Fatal Error!</em>, an exception in the execute method, and <em>Error building player</em> are marked as errors.</li>
+  <li>If Unity ends with exit code 0 but the log had error lines, the step fails with <em>Unity reported N build problems. The lines are marked in the log above.</em></li>
+  <li>With tests on, the results appear as test results of the build.</li>
+  <li>With a build profile, you first see <em>Pre-warming the project for build profile ...</em>. That first run may end with an error. This is expected and ignored.</li>
+  <li>If the project uses asset pipeline version 2, the log says the Unity Accelerator arguments are used. See <a href="unity-license.html">Unity build settings</a> for the cache server.</li>
+</ul>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>The build waits in the queue.</td><td>No online agent has a matching Editor. Open the agent's <strong>Unity</strong> tab and click <strong>Check again</strong>, or change <strong>Unity version</strong>.</td></tr>
+    <tr><td><em>The Unity Editor could not be started on this agent.</em></td><td>Install Unity on the agent, or use <strong>Manual</strong> detection mode and name the folder.</td></tr>
+    <tr><td><em>Manual detection mode needs the folder of the Unity Editor.</em></td><td>Fill in <strong>Unity folder</strong>, or choose a <strong>Unity Editor tool</strong>.</td></tr>
+    <tr><td><em>... is not a Unity version.</em></td><td>Use a version such as <code>2022.3</code> or <code>2021.3.16</code>.</td></tr>
+    <tr><td><em>The Build Profile path should point to a .asset file.</em></td><td>Give the whole path of the asset, ending in <code>.asset</code>. Build profiles need Unity 6.</td></tr>
+    <tr><td>Unity says it has no license.</td><td>Add the <a href="unity-license.html">Unity build settings</a> build feature with your serial or license file.</td></tr>
+    <tr><td><em>Unity wrote no test results</em>.</td><td>The Editor stopped before the tests ran. Read the log above the message. Check the test platform and that the project has a test assembly.</td></tr>
+    <tr><td>The step stays running after the build finished.</td><td>Check that <strong>Do not quit the Unity Editor...</strong> is off, or that your method calls <code>EditorApplication.Exit</code>.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<div class="cards">
+  <a class="card" href="unity-license.html"><h3>Unity build settings</h3><p>Activate and return a Unity license and set the cache server.</p></a>
+  <a class="card" href="../how-to/build-unity-from-git.html"><h3>Build a Unity project from Git</h3><p>A full set-up from the repository to the player.</p></a>
+  <a class="card" href="../how-to/game-unity-perforce-steam.html"><h3>Unity from Perforce to Steam</h3><p>Build, then upload to a Steam branch.</p></a>
+  <a class="card" href="../build-steps/runners.html"><h3>Runners</h3><p>Settings every step has.</p></a>
+</div>
+</main>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trust your company’s root CA · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/admin-trust-root-ca">
+<main class="doc">
+<h1>Trust your company’s root CA</h1>
+<p class="lead">Make the server and all agents trust the root certificate of your company, so builds can reach your internal Perforce, Git and package servers over TLS.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>You are a system administrator.</li>
+  <li>Your builds fail with an error like <code>PKIX path building failed</code> or <em>unable to find valid certification path</em> when they reach an internal server.</li>
+  <li>You can get the root certificate from your IT team, as a <code>.crt</code>, <code>.cer</code>, <code>.pem</code>, <code>.der</code> or <code>.p7b</code> file, and its <strong>SHA-256 fingerprint</strong>. Never ask for or paste a private key.</li>
+  <li>You can restart the server at a quiet time, and agents are version 1.9 or later.</li>
+</ul>
+
+<h2>Steps</h2>
+<ol class="steps">
+  <li>Download <code>nightlight-root-ca.crt</code> from your IT portal and write down the fingerprint it shows, for example <code>3F:9A:C1:07:…</code>.</li>
+  <li>Open <strong>Settings › Security › Trusted certificates</strong>.</li>
+  <li>Click <strong>Add certificates</strong>, then <strong>Choose file…</strong>, and pick the file.</li>
+  <li>Read the card. It should say <strong>Root CA</strong>. Compare the <strong>SHA-256</strong> with the one from IT. They must match exactly. If they do not, stop and ask IT.</li>
+  <li>Click <strong>Add 1 certificate</strong>.</li>
+  <li>Check that <strong>Send these to agents</strong> is on. On a Windows server whose computers get the root through group policy, you can instead switch on <strong>Also trust Windows’ certificate store</strong>.</li>
+  <li>Click <strong>Save</strong> if you changed a switch.</li>
+  <li>Click <strong>Restart the server</strong> in the yellow bar, when no important build is running.</li>
+  <li>When the server is back, look at the <strong>Agents</strong> table. Each agent goes from <strong>Waiting for restart</strong> to <strong>Up to date</strong> after its current build. Restart any agent that stays on <strong>Waiting for restart</strong> and says <em>Restart the agent to use them</em>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/how-to/admin-trust-ca.png" alt="The Trusted certificates page with the added root certificate and the Agents table"><figcaption>The Trusted certificates page after adding the root certificate.</figcaption></figure>
+<div class="callout tip"><p>You can do the same from a terminal: <code>buildspawn certs add nightlight-root-ca.crt</code>, then restart. See <a href="../administration/trusted-certificates.html">Trusted certificates</a>.</p></div>
+
+<h2>Check it worked</h2>
+<ol class="steps">
+  <li>The yellow <strong>Restart needed</strong> bar is gone.</li>
+  <li>The table <strong>Added to this server</strong> shows <em>Nightlight Root CA</em> and its expiry date.</li>
+  <li>Run a build configuration that talks to the internal server. The console shows no <code>PKIX</code> error.</li>
+  <li>Every agent says <strong>Up to date</strong>, or <strong>Offline</strong> (it will get the certificates when it connects).</li>
+</ol>
+
+<h2>Troubleshooting</h2>
+<table>
+  <tr><th>Problem</th><th>What to do</th></tr>
+  <tr><td>The error is still there on the server.</td><td>Restart the server. Java reads the list only when it starts.</td></tr>
+  <tr><td>The error is still there on one agent.</td><td>Look at its state. <strong>Older agent</strong>: upgrade it. <strong>Waiting for restart</strong>: restart it. <strong>Offline</strong>: start it.</td></tr>
+  <tr><td>The card says <strong>Not a CA certificate</strong>.</td><td>You have the certificate of one server, not the root. It works, but must be replaced when the server’s certificate changes. Ask IT for the root.</td></tr>
+  <tr><td>The card says <strong>Expired</strong>.</td><td>Get a current certificate from IT.</td></tr>
+  <tr><td>The card says <strong>Already trusted, skipped</strong>.</td><td>Nothing to do. It is already trusted. If the error continues, the problem is another certificate in the chain (an intermediate). Add that one too.</td></tr>
+  <tr><td>One agent needs a certificate that other agents should not have.</td><td>On that machine, use the agent’s own <strong>Certificates</strong> tab (tray app) to add it. See <a href="../agents/windows-tray-app.html">Windows tray app</a>.</td></tr>
+</table>
+
+<h2>Next steps</h2>
+<ul>
+  <li><a href="../administration/trusted-certificates.html">Trusted certificates</a>: every part of the page.</li>
+  <li>Watch for the notice that warns you 30 days before a certificate you added expires.</li>
+</ul>
+</main>
+</body>
+</html>

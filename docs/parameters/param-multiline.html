@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Multi-line string parameter · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="parameters/param-multiline">
+<main class="doc">
+<h1>Multi-line string parameter</h1>
+<p class="lead">Text with line breaks, such as a list of levels or release notes.</p>
+
+<h2>When to use it</h2>
+<p>Use it when one line is not enough: release notes, a list of maps to cook, one file name per line.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Parameters</strong>.</li>
+  <li>Add a parameter of the multi-line type (it comes from a Pipeline <code>parameters</code> block or from a configuration that already has one). The table shows it with its value.</li>
+  <li>Edit the <strong>Name</strong>, <strong>Default Value</strong> and <strong>Description</strong>.</li>
+  <li>Click <strong>Save</strong>. The Parameters tab saves as you work, so there is no other Save button.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+<thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>Name</td><td>The parameter name.</td><td>Empty</td><td><code>MAPS</code></td></tr><tr><td>Default Value</td><td>Many lines of text.</td><td>Empty</td><td>One map per line</td></tr><tr><td>Description</td><td>Shown under the field in the Run dialog.</td><td>Empty</td><td>Maps to cook, one per line</td></tr>
+</tbody>
+</table>
+
+<h2>A worked example</h2>
+<p>A parameter <code>RELEASE_NOTES</code> holds the notes for the store page. A PowerShell step writes them to a file for the upload step:</p><pre><code>Set-Content notes.txt $env:RELEASE_NOTES</code></pre>
+<h2>What you see when it runs</h2>
+<p>The Run dialog shows a large text area. Line breaks are kept in the value.</p>
+<h2>Problems and fixes</h2>
+<table>
+<thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+<tbody>
+<tr><td>A batch script breaks on the second line</td><td>A value with line breaks does not fit on one batch line. Read it as an environment variable in a PowerShell step.</td></tr>
+</tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="parameters.html">Parameters</a></li>
+  <li><a href="param-references.html">Parameter references</a></li>
+  <li><a href="../running-builds/run-dialog.html">The Run dialog</a></li>
+</ul>
+</main>
+</body>
+</html>

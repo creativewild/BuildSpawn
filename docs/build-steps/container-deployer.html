@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Container Deployer · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/container-deployer">
+<main class="doc">
+<h1>Container Deployer</h1>
+<p class="lead">Deploys a WAR or EAR file to Tomcat, JBoss or GlassFish. Credentials are chosen by id.</p>
+
+<h2>When to use it</h2>
+<p>Use it to put a web service, such as a store backend or a leaderboard, on an application server after the build.</p>
+
+<h2>How to set it up</h2>
+
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>. Type <code>Container Deployer</code> in <strong>Filter step types</strong> if you like, then click the <strong>Container Deployer</strong> tile (group <strong>Upload and deploy</strong>).</li>
+  <li>Type a <strong>Step name</strong>, for example <code>Deploy leaderboard</code>.</li>
+  <li>Fill in the fields described below.</li>
+  <li>Optional: set <strong>Execute step</strong>, <strong>Conditions</strong> and <strong>Retry on failure</strong>. See <a href="step-list.html">The steps list and the step editor</a>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<figure class="shot small">
+  <img src="../../assets/shots/build-steps/container-deployer.png" alt="The fields of the Container Deployer step in the step editor">
+  <figcaption>The fields of the Container Deployer step, as the step editor shows them.</figcaption>
+</figure>
+
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>WAR/EAR files</strong></td><td>The files to deploy, relative to the workspace root. Ant-style globs work, such as <code>**/*.war</code>.</td><td>Empty</td><td><code>target/leaderboard.war</code></td></tr>
+    <tr><td><strong>Context path</strong></td><td>The context path the container uses to publish the WAR or EAR. It may be overridden if the file has its own container configuration.</td><td>Empty</td><td><code>/leaderboard</code></td></tr>
+    <tr><td><strong>Containers</strong></td><td>Add one or more containers to deploy to. Choose the kind: Tomcat 4.x to 9.x, JBoss AS 3.x to 7.x, or GlassFish 2.x to 4.x. Each has its own fields, below.</td><td>None</td><td>Tomcat 9.x</td></tr>
+    <tr><td><strong>Credentials (every container)</strong></td><td>The username and password credential for the container's manager.</td><td>None</td><td><code>tomcat-deployer</code></td></tr>
+    <tr><td><strong>Tomcat URL</strong></td><td>The Tomcat base URL, such as <code>https://tomcat.studio.example:8443</code>.</td><td>Empty</td><td><code>https://tomcat.studio.example:8443</code></td></tr>
+    <tr><td><strong>Alternative deployment context (Tomcat)</strong></td><td>Overwrites the context path from the main block.</td><td>Empty</td><td><code>/lb</code></td></tr>
+    <tr><td><strong>Manager context path (Tomcat)</strong></td><td>Overwrites the default <code>/manager</code> for Tomcat 4 to 6 or <code>/manager/text</code> for Tomcat 7 and newer.</td><td>Default</td><td><code>/manager/text</code></td></tr>
+    <tr><td><strong>JBoss URL</strong></td><td>The JBoss URL to deploy to.</td><td>Empty</td><td><code>http://jboss.studio.example:8080</code></td></tr>
+    <tr><td><strong>GlassFish home, GlassFish admin port, GlassFish hostname</strong></td><td>Where GlassFish is installed, and where its admin server listens.</td><td>Empty</td><td><code>/opt/glassfish4</code>, <code>4848</code>, <code>glassfish.studio.example</code></td></tr>
+  </tbody>
+</table>
+
+
+<h2>A worked example</h2>
+<p>Deploy the leaderboard service to the studio Tomcat. Step name <code>Deploy leaderboard</code>, <strong>WAR/EAR files</strong> <code>target/leaderboard.war</code>, <strong>Context path</strong> <code>/leaderboard</code>, container <strong>Tomcat 9.x</strong> with <strong>Credentials</strong> <code>tomcat-deployer</code> and <strong>Tomcat URL</strong> <code>https://tomcat.studio.example:8443</code>.</p>
+
+<h2>What you see when it runs</h2>
+<p>The console shows the files found and a line for each deployment to the container. A deployment that the container refuses fails the step.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong>The credential is not in the list</strong></td><td>Create a username and password credential first. See <a href="../parameters/secrets.html">Secrets</a>.</td></tr>
+    <tr><td><strong>Nothing is deployed</strong></td><td>Check the pattern in <strong>WAR/EAR files</strong>: it is relative to the workspace root.</td></tr>
+    <tr><td><strong>401 or 403 from Tomcat</strong></td><td>The user needs the manager script role in Tomcat.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../parameters/secrets.html">Secrets</a></li>
+  <li><a href="ssh-exec.html">SSH Exec</a></li>
+  <li><a href="runners.html">Runners</a></li>
+  <li><a href="common-step-fields.html">Fields every runner has</a></li>
+</ul>
+</main>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Build a .sln with MSBuild · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/steps-build-sln-with-msbuild">
+<main class="doc">
+<h1>Build a .sln with MSBuild</h1>
+<p class="lead">Restore the NuGet packages of a Visual Studio solution and build it with MSBuild on a Windows agent.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>A Windows agent with Visual Studio or the Build Tools.</li>
+  <li>An administrator has added an MSBuild installation under <strong>Settings › Tools</strong>. See <a href="../administration/tools.html">Tools</a>.</li>
+  <li>A solution in your workspace, here <code>Tools/BuildTools.sln</code>.</li>
+</ul>
+
+<h2>Steps</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Build Steps</strong>.</li>
+  <li>Add a <strong>NuGet Installer</strong> step named <code>Restore packages</code> with <strong>Solution</strong> <code>Tools/BuildTools.sln</code>.</li>
+  <li>Add an <strong>MSBuild</strong> step named <code>Build tools</code>.</li>
+  <li>Pick the installation in <strong>MSBuild Version</strong>.</li>
+  <li>Set <strong>Project File</strong> to <code>Tools/BuildTools.sln</code> and <strong>Command Line Arguments</strong> to <code>/p:Configuration=Release /m</code>.</li>
+  <li>Tick <strong>Set build to unstable if there are warnings</strong> if warnings should be seen.</li>
+  <li>Click <strong>Save</strong> and run the build.</li>
+</ol>
+
+<h2>Check it worked</h2>
+<p>The console shows the restored packages, then the MSBuild output. Compiler errors and warnings are marked in the log. The build is successful when MSBuild ends with no errors.</p>
+
+<h2>Troubleshooting</h2>
+<ul>
+  <li><strong>No installation to pick.</strong> Add one under <strong>Settings › Tools</strong>, with the folder of <code>MSBuild.exe</code>.</li>
+  <li><strong>Missing packages.</strong> Make sure the NuGet Installer step is above the MSBuild step.</li>
+  <li><strong>The agent has no Visual Studio.</strong> Run the build configuration on a Windows agent that has it.</li>
+</ul>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../build-steps/msbuild.html">MSBuild</a></li>
+  <li><a href="../build-steps/nuget-installer.html">NuGet Installer</a></li>
+  <li><a href="../administration/tools.html">Tools</a></li>
+</ul>
+</main>
+</body>
+</html>

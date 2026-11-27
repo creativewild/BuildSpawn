@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Versioned settings · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="version-control/versioned-settings">
+<main class="doc">
+<h1>Versioned settings</h1>
+<p class="lead">Keep a project's settings in your repository next to the code, with a history of every change.</p>
+
+<p>With versioned settings on, Buildspawn writes the settings of a project and of everything inside it to a folder in a Git or Perforce repository. Every change you make in the browser becomes a commit. A change pushed to the repository is loaded back into Buildspawn. You can see who changed what, and roll back with your normal tools.</p>
+
+<h2>When to use it</h2>
+<p>Use it when you want to review settings changes as commits or pull requests, undo a bad change, or keep the settings of many build configurations next to the game code.</p>
+<h2>Turn on versioned settings</h2>
+<ol class="steps">
+  <li>Open the project and go to its settings. Choose <strong>Versioned Settings</strong>.</li>
+  <li>Under <strong>Synchronization</strong>, tick <strong>Synchronization enabled</strong>. More settings appear.</li>
+  <li>Under <strong>Settings storage</strong>, choose the version control (Git, or Perforce when it is offered) and fill in the repository URL or Perforce root, the branch, and the folder in the repository (empty means the top). Give a credential ID if the repository needs one.</li>
+  <li>Under <strong>Behaviour</strong>, choose:
+    <ul>
+      <li><strong>Allow editing via UI</strong>: on, or off to make the repository the only place to change settings;</li>
+      <li><strong>When a build starts</strong>: use the current settings, or the settings from the repository;</li>
+      <li>the <strong>check interval</strong>: how often Buildspawn looks for new commits (30 seconds or more).</li>
+    </ul>
+  </li>
+  <li>Click <strong>Save</strong>, then <strong>Commit current project settings</strong> to write the first commit.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/version-control/versioned-settings.png" alt="The Versioned Settings page of the Game project">
+  <figcaption>The Versioned Settings page of the Game project, before synchronization is turned on. It is off by default.</figcaption>
+</figure>
+<p>The status card shows the state: <em>In sync with VCS</em>, or <em>Synchronization stopped</em> with the error. It also shows the last commit and the last load, with the revision, user and time.</p>
+<div class="callout note"><p>The Git storage runs the <code>git</code> command on the Buildspawn server, so <code>git</code> must be installed there. Each command has a 120-second limit.</p></div>
+<p>A project inside a project with versioned settings is covered by it. A project with its own versioned settings is stored on its own.</p>
+
+<h2>What goes into the repository</h2>
+<pre class="no-copy"><code>settings-format.txt               the format: buildspawn-xml 1
+config.xml                        the project's own settings
+jobs/Windows Build/config.xml     each build configuration, project or template inside
+jobs/Tools/jobs/Asset Pipeline/config.xml</code></pre>
+<ul>
+  <li>Builds, workspaces and build numbers are never committed.</li>
+  <li><strong>Secrets stay on the server.</strong> Passwords and other encrypted values are emptied in the files and filled back in from the server when settings are loaded. A secret set only in the repository cannot be loaded: set it in the browser.</li>
+  <li>The versioned-settings setup itself is not committed, so a commit cannot switch it off.</li>
+</ul>
+
+<h2>Edit settings in the repository</h2>
+<ol class="steps">
+  <li>Clone the repository and change a <code>config.xml</code>, for example to add a step.</li>
+  <li>Commit and push.</li>
+  <li>Within the check interval, Buildspawn sees the new commit and loads it. Each file is checked before anything changes; a broken file stops the load and the status names it.</li>
+</ol>
+<p>You can also load at once: click <strong>Load project settings from VCS</strong>. A dialog warns you that changes not yet committed are lost.</p>
+
+<h3>Changes in the browser</h3>
+<p>Every save in the browser is committed for you. Saves within 5 seconds become one commit, with the message <em>Change settings of &lt;items&gt; (by &lt;user&gt;)</em> and the user as author.</p>
+
+<h3>Conflicts</h3>
+<p>Buildspawn does not merge. If someone pushed while you edited in the browser, the automatic commit stops and the status asks you to choose:</p>
+<ul>
+  <li><strong>Commit current project settings</strong>: the settings in Buildspawn win.</li>
+  <li><strong>Load project settings from VCS</strong>: the repository wins.</li>
+</ul>
+
+<h2>Permissions</h2>
+<ul>
+  <li>Anyone who can read the project can see the page.</li>
+  <li>Saving, committing and loading need the right to configure the project. Loading also needs the right to configure every item it changes; otherwise nothing is loaded.</li>
+</ul>
+
+<h2>A worked example</h2>
+<p>The Skyforge <strong>Game</strong> project stores its settings in the Git repository <code>git.studio.example/skyforge/ci-settings.git</code>, branch <code>main</code>, folder <code>buildspawn</code>. <strong>Allow editing via UI</strong> is on. A programmer adds a step in the browser. A minute later the repository has the commit <em>Change settings of Windows Build (by dana.k)</em>.</p>
+<h2>What you see when it runs</h2>
+<p>The status card of the page reads <em>In sync with VCS</em> and shows the last commit and the last load, with the revision, user and time.</p>
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>You see</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><em>Synchronization stopped</em> with an error</td><td>Read the error. A broken <code>config.xml</code> stops the load and the status names the file. Fix it and push again.</td></tr>
+    <tr><td>The status asks you to choose after a conflict</td><td>Pick <strong>Commit current project settings</strong> (Buildspawn wins) or <strong>Load project settings from VCS</strong> (the repository wins).</td></tr>
+    <tr><td>A secret is empty after loading</td><td>Secrets are never stored in the repository. Set them in the browser.</td></tr>
+    <tr><td>A new build configuration in the repository did not appear</td><td>Items that exist only in the repository are not created on load. Create it in the browser first.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="git.html">Git</a>, <a href="perforce.html">Perforce</a>, <a href="../how-to/share-settings-with-a-project.html">Share settings with a project</a></li>
+</ul>
+<h2>Tips</h2>
+<ul>
+  <li>Turn off <strong>Allow editing via UI</strong> when you review settings changes as pull requests.</li>
+  <li>Choose <strong>settings from the repository</strong> when a build starts if a branch's build steps must match its code.</li>
+  <li>Items that exist only in the repository are not created on load. Create the build configuration in the browser first.</li>
+</ul>
+</main>
+</body>
+</html>

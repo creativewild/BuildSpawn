@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The build console · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-results/build-console">
+<main class="doc">
+<h1>The build console</h1>
+<p class="lead">The Console Output tab shows the whole log of a build. It splits the log into blocks, puts a time on every line, and helps you find errors fast.</p>
+
+<figure class="shot">
+  <img src="../../assets/shots/build-results/console-failed.png" alt="The Console Output tab of failed build #3: the toolbar with All, Important only, Errors only, the error and warning counts, search, the Clock, Elapsed and Off time switch and Wrap; below it the blocks Perforce sync, Step 1/3 Compile with the script's own blocks, and the skipped steps">
+  <figcaption>A failed build. The failed step is open, and inside it the script's own block <em>Compile Game</em> holds the error line.</figcaption>
+</figure>
+
+<h2>Open the console</h2>
+<ol class="steps">
+  <li>Open a build. See <a href="build-page.html">The build page</a>.</li>
+  <li>Click the <strong>Console Output</strong> tab, or click <strong>Log</strong> beside a step on the Overview tab to jump to that step.</li>
+</ol>
+
+<h2>Blocks</h2>
+<p>The log is a tree of <strong>blocks</strong>. Each build step is a block, and blocks can hold smaller blocks.</p>
+<ul>
+  <li>Version control work has blocks of its own, for example the Perforce workspace, the sync and the list of changes since the last build.</li>
+  <li>Each block header shows its status (a tick, a cross or a spinner), the step's runner, its warning and error counts, and how long it took.</li>
+  <li>Blocks that failed open by themselves. Blocks that passed start closed, so you see the problem first.</li>
+  <li>Click a header to open or close a block. <strong>Expand all</strong> and <strong>Collapse all</strong> in the card header do it for every block.</li>
+</ul>
+<p>Very long logs load quickly: the console shows the start and end of each block and loads the rest when you open it.</p>
+
+<h3>The rows of the console</h3>
+<table>
+  <tr><th>Row</th><th>What it is</th></tr>
+  <tr><td><strong>Step N/M: name</strong></td><td>A step. The header shows its status, the runner (for example <em>Execute Windows batch command</em> or <em>PowerShell</em>), its error and warning counts, its lines and its duration. A step that has not started shows a spinner. A step that did not run shows <em>Skipped: a previous step failed</em> or <em>Skipped</em>.</td></tr>
+  <tr><td><strong>Done in #N</strong></td><td>In a <a href="../running-builds/resume.html">resumed build</a>, a step that was not run again. It says <em>Done in #1</em> and has an <strong>Open in #1 log</strong> link to the output in the original build.</td></tr>
+  <tr><td><strong>Perforce sync</strong>, workspace and changes</td><td>Blocks for the source control work, before the first step.</td></tr>
+  <tr><td>Your own <strong>groups</strong></td><td>Blocks your script makes with <code>::group::</code>. They can be nested, and can show details after the name, such as <em>1,204 files</em>.</td></tr>
+  <tr><td><strong>Post-build actions</strong></td><td>A block for the actions after the steps, such as archiving artifacts.</td></tr>
+  <tr><td><strong>Lanes</strong></td><td>For a Matrix block, a lane for each combination. A chip shows the lane. Click it to show only that combination. A side build of a Parallel block has its own block, named <em>Side build</em>.</td></tr>
+  <tr><td>First and last lines</td><td>The first lines say who started the build, as which user and on which agent and workspace. The last line is <em>Finished: SUCCESS</em>, <em>FAILURE</em>, <em>UNSTABLE</em> or <em>ABORTED</em>.</td></tr>
+</table>
+<h3>Errors and warnings</h3>
+<p>A line the tool marks as an error has a red band and a count in its block header. The error and warning counters at the top add them all up, also for blocks that are closed or not loaded yet. Click a counter to jump to the first line, press <kbd>E</kbd> for the next error and <kbd>W</kbd> for the next warning. Your scripts can mark lines with <code>::error::</code> and <code>::warning::</code>. A step that fails also writes a line such as <em>Build step 'Compile' failed: the batch script exited with code 1</em>, and a last line <em>Failed: Step "Compile" exited with code 1</em>. The build page's <strong>Decided by</strong> row repeats it.</p>
+
+<h2>Times</h2>
+<p>Buildspawn records a time for every line of every build. You don't need to switch anything on in the build configuration.</p>
+<p>Use the <strong>Time</strong> switch in the toolbar:</p>
+<table>
+  <thead><tr><th>Choice</th><th>What you see</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Clock</strong></td><td>The time of day each line was written, for example <code>05:36:29</code>.</td></tr>
+    <tr><td><strong>Elapsed</strong></td><td>The time since the build started. Good for spotting slow parts.</td></tr>
+    <tr><td><strong>Off</strong></td><td>No times, so the log has more room.</td></tr>
+  </tbody>
+</table>
+<p>Your choice is saved with your account and used for every build.</p>
+<div class="callout note"><p>An administrator can switch time recording off for the whole server under <strong>Settings › System › Build console</strong>. Builds from before Buildspawn 1.1 have no times.</p></div>
+
+<h2>Filters</h2>
+<p>The buttons on the left of the toolbar choose which lines you see:</p>
+<ul>
+  <li><strong>All</strong>: every line.</li>
+  <li><strong>Important only</strong>: block headers, warnings and errors.</li>
+  <li><strong>Errors only</strong>: only the lines that report errors.</li>
+</ul>
+<p>The <strong>errors</strong> and <strong>warnings</strong> counters count the whole log, also the parts that are closed or not loaded yet. Press <kbd>E</kbd> to jump to the next error, or <kbd>W</kbd> to jump to the next warning. Warning lines have a yellow band and error lines a red band.</p>
+
+<h2>Search</h2>
+<ol class="steps">
+  <li>Click <strong>Search in log</strong> and type a word, for example <code>C4996</code>.</li>
+  <li>The box shows the matches as "N of M".</li>
+  <li>Use the up and down arrows beside the box to move between matches.</li>
+</ol>
+<p>Search looks at the whole log, not only the lines on the screen.</p>
+
+<h2>Line links</h2>
+<p>Every line has a number. Click a line number to put a link to that line in the address bar, or use <strong>Copy line link</strong> to copy it. Send the link to a colleague and their browser opens the console at that line.</p>
+
+<h2>Running builds and Follow</h2>
+<figure class="shot">
+  <img src="../../assets/shots/build-results/console-running.png" alt="The console of a running PS5 Build: a Live badge with 434 lines so far, the Follow output switch, the open step Build package with a nested block Build PS5 package, shader compile lines with clock times, and Waiting for output at the bottom">
+  <figcaption>A running build. New lines appear as they are written.</figcaption>
+</figure>
+<p>While a build runs, the console shows <strong>Live</strong> and the number of lines so far.</p>
+<ul>
+  <li>Switch <strong>Follow output</strong> on to keep the newest line in view.</li>
+  <li>When you scroll up to read, following stops. A <strong>Jump to bottom</strong> chip appears; click it to follow again.</li>
+  <li>The open block shows a spinner and its time so far. <em>Waiting for output</em> means the step is still running but has not written anything new.</li>
+</ul>
+
+<h2>Other tools</h2>
+<ul>
+  <li><strong>Wrap</strong> wraps long lines instead of scrolling sideways.</li>
+  <li><strong>Download raw log</strong> saves the full log as a text file.</li>
+  <li><strong>View as plain text</strong> opens the log as plain text in the browser, with no blocks or colours.</li>
+</ul>
+
+<h2>Write your own blocks with ::group::</h2>
+<p>Your build scripts can make their own blocks and mark their own warnings and errors. Print these lines from any script, in any language. Each one must start at the beginning of the line (spaces before it are allowed).</p>
+<table>
+  <thead><tr><th>Line</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>::group::Name</code></td><td>Starts a block called <em>Name</em>. Blocks can be nested.</td></tr>
+    <tr><td><code>::group::Name::Details</code></td><td>Starts a block and shows <em>Details</em> after the name in the header, for example <code>::group::Compile::1,824 actions</code>.</td></tr>
+    <tr><td><code>::endgroup::</code></td><td>Ends the innermost open block.</td></tr>
+    <tr><td><code>::endgroup::STATUS</code></td><td>Ends the block and says how it ended: <code>SUCCESS</code>, <code>UNSTABLE</code>, <code>FAILURE</code>, <code>ABORTED</code> or <code>SKIPPED</code>.</td></tr>
+    <tr><td><code>::warning::Text</code></td><td>Writes <em>Text</em> as a warning line. It counts in the warnings counter.</td></tr>
+    <tr><td><code>::error::Text</code></td><td>Writes <em>Text</em> as an error line. It counts in the errors counter.</td></tr>
+  </tbody>
+</table>
+<p>For example, in a PowerShell step:</p>
+<pre><code>Write-Output "::group::Compile shaders::48,000 permutations"
+.\Tools\ShaderCompiler.exe --platform PS5
+if ($LASTEXITCODE -ne 0) {
+  Write-Output "::error::Shader compile failed"
+  Write-Output "::endgroup::FAILURE"
+  exit 1
+}
+Write-Output "::endgroup::"
+
+Write-Output "::warning::Texture T_Rock_D.png is larger than 4K"</code></pre>
+<p>And in a Command Line step on Windows:</p>
+<pre><code>echo ::group::Cook content
+UnrealEditor-Cmd.exe Skyforge.uproject -run=cook -targetplatform=Windows
+echo ::endgroup::</code></pre>
+<p>The marker lines are replaced by the block name or the message, so the plain text log still reads well.</p>
+<div class="callout tip"><p>To set parameters or report build statistics from a script, use <code>##buildspawn</code> messages instead. See <a href="../parameters/set-from-build.html">Setting parameters from a build</a> and <a href="../reference/service-messages.html">Service messages</a>.</p></div>
+
+<h2>Tips</h2>
+<ul>
+  <li>Start with <strong>Errors only</strong> when a build fails. Then switch back to <strong>All</strong> to see the lines around the error.</li>
+  <li>Use <strong>Elapsed</strong> times to find the slowest part of a step.</li>
+  <li>Wrap long tasks in your scripts in <code>::group::</code> blocks. The block durations then show where the time goes, build after build.</li>
+</ul>
+</main>
+</body>
+</html>

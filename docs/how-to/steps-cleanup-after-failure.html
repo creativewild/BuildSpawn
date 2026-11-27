@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Always clean up, and collect logs after a failure · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/steps-cleanup-after-failure">
+<main class="doc">
+<h1>Always clean up, and collect logs after a failure</h1>
+<p class="lead">Make a clean-up step run even when the build fails, and a log step run only after a failure.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>A build configuration with a step that can fail, for example a test step with the ID <code>tests</code>.</li>
+</ul>
+
+<h2>Steps</h2>
+<ol class="steps">
+  <li>Open <strong>Settings › Build Steps</strong> and add a Command Line step named <code>Stop test server</code>.</li>
+  <li>Under <strong>Execution</strong> set <strong>Execute step</strong> to <strong>Always, even if build stop command was issued</strong>.</li>
+  <li>Add a Command Line step named <code>Collect crash dumps</code> and set it to <strong>Only if build status is failed</strong>.</li>
+  <li>Drag both steps to the end of the list and click <strong>Save</strong>.</li>
+  <li>Optional: in a script, check <code>BUILD_STEP_STATUS_TESTS</code> to see how the tests ended.</li>
+</ol>
+
+<h2>Check it worked</h2>
+<p>On a failed build the <strong>Build steps</strong> card shows the tests as failed, the dump step as succeeded and the clean-up step as succeeded. On a green build the dump step shows as skipped with <em>the build has not failed</em>.</p>
+
+<h2>Troubleshooting</h2>
+<ul>
+  <li><strong>The clean-up step is skipped.</strong> Check that it is below the step that fails, and that its policy is not the default.</li>
+</ul>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../build-steps/step-list.html">The steps list and the step editor</a></li>
+  <li><a href="../build-steps/step-statuses.html">Step statuses</a></li>
+</ul>
+</main>
+</body>
+</html>

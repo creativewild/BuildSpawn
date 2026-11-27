@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Command Line · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/command-line">
+<main class="doc">
+<h1>Command Line</h1>
+<p class="lead">Runs a script you type, or one program you name. It is a shell script on Linux and macOS agents and a batch file on Windows agents.</p>
+
+<h2>When to use it</h2>
+<p>Use Command Line for most small jobs: copy files, call a build tool, print a version. Choose <strong>Custom script</strong> when you want several commands. Choose <strong>Executable with parameters</strong> to start one program directly, with no shell reading the parameters, which is safer for values from outside.</p>
+
+<h2>How to set it up</h2>
+
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>. Type <code>Command Line</code> in <strong>Filter step types</strong> if you like, then click the <strong>Command Line</strong> tile (group <strong>Command line and scripts</strong>).</li>
+  <li>Type a <strong>Step name</strong>, for example <code>Compile shaders</code>.</li>
+  <li>Fill in the fields described below.</li>
+  <li>Optional: set <strong>Execute step</strong>, <strong>Conditions</strong> and <strong>Retry on failure</strong>. See <a href="step-list.html">The steps list and the step editor</a>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<figure class="shot small">
+  <img src="../../assets/shots/build-steps/command-line.png" alt="The fields of the Command Line step in the step editor">
+  <figcaption>The fields of the Command Line step, as the step editor shows them.</figcaption>
+</figure>
+
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Run</strong></td><td><strong>Custom script</strong> or <strong>Executable with parameters</strong>.</td><td>Custom script</td><td>Executable with parameters</td></tr>
+    <tr><td><strong>Script</strong></td><td>The script text, in a code editor. <code>%name%</code> is replaced with that build parameter when the step runs. Type <code>%</code> to pick one. Secret parameters are listed by name only. See <a href="script-editor.html">The script editor</a>.</td><td>Empty (required)</td><td><code>Build\copy-content.bat</code> lines</td></tr>
+    <tr><td><strong>Command executable</strong></td><td>The program to start, with its path if it is not on the agent's <code>PATH</code>. It is started directly, without a shell, so nothing in the parameters is read as a command.</td><td>Empty (required)</td><td><code>C:\Tools\p4\p4.exe</code></td></tr>
+    <tr><td><strong>Command parameters</strong></td><td>Split on spaces and line breaks into separate parameters. Put double quotes around a parameter that holds spaces: <code>/c "echo hi there"</code>. A backslash is kept as it is. Other processes on the agent can see parameters, so pass a secret through the environment.</td><td>Empty</td><td><code>sync //depot/Game/...</code></td></tr>
+    <tr><td><strong>Format stderr output as</strong></td><td>Show stderr lines in orange or red in the log.</td><td>Plain, as in the log today</td><td>Warning</td></tr>
+    <tr><td><strong>Fail the step when anything is written to stderr</strong></td><td>Off: the exit code alone decides.</td><td>Off</td><td>On</td></tr>
+    <tr><td><strong>Working directory, Environment variables, Test reports, Run step within container</strong></td><td>The same in every runner. See <a href="common-step-fields.html">Fields every runner has</a>.</td><td></td><td></td></tr>
+  </tbody>
+</table>
+
+
+<h2>A worked example</h2>
+<p>A Windows agent compiles a shader pack and prints the version. Step name <code>Compile shaders</code>, <strong>Run</strong> = <strong>Custom script</strong>:</p><pre><code>@echo off
+echo Building shaders for %CONFIG% (build %build.number%)
+Build\ShaderCompiler.exe -platform Win64 -config %CONFIG% -out Saved\Shaders
+if errorlevel 1 exit /b 1</code></pre><p>Here <code>%CONFIG%</code> and <code>%build.number%</code> are build parameters, put into the script text when the step runs.</p>
+
+<h2>What you see when it runs</h2>
+<p>The console block is titled <code>[Step 1/3] Compile shaders (Command Line)</code>. The script is saved to a temporary file on the agent and run. A line with <code>$</code> shows the command. Output follows. A non-zero exit code fails the step: <em>Command Line exited with code 1</em>.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong><em>The Command Line step has no script</em> / <em>has no executable</em></strong></td><td>Fill in the <strong>Script</strong> or the <strong>Command executable</strong>.</td></tr>
+    <tr><td><strong><em>… could not start</em></strong></td><td>The program was not found. Give its full path, or put it on the agent's <code>PATH</code>.</td></tr>
+    <tr><td><strong><em>This tool is a Windows batch file, which cannot take an argument holding a double quote, %, ! or a line break</em></strong></td><td>Remove those characters from the parameters, or use a script.</td></tr>
+    <tr><td><strong><em>Parameter X was given a value other than its default by someone who may not configure this build configuration</em></strong></td><td>Use the default value, or ask someone with Configure permission to run it.</td></tr>
+    <tr><td><strong><em>Parameter X holds a secret and is not written into the script</em></strong></td><td>Read the environment variable of the parameter instead.</td></tr>
+    <tr><td><strong><em>wrote to standard error, and the step is set to fail when it does</em></strong></td><td>Untick <strong>Fail the step when anything is written to stderr</strong>, or fix the tool's warnings.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="script-editor.html">The script editor</a></li>
+  <li><a href="shell-script.html">Execute shell</a></li>
+  <li><a href="batch-file.html">Execute Windows batch command</a></li>
+  <li><a href="powershell.html">PowerShell</a></li>
+  <li><a href="../parameters/secrets.html">Secrets</a></li>
+  <li><a href="runners.html">Runners</a></li>
+  <li><a href="common-step-fields.html">Fields every runner has</a></li>
+</ul>
+</main>
+</body>
+</html>

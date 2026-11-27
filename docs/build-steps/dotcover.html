@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>dotCover · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/dotcover">
+<main class="doc">
+<h1>dotCover</h1>
+<p class="lead">Runs a program under the dotCover command line tool and writes a coverage report in HTML, XML or JSON.</p>
+
+<h2>When to use it</h2>
+<p>Use it to measure how much of your C# code your tests reach. The target is usually <code>dotnet</code> with <code>test</code>, or a test console runner. The tool has its own licence, which the step does not check.</p>
+
+<h2>How to set it up</h2>
+
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>. Type <code>dotCover</code> in <strong>Filter step types</strong> if you like, then click the <strong>dotCover</strong> tile (group <strong>Code quality and coverage</strong>).</li>
+  <li>Type a <strong>Step name</strong>, for example <code>Coverage</code>.</li>
+  <li>Fill in the fields described below.</li>
+  <li>Optional: set <strong>Execute step</strong>, <strong>Conditions</strong> and <strong>Retry on failure</strong>. See <a href="step-list.html">The steps list and the step editor</a>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<figure class="shot small">
+  <img src="../../assets/shots/build-steps/dotcover.png" alt="The fields of the dotCover step in the step editor">
+  <figcaption>The fields of the dotCover step, as the step editor shows them.</figcaption>
+</figure>
+
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Target program</strong></td><td>The program run under coverage, such as <code>dotnet</code> or a test console runner.</td><td>Empty (required)</td><td><code>dotnet</code></td></tr>
+    <tr><td><strong>Target arguments</strong></td><td>One argument per line. dotCover takes them as one string, so an argument with a space is put in double quotes.</td><td>Empty</td><td><code>test</code> then <code>Tests/Game.Tests.csproj</code></td></tr>
+    <tr><td><strong>Filters</strong></td><td>One filter per line, joined with semicolons, such as <code>+:MyApp.*</code> or <code>-:*.Tests</code>. Empty covers everything dotCover finds.</td><td>Empty</td><td><code>+:Game.*</code></td></tr>
+    <tr><td><strong>Report type</strong></td><td><strong>XML</strong>, <strong>HTML</strong>, <strong>JSON</strong> or <strong>Detailed XML</strong>.</td><td>XML</td><td>HTML</td></tr>
+    <tr><td><strong>Report file</strong></td><td>Relative to the working directory. Empty writes <code>dotCover.xml</code>, <code>dotCover.html</code> or <code>dotCover.json</code>.</td><td>Empty</td><td><code>reports/coverage.html</code></td></tr>
+    <tr><td><strong>dotCover tool</strong></td><td>Path of the dotCover command line tool. Empty takes <code>dotCover</code> from the <code>PATH</code>.</td><td>Empty</td><td><code>C:\tools\dotCover\dotCover.exe</code></td></tr>
+    <tr><td><strong>Working directory, Environment variables, Test reports, Run step within container</strong></td><td>The same in every runner. See <a href="common-step-fields.html">Fields every runner has</a>.</td><td></td><td></td></tr>
+  </tbody>
+</table>
+
+
+<h2>A worked example</h2>
+<p>Measure the coverage of the game library tests. Step name <code>Coverage</code>, <strong>Target program</strong> <code>dotnet</code>, <strong>Target arguments</strong> <code>test</code> and <code>Tests/Game.Tests.csproj</code>, <strong>Filters</strong> <code>+:Game.*</code>, <strong>Report type</strong> <strong>HTML</strong>.</p>
+
+<h2>What you see when it runs</h2>
+<p>The console shows the dotCover command and the target's output. The build page shows the coverage totals, with the report archived.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong><em>The dotCover command was not found on this agent</em></strong></td><td>Install the dotCover command line tool or put <code>dotCover</code> on the <code>PATH</code>.</td></tr>
+    <tr><td><strong><em>The dotCover step has no target program</em></strong></td><td>Fill in <strong>Target program</strong>.</td></tr>
+    <tr><td><strong><em>No … coverage report was found</em></strong></td><td>The target may have stopped before the report was written.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="nunit.html">NUnit (with dotCover or Coverlet)</a></li>
+  <li><a href="dotnet.html">.NET</a></li>
+  <li><a href="runners.html">Runners</a></li>
+  <li><a href="common-step-fields.html">Fields every runner has</a></li>
+</ul>
+</main>
+</body>
+</html>

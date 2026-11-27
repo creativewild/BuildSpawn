@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The build name and status text · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-results/build-name-and-status">
+<main class="doc">
+<h1>The build name and status text</h1>
+<p class="lead">A build script can give its build a meaningful name, such as <code>1.4.212-CL48213</code>, and a short status text, such as <em>Uploaded to Steam branch qa</em>. Both show on the build page, in History and on chain pages.</p>
+
+<h2>When to use it</h2>
+<p>A build number like #212 says little. A name with the game version and the changelist tells the QA team which build to test. A status text says what the build did when "Success" is not enough: where it uploaded, or how many tests passed.</p>
+
+<h2>Name a build</h2>
+<ol class="steps">
+  <li>In a step of the build configuration, print this line. Put it in a PowerShell, Command Line or any other script step.
+<pre><code>Write-Host "##buildspawn[buildNumber '1.4.%build.counter%-CL%build.vcs.number%']"</code></pre></li>
+  <li>Run the build. The name replaces the plain number in the header of the build page, in the History list and on chain pages.</li>
+</ol>
+<ul>
+  <li>The build's real number, its address and its links stay the same.</li>
+  <li>If several steps print the message, the last name counts.</li>
+  <li>The name can be up to 200 characters. A name that refers to an unknown parameter, or to a password, is refused. The build keeps its name and the log says why.</li>
+</ul>
+<table>
+  <tr><th>Write</th><th>To get</th></tr>
+  <tr><td><code>%build.counter%</code></td><td>The build number, for example <code>212</code>.</td></tr>
+  <tr><td><code>%build.vcs.number%</code></td><td>The changelist or commit the build used.</td></tr>
+  <tr><td><code>%build.triggeredBy.username%</code></td><td>The user who started the build.</td></tr>
+  <tr><td><code>%name%</code></td><td>A build parameter, or a value an earlier step set with <code>setParameter</code>.</td></tr>
+  <tr><td><code>{build.number}</code></td><td>The build's name so far, to add to it.</td></tr>
+  <tr><td><code>%%</code></td><td>One percent sign.</td></tr>
+</table>
+
+<h2>Set the status text</h2>
+<ol class="steps">
+  <li>In a step, print this line:
+<pre><code>Write-Host "##buildspawn[buildStatus text='{build.status.text}, uploaded to Steam branch qa']"</code></pre></li>
+  <li>When the build ends, the text shows on the build page and in History. <code>{build.status.text}</code> stands for the text the build would show anyway, so a build that says <em>Tests passed: 120</em> now says <em>Tests passed: 120, uploaded to Steam branch qa</em>.</li>
+</ol>
+<table>
+  <tr><th>Attribute</th><th>Rule</th></tr>
+  <tr><td><code>text</code></td><td>The new status text, up to 500 characters. The last text a build sends counts. A text that holds a password parameter's value is refused.</td></tr>
+  <tr><td><code>status</code></td><td>Optional: <code>SUCCESS</code>, <code>UNSTABLE</code> or <code>FAILURE</code>. It is applied when the build ends. It can only make the result worse, never better: a failed build stays failed even if a script sends <code>SUCCESS</code>.</td></tr>
+</table>
+<pre><code># PowerShell: mark the build unstable if the upload was partial
+if ($uploaded -lt $total) {
+  Write-Host "##buildspawn[buildStatus text='Uploaded $uploaded of $total depots' status='UNSTABLE']"
+}</code></pre>
+
+<h2>Know who started the build</h2>
+<p>A script can read <code>%build.triggeredBy.username%</code>, or the environment variable <code>BUILDSPAWN_TRIGGERED_BY</code>. It holds the user who started the build. It follows chains and retries, and is empty for a schedule or a version control trigger.</p>
+
+<h2>What you see</h2>
+<ul>
+  <li>The build's name in the header, History list and chain pages.</li>
+  <li>The status text next to the result chip, once the build has finished.</li>
+</ul>
+
+<h2>Problems and fixes</h2>
+<table>
+  <tr><th>Problem</th><th>What to do</th></tr>
+  <tr><td>The name did not change.</td><td>Spell the message exactly: <code>##buildspawn[buildNumber '...']</code>, with single quotes. Only a step's own output counts: the same line in a commit message or after the step ended is refused. Search the console for the line. A refusal says why.</td></tr>
+  <tr><td>The status stays <em>Success</em> although I sent <code>status='FAILURE'</code>.</td><td>The status is applied when the build ends. Check the log for a refusal line.</td></tr>
+  <tr><td>I want <code>status='SUCCESS'</code> to turn a failed build green.</td><td>It cannot. A script can only make the result worse.</td></tr>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="../reference/service-messages.html">Service messages</a>: every message a script can print.</li>
+  <li><a href="../parameters/set-from-build.html">Set parameters from a build</a></li>
+  <li><a href="build-console.html">The build console</a></li>
+</ul>
+
+</main>
+</body>
+</html>

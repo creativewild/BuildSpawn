@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Run view · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="visual-editor/run-view">
+<main class="doc">
+<h1>Run view</h1>
+<p class="lead">Watch a running build move through the blocks you drew. The run view lays a build's results over the graph, live.</p>
+
+<figure class="shot">
+  <img src="../../assets/shots/visual-editor/run-view.png" alt="The visual editor of Windows Build viewing build #7: a bar says Build #7 passed in 0:54 with the legend Passed, Running, Failed, Skipped, Done earlier and Not reached; the steps Compile, Cook content and Package each carry a green tick and their time">
+  <figcaption>Build #7 drawn over the graph. Each step shows its result and time.</figcaption>
+</figure>
+
+<h2>Open the run view</h2>
+<p>There are three ways in:</p>
+<ol class="steps">
+  <li>In the visual editor, open the build menu in the toolbar (it says <strong>Last build #7</strong>) and pick a build.</li>
+  <li>On a build's page, click <strong>Visual</strong> in the header.</li>
+  <li>On the <strong>History</strong> tab, use the visual link on a build's row.</li>
+</ol>
+<p>The toolbar then says <strong>Viewing build #N</strong>. Choose the build menu again to switch builds or to go back to editing.</p>
+<div class="callout note"><p>The run view needs only permission to see the build configuration. An administrator can switch off the visual links on the History and build pages in the system settings.</p></div>
+
+<p>Matrix blocks show one cell per combination. The console has a lane chip for each combination, and the build page lists the results in a grid with <strong>Re-run</strong> for each combination.</p>
+<h2>Read the run view</h2>
+<p>A bar above the canvas gives the build's result and time, for example <em>Build #7 passed in 0:54</em>, and the legend. Each block is lit with its state:</p>
+<table>
+  <thead><tr><th>State</th><th>Meaning</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Passed</strong></td><td>The step finished well. A green tick and its time.</td></tr>
+    <tr><td><strong>Running</strong></td><td>The step runs now. Its time counts up live.</td></tr>
+    <tr><td><strong>Failed</strong></td><td>The step failed. It shows the exit code, and <em>Attempt 2 of 4</em> when it was retried.</td></tr>
+    <tr><td><strong>Skipped</strong></td><td>The step did not run because of its execution rule or conditions.</td></tr>
+    <tr><td><strong>Done earlier</strong></td><td>On a resumed build: the step passed in an earlier build, which is named.</td></tr>
+    <tr><td><strong>Not reached</strong></td><td>The build stopped before this step.</td></tr>
+  </tbody>
+</table>
+<ul>
+  <li>Open a step to jump to its block in the build console log.</li>
+  <li>On a failed step, <strong>Resume from here</strong> starts a resumed build at that step. It needs the Build permission. See <a href="../build-steps/resume-and-retry.html">Resume and retry</a>.</li>
+  <li>For a <a href="../build-steps/parallel-blocks.html">Parallel block</a> on separate machines, each side shows its agent and status, and the main build shows when it waits for the sides or for a slot on its agent.</li>
+</ul>
+<div class="callout tip"><p>Keep the run view open on a big screen during a release build: it updates every few seconds while it is visible.</p></div>
+</main>
+</body>
+</html>

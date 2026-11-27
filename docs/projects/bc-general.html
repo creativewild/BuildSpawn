@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>General · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/bc-general">
+<main class="doc">
+<h1>General</h1>
+<p class="lead">The name, ID, icon, build number and artifact rules of a build configuration, plus how builds are queued, limited, cleaned up and checked out.</p>
+<h2>When to use it</h2>
+<p>Open General first when you make a build configuration. It says what the build is called, which icon shows in the tree, how builds are numbered, and how many builds may run at once. Everything else on this page is optional.</p>
+<figure class="shot">
+  <img src="../../assets/shots/projects/bc-general.png" alt="The General tab of Windows Build: Build configuration card with Name, Build configuration ID, Description and the icon choices">
+  <figcaption>The General tab. The index on the left jumps to a card; the summary on the right shows the next build number.</figcaption>
+</figure>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings</strong>. Then click <strong>General</strong>.</li>
+  <li>Check the <strong>Name</strong> and the <strong>Build configuration ID</strong>. Choose an <strong>Icon</strong> for the platform.</li>
+  <li>Set the <strong>Build number format</strong> if you want names such as <code>1.4.2</code>.</li>
+  <li>Open the other cards (Artifacts, Build options, Clean-up rules, Checkout options) if you need them.</li>
+  <li>Click <strong>Save</strong>, or <strong>Apply</strong> to save and stay on the page.</li>
+</ol>
+<h2>Every field</h2>
+<h3>Build configuration</h3><table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Name</td><td>What the build configuration is called. It is part of its address. To rename, use <strong>Rename</strong> in the page header.</td><td>The name you gave</td><td><code>Windows Build</code></td></tr>
+    <tr><td>Build configuration ID</td><td>Stable and unique on the server. Dependencies and links use it. Letters, digits and underscores, starting with a letter. Changing it keeps the old ID as an alias. <strong>Regenerate</strong> makes a new one from the name. See <a href="project-ids.html">IDs</a>.</td><td>Parent project ID, an underscore and the name</td><td><code>Game_WindowsBuild</code></td></tr>
+    <tr><td>Description</td><td>Free text shown under the name.</td><td>Empty</td><td><code>Compiles, cooks and packages Skyforge for Windows.</code></td></tr>
+    <tr><td>Icon and Icon colour</td><td>The platform the build makes. Shown in the tree, in tables and in the Run dialog. See <a href="project-icons.html">Project icons</a>.</td><td>Generic</td><td>Windows</td></tr>
+  </tbody>
+</table>
+<h3>Build number</h3><table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Build number format</td><td>Text with <code>%build.counter%</code> and other parameters. It becomes the display name of each build. The plain number stays the build number. Empty means the usual <code>#N</code>.</td><td>Empty</td><td><code>1.4.%build.counter%</code></td></tr>
+    <tr><td>Build counter</td><td>The number the next build gets. It cannot go below the last build.</td><td>Last number plus 1</td><td><code>500</code></td></tr>
+  </tbody>
+</table>
+<h3>Artifacts</h3><table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Artifact paths</td><td>One rule per line: <code>source =&gt; target folder</code>. Files kept with each build when it ends. Build configurations with the <a href="../post-build/archive-artifacts.html">Archive the artifacts</a> action keep it in that action instead.</td><td>Empty</td><td><code>Output/** =&gt; game</code></td></tr>
+    <tr><td>Publish artifacts only if the build succeeds</td><td>Off: artifacts are kept when the build fails too. On: a failed build keeps none, an unstable one still does.</td><td>Off</td><td>On</td></tr>
+  </tbody>
+</table>
+<h3>Build options</h3><table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Display name</td><td>Shown in lists and in the page title instead of the name. Optional.</td><td>Empty</td><td><code>Win64 Dev</code></td></tr>
+    <tr><td>Build priority</td><td>Decides the order of builds that wait for an agent. Builds with the same priority go first come, first served. A whole number from -100 to 100.</td><td>0</td><td><code>10</code></td></tr>
+    <tr><td>Quiet period</td><td>Seconds a new build waits in the queue, so several triggers can join one build. Empty uses the server default.</td><td>Server default</td><td><code>60</code></td></tr>
+    <tr><td>JDK</td><td>Shown only when the server has a JDK set up. The build runs with this JDK on the agent.</td><td>System</td><td>-</td></tr>
+    <tr><td>Concurrent builds</td><td>Allow concurrent builds (a new build starts at once when an agent is free), Limit the number of builds at once (Up to N builds at once; the rest wait), or Run one build at a time (a new build waits until the running one ends).</td><td>Run one build at a time for a new build configuration</td><td>Limit, up to <code>2</code></td></tr>
+    <tr><td>Throttle builds</td><td>Limits how often builds start, however they are triggered: <strong>Allow</strong> N builds per time period. A tick lets builds that a person starts ignore the limit.</td><td>Off</td><td><code>1</code> build per hour</td></tr>
+  </tbody>
+</table>
+<p>The rest of the page, <strong>Clean-up rules</strong> and <strong>Checkout options</strong>, is described on <a href="bc-retention.html">Retention and discard old builds</a> and <a href="bc-workspace-options.html">Workspace options</a>.</p><h2>A worked example</h2>
+<p>The Skyforge <strong>Windows Build</strong> uses the ID <code>Game_WindowsBuild</code> and the Windows icon. The <strong>Build number format</strong> is <code>1.4.%build.counter%</code>, so the first build of the day shows as <em>1.4.142</em>. <strong>Build priority</strong> is <code>10</code> so it goes before the nightly Linux builds when agents are scarce.</p><h2>What you see when it runs</h2>
+<p>The build page and the History list show the display name and the build number format. The project tree shows the icon. The summary card on the right of General shows the next build number and the artifact rules.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>I cannot change the settings</td><td>Changing them needs the Configure permission. Without it the page is read-only.</td></tr>
+    <tr><td>The new ID is refused</td><td>An ID has letters, digits and underscores only, starts with a letter, and must be unique on the server.</td></tr>
+    <tr><td>The build counter is refused</td><td>It cannot go below the number of the last build.</td></tr>
+    <tr><td>The priority is refused</td><td>It must be a whole number from -100 to 100.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="settings-homes.html">Settings homes</a></li>
+  <li><a href="project-ids.html">IDs</a></li>
+  <li><a href="project-icons.html">Project icons</a></li>
+  <li><a href="bc-retention.html">Retention and discard old builds</a></li>
+  <li><a href="bc-workspace-options.html">Workspace options</a></li>
+</ul>
+</main>
+</body>
+</html>

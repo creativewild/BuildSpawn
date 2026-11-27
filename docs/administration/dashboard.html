@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="administration/dashboard">
+<main class="doc">
+<h1>Dashboard</h1>
+<p class="lead">Choose what the dashboard shows: the builds, failures, queue, agents and numbers your team should see first.</p>
+
+<p>Click <strong>Dashboard</strong> in the top bar to open it. The dashboard is a grid of <strong>widgets</strong>. An administrator arranges it, and everybody sees the same dashboard. Each widget only shows what the viewer is allowed to see.</p>
+<p>The full list of projects and build configurations is on the <strong>Projects</strong> page, not here. Use the dashboard for the few things that matter most.</p>
+
+<h2>Dashboard settings</h2>
+<p>You need the <strong>System administrator</strong> role to change the dashboard. Other users see the dashboard but no <strong>Edit dashboard</strong> button.</p>
+
+<h3>Start with the suggested widgets</h3>
+<p>When the dashboard is empty, you see <strong>Arrange the dashboard</strong> with two buttons:</p>
+<ol class="steps">
+  <li>Click <strong>Start with suggested widgets</strong>. Buildspawn adds a useful set: metric cards, builds per day, the build queue, executor status, recent builds and failing builds.</li>
+  <li>Move, resize or remove widgets as you like (see below).</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/administration/dashboard-edit.png" alt="The dashboard in edit mode with Add widget, Cancel and Save buttons, and dashed widget frames for Metric cards, Builds per day, Build queue, Build executor status, Recent builds and Needs attention, each with arrange and size buttons">
+  <figcaption>Edit mode. Each widget has a bar with buttons to move, resize, set options and remove it.</figcaption>
+</figure>
+
+<h3>Change the dashboard</h3>
+<ol class="steps">
+  <li>Click <strong>Edit dashboard</strong>. The title changes to <em>Edit dashboard</em>.</li>
+  <li>Change the widgets (see the table below).</li>
+  <li>Click <strong>Save</strong> to publish the dashboard to everybody, or <strong>Cancel</strong> to throw your changes away.</li>
+</ol>
+<p>Each widget has a bar with these buttons:</p>
+<table>
+  <thead><tr><th>Button</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Drag handle</strong> (dots)</td><td>Drag the widget to a new place.</td></tr>
+    <tr><td><strong>‹ ›</strong></td><td>Move earlier or later in the grid.</td></tr>
+    <tr><td><strong>Narrower / Wider</strong></td><td>Change the width. The grid has 12 columns; a widget is 2 to 12 wide.</td></tr>
+    <tr><td><strong>Shorter / Taller</strong></td><td>Change the height, from 1 to 6 rows.</td></tr>
+    <tr><td><strong>Widget options</strong></td><td>Change the title and the widget's own options.</td></tr>
+    <tr><td><strong>×</strong></td><td>Remove the widget.</td></tr>
+  </tbody>
+</table>
+<p>The size is shown at the top right of each widget, for example <em>8 × 2</em> (8 columns wide, 2 rows high).</p>
+
+<h3>Add a widget</h3>
+<ol class="steps">
+  <li>In edit mode, click <strong>Add widget</strong>.</li>
+  <li>Pick a widget from the list.</li>
+  <li>Open its <strong>Widget options</strong> to set it up, then click <strong>Save</strong> on the dashboard.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/administration/dashboard-add-widget.png" alt="The Add widget dialog listing Metric cards, Builds per day, Recent builds, Build queue, Build executor status, Needs attention and Watched builds, each with a one-line description">
+  <figcaption>The seven widget types.</figcaption>
+</figure>
+
+<h2>Widget types</h2>
+<table>
+  <thead><tr><th>Widget</th><th>What it shows</th><th>Options</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Metric cards</strong></td><td>Four cards: failing configurations, running builds, builds waiting in the queue and available executors. Each card links to its list.</td><td>Title</td></tr>
+    <tr><td><strong>Builds per day</strong></td><td>A bar chart of builds per day, stacked by result, with the success rate, average duration and average queue time.</td><td>Title, period: last 24 hours, 7, 14 or 30 days</td></tr>
+    <tr><td><strong>Recent builds</strong></td><td>The latest builds across all build configurations, with result, changes, start time and duration.</td><td>Title, how many to show</td></tr>
+    <tr><td><strong>Build queue</strong></td><td>How many builds wait, the oldest wait, why each build waits, and the waits over the last hour.</td><td>Title</td></tr>
+    <tr><td><strong>Build executor status</strong></td><td>Online, busy and offline agents, and idle executors.</td><td>Title, list offline agents</td></tr>
+    <tr><td><strong>Needs attention</strong></td><td>Everything that is failing, failing first.</td><td>Title, include unstable builds, how many to show</td></tr>
+    <tr><td><strong>Watched builds</strong></td><td>The build configurations you choose, with their status, recent history and running progress.</td><td>Title, the build configurations (type to find one, then order them)</td></tr>
+  </tbody>
+</table>
+<p>A dashboard holds up to 30 widgets, and a Watched builds widget up to 50 build configurations.</p>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="settings-overview.html">Settings overview</a>: every administrator page in one list.</li>
+  <li><a href="../running-builds/queue.html">Queue</a> and <a href="../agents/agents-page.html">Agents page</a>: the full lists behind the queue and executor widgets.</li>
+  <li><a href="management-pages.html#load-statistics">Load Statistics</a>: long-term charts of executors and queue length.</li>
+</ul>
+
+<h2>Tips</h2>
+<ul>
+  <li>Leave a widget's title empty to use its own name.</li>
+  <li>A user who may not see a build configuration in a Watched builds widget does not see it at all, so one dashboard works for the whole studio.</li>
+  <li>Widgets refresh by themselves. If the server cannot be reached, a widget keeps the last data and says <em>Showing last known data</em>.</li>
+  <li>Put a Watched builds widget with your release build configurations at the top, so everybody sees at once whether the game builds.</li>
+</ul>
+</main>
+</body>
+</html>

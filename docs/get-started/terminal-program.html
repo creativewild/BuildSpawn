@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The terminal program · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="get-started/terminal-program">
+<main class="doc">
+<h1>The terminal program</h1>
+<p class="lead">Start the server and watch it live from a terminal.</p>
+
+<h2 id="what">What it is</h2>
+<p><code>buildspawn</code> is a terminal program that comes with every download. It is the same program on Windows, Linux and macOS. It sets up and starts the server, and then shows a live monitor of builds, the queue and agents.</p>
+<p>Run <code>buildspawn</code> with nothing after it, and it opens one of two screens:</p>
+<ul>
+  <li>the <strong>launch flow</strong>, on a first run, when this copy has no settings file and no service yet;</li>
+  <li>the <strong>live monitor</strong>, every other time.</li>
+</ul>
+
+<h2 id="start">Start it</h2>
+<table>
+  <thead><tr><th>Download</th><th>How to start it</th></tr></thead>
+  <tbody>
+    <tr><td>Windows setup</td><td>Open a new Windows Terminal and type <code>buildspawn</code>. Setup put it on the PATH.</td></tr>
+    <tr><td>Windows zip</td><td>In the program folder, type <code>.\bin\buildspawn.exe</code>.</td></tr>
+    <tr><td>Linux and macOS folders</td><td>In the folder, type <code>bin/buildspawn</code>.</td></tr>
+    <tr><td>Linux packages</td><td>Type <code>buildspawn</code>. The package put it on the PATH.</td></tr>
+  </tbody>
+</table>
+<div class="callout note"><p>On Windows, in the program folder, type <code>bin\buildspawn</code>, not just <code>buildspawn</code>. Windows doesn't tell upper and lower case apart, so plain <code>buildspawn</code> there opens <code>Buildspawn.exe</code>, the app.</p></div>
+
+<h2 id="launch-flow">The launch flow</h2>
+<p>The launch flow has five steps. <kbd>Enter</kbd> goes forward and <kbd>Esc</kbd> goes back.</p>
+<ol class="steps">
+  <li><strong>Home:</strong> the folder for jobs, build history and settings.</li>
+  <li><strong>Port &amp; memory:</strong> the web port (8080 by default), whether to listen on the network or this computer only, and the Java memory.</li>
+  <li><strong>Run as:</strong> pick one.
+    <ul>
+      <li><strong>Service</strong> (recommended): starts at boot, runs without anyone signed in and restarts after a crash. It needs administrator rights once to install it. On macOS it is a LaunchAgent and needs none. Ticks under it: start at boot, open the firewall (Windows only), start now.</li>
+      <li><strong>Portable:</strong> runs in this window and stops when you close it. No administrator rights. Good for a try-out.</li>
+    </ul>
+  </li>
+  <li><strong>Admin password:</strong> the first-login password. Press <kbd>v</kbd> to show it and <kbd>c</kbd> to copy it.</li>
+  <li><strong>Start:</strong> a summary. Then it starts the server and switches to the live monitor.</li>
+</ol>
+<p>You can save your answers as a <strong>preset</strong> and use them again on another machine:</p>
+<pre><code>buildspawn launch --preset NAME</code></pre>
+<p>To open the launch flow again on a copy that is already set up, run <code>buildspawn launch</code>.</p>
+
+<h2 id="monitor">The live monitor</h2>
+<p>The monitor reads the running server and refreshes on its own, every 2 seconds by default. The top line shows the server's state and address. The second line lists the seven views; press a number to switch.</p>
+<pre class="terminal no-copy" data-title="buildspawn · Overview"> <span class="t-bold">Buildspawn 1.9.3</span> · <span class="t-green">● Serving</span> http://127.0.0.1:8090 · 1 of 6 executors busy · 1 queued                   <span class="t-green">LIVE</span>
+ <span class="t-inverse">[1 Overview]</span>   2 Builds 1   3 Queue 1   4 Agents 4/5   5 Logs   6 Service   7 Settings
+<span class="t-dim">──────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span class="t-dim"> ┌─</span> Server <span class="t-dim">─────────────────────────┐┌─</span> Builds running <span class="t-dim">─────────────────┐┌─</span> Queue <span class="t-dim">──────────────────────────┐</span>
+<span class="t-dim"> │</span> <span class="t-green">● Running</span>                        <span class="t-dim">││</span> 1 of 6 executors                 <span class="t-dim">││</span> 1 waiting · oldest 6:21          <span class="t-dim">│</span>
+<span class="t-dim"> │</span> 2.589-buildspawn.21              <span class="t-dim">││</span> <span class="t-cyan">████</span><span class="t-dim">░░░░░░░░░░░░░░░░░░░░░░</span> 16%   <span class="t-dim">││</span> <span class="t-yellow">█</span> last 30 min                    <span class="t-dim">│</span>
+<span class="t-dim"> └──────────────────────────────────┘└──────────────────────────────────┘└──────────────────────────────────┘</span>
+<span class="t-dim"> ┌─</span> Builds / hour <span class="t-dim">──────────────────┐┌─</span> Success rate <span class="t-dim">───────────────────┐┌─</span> Agents <span class="t-dim">─────────────────────────┐</span>
+<span class="t-dim"> │</span> 12 now · peak 12                 <span class="t-dim">││</span> 72 %  8 of 11 · 24 h             <span class="t-dim">││</span> 4 online · 1 offline             <span class="t-dim">│</span>
+<span class="t-dim"> │</span> <span class="t-cyan">▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█</span> 24 h    <span class="t-dim">││</span> <span class="t-green">███████████████████</span><span class="t-dim">░░░░░░░</span> 72%   <span class="t-dim">││</span> 6 executors · 1 busy             <span class="t-dim">│</span>
+<span class="t-dim"> └──────────────────────────────────┘└──────────────────────────────────┘└──────────────────────────────────┘</span>
+<span class="t-dim"> ┌─</span> JVM heap <span class="t-dim">───────────────────────┐┌─</span> CPU <span class="t-dim">────────────────────────────┐┌─</span> Disk free · home <span class="t-dim">───────────────┐</span>
+<span class="t-dim"> │</span> not reported                     <span class="t-dim">││</span> not reported                     <span class="t-dim">││</span> 354 GB free                      <span class="t-dim">│</span>
+<span class="t-dim"> │</span>                                  <span class="t-dim">││</span>                                  <span class="t-dim">││</span>                                  <span class="t-dim">│</span>
+<span class="t-dim"> └──────────────────────────────────┘└──────────────────────────────────┘└──────────────────────────────────┘</span>
+<span class="t-dim"> ┌─</span> Recent builds <span class="t-dim">───────────────────────────────────────────────────────────────────────────</span>9 of 12 · 24 h<span class="t-dim">──┐</span>
+<span class="t-dim"> │   Start Job                              # Result              Time Agent                     Cause      │</span>
+<span class="t-dim"> │</span><span class="t-inverse">▸  05:40 Game/PS5 Build                  #2 ▶ ██████ 99%        2:57 ps5-devkit-01             docs       </span><span class="t-dim">│</span>
+<span class="t-dim"> │</span>   05:39 Game/Windows Build              #4 <span class="t-green">✓ success</span>           0:09 win-build-01              docs       <span class="t-dim">│</span>
+<span class="t-dim"> │</span>   05:39 Game/Windows Build              #3 <span class="t-red">✗ failed</span>            0:05 win-build-01              docs       <span class="t-dim">│</span>
+<span class="t-dim"> │</span>   05:39 Game/Windows Build              #2 <span class="t-green">✓ success</span>           0:09 win-build-01              docs       <span class="t-dim">│</span>
+<span class="t-dim"> │</span>   05:39 Game/PS5 Build                  #1 <span class="t-green">✓ success</span>           0:07 ps5-devkit-01             docs       <span class="t-dim">│</span>
+<span class="t-dim"> │</span>   05:39 Game/Windows Build              #1 <span class="t-green">✓ success</span>           0:08 win-build-01              docs       <span class="t-dim">│</span>
+<span class="t-dim"> │</span>   05:36 Engine/Unit Tests               #3 <span class="t-green">✓ success</span>           0:05 win-build-02              docs       <span class="t-dim">│</span>
+<span class="t-dim"> │</span>   05:36 Tools/Asset Pipeline            #2 <span class="t-green">✓ success</span>           0:02 win-build-02              docs       <span class="t-dim">│</span>
+<span class="t-dim"> │</span>   05:36 Engine/Unit Tests               #2 <span class="t-yellow">▲ unstable</span>          0:05 win-build-02              docs       <span class="t-dim">│</span>
+<span class="t-dim"> └──────────────────────────────────────────────────────────────────────────────────────────────────────────┘</span>
+<span class="t-dim"> ↑↓ select build  Enter open build log  Tab next tile</span>
+<span class="t-dim"> 1-7 views  / filter  Space freeze  r refresh  t theme  b open in browser  ? help  q quit</span>
+ Signed in docs                                                                        <span class="t-dim">refresh 2 s · 05:43:00</span></pre>
+
+<h3>The seven views</h3>
+<table>
+  <thead><tr><th>Key</th><th>View</th><th>What it shows</th></tr></thead>
+  <tbody>
+    <tr><td><kbd>1</kbd></td><td>Overview</td><td>Tiles with bars and trends, and the recent builds</td></tr>
+    <tr><td><kbd>2</kbd></td><td>Builds</td><td>The last 24 hours: filter, result chips, group by job. <kbd>Enter</kbd> opens the build log.</td></tr>
+    <tr><td><kbd>3</kbd></td><td>Queue</td><td>Every waiting item and why it waits</td></tr>
+    <tr><td><kbd>4</kbd></td><td>Agents</td><td>State, executors, labels, free disk</td></tr>
+    <tr><td><kbd>5</kbd></td><td>Logs</td><td>The server log, the GC log and a build log, with a level filter</td></tr>
+    <tr><td><kbd>6</kbd></td><td>Service</td><td>The service: start, stop, restart, install, remove, start at boot</td></tr>
+    <tr><td><kbd>7</kbd></td><td>Settings</td><td>Port, listen, memory, home, logs, Java options, arguments. Applying restarts the server after asking.</td></tr>
+  </tbody>
+</table>
+
+<h3>The Queue view</h3>
+<p>The Queue view tells you why each build waits. Here a build waits because the only agent in its pool is offline:</p>
+<pre class="terminal no-copy" data-title="buildspawn · Queue"> <span class="t-bold">Buildspawn 1.9.3</span> · <span class="t-green">● Serving</span> http://127.0.0.1:8090 · 1 of 6 executors busy · 1 queued                   <span class="t-green">LIVE</span>
+  1 Overview   2 Builds 1  <span class="t-inverse">[3 Queue]</span> 1   4 Agents 4/5   5 Logs   6 Service   7 Settings
+<span class="t-dim">──────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span class="t-dim"> / type to filter</span>   Why  all  blocked 0  waiting 0  <span class="t-yellow">offline 1</span>  quiet 0  lock 0
+<span class="t-dim"> ┌─</span> Queue <span class="t-dim">────────────────────────────────────────────────────────────────────────────</span>1 item · oldest 6:38<span class="t-dim">──┐</span>
+<span class="t-dim"> │    # Job                          Waiting Why it waits                                                   │</span>
+<span class="t-dim"> │</span><span class="t-inverse">▸   1 Engine » Linux Server Build     6:38 ▲ Not in a pool assigned to this project (pool: Consoles); Not…</span><span class="t-dim">│</span>
+<span class="t-dim"> └──────────────────────────────────────────────────────────────────────────────────────────────────────────┘</span></pre>
+
+<h3>The Agents view</h3>
+<pre class="terminal no-copy" data-title="buildspawn · Agents"> <span class="t-bold">Buildspawn 1.9.3</span> · <span class="t-green">● Serving</span> http://127.0.0.1:8090 · 1 of 6 executors busy · 1 queued                   <span class="t-green">LIVE</span>
+  1 Overview   2 Builds 1   3 Queue 1  <span class="t-inverse">[4 Agents]</span> 4/5   5 Logs   6 Service   7 Settings
+<span class="t-dim">──────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span class="t-dim"> ┌─</span> Agents <span class="t-dim">───────────────────────────────────────────────────────────────────────────</span>4 online · 1 offline<span class="t-dim">──┐</span>
+<span class="t-dim"> │   Agent            State     Executors        Labels               System          Free Ping / since     │</span>
+<span class="t-dim"> │</span><span class="t-inverse">▸  built-in         ● idle    0/0 ░░░░░░░░     built-in             Windows 11 …  354 GB —                </span><span class="t-dim">│</span>
+<span class="t-dim"> │</span>   linux-build-01   <span class="t-red">○ offline</span> 0 of 2           server linux         —                  — offline 05:31    <span class="t-dim">│</span>
+<span class="t-dim"> │</span>   ps5-devkit-01    <span class="t-cyan">● busy</span>    1/2 <span class="t-cyan">████</span><span class="t-dim">░░░░</span>     console ps5 windows  Windows 11 …  354 GB 64 ms            <span class="t-dim">│</span>
+<span class="t-dim"> │</span>   win-build-01     <span class="t-green">● idle</span>    0/2 <span class="t-dim">░░░░░░░░</span>     win64 vs2022 windows Windows 11 …  354 GB 63 ms            <span class="t-dim">│</span>
+<span class="t-dim"> │</span>   win-build-02     <span class="t-green">● idle</span>    0/2 <span class="t-dim">░░░░░░░░</span>     win64 vs2022 windows Windows 11 …  354 GB 57 ms            <span class="t-dim">│</span>
+<span class="t-dim"> │</span>                                                                                                          <span class="t-dim">│</span>
+<span class="t-dim"> │</span>Executors 6 online · 1 busy · 5 idle   Offline linux-build-01 <span class="t-yellow">Disk replacement, back on Monday</span> 05:31      <span class="t-dim">│</span>
+<span class="t-dim"> └──────────────────────────────────────────────────────────────────────────────────────────────────────────┘</span></pre>
+
+<h2 id="keys">Keys</h2>
+<table>
+  <thead><tr><th>Key</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><kbd>1</kbd> to <kbd>7</kbd>, <kbd>Tab</kbd></td><td>Switch view</td></tr>
+    <tr><td><kbd>/</kbd></td><td>Filter the list</td></tr>
+    <tr><td><kbd>Space</kbd></td><td>Freeze the screen, so you can read it</td></tr>
+    <tr><td><kbd>r</kbd></td><td>Refresh now</td></tr>
+    <tr><td><kbd>t</kbd></td><td>Theme: colour, light or mono</td></tr>
+    <tr><td><kbd>G</kbd></td><td>Glyph set: unicode, ascii or solid</td></tr>
+    <tr><td><kbd>b</kbd></td><td>Open the web interface in your browser</td></tr>
+    <tr><td><kbd>?</kbd></td><td>Help</td></tr>
+    <tr><td><kbd>q</kbd></td><td>Quit. It asks whether to keep the server running or stop it.</td></tr>
+  </tbody>
+</table>
+
+<h2 id="token">Actions need an API token</h2>
+<p>Without an API token the monitor is <strong>read only</strong>. The Service and Settings views still work. But stopping a build (<kbd>x</kbd>), cancelling a queue item (<kbd>c</kbd>) and taking an agent offline (<kbd>d</kbd>) need a token.</p>
+<ol class="steps">
+  <li>In the web interface, open your account menu (top right) and choose <strong>Security</strong>.</li>
+  <li>Under API Token, choose <strong>Add new token</strong>, give it a name and copy it. It is shown only once.</li>
+  <li>Save a one-line text file that holds your user name and the token as <code>user:token</code>. Keep the file private.</li>
+  <li>Start the monitor with <code>--token-file PATH</code>, or set <code>BUILDSPAWN_TOKEN_FILE</code> to the file's path.</li>
+</ol>
+<p>See <a href="../reference/api-tokens.html">API tokens</a> for more.</p>
+
+<h2 id="commands">Commands for scripts</h2>
+<p>Every view also has a text twin, so you can use the program in scripts. These are the most used commands:</p>
+<table>
+  <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>buildspawn status</code></td><td>Where it is, whether it runs, URL, home, builds, queue, agents. Exit code 0 when running, 3 when stopped.</td></tr>
+    <tr><td><code>buildspawn builds --failed</code></td><td>The Builds table as text. Also <code>--running</code> and <code>--limit N</code>.</td></tr>
+    <tr><td><code>buildspawn queue</code> / <code>agents</code></td><td>The Queue and Agents tables</td></tr>
+    <tr><td><code>buildspawn logs</code></td><td>Follows the log</td></tr>
+    <tr><td><code>buildspawn run</code></td><td>Runs the server in this terminal until <kbd>Ctrl</kbd> + <kbd>C</kbd></td></tr>
+    <tr><td><code>buildspawn start</code> / <code>stop</code> / <code>restart</code></td><td>The service when one is installed for this copy, otherwise in the background</td></tr>
+    <tr><td><code>buildspawn check</code></td><td>Checks the settings and Java, and prints the Java command</td></tr>
+    <tr><td><code>buildspawn certs list</code></td><td>Lists the trusted certificates you added. <code>certs add FILE</code>, <code>certs remove FINGERPRINT-OR-NAME</code> and <code>certs windows-store on|off</code> change them.</td></tr>
+    <tr><td><code>buildspawn set port=8090</code></td><td>Changes the settings file. Add <code>--apply</code> to restart afterwards.</td></tr>
+    <tr><td><code>buildspawn admin-password</code></td><td>Prints the initial admin password while it exists. <code>--copy</code> puts it on the clipboard.</td></tr>
+    <tr><td><code>buildspawn help</code></td><td>Lists everything</td></tr>
+  </tbody>
+</table>
+<p>The table commands take <code>--json</code>. Useful options for any command: <code>--url URL</code> to watch another server, <code>--view NAME</code> to open on a view, <code>--once</code> to draw one frame as text and exit, <code>--no-color</code> and <code>--theme</code>.</p>
+<pre><code>buildspawn --url http://buildserver:8080/ --view queue
+buildspawn status --json</code></pre>
+<p>The full list is in <a href="../reference/terminal-commands.html">Terminal program commands</a>.</p>
+
+<h2 id="good-to-know">Good to know</h2>
+<ul>
+  <li>The program uses the same settings file, folders and service as the Windows app, so the two never disagree.</li>
+  <li>Installing, removing, starting or stopping the service asks for administrator permission at that moment. On Linux, actions that need root say so and run <code>sudo</code> only after you answer <kbd>y</kbd>.</li>
+  <li>Windows Terminal gets colour and unicode symbols. The old console window gets simple ASCII symbols. Set <code>BUILDSPAWN_GLYPHS=unicode</code> to change that.</li>
+  <li>Without a terminal, for example from a scheduled task, <code>buildspawn</code> prints the status instead of opening the monitor.</li>
+</ul>
+
+<h2 id="agent-screen">The agent's terminal screen</h2>
+<p>Every agent download has its own terminal screen, <code>buildspawn-agent-tui</code>, on every system. It shows the agent's connection, current build, logs, workspaces and machine details. You can pause the agent (it finishes the current build first) or stop it. View 8, <strong>Certificates</strong>, lists the certificates from the server and the ones added on that machine: add a file, remove one, see its details, switch the Windows certificate store and restart the agent. For machines without a screen, use <code>buildspawn-agent-tui certs list | add FILE | remove FINGERPRINT-OR-NAME | windows-store on|off</code>. On Windows an agent also has a notification-area app with the same status. See <a href="../agents/install-agent.html">Install an agent</a>.</p>
+
+</main>
+</body>
+</html>

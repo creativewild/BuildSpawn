@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Git · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="version-control/git">
+<main class="doc">
+<h1>Git</h1>
+<p class="lead">Connect a Git repository to a build configuration, so each build checks out the code and lists what changed.</p>
+
+<p>A <strong>root</strong> (or VCS root) is one repository a build configuration checks out. Git support is built into Buildspawn: you don't need to install anything on the server. Agents need the <code>git</code> command.</p>
+
+<h2>When to use it</h2>
+<p>Use Git when the code of the build configuration lives in a Git repository.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Version Control</strong>.</li>
+  <li>Choose <strong>Git</strong>.</li>
+  <li>Type the <strong>Repository URL</strong>, for example <code>https://git.studio.example/skyforge/engine.git</code> or <code>git@git.studio.example:skyforge/engine.git</code>.</li>
+  <li>Pick the <strong>Credentials</strong> to use, or add new ones. Public repositories need none.</li>
+  <li>Under <strong>Branches to build</strong>, type the branch, for example <code>*/main</code>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot">
+  <img src="../../assets/shots/version-control/git-root.png" alt="The Version Control settings of the Unit Tests build configuration with a Git repository URL and the branch */main">
+  <figcaption>The Unit Tests build configuration builds the <code>main</code> branch of a Git repository.</figcaption>
+</figure>
+<p>The next build checks out the code into its checkout directory on the agent. The build page shows the commit it built, and the <strong>Change Log</strong> tab lists the new commits since the last build.</p>
+<div class="callout tip"><p>To build when someone pushes, add a <a href="../running-builds/triggers.html">version control trigger</a>.</p></div>
+
+<h2 id="several-roots">Several roots</h2>
+<p>A build configuration can check out more than one root, for example a game repository and a tools repository, or Git and Perforce together. See <a href="several-roots.html">Several roots</a>.</p>
+<h2>Branches</h2>
+<p><strong>Branches to build</strong> decides what a build checks out:</p>
+<table>
+  <thead><tr><th>You type</th><th>What it builds</th></tr></thead>
+  <tbody>
+    <tr><td><code>*/main</code></td><td>The <code>main</code> branch.</td></tr>
+    <tr><td><code>*/release/*</code></td><td>Any branch under <code>release/</code>. A trigger builds the one that changed.</td></tr>
+    <tr><td><code>refs/tags/v1.4</code></td><td>One tag.</td></tr>
+  </tbody>
+</table>
+<p>The branch a build used is in <code>%build.branch%</code> and in the build's info line.</p>
+
+<h3>Build another branch once</h3>
+<p>You don't need to change the settings to build a different commit, tag or branch once. Use <a href="../running-builds/rerun.html">Re-run with changes</a> and choose the revision in the <strong>Source</strong> row of the root.</p>
+
+<h2>Templates and shared roots</h2>
+<p>A <a href="../projects/templates.html">template</a> can hold roots too. Build configurations that use the template get its roots. Template roots always check out into a directory of their own, so they never clash with the build configuration's roots.</p>
+
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Repositories › Repository URL</strong></td><td>Where the code is. Add more with <strong>Add Repository</strong>.</td><td></td><td><code>git@git.studio.example:skyforge/engine.git</code></td></tr>
+    <tr><td><strong>Credentials</strong></td><td>An SSH key or access token. Public repositories need none.</td><td>None</td><td>git-buildbot</td></tr>
+    <tr><td><strong>Name</strong> and <strong>Refspec</strong> (advanced)</td><td>The remote's name, and which refs to fetch.</td><td><code>origin</code></td><td><code>+refs/heads/*:refs/remotes/origin/*</code></td></tr>
+    <tr><td><strong>Branches to build › Branch Specifier</strong></td><td>What to build. Add more with <strong>Add Branch</strong>. One branch per build configuration works best: with many, the changes between branches can be wrong.</td><td><code>*/master</code></td><td><code>*/main</code></td></tr>
+    <tr><td><strong>Git executable</strong></td><td>Which Git to use, when more than one is set up under Tools.</td><td>Default</td><td></td></tr>
+    <tr><td><strong>Additional Behaviours</strong></td><td>Extra options, listed below.</td><td>None</td><td></td></tr>
+  </tbody>
+</table>
+<h3>Additional Behaviours</h3>
+<p>Click <strong>Add</strong> under <strong>Additional Behaviours</strong> and choose:</p>
+<table>
+  <thead><tr><th>Behaviour</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Clean before checkout</strong></td><td>Deletes untracked files (also those in <code>.gitignore</code>) and resets tracked files before every checkout.</td></tr>
+    <tr><td><strong>Clean after checkout</strong></td><td>The same, after the checkout.</td></tr>
+    <tr><td><strong>Wipe out repository &amp; force clone</strong></td><td>Empties the workspace before building.</td></tr>
+    <tr><td><strong>Advanced clone behaviours</strong></td><td>Shallow clone depth, tags, timeouts and reference repositories. A shallow clone saves time but lists every file as changed in the first changes.</td></tr>
+    <tr><td><strong>Advanced checkout behaviours</strong></td><td>The checkout timeout in minutes (default 10).</td></tr>
+    <tr><td><strong>Advanced sub-modules behaviours</strong></td><td>Update submodules, recursive, shallow, with parent credentials.</td></tr>
+    <tr><td><strong>Git LFS pull after checkout</strong></td><td>Pulls large files after the checkout. Needs <code>git lfs</code> on the server and every agent. Good for game assets.</td></tr>
+    <tr><td><strong>Check out to a sub-directory</strong></td><td>A folder under the workspace for the repository.</td></tr>
+    <tr><td><strong>Check out to specific local branch</strong></td><td>Checks out the revision as a local branch of this name. Empty or <code>**</code> uses the remote branch name.</td></tr>
+    <tr><td><strong>Sparse checkout paths</strong></td><td>Only these paths are checked out.</td></tr>
+    <tr><td><strong>Merge before build</strong></td><td>Merges a branch into the build's branch first, for example an integration branch into <code>master</code>.</td></tr>
+    <tr><td><strong>Calculate changelog against a specific branch</strong></td><td>Lists changes against that branch.</td></tr>
+    <tr><td><strong>First build changelog</strong></td><td>The first build lists the latest commit, so Pipelines can look at changes.</td></tr>
+    <tr><td><strong>Use commit author in changelog</strong></td><td>Uses the author, not the committer.</td></tr>
+    <tr><td><strong>Strategy for choosing what to build</strong></td><td>How the branches are chosen and ordered.</td></tr>
+    <tr><td><strong>Build single revision only</strong></td><td>Builds one of several candidate revisions.</td></tr>
+    <tr><td><strong>Force polling using workspace</strong></td><td>Polls with a workspace, not <code>git ls-remote</code>.</td></tr>
+    <tr><td><strong>Polling ignores commits with certain messages</strong>, <strong>...in certain paths</strong>, <strong>...from certain users</strong></td><td>Commits that match do not start a build. Use them to ignore the build's own commits. Path filters turn off fast polling.</td></tr>
+    <tr><td><strong>Don't trigger a build on commit notifications</strong></td><td>Ignores this repository when a commit notification arrives.</td></tr>
+    <tr><td><strong>Create a tag for every build</strong></td><td>Tags the built commit in the workspace.</td></tr>
+    <tr><td><strong>Prune stale remote-tracking branches</strong>, <strong>Prune stale tags</strong></td><td>Removes branches and tags the remote no longer has.</td></tr>
+    <tr><td><strong>Custom user name/e-mail address</strong></td><td>Sets the author and committer of commits the build makes.</td></tr>
+    <tr><td><strong>Custom SCM name</strong></td><td>A unique name for this root.</td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p>The Skyforge tools repository has <strong>Repository URL</strong> <code>git@git.studio.example:skyforge/tools.git</code>, <strong>Credentials</strong> an SSH key, <strong>Branch Specifier</strong> <code>*/main</code> and the behaviours <strong>Git LFS pull after checkout</strong> and <strong>Polling ignores commits from certain users</strong> (<code>buildbot</code>).</p>
+<h2>What you see when it runs</h2>
+<p>The log shows the fetch and checkout of the commit. The build page shows the commit and branch, and the <strong>Change Log</strong> tab lists new commits.</p>
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>You see</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>Authentication failed</td><td>Check the <strong>Credentials</strong>. An SSH key needs the matching public key on the Git host.</td></tr>
+    <tr><td>The checkout times out</td><td>Add <strong>Advanced checkout behaviours</strong> with a longer timeout, or a shallow clone.</td></tr>
+    <tr><td>Changes look wrong between branches</td><td>Build one branch per build configuration.</td></tr>
+    <tr><td><code>git</code> not found</td><td>Install Git on the agent.</td></tr>
+  </tbody>
+</table>
+<h2>Tips</h2>
+<ul>
+  <li>Use SSH keys or access tokens as credentials, not your own password.</li>
+  <li>Keep large binary assets out of Git, or use Git LFS. For big game content, <a href="perforce.html">Perforce</a> is often the better fit.</li>
+  <li>Keep the build configuration's settings next to the code with <a href="versioned-settings.html">versioned settings</a>.</li>
+</ul>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="overview.html">Version control overview</a>, <a href="several-roots.html">Several roots</a>, <a href="vcs-parameters.html">Version control parameters</a>, <a href="../how-to/build-unity-from-git.html">Build a Unity project from Git</a></li>
+</ul>
+</main>
+</body>
+</html>

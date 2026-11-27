@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Give release builds priority on agents · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="how-to/borrow-agents-for-release">
+<main class="doc">
+<h1>Give release builds priority on agents</h1>
+<p class="lead">When a release build waits, let Buildspawn borrow an idle agent from a less important pool and give it back afterwards.</p>
+
+<h2>Before you start</h2>
+<ul>
+  <li>You are an administrator.</li>
+  <li>The release build configuration is in a pool, for example <code>HT2 Devkits</code>.</li>
+  <li>The release build has a parameter that marks it as a release. Here it is a tick box named <code>release</code> (a boolean parameter). See <a href="../parameters/parameters.html">Parameters</a>.</li>
+  <li>Decide which pools may lend agents. Only pools with a <strong>lower weight</strong> than the target pool lend.</li>
+</ul>
+
+<h2>Steps</h2>
+<ol class="steps">
+  <li>Open <strong>Agents</strong>, click the <strong>Pools</strong> tab, then <strong>Priority rules</strong>.</li>
+  <li>Check that <strong>Automatic balancing</strong> is switched on.</li>
+  <li>Under <strong>Pool weights</strong>, give the release pool a higher number than the pools that should lend to it, for example <code>HT2 Devkits</code> <code>100</code> and <code>HT2 Spare</code> <code>20</code>. Click <strong>Save weights</strong>.</li>
+  <li>Click <strong>Add priority rule</strong>.</li>
+  <li>In <strong>Name</strong>, type <code>HT2 Release builds first</code>.</li>
+  <li>In <strong>Parameter</strong>, type <code>release</code>. Leave <strong>Value</strong> empty: an empty value matches <code>true</code>, <code>1</code>, <code>yes</code> or <code>on</code>.</li>
+  <li>Set <strong>Priority</strong> (higher is served first) to <code>200</code>, <strong>Target pool</strong> to <code>HT2 Devkits</code>, and <strong>Max agents</strong> (how many agents this rule may borrow at once) to <code>1</code>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/how-to/borrow-agents-for-release-1.png" alt="The Add priority rule dialog: Name HT2 Release builds first, Parameter release, Value empty, Priority 200, Target pool HT2 Devkits, Max agents 1, On"><figcaption>The rule: which builds, how important, and where agents go.</figcaption></figure>
+<figure class="shot"><img src="../../assets/shots/how-to/borrow-agents-for-release-2.png" alt="The Priority rules tab: Automatic balancing on, the rules HT2 Release builds first and Release builds first, and Pool weights with HT2 Devkits 100 and HT2 Spare 20"><figcaption>The rule in the list, and the pool weights.</figcaption></figure>
+<ol class="steps" start="9">
+  <li>Start a release build: open the build configuration, click <strong>Run</strong> with options, tick <strong>release</strong>, and run it.</li>
+</ol>
+
+<h2>Check it worked</h2>
+<ol class="steps">
+  <li>Within a minute, open the <strong>Overview</strong> tab of the Pool Scheduler. <strong>Borrowed agents</strong> counts 1, and <strong>Capacity per pool</strong> shows <strong>+1 in</strong> on the target pool and <strong>1 out</strong> on the lending pool.</li>
+  <li><strong>Recent moves</strong> lists the move with <strong>Rule: HT2 Release builds first</strong>.</li>
+  <li>The release build's page says it ran on the borrowed agent.</li>
+  <li>When the agent is idle and no matching build waits, it goes back to its home pool. Its state in <strong>Borrowed agents</strong> reads <strong>Going back when idle</strong> until then.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/how-to/borrow-agents-for-release-3.png" alt="The Pool Scheduler Overview: Borrowed agents 1; HT2 Devkits shows +1 in and HT2 Spare 1 out; Recent moves shows ht-win-agent-01 from HT2 Spare to HT2 Devkits by Rule: HT2 Release builds first; Borrowed agents lists ht-win-agent-01, home pool HT2 Spare, now in HT2 Devkits, Going back when idle"><figcaption>An agent borrowed for the release build.</figcaption></figure>
+
+<h2>Troubleshooting</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>The build waits and nothing is borrowed.</td><td>No pool with a <em>lower</em> weight has an idle agent. Pools with equal or higher weight never lend. Busy, offline and personal agents, and agents on the <strong>Never move</strong> list, are never borrowed.</td></tr>
+    <tr><td>The rule doesn't match.</td><td>Check the parameter name. Without a prefix it is a configuration parameter; use <code>env.</code> or <code>system.</code> for those kinds. The value must match exactly, or be empty for a tick box.</td></tr>
+    <tr><td>Agents never go back.</td><td>Turn on <strong>Return borrowed agents when idle</strong> under <strong>Settings</strong>. Also check that the scheduler is not <strong>Paused</strong>.</td></tr>
+    <tr><td>Too many agents are borrowed.</td><td>Lower <strong>Max agents</strong> on the rule.</td></tr>
+  </tbody>
+</table>
+
+<h2>Next steps</h2>
+<ul>
+  <li><a href="../agents/pool-scheduler.html">Priority rules and weights</a>: how balancing chooses agents.</li>
+  <li><a href="night-pool-schedule.html">Move agents to another pool every evening</a>.</li>
+  <li><a href="../running-builds/run-dialog.html">The Run dialog</a>.</li>
+</ul>
+</main>
+</body>
+</html>

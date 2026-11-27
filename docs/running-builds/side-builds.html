@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Side builds · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="running-builds/side-builds">
+<main class="doc">
+<h1>Side builds</h1>
+<p class="lead">A side build is one part of a Parallel block that runs on its own machine. Buildspawn starts it for you, and shows it under the main build.</p>
+
+<h2>When to use it</h2>
+<p>You meet side builds when a build configuration has a <a href="../build-steps/parallel-blocks.html">Parallel block</a> set to <em>Separate machines</em>, or a Matrix block. For example, one side cooks for PS5 on a console agent, and another cooks for Xbox on another agent. This page explains what you see in the queue, the build list and the build page. How to set the block up is on <a href="../build-steps/parallel-blocks.html">Parallel blocks and overrides</a>.</p>
+
+<h2>How a main build and its sides run</h2>
+<ol class="steps">
+  <li>The main build runs its steps up to the Parallel block on its agent.</li>
+  <li>At the block it starts one side build for each side. Each one needs an agent that fits the side's <em>Run on</em> choice, and fetches the same revision as the main build.</li>
+  <li>While the sides run, the main build gives up its executor slot on its agent and keeps its workspace. The log says <em>This build gives up its slot on agent while its 2 sides run on their own machines. Its workspace stays reserved for it.</em></li>
+  <li>When all sides are done, the main build comes back to the same agent, copies in the files the sides sent back and goes on. If that agent is not free again in time, or went offline, the <em>Fallback</em> of the block lets the build go on on any matching agent.</li>
+</ol>
+<p>A main build that started before its block was set to run on separate machines keeps its slot: <em>Starting 2 side builds. This build keeps its slot</em>.</p>
+
+<h2>Where you see side builds</h2>
+<table>
+  <tr><th>Place</th><th>What you see</th></tr>
+  <tr><td>The build list and History of the build configuration</td><td>Side builds are nested under their main build. They read <em>Side build of #12</em>. They are never listed as build configurations of their own.</td></tr>
+  <tr><td>The queue</td><td>Each side waits like any build, and counts in agent usage.</td></tr>
+  <tr><td>Last successful build and other permalinks</td><td>They skip side builds.</td></tr>
+  <tr><td>The main build's console</td><td>Messages such as <em>Queued the side build of PS5</em>, <em>Started PS5 on ps5-devkit-01</em>, <em>PS5 passed in 4 min 10 s on ps5-devkit-01</em> and <em>Sending back 120 files</em>.</td></tr>
+  <tr><td>A side build's own name</td><td><em>#12 &middot; side 1 (PS5)</em>, with the cause <em>Side 1 (PS5) of #12</em>.</td></tr>
+</table>
+
+<h2>If a side fails or you stop the build</h2>
+<ul>
+  <li>With <em>Let the others finish</em> (the default) every side runs to its end. With <em>Stop the others</em>, a side that fails stops the rest: <em>Stopped: another side of ... failed, and the block stops the others</em>. Either way the main build fails after the block.</li>
+  <li>Stopping the main build stops its side builds, and takes the queued ones out of the queue.</li>
+  <li>To run a failed build again without redoing the sides that passed, use <a href="resume.html">Resume</a>: the sides that passed are not run again, and only the failed side restarts, from its failed step.</li>
+</ul>
+
+<h2>Matrix blocks</h2>
+<p>A Matrix block writes the steps once and runs them for every combination of values, for example <code>platform</code> &times; <code>config</code>. Each combination runs as its own side and can use <code>%platform%</code> and <code>%config%</code>. A block has at most 4 axes and 256 combinations. On the build page you see:</p>
+<ul>
+  <li>a <strong>Matrix</strong> card with a grid of the results: <em>Success</em>, <em>Failed</em>, <em>Unstable</em>, <em>Running</em>, <em>Stopped</em>, <em>Did not start</em> or <em>Excluded</em>, with counts such as <em>3 passed</em>, <em>1 failed</em>;</li>
+  <li>for each combination a <strong>Log</strong> link and a <strong>Re-run</strong> button. <em>Run it again. The combinations that passed are not run again.</em> A message says <em>Re-run queued</em>;</li>
+  <li>in the console, a <strong>lane</strong> for each combination. Click the lane chip to show only that combination;</li>
+  <li>on the build configuration's Overview, a trend of the last builds.</li>
+</ul>
+<p>How the block decides what happens when a combination fails (<em>Let the others finish</em>, <em>No new combination starts</em> or <em>Stop the others</em>) and how many run at once are set on the block. See <a href="../build-steps/parallel-blocks.html">Parallel blocks and overrides</a>.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <tr><th>Problem</th><th>What to do</th></tr>
+  <tr><td>A side waits in the queue for a long time.</td><td>Click <strong>Why is it waiting?</strong>. Often no agent of the pool in <em>Run on</em> is free or online. See <a href="queue.html">The queue</a>.</td></tr>
+  <tr><td><em>The build configuration no longer has the side ...</em></td><td>The side was removed from the Parallel block after the main build started. Re-run the main build.</td></tr>
+  <tr><td><em>No files match the files sent back</em></td><td>The side made no files that match its <em>Files sent back</em> rules. Check the rules on the block.</td></tr>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="parallel-and-composite.html">Parallel tests and composite builds</a></li>
+  <li><a href="../build-steps/parallel-blocks.html">Parallel blocks and overrides</a></li>
+  <li><a href="../how-to/run-steps-in-parallel.html">Run steps in parallel on several agents</a></li>
+</ul>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unreal Engine step · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="game-builds/unreal">
+<main class="doc">
+<h1>Unreal Engine step</h1>
+<p class="lead">Compile, cook, package and test an Unreal Engine game: BuildCookRun, BuildGraph on one machine or many, automation tests, commandlets and custom automation commands.</p>
+
+<h2>When to use it</h2>
+<p>Use it when your game is an Unreal Engine project. One step type covers the five jobs a build machine does: make a packaged game, run a build graph script, run automation tests, run a commandlet (a small program the editor runs, such as a content check), and run any other automation command. The step finds the engine on the agent, runs the Unreal tools without windows or prompts, and picks errors and warnings out of the engine log.</p>
+
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Build steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>, type <code>Unreal</code> in <strong>Filter step types</strong> and click the <strong>Unreal Engine</strong> tile.</li>
+  <li>Give the step a name, for example <code>Build, cook and package</code>.</li>
+  <li>Choose the <strong>Engine detection mode</strong>. In <strong>Automatic</strong>, type the engine version in <strong>Identifier</strong>. In <strong>Manual</strong>, type the engine folder in <strong>Root dir</strong>.</li>
+  <li>Choose the <strong>Command</strong>. The fields below it change with your choice.</li>
+  <li>Fill in the fields for that command (see the tables below).</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/game-builds/unreal-step.png" alt="The Unreal Engine step with its Command and project fields"><figcaption>The Unreal Engine step.</figcaption></figure>
+<div class="callout note"><p>Settings every step has (step name, working directory, environment variables, when the step runs) are on <a href="../build-steps/runners.html">Runners</a>.</p></div>
+
+<h2>Every field</h2>
+<h3>Engine (all commands)</h3>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Engine detection mode</strong></td><td><strong>Automatic</strong> picks an engine the agent found. <strong>Manual</strong> uses a folder you name.</td><td>Automatic</td><td>Automatic</td></tr>
+    <tr><td><strong>Identifier</strong></td><td>Automatic mode. A version such as <code>5.2</code> or <code>5.3.4</code> for engines installed from the Epic launcher, or the custom name of a source build. The step runs only on agents that report a matching engine. If several match, the latest one is used.</td><td>Empty</td><td><code>5.4</code></td></tr>
+    <tr><td><strong>Root dir</strong></td><td>Manual mode. The Unreal Engine root folder, relative to the workspace or absolute.</td><td>Empty</td><td><code>D:\UE\UE_5.4</code></td></tr>
+    <tr><td><strong>Command</strong></td><td>What the step runs: <strong>BuildCookRun</strong>, <strong>BuildGraph</strong>, <strong>Automation tests</strong>, <strong>Custom automation command</strong> or <strong>Commandlet</strong>.</td><td>BuildCookRun</td><td>BuildCookRun</td></tr>
+    <tr><td><strong>Additional arguments</strong></td><td>Added after the command. The default makes the build tools and the editor run unattended on a build machine. The step also sets <code>UE_LOG_JSON_TO_STDOUT=1</code> so errors and warnings are found in the log.</td><td><code>-utf8output -buildmachine -unattended -noP4 -nosplash -stdout -NoCodeSign</code></td><td>Add <code>-clean</code></td></tr>
+  </tbody>
+</table>
+
+<h3>Command: BuildCookRun</h3>
+<p>Builds the game, cooks the content (turns assets into the format of the platform), stages the files, packages and archives.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Project</strong></td><td>Path to the <code>.uproject</code> file, relative to the workspace or absolute. The button <strong>Detect projects</strong> lists the <code>.uproject</code> files in the top folder of the last workspace and in the folders a <code>.uprojectdirs</code> file lists.</td><td>Empty (required)</td><td><code>Skyforge.uproject</code></td></tr>
+    <tr><td><strong>Build configuration</strong></td><td>What kind of build: <strong>Standalone game</strong>, <strong>Client</strong>, <strong>Server</strong> or <strong>Client and server</strong>. It decides which target fields are shown.</td><td>Standalone game</td><td>Client and server</td></tr>
+    <tr><td><strong>Target configurations</strong></td><td>Standalone. Debug, DebugGame, Development, Test or Shipping, joined with <code>+</code>. Tick the boxes or type them.</td><td>Development</td><td><code>Development+Shipping</code></td></tr>
+    <tr><td><strong>Target platforms</strong></td><td>Standalone. Platform names joined with <code>+</code>: Android, HoloLens, IOS, Linux, LinuxArm64, Mac, TVOS, Win64. Names not on the list are accepted.</td><td>Win64</td><td><code>Win64+Linux</code></td></tr>
+    <tr><td><strong>Client target configurations</strong>, <strong>Client target platforms</strong></td><td>Same, for the client. Shown for Client, and Client and server.</td><td>Development, Win64</td><td><code>Shipping</code>, <code>Win64</code></td></tr>
+    <tr><td><strong>Server target configurations</strong>, <strong>Server target platforms</strong></td><td>Same, for the server. Shown for Server, and Client and server.</td><td>Development, Linux</td><td><code>Development</code>, <code>Linux</code></td></tr>
+    <tr><td><strong>Steps</strong></td><td>Four switches. <strong>Cook</strong>: perform cooking (off passes <code>-skipcook</code>). <strong>Stage</strong>: put the executables and content in a stage directory (off passes <code>-skipstage</code>). <strong>Package</strong>: package for the target platform. <strong>Archive</strong>: place the build in an archive directory.</td><td>All on</td><td>All on</td></tr>
+  </tbody>
+</table>
+<p>Under <strong>Advanced</strong>:</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Target</strong></td><td>Name the build target when the project has several of one type. Join several with <code>+</code>.</td><td>Empty</td><td><code>SkyforgeGame</code></td></tr>
+    <tr><td><strong>Maps to cook</strong></td><td>Map names joined with <code>+</code>. Empty uses the maps of the project settings.</td><td>Empty</td><td><code>Forest_Main+Hub</code></td></tr>
+    <tr><td><strong>Cook cultures</strong></td><td>Cultures joined with <code>+</code>. Empty uses <code>CulturesToStage</code> of the project.</td><td>Empty</td><td><code>en-US+de-DE</code></td></tr>
+    <tr><td><strong>Unversioned content</strong></td><td>Leave out asset versions. All loaded assets are assumed to be of the current version.</td><td>On</td><td>On</td></tr>
+    <tr><td><strong>Staging directory</strong></td><td>Where files are staged. Empty uses <code>Saved/StagedBuilds</code>.</td><td>Empty</td><td><code>Stage</code></td></tr>
+    <tr><td><strong>Pak</strong></td><td>Put all assets into one <code>.pak</code> file.</td><td>On</td><td>On</td></tr>
+    <tr><td><strong>Compressed</strong></td><td>Smaller deployment, possibly slower to load.</td><td>On</td><td>On</td></tr>
+    <tr><td><strong>Prerequisites</strong></td><td>Include an installer for the prerequisites of the packaged game, where the platform has one.</td><td>On</td><td>On</td></tr>
+    <tr><td><strong>Archive directory</strong></td><td>Where the archive goes. Used when <strong>Archive</strong> is on.</td><td>Empty</td><td><code>Output</code></td></tr>
+  </tbody>
+</table>
+
+<h3>Command: BuildGraph</h3>
+<p>BuildGraph is Unreal's script format for build pipelines: a graph of nodes, grouped by the machine type that runs them.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Script path</strong></td><td>The script that describes the build graph.</td><td>Empty (required)</td><td><code>Engine/Build/Graph/Examples/BuildEditorAndTools.xml</code></td></tr>
+    <tr><td><strong>Target</strong></td><td>The name of the node or output tag to build.</td><td>Empty (required)</td><td><code>Make Installed Build Win64</code></td></tr>
+    <tr><td><strong>Options</strong></td><td>One <code>OPTION_NAME=OPTION_VALUE</code> per line. Each becomes <code>-set:NAME=VALUE</code> for the script. You can use <code>${WORKSPACE}</code> in a value.</td><td>Empty</td><td><code>BuildPlatforms=Win64</code></td></tr>
+    <tr><td><strong>Mode</strong></td><td><strong>Single machine</strong> runs every node one after the other on this agent. <strong>Distributed</strong> gives each agent group of the script its own build, run as a build chain on several agents.</td><td>Single machine</td><td>Distributed</td></tr>
+    <tr><td><strong>Shared storage</strong></td><td>Distributed only. A folder every agent can reach, for example a network share. Empty reads <code>UNREAL_BUILDGRAPH_SHARED_DIR</code> on each agent. A folder named after this build is made inside it.</td><td>Empty</td><td><code>\\fileserver\buildgraph</code></td></tr>
+    <tr><td><strong>Post badges</strong></td><td>Distributed only. Posts the badges defined in the graph to a UGS metadata server as their nodes run.</td><td>Off</td><td>On</td></tr>
+    <tr><td><strong>Metadata server</strong></td><td>Distributed only. Needed when <strong>Post badges</strong> is on.</td><td>Empty</td><td><code>http://ugs.studio.example:3000</code></td></tr>
+    <tr><td><strong>Credentials</strong></td><td>Distributed only. Optional. A Secret text credential sent as a bearer token. UGS metadata servers usually run in a closed network and need none.</td><td>None</td><td><code>ugs-token</code></td></tr>
+    <tr><td>Button <strong>Test metadata server</strong></td><td>Connects to the server and says which API version it uses.</td><td>-</td><td>-</td></tr>
+  </tbody>
+</table>
+<h4>Distributed BuildGraph</h4>
+<ol>
+  <li>The step first exports the graph and reads its agent groups.</li>
+  <li>It creates one build per agent group, in the order the groups depend on each other, and starts them as a build chain. Each group build runs its nodes with <code>-SingleNode</code>, and writes to the shared storage folder.</li>
+  <li>The agent for a group is chosen by the group's agent types. An agent offers its types in the environment variable <code>UNREAL_BUILDGRAPH_AGENT_TYPE</code>, separated by <code>;</code>. The shared folder can be set on the agent with <code>UNREAL_BUILDGRAPH_SHARED_DIR</code>.</li>
+  <li>When all groups finish, the files they archived are added to the artifacts of this build. If a group did not succeed, the step fails and names the groups. A group whose dependency failed is skipped.</li>
+</ol>
+<div class="callout warning"><p>A distributed BuildGraph step must be the only step of its build configuration. The source must already be checked out, so connect a <a href="../version-control/perforce.html">version control root</a>. The group builds check out the same revision this build used.</p></div>
+
+<h3>Command: Automation tests</h3>
+<p>Runs the editor with the Unreal automation test system.</p>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Project</strong></td><td>Path to the <code>.uproject</code> file.</td><td>Empty (required)</td><td><code>Skyforge.uproject</code></td></tr>
+    <tr><td><strong>Exec command</strong></td><td>Adds <code>-ExecCmds=Automation</code> with the chosen mode: <strong>Run all</strong>, <strong>Run filter</strong> or <strong>Run tests</strong>.</td><td>Run all</td><td>Run filter</td></tr>
+    <tr><td><strong>Filter</strong></td><td>For Run filter. Runs only the tests tagged with this filter: Engine, Smoke, Stress, Perf or Product.</td><td>Product</td><td>Smoke</td></tr>
+    <tr><td><strong>Tests</strong></td><td>For Run tests. One test name per line. Full or partial hierarchical names, joined with <code>+</code>.</td><td>Empty</td><td><code>Project.Skyforge.Inventory</code></td></tr>
+    <tr><td><strong>Run without rendering (nullRHI)</strong></td><td>Disable rendering. Passes <code>-nullrhi</code>.</td><td>On</td><td>On</td></tr>
+  </tbody>
+</table>
+<p>The test lines of the engine log are turned into test results, so each test shows as passed, failed or skipped.</p>
+
+<h3>Command: Custom automation command</h3>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Name</strong></td><td>The automation command to run with RunUAT.</td><td>Empty (required)</td><td><code>BuildPlugin</code></td></tr>
+    <tr><td><strong>Arguments</strong></td><td>Arguments passed to the command.</td><td>Empty</td><td><code>-Plugin=D:\Skyforge\Plugins\Fog\Fog.uplugin -Package=D:\Out</code></td></tr>
+  </tbody>
+</table>
+
+<h3>Command: Commandlet</h3>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Editor</strong></td><td>Empty uses the default editor. A binary name uses the default folder. A relative path starts at the engine root. An absolute path is used as it is.</td><td>Empty</td><td><code>UnrealEditor-Cmd.exe</code></td></tr>
+    <tr><td><strong>Project</strong></td><td>A path to the project, or its name for a native project. Empty runs without a project.</td><td>Empty</td><td><code>Skyforge.uproject</code></td></tr>
+    <tr><td><strong>Commandlet</strong></td><td>The name used after <code>-run=</code>.</td><td>Empty (required)</td><td><code>ResavePackages</code></td></tr>
+    <tr><td><strong>Arguments</strong></td><td>Arguments passed to the commandlet.</td><td>Empty</td><td><code>-AutoCheckout -IgnoreChangelist</code></td></tr>
+  </tbody>
+</table>
+
+<h2>How the engine is found</h2>
+<p>When an agent connects, it looks for engines in the Epic launcher list, the engine list files, and (on Windows) the registry, where source builds are recorded. Open <strong>Agents</strong>, open an agent and click <strong>Unreal Engines</strong>. The <strong>Detected engines</strong> table shows the <strong>Kind</strong> (Launcher or Source build), <strong>Identifier</strong>, <strong>Version</strong>, <strong>Path</strong> and <strong>Found in</strong> of each engine. Click <strong>Detect again</strong> after you install an engine.</p>
+<p>A step with an <strong>Identifier</strong> only runs on an agent that has an engine whose identifier starts with it. Otherwise the build waits in the queue, and the wait reason names each agent and why it cannot take the build.</p>
+<p>The same tab has a card for BuildGraph with the two settings agents use for distributed graphs: <code>UNREAL_BUILDGRAPH_AGENT_TYPE</code> and <code>UNREAL_BUILDGRAPH_SHARED_DIR</code>. Set them as environment variables on the agent (<strong>Configure › Node Properties</strong>).</p>
+<figure class="shot"><img src="../../assets/shots/game-builds/unreal-agent-tab.png" alt="The Unreal Engines tab of an agent with the Detected engines card (no engine found on this agent) and the BuildGraph card"><figcaption>The Unreal Engines tab of an agent. This agent has no engine yet, so the list is empty.</figcaption></figure>
+<p>The step starts <code>RunUAT</code> for BuildCookRun, BuildGraph and custom automation commands, and the editor for automation tests and commandlets.</p>
+
+<h2>A worked example</h2>
+<p>Skyforge is built with Unreal Engine 5.4 on Windows agents. The nightly build runs <strong>BuildCookRun</strong>, then an <strong>Automation tests</strong> step.</p>
+<table>
+  <thead><tr><th>Step 1 field</th><th>Value</th></tr></thead>
+  <tbody>
+    <tr><td>Step name</td><td><code>Build, cook and package</code></td></tr>
+    <tr><td>Engine detection mode / Identifier</td><td>Automatic / <code>5.4</code></td></tr>
+    <tr><td>Command</td><td>BuildCookRun</td></tr>
+    <tr><td>Project</td><td><code>Skyforge.uproject</code></td></tr>
+    <tr><td>Target configurations / platforms</td><td><code>Development</code> / <code>Win64</code></td></tr>
+    <tr><td>Steps</td><td>Cook, Stage, Package and Archive on</td></tr>
+    <tr><td>Archive directory</td><td><code>Output</code></td></tr>
+  </tbody>
+</table>
+<p>Step 2 uses Command <strong>Automation tests</strong>, <strong>Project</strong> <code>Skyforge.uproject</code>, <strong>Exec command</strong> <strong>Run filter</strong> and <strong>Filter</strong> <strong>Smoke</strong>.</p>
+
+<h2>What you see when it runs</h2>
+<ul>
+  <li>The log says <em>Engine 5.4 located at ... was chosen for the build.</em> If several engines match, it also says the latest one was used.</li>
+  <li>Engine log lines are shown as plain messages. Lines with level Error or Critical are marked as errors, and Warning lines as warnings. Output on the error stream is shown as a warning.</li>
+  <li>If the engine ends with exit code 0 but the log had error lines, the step fails: <em>The Unreal Engine log has N error lines, so the step failed even though the process ended normally.</em></li>
+  <li>For automation tests and BuildGraph on one machine, the build gets test results when the step ends.</li>
+  <li>For a distributed graph, the build page shows the build chain with one build per agent group, and the log lists each group and its result.</li>
+</ul>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>The build waits: <em>has no Unreal Engine that matches '5.4'</em>.</td><td>Open the agent's <strong>Unreal Engines</strong> tab and click <strong>Detect again</strong>, or change the <strong>Identifier</strong>. If the agent has not reported yet, it is asked again.</td></tr>
+    <tr><td><em>The agent has no Unreal Engine that matches the identifier</em>.</td><td>The same cause when the build already runs. Install the engine or use Manual mode.</td></tr>
+    <tr><td><em>The engine root folder is not set</em> or <em>The engine identifier cannot be empty</em>.</td><td>Fill in <strong>Root dir</strong> (Manual) or <strong>Identifier</strong> (Automatic).</td></tr>
+    <tr><td><em>Could not find the specified project file</em>.</td><td>The <strong>Project</strong> path is relative to the workspace. Include sub-folders. Use <strong>Detect projects</strong> after a first run.</td></tr>
+    <tr><td><em>No .uproject file was found</em> on Detect projects.</td><td>The workspace has none in its top folder. Type the path by hand.</td></tr>
+    <tr><td><em>The build configuration has no workspace yet</em>.</td><td>Run the build once, then click <strong>Detect projects</strong> again.</td></tr>
+    <tr><td><em>A distributed BuildGraph step must be the only step</em>.</td><td>Move other work into another build configuration.</td></tr>
+    <tr><td><em>The shared storage folder is not set</em>.</td><td>Fill in <strong>Shared storage</strong> or set <code>UNREAL_BUILDGRAPH_SHARED_DIR</code> on the agent.</td></tr>
+    <tr><td><em>The metadata server URL must not be empty</em>.</td><td>Fill in <strong>Metadata server</strong>, or turn <strong>Post badges</strong> off.</td></tr>
+    <tr><td><em>Check out the source before the unreal step</em>.</td><td>A distributed graph needs a version control root on the build configuration.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<div class="cards">
+  <a class="card" href="ugs-badge.html"><h3>UGS metadata server badge</h3><p>Show the build result in UnrealGameSync.</p></a>
+  <a class="card" href="../how-to/build-unreal-from-perforce.html"><h3>Build an Unreal Engine game from Perforce</h3><p>A full set-up.</p></a>
+  <a class="card" href="../version-control/perforce.html"><h3>Perforce</h3><p>Roots, streams and shelves.</p></a>
+  <a class="card" href="epic-overview.html"><h3>Epic Games Store</h3><p>Upload the packaged game.</p></a>
+</div>
+</main>
+</body>
+</html>

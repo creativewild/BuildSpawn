@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Item types · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/item-types">
+<main class="doc">
+<h1>Item types</h1>
+<p class="lead">An item is anything in the project tree: a project, a build configuration, a Pipeline or a template. You pick the type when you create it on the New Item page.</p>
+<h2>Create an item</h2>
+<figure class="shot">
+  <img src="../../assets/shots/projects/new-item.png" alt="The New Item page: name, ID, where it is created, Start from, and the type cards">
+  <figcaption>The New Item page of the Game project.</figcaption>
+</figure>
+<ol class="steps">
+  <li>Open the project the new item goes in. Click <strong>New Item</strong> in the page header, or <strong>+</strong> above the project tree.</li>
+  <li>Type the <strong>Item name</strong>. The page checks it as you type. These characters are not allowed: <code>? * / \ % ! @ # $ ^ &amp; | &lt; &gt; [ ] : ;</code>. The name must be unique in the project.</li>
+  <li>Check the <strong>ID</strong>. It is made from the ID of the project and the name, and you may edit it. See <a href="project-ids.html">IDs</a>.</li>
+  <li>Check <strong>Created in</strong>. Click <strong>Change</strong> to pick another project.</li>
+  <li>Choose <strong>Start from</strong>: <strong>Empty</strong>, <strong>Copy of an existing item</strong> or <strong>Template</strong>.</li>
+  <li>Under <strong>Type</strong> click a card.</li>
+  <li>Click <strong>Create</strong>. The button stays off until everything is valid and says why. The summary card on the right says what will be created.</li>
+</ol>
+<h2>The types</h2>
+<table>
+  <thead><tr><th>Type</th><th>What it is</th><th>Page</th></tr></thead>
+  <tbody>
+    <tr><td>Build configuration</td><td>Steps run one after another, with the step editor, templates and Perforce roots. Use it for most builds.</td><td><a href="type-build-configuration.html">Build configuration</a></td></tr>
+    <tr><td>Pipeline</td><td>A script file that defines stages, parallel work and approvals.</td><td><a href="type-pipeline.html">Pipeline</a></td></tr>
+    <tr><td>Build configuration template</td><td>Steps and parameters that several build configurations share.</td><td><a href="type-template.html">Build configuration template</a></td></tr>
+    <tr><td>Project</td><td>Groups projects. Holds shared settings, credentials, Perforce roots and permissions.</td><td><a href="type-project.html">Project</a></td></tr>
+    <tr><td>Multibranch Pipeline</td><td>Creates a set of Pipeline build configurations, one per branch of a repository. Under <strong>More types</strong>.</td><td><a href="type-multibranch.html">Multibranch Pipeline</a></td></tr>
+  </tbody>
+</table>
+<p>The cards are grouped as <strong>Builds</strong> (Build configuration, Pipeline, Template), <strong>Organise</strong> (Project) and <strong>More types</strong>.</p><h2>Types that are hidden</h2>
+<p>Two types are not offered on the New Item page. Items of these types that already exist keep working. You can open, build, configure and copy them. Only the choice of the type for a new item is gone.</p><table>
+  <thead><tr><th>Type</th><th>Why it is hidden</th><th>Page</th></tr></thead>
+  <tbody>
+    <tr><td>Multi-configuration project</td><td>The Matrix mode of <a href="../build-steps/matrix-mode.html">Parallel blocks</a> does the same job inside a normal build configuration.</td><td><a href="type-multi-configuration.html">Multi-configuration project</a></td></tr>
+    <tr><td>Organization Folder</td><td>It is not created by hand on this page. It scans an account of a code host and makes a Multibranch Pipeline for each repository it finds.</td><td><a href="type-organization-folder.html">Organization Folder</a></td></tr>
+  </tbody>
+</table>
+<div class="callout note"><p>A <strong>Start from</strong> choice of <strong>Copy of an existing item</strong> shows only when the server has items. <strong>Template</strong> shows only when a template is within reach of the project.</p></div>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="create-build-configuration.html">Create a build configuration</a></li>
+  <li><a href="projects.html">Projects</a></li>
+  <li><a href="templates.html">Templates</a></li>
+  <li><a href="project-copy-settings.html">Copying settings</a></li>
+</ul>
+</main>
+</body>
+</html>

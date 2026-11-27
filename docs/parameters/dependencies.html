@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Snapshot and artifact dependencies · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="parameters/dependencies">
+<main class="doc">
+<h1>Snapshot and artifact dependencies</h1>
+<p class="lead">How one build configuration needs another: to build first, and to pass files on.</p>
+
+<h2>When to use them</h2>
+<p>Use a <strong>snapshot dependency</strong> when a build needs another build of the same code to run first: the game needs the engine package. Use an <strong>artifact dependency</strong> when a build needs files that another build made: the installer needs the cooked content. Together they make a <a href="build-chains.html">build chain</a>.</p>
+<h2>How to set them up</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Dependencies</strong>.</li>
+  <li>Under <strong>Snapshot Dependencies</strong> click <strong>Add snapshot dependency</strong>. Under <strong>Artifact Dependencies</strong> click <strong>Add artifact dependency</strong>.</li>
+  <li>Type the build configuration. Start typing a name, such as <code>Engine/Windows Package</code>. It is a path relative to this build configuration's project (<code>..</code> goes up a project, a leading <code>/</code> starts at the top). The suggestions list every build configuration you can see.</li>
+  <li>Set the options below and click <strong>Save</strong>.</li>
+  <li>Click <strong>See the dependency graph</strong> to check the chain.</li>
+</ol>
+<figure class="shot"><img src="../../assets/shots/parameters/dependencies.png" alt="The Dependencies settings of Release Candidate: a snapshot dependency and an artifact dependency on Windows Build, then the Dependency options"><figcaption>Release Candidate depends on Windows Build twice: it runs in the same chain (snapshot) and takes its Win64 files (artifact).</figcaption></figure>
+<h2>Snapshot dependency: every field</h2>
+<p>Starting this build configuration starts the ones it depends on first, in parallel when they are independent, and waits for them. All builds of a chain use the same revision of the code.</p>
+<table>
+<thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>Build configuration</td><td>The build configuration this one depends on.</td><td>Empty</td><td><code>Engine/Windows Package</code></td></tr><tr><td>Do not run new build if there is a suitable one</td><td>Reuse a suitable finished build instead of starting a new one. The row says <em>Reuses suitable builds</em> or <em>Always runs a new build</em>.</td><td>On</td><td>On</td></tr><tr><td>Only use successful builds from suitable ones</td><td>Failed builds are never reused, even if they are otherwise suitable.</td><td>On</td><td>On</td></tr><tr><td>On failed dependency</td><td>What happens to this build when the dependency fails (finishes worse than successful, is cancelled or fails to start): <strong>Run build, but add problem</strong>, <strong>Run build, but do not add problem</strong>, <strong>Make build failed to start</strong> or <strong>Cancel build</strong>.</td><td>Run build, but add problem</td><td>Cancel build</td></tr>
+</tbody>
+</table>
+<h3>What a suitable build is</h3>
+<ul>
+  <li>it succeeded (when the dependency only uses successful builds), and was started after the dependency's configuration was last saved;</li>
+  <li>it used the same parameter values the chain requests (the dependency's default values, with any <a href="build-chains.html">reverse.dep</a> values applied);</li>
+  <li>it is the dependency's newest build: no newer build is running or queued;</li>
+  <li>the builds of its own snapshot dependencies are reused too.</li>
+</ul>
+<p><strong>Run…</strong> on the build configuration can rebuild failed and incomplete dependencies, or all of them, whatever these options say.</p>
+<h2>Artifact dependency: every field</h2>
+<p>Before the build steps run, files from builds of other build configurations are copied into the workspace.</p>
+<table>
+<thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>Build configuration</td><td>Where the files come from.</td><td>Empty</td><td><code>Game/Cook Content</code></td></tr><tr><td>Get artifacts from</td><td><strong>Build from the same chain</strong> (needs a snapshot dependency on the same build configuration), <strong>Last successful build</strong>, <strong>Last pinned build</strong>, <strong>Last finished build</strong> or <strong>Build number</strong>.</td><td>Last successful build</td><td>Build from the same chain</td></tr><tr><td>Build number</td><td>Only for <strong>Build number</strong>: the number of the build to use.</td><td>Empty</td><td><code>42</code></td></tr><tr><td>Artifact rules</td><td>One rule per line: a path or pattern in the build's artifacts (<code>*</code> and <code>**</code> wildcards), optionally <code>=&gt;</code> a folder in the workspace. The part of the path before the first wildcard is not copied. A line that starts with <code>-:</code> leaves files out. At least one rule is needed, and a target must be relative with no <code>..</code>.</td><td>Empty</td><td><code>dist/**/*.zip =&gt; packages</code></td></tr><tr><td>Clean destination paths before downloading artifacts</td><td>Deletes the contents of each target folder before copying. Never the workspace root.</td><td>Off</td><td>On</td></tr>
+</tbody>
+</table>
+<pre><code>dist/**/*.zip =&gt; packages      # every zip under dist/ into packages/, keeping the folders below dist/
+reports/summary.html           # one file into the workspace root
+-:dist/**/*-debug.zip          # leave out the debug zips</code></pre>
+<p>A Pipeline copies the files when the script calls <code>resolveArtifactDependencies()</code> inside <code>node { … }</code>. The step fails the build when an artifact cannot be resolved.</p>
+<h2>Dependency options</h2>
+<p>Three switches at the bottom of the Dependencies page say how this build configuration behaves while the ones around it are building. Click <strong>Set up</strong> (or <strong>Edit</strong>) on a card, turn it on and save.</p>
+<table>
+<thead><tr><th>Switch</th><th>What it does</th><th>Default</th></tr></thead>
+<tbody>
+<tr><td>Wait while an upstream build configuration is building</td><td>This build configuration does not start while a build configuration it depends on is building or waiting in the queue. The card shows what is building now.</td><td>Off</td></tr>
+<tr><td>Wait while a downstream build configuration is building</td><td>This build configuration does not start while a build configuration that follows it is building or waiting in the queue.</td><td>Off</td></tr>
+<tr><td>Keep the build logs of dependencies</td><td>While a build of this build configuration is kept, the builds it used from other build configurations are kept too, so their logs stay readable.</td><td>Off</td></tr>
+</tbody>
+</table>
+<h2>A worked example</h2>
+<p>The <code>Game/Installer</code> build has a snapshot dependency on <code>Game/Cook Content</code> and an artifact dependency on it: <strong>Build from the same chain</strong>, rule <code>Cooked/**/* =&gt; Content</code>, clean on. Starting the installer starts the cook (or reuses a suitable one), then copies its files into <code>Content</code>.</p>
+<h2>What you see when it runs</h2>
+<p>The queue shows the dependency waiting for the build that started it. The <strong>Build Chains</strong> page shows the graph. The console of the installer lists the artifact files it copied. See <a href="../how-to/params-use-other-build-artifacts.html">Use another build's artifacts</a>.</p>
+<h2>Problems and fixes</h2>
+<table>
+<thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+<tbody>
+<tr><td>Enter at least one artifact rule</td><td>Type a rule such as <code>target/*.jar =&gt; lib</code>.</td></tr><tr><td>The target path must be relative to the workspace and must not contain ..</td><td>Remove the <code>..</code> and the drive letter.</td></tr><tr><td>Build from the same chain is refused</td><td>Add a snapshot dependency on the same build configuration first.</td></tr><tr><td>A re-run says the source build no longer exists</td><td>The build whose artifacts the first run used was deleted. The re-run does not copy other artifacts instead.</td></tr><tr><td>A new build starts every time</td><td>The dependency ran with other parameter values, or is older than its last configuration change. See "What a suitable build is".</td></tr>
+</tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="build-chains.html">Passing parameters in a build chain</a></li>
+  <li><a href="../running-builds/trigger-finish-build.html">Finish Build trigger</a></li>
+  <li><a href="../running-builds/parallel-and-composite.html">Parallel tests and composite builds</a></li>
+</ul>
+</main>
+</body>
+</html>

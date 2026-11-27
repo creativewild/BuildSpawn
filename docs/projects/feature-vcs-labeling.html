@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VCS labeling · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="projects/feature-vcs-labeling">
+<main class="doc">
+<h1>VCS labeling</h1>
+<p class="lead">Puts a label on the Perforce revision that a build used, so you can find the exact files again.</p>
+<h2>When to use it</h2>
+<p>Use it when you need to rebuild or compare a release later. The label is named from the build, for example <code>build-1.4.2</code>. Anyone can then sync that label in P4V.</p>
+<figure class="shot">
+  <img src="../../assets/shots/projects/feat-vcs-labeling.png" alt="The VCS labeling form">
+  <figcaption>The VCS labeling form.</figcaption>
+</figure>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration, click <strong>Settings</strong>, then <strong>Build Features</strong>. Click <strong>Add build feature</strong> and choose <strong>VCS labeling</strong>.</li>
+  <li>If the build configuration has several Perforce roots, choose the <strong>Perforce root</strong>.</li>
+  <li>Set the <strong>Label pattern</strong>.</li>
+  <li>Choose <strong>Label builds</strong>: only successful builds, or every build.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Perforce root</td><td>Which root to label when the build configuration has several. A build that did not check out this root gets a warning.</td><td>The only root</td><td><code>Main</code></td></tr>
+    <tr><td>Label pattern</td><td>The name of the label. You can use build variables.</td><td><code>build-${BUILD_NUMBER}</code></td><td><code>skyforge-${BUILD_NUMBER}</code></td></tr>
+    <tr><td>Label builds</td><td>Which builds get a label: successful builds only, or every build.</td><td>Successful builds only</td><td>Successful</td></tr>
+    <tr><td>Branch filter</td><td>Which branches are labelled. One rule per line: <code>+:name</code> or <code>-:name</code>. <code>*</code> matches any text, <code>&lt;default&gt;</code> is the stream of the root. The last matching rule decides. Empty labels every branch.</td><td>Empty</td><td><code>+:main</code></td></tr>
+    <tr><td>Label description</td><td>Text for the description of the label. You can use build variables.</td><td>Empty</td><td><code>Skyforge build ${BUILD_NUMBER}</code></td></tr>
+    <tr><td>Move a label Buildspawn created</td><td>Off: a label that already exists is refused. On: move a label that Buildspawn made. A label that Buildspawn did not make is never changed.</td><td>Off</td><td>Off</td></tr>
+    <tr><td>Email on failure</td><td>Who to tell when labelling fails, separated by spaces or commas. Uses the mail server of the global settings.</td><td>Empty</td><td><code>p4-admin@studio.example</code></td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p><strong>Windows Build</strong> uses the label pattern <code>skyforge-${BUILD_NUMBER}</code> with <strong>Label builds</strong> set to successful builds. Build 142 creates the label <code>skyforge-142</code> on the changelist it synced.</p><h2>What you see when it runs</h2>
+<p>The build log shows the label being created. The Perforce <strong>Labels</strong> tab of the build configuration lists it.</p><h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>The label already exists</td><td>Use a pattern with the build number, or turn on <strong>Move a label Buildspawn created</strong> if the label was made by Buildspawn.</td></tr>
+    <tr><td>Warning: root not checked out</td><td>The build did not use the root you chose. Choose the root the build syncs.</td></tr>
+    <tr><td>No label on a failed build</td><td>That is the default. Set <strong>Label builds</strong> to every build.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="bc-build-features.html">The Build Features tab</a></li>
+  <li><a href="../post-build/perforce-label.html">Label in Perforce (post-build action)</a></li>
+  <li><a href="../version-control/perforce.html">Perforce</a></li>
+</ul>
+</main>
+</body>
+</html>

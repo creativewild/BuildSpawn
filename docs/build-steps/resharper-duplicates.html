@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Duplicates (ReSharper) · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/resharper-duplicates">
+<main class="doc">
+<h1>Duplicates (ReSharper)</h1>
+<p class="lead">Runs the <code>dupfinder</code> command line tool on a solution and lists the duplicate blocks on the build, as <a href="duplicates-finder.html">Duplicates finder</a> does. The tool is not part of Buildspawn.</p>
+
+<h2>When to use it</h2>
+<p>Use it for C# solutions when you have the ReSharper command line tools on the agent.</p>
+
+<h2>How to set it up</h2>
+
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>. Type <code>Duplicates (ReSharper)</code> in <strong>Filter step types</strong> if you like, then click the <strong>Duplicates (ReSharper)</strong> tile (group <strong>Code quality and coverage</strong>).</li>
+  <li>Type a <strong>Step name</strong>, for example <code>Find duplicates</code>.</li>
+  <li>Fill in the fields described below.</li>
+  <li>Optional: set <strong>Execute step</strong>, <strong>Conditions</strong> and <strong>Retry on failure</strong>. See <a href="step-list.html">The steps list and the step editor</a>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<figure class="shot small">
+  <img src="../../assets/shots/build-steps/resharper-duplicates.png" alt="The fields of the Duplicates (ReSharper) step in the step editor">
+  <figcaption>The fields of the Duplicates (ReSharper) step, as the step editor shows them.</figcaption>
+</figure>
+
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Solution or project</strong></td><td>The solution (<code>.sln</code>) or project file to search, relative to the working directory.</td><td>Empty (required)</td><td><code>Game.sln</code></td></tr>
+    <tr><td><strong>Lowest duplicate cost</strong></td><td>Passed as <code>--discard-cost</code>. Duplicates cheaper than this are not reported. Empty uses the tool default.</td><td>Empty</td><td><code>70</code></td></tr>
+    <tr><td><strong>Exclude</strong></td><td>One file glob per line, joined with semicolons and passed as <code>--exclude</code>.</td><td>Empty</td><td><code>**/Generated/**</code></td></tr>
+    <tr><td><strong>Arguments</strong></td><td>One argument per line, placed before the solution.</td><td>Empty</td><td><code>--show-text</code></td></tr>
+    <tr><td><strong>Limit</strong></td><td>Optional. The step is worse when it finds more duplicate blocks than this number. Empty means no limit.</td><td>Empty</td><td><code>20</code></td></tr>
+    <tr><td><strong>When over the limit</strong></td><td><strong>The build turns unstable</strong> or <strong>The step fails</strong>.</td><td>The build turns unstable</td><td>The build turns unstable</td></tr>
+    <tr><td><strong>Working directory, Environment variables, Test reports, Run step within container</strong></td><td>The same in every runner. See <a href="common-step-fields.html">Fields every runner has</a>.</td><td></td><td></td></tr>
+  </tbody>
+</table>
+
+
+<h2>A worked example</h2>
+<p>Search the game solution, leaving out generated code. Step name <code>Find duplicates</code>, <strong>Solution or project</strong> <code>Game.sln</code>, <strong>Exclude</strong> <code>**/Generated/**</code>.</p>
+
+<h2>What you see when it runs</h2>
+<p>The console shows the <code>dupfinder</code> command. The duplicate blocks are listed on the <strong>Code Inspections</strong> page of the build.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong><em>The dupfinder command was not found on this agent</em></strong></td><td>Install the dupfinder command line tool or put <code>dupfinder</code> on the <code>PATH</code>.</td></tr>
+    <tr><td><strong><em>The … step has no solution to search</em></strong></td><td>Fill in <strong>Solution or project</strong>.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="duplicates-finder.html">Duplicates finder</a></li>
+  <li><a href="resharper-inspections.html">Inspections (ReSharper)</a></li>
+  <li><a href="runners.html">Runners</a></li>
+  <li><a href="common-step-fields.html">Fields every runner has</a></li>
+</ul>
+</main>
+</body>
+</html>

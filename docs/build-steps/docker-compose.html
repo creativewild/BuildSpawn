@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Docker Compose · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="build-steps/docker-compose">
+<main class="doc">
+<h1>Docker Compose</h1>
+<p class="lead">Runs <code>docker compose</code> with a file, a command and services.</p>
+
+<h2>When to use it</h2>
+<p>Use it to start the services a test needs, such as a game server and its database, and to stop them again after the tests.</p>
+
+<h2>How to set it up</h2>
+
+<ol class="steps">
+  <li>Open the build configuration and click <strong>Settings › Build Steps</strong>.</li>
+  <li>Click <strong>Add build step</strong>. Type <code>Docker Compose</code> in <strong>Filter step types</strong> if you like, then click the <strong>Docker Compose</strong> tile (group <strong>Containers</strong>).</li>
+  <li>Type a <strong>Step name</strong>, for example <code>Start services</code>.</li>
+  <li>Fill in the fields described below.</li>
+  <li>Optional: set <strong>Execute step</strong>, <strong>Conditions</strong> and <strong>Retry on failure</strong>. See <a href="step-list.html">The steps list and the step editor</a>.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+
+<figure class="shot small">
+  <img src="../../assets/shots/build-steps/docker-compose.png" alt="The fields of the Docker Compose step in the step editor">
+  <figcaption>The fields of the Docker Compose step, as the step editor shows them.</figcaption>
+</figure>
+
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Compose files</strong></td><td>One file per line, each passed as <code>-f</code>. Empty lets <code>docker compose</code> find its default file.</td><td>Empty</td><td><code>docker-compose.test.yml</code></td></tr>
+    <tr><td><strong>Command</strong></td><td><strong>up (starts in the background)</strong>, <strong>down</strong>, <strong>build</strong>, <strong>pull</strong>, <strong>ps</strong>, <strong>logs</strong>, <strong>stop</strong> or <strong>Other command</strong>.</td><td>up</td><td>down</td></tr>
+    <tr><td><strong>Custom command</strong></td><td>Used with Other command only: the compose command, such as <code>restart</code>.</td><td>Empty</td><td><code>restart</code></td></tr>
+    <tr><td><strong>Services</strong></td><td>One service per line, named after the command. Empty means all of them.</td><td>Empty</td><td><code>gameserver</code></td></tr>
+    <tr><td><strong>Arguments</strong></td><td>One argument per line, placed before the services.</td><td>Empty</td><td><code>--wait</code></td></tr>
+    <tr><td><strong>Pull images explicitly</strong></td><td>Runs <code>docker compose pull</code> first, with the same files and services, before up or build. A failed pull stops the step.</td><td>Off</td><td>On</td></tr>
+    <tr><td><strong>Working directory, Environment variables, Test reports</strong></td><td>The same in every runner. See <a href="common-step-fields.html">Fields every runner has</a>. This runner has no container settings.</td><td></td><td></td></tr>
+  </tbody>
+</table>
+
+
+<h2>A worked example</h2>
+<p>Start the test server, run the tests, then stop it. Step 1 <code>Start services</code>: <strong>Compose files</strong> <code>docker-compose.test.yml</code>, <strong>Command</strong> <strong>up</strong>, <strong>Arguments</strong> <code>--wait</code>. Step 2 runs the tests. Step 3 <code>Stop services</code>: <strong>Command</strong> <strong>down</strong>, with <strong>Execute step</strong> set to <strong>Even if some of the previous steps failed</strong>.</p>
+
+<h2>What you see when it runs</h2>
+<p>The console shows <code>$ docker compose -f docker-compose.test.yml up --wait</code> and the container events.</p>
+
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><strong><em>The docker command was not found on this agent, or it has no compose command</em></strong></td><td>Install Docker with Docker Compose, or put <code>docker</code> on the <code>PATH</code>.</td></tr>
+    <tr><td><strong><em>The Docker Compose step has no command</em></strong></td><td>Fill in <strong>Custom command</strong> for Other command.</td></tr>
+    <tr><td><strong>Services stay running after a failed build</strong></td><td>Add a <strong>down</strong> step that runs even if previous steps failed.</td></tr>
+  </tbody>
+</table>
+
+<h2>Related pages</h2>
+<ul>
+  <li><a href="docker.html">Docker</a></li>
+  <li><a href="../how-to/steps-run-in-docker-container.html">Run steps in a Docker container</a></li>
+  <li><a href="runners.html">Runners</a></li>
+  <li><a href="common-step-fields.html">Fields every runner has</a></li>
+</ul>
+</main>
+</body>
+</html>

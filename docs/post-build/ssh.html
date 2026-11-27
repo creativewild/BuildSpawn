@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Send build artifacts over SSH · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="post-build/ssh">
+<main class="doc">
+<h1>Send build artifacts over SSH</h1>
+<p class="lead">Sends files from the build to a server over SSH, when the build ends.</p>
+<h2>When to use it</h2>
+<p>Use it to put build output where other people or machines can get it. You can also run a command on the server after the files arrive. An administrator sets up the servers once in the global settings. The same form is also offered as a build step of a promotion, for build configurations that use promotions.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration, click <strong>Settings</strong>, then <strong>Post-build Actions</strong>. Click <strong>Add post-build action</strong> and choose <strong>Send build artifacts over SSH</strong>.</li>
+  <li>Click <strong>Add</strong> under <strong>Publishers</strong> and choose the server in <strong>Name</strong>.</li>
+  <li>Add a transfer set: <strong>Source files</strong> and the other fields.</li>
+  <li>Open <strong>Advanced</strong> for retries, labels and what to do on an error.</li>
+  <li>Click <strong>Save</strong>.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+  <thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Name</td><td>The server, chosen from the servers set up in the global settings.</td><td>None</td><td><code>build-share-01</code></td></tr>
+    <tr><td>Source files</td><td>Files to send, as a comma separated Ant pattern. The base folder is the workspace.</td><td>Empty</td><td><code>Output/**</code></td></tr>
+    <tr><td>Remove prefix</td><td>The first part of the path that is not created on the server.</td><td>Empty</td><td><code>Output</code></td></tr>
+    <tr><td>Remote directory</td><td>A folder below the one set in the global settings. It is created when missing.</td><td>Empty</td><td><code>skyforge/nightly</code></td></tr>
+    <tr><td>Exclude files</td><td>Files that match are not sent. Comma separated Ant patterns.</td><td>Empty</td><td><code>**/*.pdb</code></td></tr>
+    <tr><td>Exec command</td><td>A command to run on the server after the files are sent. A transfer set needs files, a command, or both.</td><td>Empty</td><td><code>./deploy.sh</code></td></tr>
+    <tr><td>Pattern separator</td><td>The regular expression that separates patterns in the two fields above.</td><td><code>[, ]+</code></td><td><code>[,]+</code></td></tr>
+    <tr><td>No default excludes</td><td>Send files that Ant leaves out by default.</td><td>Off</td><td>Off</td></tr>
+    <tr><td>Make empty dirs</td><td>Also create folders that match, even when empty.</td><td>Off</td><td>Off</td></tr>
+    <tr><td>Flatten files</td><td>Send only files, no folders. File names must be unique, or the transfer stops.</td><td>Off</td><td>Off</td></tr>
+    <tr><td>Clean remote</td><td>Delete the files in the remote directory before sending.</td><td>Off</td><td>Off</td></tr>
+    <tr><td>Remote directory is a date format</td><td>The remote directory is a Java date pattern, filled with the build date.</td><td>Off</td><td>On with <code>yyyy-MM-dd</code></td></tr>
+    <tr><td>Exec timeout (ms)</td><td>Advanced. How long the command may run. 0 turns it off.</td><td>120000</td><td><code>60000</code></td></tr>
+    <tr><td>Exec in pty</td><td>Advanced. Run the command in a pseudo terminal, so commands such as <code>sudo</code> that need a terminal work.</td><td>Off</td><td>On</td></tr>
+    <tr><td>Exec using Agent Forwarding</td><td>Advanced. Pass key checks back to the original agent for chained SSH.</td><td>Off</td><td>Off</td></tr>
+    <tr><td>Keep file permissions</td><td>Advanced. Copy the file permissions (POSIX only).</td><td>Off</td><td>Off</td></tr>
+    <tr><td>Use SFTP for Exec</td><td>Advanced. Use SFTP commands (<code>mkdir</code>, <code>ln</code>, <code>rm</code>, <code>rmdir</code>, <code>cd</code>, <code>get</code>, <code>ls</code>) instead of a shell.</td><td>Off</td><td>Off</td></tr>
+    <tr><td>Credentials</td><td>Advanced. Other credentials for this server than the ones set globally.</td><td>Global</td><td>-</td></tr>
+    <tr><td>Retry: Retries</td><td>Advanced. How many times to try again after an error.</td><td>Off</td><td><code>3</code></td></tr>
+    <tr><td>Retry: Delay</td><td>Advanced. Milliseconds to wait between tries.</td><td>Off</td><td><code>10000</code></td></tr>
+    <tr><td>Label</td><td>Advanced. A label for this server, used for parameterized publishing.</td><td>Empty</td><td><code>live</code></td></tr>
+    <tr><td>Parameterized publishing: Parameter name</td><td>Name of a build parameter that holds a regular expression. Only servers whose label matches are used.</td><td>Off</td><td><code>PUBLISH_TO</code></td></tr>
+    <tr><td>Verbose output in console</td><td>Advanced. A lot of detail in the build log, for finding problems.</td><td>Off</td><td>Off</td></tr>
+    <tr><td>Publish to other SSH servers if an error occurs / Fail the build if an error occurs</td><td>Advanced (on the whole list). Keep going with the other servers after an error; mark the build failed instead of unstable.</td><td>Off / Off</td><td>-</td></tr>
+    <tr><td>Always transfer from master / Give the master a NODE_NAME</td><td>Advanced. Send the files through the server, which helps with strict firewalls.</td><td>Off</td><td>-</td></tr>
+    <tr><td>Use the workspace / Use promotion timestamp</td><td>Promotion only. Take files from the workspace instead of the artifacts of the promoted build; use the promotion time for the date format.</td><td>Off</td><td>-</td></tr>
+  </tbody>
+</table>
+<h2>A worked example</h2>
+<p>The <strong>Linux Server Build</strong> sends <code>Builds/Linux/**</code> to the studio server <code>build-share-01</code>, into <code>skyforge/nightly/2026-11-27</code> (date format <code>yyyy-MM-dd</code>), then runs <code>./restart-test-server.sh</code>.</p><h2>What you see when it runs</h2>
+<p>The log shows the connection, each file sent and the command output. An error makes the build unstable, or failed if you chose that.</p><pre class="terminal" data-title="build log">SSH: Connecting from host [WIN-BUILD-02]
+SSH: Transferred 412 file(s)
+SSH: Exec command exit status: 0</pre>
+<h2>Problems and fixes</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>Failed to connect</td><td>Check the server in the global settings, the key or password, and the firewall.</td></tr>
+    <tr><td>Prefix must be present in all file paths</td><td>Remove prefix must match the start of every sent path. Fix the pattern or the prefix.</td></tr>
+    <tr><td>Duplicate filename in flatten mode</td><td>Two files have the same name. Turn off <strong>Flatten files</strong>.</td></tr>
+  </tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="overview.html">After the build: overview</a></li>
+  <li><a href="../projects/bc-post-build-actions.html">Post-build actions tab</a></li>
+  <li><a href="../projects/feature-ssh-before.html">SSH before the build (build feature)</a></li>
+  <li><a href="../projects/feature-ssh-after.html">SSH after the build (build feature)</a></li>
+</ul>
+</main>
+</body>
+</html>

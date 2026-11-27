@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en" data-root="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>File parameter · Buildspawn Guide</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/search-index.js" defer></script>
+<script src="../../assets/site.js" defer></script>
+</head>
+<body data-page="parameters/param-file">
+<main class="doc">
+<h1>File parameter</h1>
+<p class="lead">A file that the person starting the build uploads.</p>
+
+<h2>When to use it</h2>
+<p>Use it when a build needs a file you do not keep in version control: a one-off config, a list of test accounts.</p>
+<h2>How to set it up</h2>
+<ol class="steps">
+  <li>Open the build configuration and go to <strong>Settings › Parameters</strong>.</li>
+  <li>Add a parameter of the file type. A file parameter is always a <strong>Configuration</strong> parameter.</li>
+  <li>Type the <strong>File location</strong> and, if you like, a <strong>Description</strong>.</li>
+  <li>Click <strong>Save</strong>. The Parameters tab saves as you work, so there is no other Save button.</li>
+</ol>
+<h2>Every field</h2>
+<table>
+<thead><tr><th>Field</th><th>What it does</th><th>Default</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>File location</td><td>The path in the workspace where the uploaded file is put. This is also the parameter name.</td><td>Empty</td><td><code>config/overrides.json</code></td></tr><tr><td>Description</td><td>Shown in the Run dialog.</td><td>Empty</td><td>Settings for this run</td></tr>
+</tbody>
+</table>
+
+<h2>A worked example</h2>
+<p>A file parameter <code>config/overrides.json</code>. When you run the build, you pick a file in the Run dialog. A step reads <code>config/overrides.json</code> in the workspace.</p>
+<h2>What you see when it runs</h2>
+<p>The Parameters tab shows <em>Chosen when the build runs</em> instead of a value. The Run dialog shows a file chooser. The file is copied into the workspace before the steps run.</p>
+<h2>Problems and fixes</h2>
+<table>
+<thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+<tbody>
+<tr><td>Environment kind is refused</td><td>A file parameter is a configuration parameter only. Choose Configuration.</td></tr><tr><td>The file is missing in the workspace</td><td>Nobody chose a file in the Run dialog. A build started by a trigger gets no file.</td></tr>
+</tbody>
+</table>
+<h2>Related pages</h2>
+<ul>
+  <li><a href="parameters.html">Parameters</a></li>
+  <li><a href="param-references.html">Parameter references</a></li>
+  <li><a href="../running-builds/run-dialog.html">The Run dialog</a></li>
+</ul>
+</main>
+</body>
+</html>
