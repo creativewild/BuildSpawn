@@ -1,3 +1,4 @@
+(function () { var s = document.currentScript; if (s && !document.querySelector('link[rel="icon"]')) { var l = document.createElement('link'); l.rel = 'icon'; l.href = new URL('home/mark.svg', s.src).href; document.head.appendChild(l); } })();
 /*
  * Buildspawn Guide: shared page script.
  *
